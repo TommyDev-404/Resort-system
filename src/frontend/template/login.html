@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<link rel="stylesheet" href="/style/output.css" />
+	
+</head>
+<body class="font-sans relative h-[100vh] bg-primary-blue">
+	
+	<div class="absolute top-0 left-0 w-full h-full bg-black/40 login-overlay flex z-10">
+		<div class="relative top-1/2  left-1/2  -translate-x-1/2 -translate-y-1/2 h-[89vh] w-[70%] bg-card-bg rounded-lg shadow-lg shadow-black/60 flex overflow-hidden">
+			<div class="bg-cover w-[62%] rounded-tr-[30%] rounded-br-[30%] relative overflow-hidden" style="background-image: url('/assets/resort.jpg')">
+				<div class="absolute top-0 left-0 w-full h-full bg-black/30 flex flex-col text-center ">
+					<h1 class="text-white font-bold text-[20px] mt-[40%]">Welcome to</h1>
+					<h1 class="text-white font-bold text-[40px] tracking-wider">🏖️ Laguna Grand-Villa Resort</h1>
+					<p class="text-lg mb-1 text-white text-[17px] mt-[2%]">Escape the ordinary — find your paradise today.</p>
+				</div>
+			</div>
+			<div class=" w-[42%] px-4 py-8">
+				<form class=" w-full flex flex-col gap-2 px-15 justify-center relative top-1/2 -translate-y-1/2">
+					<div class="font-medium flex items-center justify-center text-primary-blue text-[20px] fixed top-[-22%] left-1/2 -translate-x-1/2"><img src="/assets/resort.avif" width="70px">Resto-<span class="font-bold text-secondary-gold">Hub</span></div>
+					<div class="flex flex-col items-center">
+						<img src="/assets/user.png" class="w-[80px] h-[80px] ">
+						<h1 class="text-[25px] font-bold tracking-wider">Admin Login</h1>
+					</div>
+					
+					<div class="flex flex-col relative mt-6">  
+						<img src="/assets/uname.png" width="38px" class="absolute top-4 left-[86%]">
+						<input type="text" placeholder="" required class="peer border border-gray-400 p-4 rounded-lg outline-none transition-all duration-300 ease-in-out focus:border-1 focus:border-blue-700 focus:shadow-md valid:border-blue-700"/>
+						<span class="absolute top-4 left-[4%] px-2 peer-focus:-top-2 peer-valid:-top-2 peer-focus:text-sm peer-valid:text-sm peer-focus:text-blue-700 peer-valid:text-blue-700 transiton-all duration-300 ease-in-out bg-white">Username</span>
+					</div>	
+
+					<div class="flex flex-col relative mt-2 passField">  
+						<img src="/assets/pass.png" width="24px" id="ps-icon" class="absolute top-4 left-[88%]">
+						<input type="password" name="password" placeholder="" required class="peer border border-gray-400 p-4 rounded-lg outline-none transition-all duration-300 ease-in-out focus:border-1 focus:border-blue-700 focus:shadow-md valid:border-blue-700"/>
+						<span class="absolute top-4 left-[4%] px-2 peer-focus:-top-2 peer-valid:-top-2 peer-focus:text-sm peer-valid:text-sm  peer-focus:text-blue-700 peer-valid:text-blue-700 transiton-all duration-300 ease-in-out bg-white" id="ps-icon">Password</span>
+					</div>
+
+					<label class="flex justify-start items-center text-gray-500 text-[17px]  text-gray-500 gap-[10px] ml-[10px] cursor-pointer"><input type="checkbox" class="">Remember me</label>
+					<a href="/resort-admin-page" class="bg-primary-blue py-3 text-white font-semibold rounded-[50px] mt-[50px] hover:bg-blue-500 cursor-pointer text-center">Login</a>
+					
+					<div class="flex gap-8 justify-center mt-4">
+						<img src="/assets/fbs.png" width="50px">
+						<img src="/assets/insta.avif" width="47px">
+						<img src="/assets/tiktok.avif" width="50px">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<script type="module" src="/scripts/login.js"></script>
+
+</body>
+</html>

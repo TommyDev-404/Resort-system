@@ -1,0 +1,22 @@
+{
+  "name": "new",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon ./src/backend/server.js",
+    "tailwind": "npx @tailwindcss/cli -i ./src/frontend/style/input.css -o ./src/frontend/style/output.css --watch"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "@tailwindcss/cli": "^4.1.14",
+    "chart.js": "^4.5.0",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10",
+    "tailwindcss": "^4.1.14"
+  }
+}

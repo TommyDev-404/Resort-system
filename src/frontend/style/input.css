@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-blue: #10569c;
+  --color-secondary-gold: #ffc107;
+  --color-bg-light: #f7f9fb;
+  --color-card-bg: #ffffff;
+
+  --font-sans: Inter, sans-serif;
+}
+
+/* inside /style/input.css or wherever Tailwind runs */
+.passField:valid ~ label {
+  @apply absolute left-[6%] top-1/2 bg-white px-[10px] text-gray-600 transition-all duration-300 ease-in-out text-blue-700;
+}
