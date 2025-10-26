@@ -9,7 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./src/backend/server.js",
-    "tailwind": "npx @tailwindcss/cli -i ./src/frontend/style/input.css -o ./src/frontend/style/output.css --watch"
+    "tailwind": "npx @tailwindcss/cli -i ./src/frontend/static/style/input.css -o ./src/frontend/static/style/output.css --watch"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.1.0",

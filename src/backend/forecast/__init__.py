@@ -1,0 +1,1 @@
+from .forecast_script import Forecast

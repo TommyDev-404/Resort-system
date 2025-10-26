@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Resort Management Dashboard</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='style/output.css') }}" />
+      <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
+      <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+            
+            body {
+                  font-family: 'Inter', sans-serif;
+                  background-color: #f7f9fb;
+            }
+
+            .sidebar-item {
+                  cursor: pointer;
+                  transition: all 0.2s;
+            }
+            
+            .sidebar-item:hover {
+                  background-color: #10569c1a; /* Light tint of primary-blue */
+            }
+            
+            .sidebar-item.active {
+                  background-color: #10569c;
+                  color: white;
+                  border-left: 4px solid #ffc107;
+                  padding-left: 1.75rem;
+            }
+            
+            /* Ensure the main content takes up remaining height on large screens */
+            .main-container {
+                  min-height: 100vh;
+            }
+
+            /* Responsive adjustment for the main layout */
+            @media (min-width: 1024px) {
+                  .main-container {
+                  display: grid;
+                  grid-template-columns: 280px 1fr;
+                  }
+            }
+
+            /* Hide content sections by default */
+            .content-section {
+                  display: none;
+            }
+
+            /* Key metric cards styling */
+            .metric-card {
+                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+                  transition: transform 0.2s;
+                  border-radius: 0.75rem; /* rounded-xl */
+            }
+
+            .metric-card:hover {
+                  transform: translateY(-2px);
+                  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            }
+
+            @keyframes fadeInUp {
+                  0% {
+                        opacity: 0;
+                        transform: translateY(10px);
+                  }
+                  100% {
+                        opacity: 1;
+                        transform: translateY(0);
+                  }
+            }
+
+            .fade-in-up {
+                  animation: fadeInUp 0.6s ease-out forwards;
+            }
+      </style>
+
+      <!--<script src="https://unpkg.com/lucide@latest"></script>-->
+
+</head>
+<body class="text-gray-800">
+
+      <div id="app" class="main-container">
+            
+            <!-- Sidebar Navigation -->
+            <aside id="sidebar" class="bg-card-bg shadow-xl lg:shadow-md fixed lg:static h-screen overflow-y-auto w-72 h-full z-30 transition-transform transform -translate-x-full lg:translate-x-0">
+                  <div class="p-6 border-b border-gray-100">
+                  <h1 class="text-2xl font-bold text-primary-blue flex items-center">
+                        <span data-lucide="hotel" class="mr-2 text-secondary-gold w-6 h-6"></span>
+                        Resort<label class="text-secondary-gold">-Hub</label>
+                  </h1>
+                  <p class="text-xs text-gray-500 mt-1r">Analytics & Management</p>
+                  </div>
+                  
+                  <nav class="p-4 space-y-1">
+                        <!-- HOME DASHBOARD LINK -->
+                        <div id="nav-home-dashboard" data-section="home-dashboard" class="sidebar-item active p-4 rounded-lg flex items-center space-x-3">
+                              <span data-lucide="layout-dashboard" class="w-5 h-5"></span>
+                              <span>Home Dashboard</span>
+                        </div>
+                        <!-- EXISTING LINKS -->
+                        <div id="nav-analytics" data-section="analytics" class="sidebar-item p-4 rounded-lg flex items-center space-x-3 text-gray-700">
+                              <span data-lucide="bar-chart-3" class="w-5 h-5"></span>
+                              <span>Analytics (Reports)</span>
+                        </div>
+                        <div id="nav-all-reservations" data-section="all-reservations" class="sidebar-item p-4 rounded-lg flex items-center space-x-3 text-gray-700">
+                              <span data-lucide="calendar-check" class="w-5 h-5"></span>
+                              <span>All Reservations</span>
+                        </div>
+                        <div id="nav-housekeeping" data-section="housekeeping" class="sidebar-item p-4 rounded-lg flex items-center space-x-3 text-gray-700">
+                              <span data-lucide="sparkles" class="w-5 h-5"></span>
+                              <span>Housekeeping</span>
+                        </div>
+                        <div id="nav-rates-availability" data-section="rates-availability" class="sidebar-item p-4 rounded-lg flex items-center space-x-3 text-gray-700">
+                              <span data-lucide="calendar" class="w-5 h-5"></span>
+                              <span>Rates and Availability</span>
+                        </div>
+                        <div id="nav-revenue-management" data-section="revenue-management" class="sidebar-item p-4 rounded-lg flex items-center space-x-3 text-gray-700">
+                              <span data-lucide="trending-up" class="w-5 h-5"></span>
+                              <span>Revenue Management</span>
+                        </div>
+                        <div id="nav-accounting" data-section="accounting" class="sidebar-item p-4 rounded-lg flex items-center space-x-3 text-gray-700">
+                              <span data-lucide="wallet" class="w-5 h-5"></span>
+                              <span>Accounting</span>
+                        </div>
+                        <div id="nav-admin-profile" data-section="admin-profile" class="sidebar-item p-4 rounded-lg flex items-center space-x-3 text-gray-700">
+                              <span data-lucide="user" class="w-5 h-5"></span>
+                              <span>Admin Profile</span>
+                        </div>
+                        <div id="nav-logout" data-section="logout" class="sidebar-item p-4 rounded-lg flex items-center space-x-3 text-gray-700">
+                              <span data-lucide="log-out" class="w-5 h-5"></span>
+                              <span>Log-out</span>
+                        </div>
+                  </nav>
+            </aside>
+            
+            <!-- Main Content Area -->
+            <main class="flex-1 lg:ml-10 p-4 overflow-y-auto h-screen">
+                  <!-- OCCUPANCY -->
+                  <div id="alertToast" class="fixed top-5 right-2 z-[100] hidden fade-in-up">
+                        <div id="alertBox" class="bg-white border-l-4 border-red-500 shadow-lg rounded-xl p-4 w-[600px] flex items-start gap-3 animate-slide-in">
+                              <div id="alertIcon" class="mt-1 w-3 h-3 rounded-full bg-red-500"></div>
+                              <div class="flex-1">
+                                    <h3 id="alertTitle" class="text-sm font-semibold text-gray-800">⚠️ Occupancy Alert!</h3>
+                                    <p id="alertMessage" class="text-sm text-gray-600 mt-1"></p>
+                                    <p id="data" class="text-sm text-gray-600 mt-1"></p>
+                              </div>
+                              <button id="closeAlert" class="text-gray-400 hover:text-red-500 ml-2">✕</button>
+                        </div>
+                  </div>
+                  <!-- HOUSEKEEPING ALERT-->
+                  <div id="alertHousekeeping" class="fixed top-5 right-2 z-[100] hidden fade-in-up">
+                        <div id="alertBox2" class="bg-white border-l-4 border-red-500 shadow-lg rounded-xl p-4 w-[600px] flex items-start gap-3 animate-slide-in">
+                              <div id="alertIcon2" class="mt-1 w-3 h-3 rounded-full bg-red-500"></div>
+                              <div class="flex-1">
+                                    <h3 id="alertTitle2" class="text-sm font-semibold text-gray-800">⚠️ Cleaning Alert!</h3>
+                                    <p id="alertMessage2" class="text-sm text-gray-600 mt-1"></p>
+                              </div>
+                              <button id="closeAlertHousekeeping" class="text-gray-400 hover:text-red-500 ml-2">✕</button>
+                        </div>
+                  </div>
+
+                  <!-- Promotion Toast -->
+                  <div id="promoToast" class="fixed top-0 right-2 z-[10] hidden">
+                        <div class="bg-gradient-to-r from-yellow-100 via-orange-100 to-pink-100 border-l-4 border-yellow-500 shadow-lg rounded-xl p-2 w-[400px] flex items-start gap-3 animate-slide-in">
+                              <div class="mt-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.91c.969 0 1.371 1.24.588 1.81l-3.973 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.973-2.89a1 1 0 00-1.176 0l-3.973 2.89c-.784.57-1.838-.197-1.54-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.973-2.89c-.783-.57-.38-1.81.588-1.81h4.91a1 1 0 00.95-.69l1.518-4.674z" />
+                                    </svg>
+                              </div>
+                              <div class="flex-1">
+                                    <h3 class="text-sm font-semibold text-yellow-800">🌴 Resort is under Promotion!</h3>
+                                    <p id="promoMessage" class="text-sm text-gray-700 mt-1">Book early and save 20%! Valid for next week stays only.</p>
+                              </div>
+                              <button onclick="closePromoToast()" class="text-gray-400 hover:text-yellow-600 ml-2">✕</button>
+                        </div>
+                  </div>
+
+                  <!-- 0. HOME DASHBOARD (Enhanced) -->
+                  <section id="home-dashboard" class="content-section block space-y-8 fade-in-up">
+                        <h2 class="text-3xl font-bold text-primary-blue border-b pb-3 mb-4">Executive Home Dashboard</h2>
+                        <p class="text-gray-600 max-w-2xl">
+                        Quick overview of today's key metrics, revenue forecasting, and historical guest trends.
+                        </p>
+                        
+                        <!-- Daily Visitor Tracking / Today's Key Metrics -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                              <!-- Card 1: Total Guests In-House -->
+                              <div class="metric-card bg-card-bg p-6 border-b-4 border-green-500 flex flex-col justify-between">
+                                    <div class="flex items-start justify-between">
+                                    <p class="text-sm font-medium text-gray-500">Today's Guest</p>
+                                    <span data-lucide="user-check" class="w-6 h-6 text-green-500 bg-green-50 p-1 rounded-full"></span>
+                                    </div>
+                                    <p class="text-4xl font-extrabold mt-2 text-green-700" id="today-guest">188</p>
+                                    <div class="text-xs mt-3 flex items-center text-green-600 font-medium">
+                                    <span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+                                    <span><label id="change-rate-today-guest">+0</label>% vs Yesterday</span>
+                                    </div>
+                              </div>
+                              <!-- Card 1: Total Guests In-House -->
+                              <div class="metric-card bg-card-bg p-6 border-b-4 border-teal-500 flex flex-col justify-between">
+                                    <div class="flex items-start justify-between">
+                                    <p class="text-sm font-medium text-gray-500">Total Guests In-House</p>
+                                    <span data-lucide="user-check" class="w-6 h-6 text-green-500 bg-teal-50 p-1 rounded-full"></span>
+                                    </div>
+                                    <p class="text-4xl font-extrabold mt-2 text-teal-700" id="total-guest-in-house">188</p>
+                                    <div class="text-xs mt-3 flex items-center text-teal-600 font-medium">
+                                    <span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+                                    <span><label id="change-rate-guest">+0</label>% vs Last Week</span>
+                                    </div>
+                              </div>
+                              
+                              <!-- Card 2: Today's Check-Ins -->
+                              <div class="metric-card bg-card-bg p-6 border-b-4 border-primary-blue flex flex-col justify-between">
+                                    <div class="flex items-start justify-between">
+                                    <p class="text-sm font-medium text-gray-500">Today's Check-Ins</p>
+                                    <span data-lucide="calendar-plus" class="w-6 h-6 text-primary-blue bg-blue-50 p-1 rounded-full"></span>
+                                    </div>
+                                    <p class="text-4xl font-extrabold mt-2 text-primary-blue" id="check-ins-data">22</p>
+                                    <div class="text-xs mt-3 flex items-center text-primary-blue font-medium">
+                                    <span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+                                    <span><label id="change-rate-checkin">+0</label>% vs Yesterday</span>
+                                    </div>
+                              </div>
+                              
+                              <!-- Card 3: Current Occupancy -->
+                              <div class="metric-card bg-card-bg p-6 border-b-4 border-secondary-gold flex flex-col justify-between">
+                                    <div class="flex items-start justify-between">
+                                    <p class="text-sm font-medium text-gray-500">Current Occupancy</p>
+                                    <span data-lucide="bar-chart-2" class="w-6 h-6 text-secondary-gold bg-yellow-50 p-1 rounded-full"></span>
+                                    </div>
+                                    <p class="text-4xl font-extrabold mt-2 text-secondary-gold" id="occupancy-rate">85%</p>
+                                    <div class="text-xs mt-3 flex items-center text-gray-500 font-medium">
+                                    <span data-lucide="hotel" class="w-4 h-4 mr-1"></span>
+                                    <span>Available Areas: <label id="total-room">220</label></span>
+                                    </div>
+                              </div>
+                              
+                              <!-- Card 4: Projected Revenue Today -->
+                              <div class="metric-card bg-card-bg p-6 border-b-4 border-red-500 flex flex-col justify-between">
+                                    <div class="flex items-start justify-between">
+                                          <p class="text-sm font-medium text-gray-500">Projected Revenue (This month)</p>
+                                          <span data-lucide="dollar-sign" class="w-6 h-6 text-red-500 bg-red-50 p-1 rounded-full"></span>
+                                    </div>
+                                    <p class="text-4xl font-extrabold mt-2 text-red-600" id="total-revenue">$45,900</p>
+                                    <div class="text-xs mt-3 flex items-center text-red-600 font-medium">
+                                          <span id="revenue-this-month" data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+                                          <span><label id="target-revenue">-2%</label> vs Target</span>
+                                    </div>
+                              </div>
+                        </div>
+                        
+                        <!-- Forecasting & Historical Charts -->
+                        <div class="flex flex-col gap-8 mt-6">
+                              <div class="bg-card-bg p-6 rounded-xl shadow-lg" style="height: 600px; padding-bottom: 60px;">
+                                    <h4 class="text-lg font-semibold mb-2 flex items-center">
+                                          <span data-lucide="trending-up" class="w-5 h-5 mr-2 text-primary-blue"></span> Forecasted Occupancy (Next 30 Days)
+                                    </h4>
+                                    <canvas id="occupancyChartForecast" class="w-full"></canvas>
+                              </div>
+                              <!-- Heavy Month Guest Tracking Chart -->
+                              <div class="bg-card-bg p-6 rounded-xl shadow-lg border border-gray-100">
+                                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                                          <span data-lucide="calendar-heart" class="w-5 h-5 mr-2 text-primary-blue"></span> Heavy Guest Month Tracking (Historical)
+                                    </h3>
+                                    <div class="w-full h-80">
+                                    <canvas id="heavy-month-chart" class="w-full h-full" height="90px"></canvas>
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+                  
+                  <!-- 2. ANALYTICS -->
+                  <section id="analytics" class="content-section space-y-8 fade-in-up">
+                        <h2 class="text-3xl font-bold text-primary-blue border-b pb-3 mb-4">Analytics & Revenue Forecast</h2>
+                        <p class="text-gray-600 max-w-2xl">Provides key insights and forecasts for occupancy, ADR, RevPAR, and revenue, helping management make informed decisions.</p>
+                        
+                        <!-- Filters -->
+                        <div class="flex space-x-4 my-4">
+                              <select class="border rounded p-2" id="roomTypeFilter">
+                                    <option value="all">All Resort Area</option>
+                                    <option value="premium">Premium Villa</option>
+                                    <option value="standard">Standard Villa</option>
+                                    <option value="family">Family Room</option>
+                                    <option value="garden">Garden VIew</option>
+                                    <option value="barkada">Barkada Room</option>
+                                    <option value="cabana">Cabana Cottage</option>
+                                    <option value="small">Small Cottage</option>
+                                    <option value="big">Big Cottage</option>
+                                    <option value="hall">Hall</option>
+                              </select>
+                        </div>
+                        
+                        <!-- Key Metrics -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                              <!-- Occupancy -->
+                              <div class="metric-card bg-card-bg p-6 rounded-xl border-l-4 border-indigo-500">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500">Occupancy (MTD)</p>
+                                                <p class="text-3xl font-semibold mt-2" id="occupancy-percentage">78%</p>
+                                                <span class="text-green-500 text-sm mt-2" id="occupancy-change">+5%</span>
+                                          </div>
+                                          <div class="bg-indigo-100 p-3 rounded-full">
+                                                <i data-lucide="building-2" class="w-6 h-6 text-indigo-600"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        
+                              <!-- ADR (Average Daily Rate) -->
+                              <div class="metric-card bg-card-bg p-6 rounded-xl border-l-4 border-primary-blue">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500">ADR (MTD)</p>
+                                                <p class="text-3xl font-semibold mt-1 text-primary-blue" id="adr">$215</p>
+                                                <span class="text-red-500 text-sm" id="adr-change">-3%</span>
+                                          </div>
+                                          <div class="bg-primary-blue/10 p-3 rounded-full">
+                                                <i data-lucide="credit-card" class="w-6 h-6 text-primary-blue"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        
+                              <!-- RevPAR -->
+                              <div class="metric-card bg-card-bg p-6 rounded-xl border-l-4 border-green-500">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500">RevPAR (MTD)</p>
+                                                <p class="text-3xl font-semibold mt-1 text-green-600" id="revpar">$167.70</p>
+                                                <span class="text-green-500 text-sm" id="revpar-change">+2%</span>
+                                          </div>
+                                          <div class="bg-green-100 p-3 rounded-full">
+                                                <i data-lucide="trending-up" class="w-6 h-6 text-green-600"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        
+                              <!-- Target Revenue -->
+                              <div class="metric-card bg-card-bg p-6 rounded-xl border-l-4 border-red-500">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500">Target Revenue (This month)</p>
+                                                <p class="text-3xl font-semibold mt-1 text-red-600" id="target">$62,500</p>
+                                          </div>
+                                          <div class="bg-red-100 p-3 rounded-full">
+                                                <i data-lucide="target" class="w-6 h-6 text-red-600"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+
+                        <!-- Trend Charts -->
+                        <div class="flex flex-col gap-6 mt-6">
+                        <!-- Forecasting Card: Occupancy Projection (90 Days) -->
+                              <div class="bg-card-bg p-6 rounded-xl shadow-lg border border-gray-100" style="height: 600px; ">
+                                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2"><span data-lucide="line-chart" class="w-5 h-5 mr-2 text-primary-blue"></span> Check-In Forecast <label class="text-lg font-semibold" id="year"> </label><span class="text-xl font-bold ml-2" id="accomodation_type"></span></h3>
+                                    <div class="w-full h-full pb-10">
+                                          <canvas id="occupancy-forecast-chart"></canvas>
+                                    </div>
+                              </div>
+                              <div class="bg-card-bg p-6 rounded-xl shadow-lg" style="height: 600px; padding-bottom: 60px;">
+                                    <h4 class="text-lg font-semibold mb-2 flex items-center"><span data-lucide="dollar-sign" class="w-5 h-5 mr-2 text-primary-blue"></span> Revenue Forecast <label class="text-lg font-semibold" id="year"></label><span class="text-xl font-bold text-center" id="accomodation_type"></span></h4>
+                                    <canvas id="revenueForecastChart" class="w-full"></canvas>
+                              </div>
+                        </div>
+                  </section>
+
+                  <!-- 3. ALL RESERVATIONs -->
+                  <section id="all-reservations" class="content-section space-y-10 fade-in-up">
+                        <!-- Header -->
+                        <div class="flex flex-col gap-2">
+                              <h2 class="text-3xl font-bold text-primary-blue border-b-2 border-primary-blue/30 pb-2">All Reservations</h2>
+                              <p class="text-gray-600 max-w-3xl leading-relaxed">This is the primary module for managing all guest bookings, from initial inquiry to confirmation. It ensures accurate and efficient handling of traveler and booking information.</p>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                              <!-- Total Check-Ins -->
+                              <div class="metric-card bg-card-bg p-6 rounded-xl shadow-sm border-l-4 border-primary-blue transition-all hover:shadow-md hover:-translate-y-1 duration-300 ease-in-out">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500">Total Check-Ins (This week)</p>
+                                                <p class="text-3xl font-bold mt-1 text-primary-blue" id="total_checkin">45</p>
+                                                <span class="text-xs text-gray-400"><span id="change_checkins"></span>% vs. from last week</span>
+                                          </div>
+                                          <div class="bg-primary-blue/10 p-3 rounded-full">
+                                                <i data-lucide="log-in" class="w-6 h-6 text-primary-blue"></i>
+                                          </div>
+                                    </div>
+                              </div>
+
+                              <!-- Today's Check-Outs -->
+                              <div class="metric-card bg-card-bg p-6 rounded-xl shadow-sm border-l-4 border-red-600 transition-all hover:shadow-md hover:-translate-y-1 duration-300 ease-in-out">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500">Today's Check-Outs</p>
+                                                <p class="text-3xl font-bold mt-1 text-red-600" id="today_checkouts">12</p>
+                                          </div>
+                                          <div class="bg-red-100 p-3 rounded-full">
+                                                <i data-lucide="log-out" class="w-6 h-6 text-red-600"></i>
+                                          </div>
+                                    </div>
+                              </div>
+
+                              <!-- Upcoming Arrivals -->
+                              <div class="metric-card bg-card-bg p-6 rounded-xl shadow-sm border-l-4 border-indigo-600 transition-all hover:shadow-md hover:-translate-y-1 duration-300 ease-in-out">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500">Upcoming Arrivals</p>
+                                                <p class="text-3xl font-bold mt-1 text-indigo-600" id="upcoming_arrivals">45</p>
+                                                <span class="text-xs text-gray-400">Next 48 hours</span>
+                                          </div>
+                                          <div class="bg-indigo-100 p-3 rounded-full">
+                                                <i data-lucide="calendar-days" class="w-6 h-6 text-indigo-600"></i>
+                                          </div>
+                                    </div>
+                              </div>
+
+                              <!-- Cancelled Bookings (This month) -->
+                              <div class="metric-card bg-card-bg p-6 rounded-xl shadow-sm border-l-4 border-red-600 transition-all hover:shadow-md hover:-translate-y-1 duration-300 ease-in-out">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500">Cancelled Bookings (This month)</p>
+                                                <p class="text-3xl font-bold mt-1 text-red-600" id="cancelled">12</p>
+                                          </div>
+                                          <div class="bg-red-100 p-3 rounded-full">
+                                                <i data-lucide="x-circle" class="w-6 h-6 text-red-600"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+
+                        <!-- Filter + Search + Button -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <div class="flex items-center gap-3">
+                                    <label class="text-[15px] font-semibold text-gray-700">Year :</label>
+                                    <select id="yearSelect" class="py-2.5 px-4 border border-gray-300 rounded-lg bg-card-bg text-gray-700 text-sm focus:ring-2 focus:ring-primary-blue outline-none"></select>
+                                    
+                                    <label class="text-[15px] font-semibold text-gray-700 ml-6">Months :</label>
+                                    <select id="monthSelect" class="py-2.5 px-4 border border-gray-300 rounded-lg bg-card-bg text-gray-700 text-sm focus:ring-2 focus:ring-primary-blue outline-none">
+                                          <script>
+                                                const monthSelect = document.getElementById("monthSelect");
+                                                const currentDate = new Date();
+                                                const currentYear = currentDate.getFullYear();
+
+                                                for (let i = 0; i < 12; i++) {
+                                                      const date = new Date(currentYear, i, 1);
+                                                      const monthName = date.toLocaleString('default', { month: 'long' });
+
+                                                      const option = document.createElement("option");
+                                                      option.value = i + 1;
+                                                      option.textContent = `${monthName}`;
+
+                                                      // Highlight the current month
+                                                      if (i === currentDate.getMonth()) option.selected = true;
+
+                                                      monthSelect.appendChild(option);
+                                                }
+                                          </script>
+                                    </select>
+                              </div>
+                                    <button type="button" class="bg-green-500 text-white  px-8 py-2.5 rounded-sm shadow hover:bg-green-400 hover:shadow-md transition-all" id="add-booking-btn"> + Add Booking</button>
+                        </div>
+                        
+                        <!-- Recent Bookings Table -->
+                        <div class="bg-card-bg p-6 rounded-xl shadow-md border border-gray-200">
+                              <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-semibold text-gray-800">Recent Bookings</h3>
+                                    <span class="text-sm text-gray-500">Traveler & Booking Details</span>
+                              </div>
+                              <div class="overflow-y-auto h-[37vh]">
+                                    <table class="min-w-full text-sm text-center">
+                                          <thead class="bg-gray-100 sticky top-0">
+                                                <tr>
+                                                      <th class="px-6 py-3 text-gray-600 font-semibold uppercase">Traveler Details</th>
+                                                      <th class="px-6 py-3 text-gray-600 font-semibold uppercase">Booking Details</th>
+                                                      <th class="px-6 py-3 text-gray-600 font-semibold uppercase">Room Details</th>
+                                                      <th class="px-6 py-3 text-gray-600 font-semibold uppercase">Status</th>
+                                                      <th class="px-6 py-3 text-gray-600 font-semibold uppercase">Payment</th>
+                                                      <th class="px-6 py-3 text-gray-600 font-semibold uppercase">Action</th>
+                                                </tr>
+                                          </thead>
+                                          <tbody class="divide-y divide-gray-200" id="tbody"></tbody>
+                                    </table>
+                              </div>
+                        </div>
+                  </section>
+
+                  <!-- 🧹 HOUSEKEEPING SECTION -->
+                  <section id="housekeeping" class="content-section space-y-8 fade-in-up">
+                        <!-- Header -->
+                        <div>
+                              <h2 class="text-3xl font-bold text-primary-blue border-b pb-3 mb-2">Housekeeping</h2>
+                              <p class="text-gray-600 max-w-2xl">Manage room cleaning, inspection, and readiness. Automatically updates based on guest check-in/check-out activities.</p>
+                        </div>
+
+                        <!-- Summary Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                              <div class="metric-card bg-card-bg p-5 rounded-xl text-center border-b-4 border-blue-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="sparkles" class="w-8 h-8 text-blue-600 mb-2 opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 uppercase">To Be Cleaned</p>
+                                          <p class="text-3xl font-extrabold mt-2 text-blue-600" id="to-be-clean">6</p>
+                                    </div>
+                              </div>
+
+                              <div class="metric-card bg-card-bg p-5 rounded-xl text-center border-b-4 border-yellow-400">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="loader" class="w-8 h-8 text-yellow-500 mb-2 animate-spin opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 uppercase">Cleaning in Progress</p>
+                                          <p class="text-3xl font-extrabold mt-2 text-yellow-500" id="on-clean">3</p>
+                                    </div>
+                              </div>
+
+                              <div class="metric-card bg-card-bg p-5 rounded-xl text-center border-b-4 border-green-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="check-circle" class="w-8 h-8 text-green-600 mb-2 opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 uppercase">Ready / Cleaned</p>
+                                          <p class="text-3xl font-extrabold mt-2 text-green-600" id="ready">45</p>
+                                    </div>
+                              </div>
+
+                              <div class="metric-card bg-card-bg p-5 rounded-xl text-center border-b-4 border-purple-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="bed" class="w-8 h-8 text-purple-600 mb-2 opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 uppercase">Occupied</p>
+                                          <p class="text-3xl font-extrabold mt-2 text-purple-600" id="occupied">4</p>
+                                    </div>
+                              </div>
+
+                              <div class="metric-card bg-card-bg p-5 rounded-xl text-center border-b-4 border-gray-400">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="building" class="w-8 h-8 text-gray-700 mb-2 opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 uppercase">Total Rooms</p>
+                                          <p class="text-3xl font-extrabold mt-2 text-gray-700" id="all-areas">83</p>
+                                    </div>
+                              </div>
+                        </div>
+
+                        <!-- Room Type Summary Table -->
+                        <div class="bg-card-bg p-6 rounded-xl shadow-lg border border-gray-100">
+                              <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-semibold text-primary-blue">Room Summary by Type</h3>
+                              </div>
+                              <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200 text-center">
+                                          <thead class="bg-gray-100">
+                                                <tr>
+                                                      <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Room Type</th>
+                                                      <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Total Rooms</th>
+                                                      <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase">To Be Cleaned</th>
+                                                      <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Cleaning</th>
+                                                      <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Ready</th>
+                                                      <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Occupied</th>
+                                                      <th class="px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Action</th>
+                                                </tr>
+                                          </thead>
+                                          <tbody class="divide-y divide-gray-200" id="acc-tbody"></tbody>
+                                    </table>
+                              </div>
+                        </div>
+                  </section>
+
+                  <!-- 3. Rates and Availability (UPDATED Cottage</td> ROOM TYPES) -->
+                  <section id="rates-availability" class="content-section space-y-8 fade-in-up">
+                        <h2 class="text-3xl font-bold text-primary-blue border-b pb-3 mb-4">Rates and Availability</h2>
+                        <p class="text-gray-600 max-w-2xl">This feature provides a centralized view and control over room inventory and pricing, which is crucial for maximizing occupancy and revenue.</p>
+
+                        <div class="bg-card-bg p-6 rounded-bl-xl rounded-br-xl shadow-lg border border-gray-100">
+                              <!-- Modern Category Buttons -->
+                              <div class="mb-2 flex justify-between items-center">
+                                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                                          <span data-lucide="calendar" class="w-5 h-5 mr-2 text-primary-blue"></span> 
+                                          <span id="calendar-title">Area Availability Data</span>
+                                    </h3>      
+                              </div>
+                              <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                          <thead class="bg-gray-50" id="table-header"></thead>
+                                          <tbody class="bg-card-bg divide-y divide-gray-200" id="table2-body"></tbody>
+                                    </table>
+                              </div>
+                        </div>
+                  </section>
+
+                  <!-- 4. Revenue Management -->
+                  <section id="revenue-management" class="content-section space-y-8 fade-in-up">
+                        <h2 class="text-3xl font-bold text-primary-blue border-b pb-3 mb-4">Revenue Management</h2>
+                        <p class="text-gray-600 max-w-2xl">This feature is dedicated to strategizing and executing pricing and promotion decisions to achieve the optimal balance of occupancy and Average Daily Rate (ADR).</p>
+
+                        <div class="flex justify-start">
+                              <button id="add-promo" class="bg-blue-600 hover:bg-blue-500 py-2 px-6 text-white text-center text-[16px] font-semibold rounded-sm">+ Add Promotion</button>
+                        </div>
+
+                        <div class="bg-white rounded-sm p-4 w-full h-[70vh]">
+                              <h1 class="text-gray-600 font-semibold text-lg mb-4 text-center">Recent Promotions Applied</h1>
+                              <div class="overflow-y-auto max-h-[60vh] max-w-full">
+                                    <table class="min-w-full border border-gray-200 rounded-lg text-center">
+                                          <colgroup>
+                                                <col style="width: 13%;">
+                                                <col style="width: 13%;">
+                                                <col style="width: 23%;">
+                                                <col style="width: 10%;">
+                                                <col style="width: 25%;">
+                                                <col style="width: 15%;">
+                                          </colgroup>
+                                          <thead class="bg-blue-600 text-white sticky top-0 text-[15px]">
+                                                <tr>
+                                                      <th class="py-3 px-4 font-semibold text-center">Start</th>
+                                                      <th class="py-3 px-4 font-semibold text-center">End</th>
+                                                      <th class="py-3 px-4 font-semibold text-center">Promotion Name</th>
+                                                      <th class="py-3 px-4 font-semibold text-center">Discount%</th>
+                                                      <th class="py-3 px-4 font-semibold text-center">Applied Rooms</th>
+                                                      <th class="py-3 px-4 font-semibold text-center">Status</th>
+                                                </tr>
+                                          </thead>
+                                          <tbody class="divide-y divide-gray-200 text-center" id="promo-tbody"></tbody>
+                                    </table>
+                              </div>
+                        </div>
+                  </section>
+                  
+                  <!-- 5. Accounting -->
+                  <section id="accounting" class="content-section space-y-8 fade-in-up">
+                        <h2 class="text-3xl font-bold text-primary-blue border-b pb-3 mb-4">Accounting</h2>
+                        <p class="text-gray-600 max-w-2xl">This feature manages all financial transactions related to bookings, including payment processing, reconciliation, and detailed reporting of revenue sources.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                              <div class="metric-card bg-card-bg p-6 rounded-xl border-b-4 border-green-500 flex items-center justify-between">
+                              <div>
+                              <p class="text-sm font-medium text-gray-500">Direct Payment</p>
+                              <p class="text-3xl font-semibold mt-1 text-green-600" id="direct-payment">$5,100</p>
+                              </div>
+                              <i data-lucide="credit-card" class="w-8 h-8 text-green-600 opacity-80"></i>
+                              </div>
+
+                              <div class="metric-card bg-card-bg p-6 rounded-xl border-b-4 border-blue-500 flex items-center justify-between">
+                              <div>
+                              <p class="text-sm font-medium text-gray-500">ZUZU Payment (Online)</p>
+                              <p class="text-3xl font-semibold mt-1 text-blue-600" id="online-payment">$8,900</p>
+                              </div>
+                              <i data-lucide="globe" class="w-8 h-8 text-blue-600 opacity-80"></i>
+                              </div>
+
+                              <div class="metric-card bg-card-bg p-6 rounded-xl border-b-4 border-yellow-500 flex items-center justify-between">
+                              <div>
+                              <p class="text-sm font-medium text-gray-500">Total Booking Revenue Today</p>
+                              <p class="text-3xl font-semibold mt-1 text-yellow-600" id="booking-revenue">$14,000</p>
+                              </div>
+                              <i data-lucide="bar-chart-3" class="w-8 h-8 text-yellow-600 opacity-80"></i>
+                              </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                              <div>
+                                    <label for="filter-payment" class="text-[15px] font-semibold text-gray-600">Year : </label>
+                                    <select id="filter-payment" class="ml-4 border border-gray-400 py-2 px-4 rounded-[4px]"></select>
+                              </div>
+                        </div>
+                        
+                        <div class="bg-card-bg p-6 rounded-xl shadow-lg border border-gray-100">
+                              <h3 class="text-xl font-semibold mb-4 flex items-center"><span data-lucide="receipt" class="w-5 h-5 mr-2 text-primary-blue"></span> Booking Revenue Report (Last 7 Days)</h3>
+                              <div class="overflow-y-auto max-h-[50vh]">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50 sticky top-0">
+                                          <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Online Payment</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direct Payment</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody class="bg-card-bg divide-y divide-gray-200" id="accounting-tbody"></tbody></table>
+                              </div>
+                        </div>
+                  </section>
+
+                  <!--6. ADMIN SETTINGS SECTION -->
+                  <section id="admin-profile" class="content-section space-y-8 fade-in-up">
+                        <!-- Header -->
+                        <div class="flex flex-col gap-2">
+                              <h2 class="text-3xl font-bold text-primary-blue border-b-2 border-primary-blue/30 pb-2">Admin Settings</h2>
+                              <p class="text-gray-600 max-w-3xl leading-relaxed">Manage your profile details, change your password, and update your account email.</p>
+                        </div>
+
+                        <div class="max-w-full mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md">
+                              <div class="rounded-lg mb-[8%]" style="background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),  url('{{ url_for('static', filename='assets/resort.jpg') }}'); background-repeat: no-repeat; background-position: center center; background-size: cover; height: 350px;">
+                                    <div class="w-[330px] h-[30vh] rounded-[100%] absolute top-[23%] left-1/2 -translate-x-1/2 border-8 border-white" style="background-image: url('{{ url_for('static', filename='assets/logo2.png') }}'); background-repeat: no-repeat; background-position: center center; background-size: cover;" >       
+                                          <h1 class="font-bold text-2xl mt-[320px] text-center">Admin Profile</h1>
+                                    </div>
+                              </div>
+
+                              <!-- Profile Details -->
+                              <div class="space-y-4">
+                                    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm">
+                                          <div class="flex items-center gap-4">
+                                                <i data-feather="user" class="w-6 h-6 text-gray-500"></i>
+                                                <div>
+                                                      <p class="text-gray-600 text-sm">Name</p>
+                                                      <p id="admin-name" class="text-gray-800 font-medium">Rustom Galicia</p>
+                                                </div>
+                                          </div>
+                                          <button id="change-name" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Edit</button>
+                                    </div>
+                              
+                                    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm">
+                                          <div class="flex items-center gap-4">
+                                                <i data-feather="mail" class="w-6 h-6 text-gray-500"></i>
+                                                <div>
+                                                      <p class="text-gray-600 text-sm">Email</p>
+                                                      <p id="admin-email" class="text-gray-800 font-medium">galiciarustom14@gmail.com</p>
+                                                </div>
+                                          </div>
+                                          <button id="change-email" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Edit</button>
+                                    </div>
+                              
+                                    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm">
+                                          <div class="flex items-center gap-4">
+                                                <i data-feather="phone" class="w-6 h-6 text-gray-500"></i>
+                                                <div>
+                                                      <p class="text-gray-600 text-sm">Contact Number</p>
+                                                      <p id="admin-num" class="text-gray-800 font-medium">+63 912 345 6789</p>
+                                                </div>
+                                          </div>
+                                          <button id="change-num" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Edit</button>
+                                    </div>
+                              
+                                    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm">
+                                          <div class="flex items-center gap-4">
+                                                <i data-feather="lock" class="w-6 h-6 text-gray-500"></i>
+                                                <div>
+                                                      <p class="text-gray-600 text-sm">Password Last Changed</p>
+                                                      <p id="date-pass-change" class="text-gray-800 font-medium">October 10, 2025</p>
+                                                </div>
+                                          </div>
+                                          <button id="change-pass" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Change Password</button>
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+
+            </main>
+      </div>
+      
+      <!-- MODAL INSERTION -->
+      <div id="reservationPortal"></div>
+      <div id="housekeepingPortal"></div>
+      <div id="ratesAvailabilityPortal"></div>
+      <div id="promoModalPortal"></div>
+      <div id="adminModalPortal"></div>
+      <div id="logoutPortal"></div>
+      
+      <script src="https://unpkg.com/lucide@latest"></script> 
+      <script src="https://unpkg.com/feather-icons"></script>
+      <script> feather.replace()</script>
+      <script type="module" src="{{ url_for('static', filename='scripts/chart.umd.js') }}"></script>
+      <script type="module" src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+</body>
+</html>

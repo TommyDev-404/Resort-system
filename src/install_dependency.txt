@@ -1,0 +1,13 @@
+
+#python
+pip install flask
+
+pip install pymysql
+
+pip install pandas
+
+pip install prophet
+
+pip install bcrypt
+
+

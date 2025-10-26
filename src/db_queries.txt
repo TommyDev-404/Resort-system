@@ -1,0 +1,136 @@
+
+# accomodation_spaces table
+CREATE TABLE accomodation_spaces (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    room INT(11) NOT NULL,
+    status VARCHAR(39) NOT NULL,
+    staff_assign VARCHAR(100) NOT NULL,
+    role VARCHAR(100) NOT NULL,
+    date DATE NOT NULL,
+    rate INT(11) NOT NULL,
+    orig_rate INT(11) NOT NULL,
+    promo VARCHAR(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT Into accomodation_spaces (name, room, avl) VALUES
+('Standard', 101, 1), ('Standard', 102, 1), ('Standard', 103, 1), ('Garden', 101, 1), ('Garden', 102, 1), ('Garden', 103, 1), ('Garden', 104, 1), ('Garden', 105, 1), ('Garden', 106, 1), ('Garden', 107, 1), ('Garden', 108, 1),('Garden', 109, 1),('Garden', 110, 1),('Garden', 111, 1),('Garden', 112, 1), ('Premium', 101, 1),  ('Premium', 102, 1),  ('Premium', 103, 1),  ('Premium', 104, 1),  ('Barkada', 101, 1),  ('Barkada', 102, 1),  ('Barkada', 103, 1),
+ ('Barkada', 104, 1),  ('Barkada', 105, 1),  ('Barkada', 106, 1),  ('Barkada', 107, 1),  ('Family', 101, 1), ('Family', 102, 1), ('Family', 103, 1), ('Family', 104, 1), ('Family', 105, 1), ('Family', 106, 1), ('Family', 107, 1), 
+ ('Cabana', 101, 1), ('Cabana', 102, 1), ('Cabana', 103, 1), ('Cabana', 104, 1), ('Cabana', 101, 1), ('Cabana', 102, 1), ('Cabana', 103, 1), ('Cabana', 104, 1), ('Small', 101, 1), ('Small', 102, 1), ('Small', 103, 1), ('Small', 104, 1), ('Small', 105, 1), ('Small', 106, 1), ('Small', 107, 1), ('Small', 108, 1),
+ ('Big', 101, 1), ('Big', 102, 1), ('Big', 103, 1), ('Big', 104, 1), ('Big', 105, 1), ('Big', 106, 1), ('Big', 107, 1), ('Big', 108, 1), ('Hall', 101, 1)
+
+INSERT INTO accomodation_spaces (name, room, status, staff_assign, role, date, rate, orig_rate, promo)
+VALUES
+('Premium', 101, 'avl', 'n/a', 'N/A', '0000-00-00', 10000, 10000, 'None'),
+('Premium', 102, 'avl', 'N/A', 'N/A', '0000-00-00', 10000, 10000, 'None'),
+('Premium', 103, 'avl', 'N/A', 'N/A', '0000-00-00', 10000, 10000, 'None'),
+('Premium', 104, 'avl', 'N/A', 'N/A', '0000-00-00', 10000, 10000, 'None'),
+
+('Family', 101, 'avl', 'N/A', 'N/A', '0000-00-00', 3000, 3000, 'None'),
+('Family', 102, 'avl', 'N/A', 'N/A', '0000-00-00', 3000, 3000, 'None'),
+('Family', 103, 'avl', 'N/A', 'N/A', '0000-00-00', 3000, 3000, 'None'),
+('Family', 104, 'avl', 'N/A', 'N/A', '0000-00-00', 3000, 3000, 'None'),
+('Family', 105, 'avl', 'N/A', 'N/A', '0000-00-00', 3000, 3000, 'None'),
+('Family', 106, 'avl', 'N/A', 'N/A', '0000-00-00', 3000, 3000, 'None'),
+('Family', 107, 'avl', 'N/A', 'N/A', '0000-00-00', 3000, 3000, 'None'),
+
+('Barkada', 101, 'avl', 'john', 'N/A', '0000-00-00', 7000, 7000, 'None'),
+('Barkada', 102, 'avl', 'N/A', 'N/A', '0000-00-00', 7000, 7000, 'None'),
+('Barkada', 103, 'avl', 'N/A', 'N/A', '0000-00-00', 7000, 7000, 'None'),
+('Barkada', 104, 'avl', 'N/A', 'N/A', '0000-00-00', 7000, 7000, 'None'),
+('Barkada', 105, 'avl', 'N/A', 'N/A', '0000-00-00', 7000, 7000, 'None'),
+('Barkada', 106, 'avl', 'N/A', 'N/A', '0000-00-00', 7000, 7000, 'None'),
+('Barkada', 107, 'avl', 'N/A', 'N/A', '0000-00-00', 7000, 7000, 'None'),
+
+('Standard', 101, 'avl', 'N/A', 'N/A', '0000-00-00', 8000, 8000, 'None'),
+('Standard', 102, 'avl', 'n/a', 'N/A', '0000-00-00', 8000, 8000, 'None'),
+('Standard', 103, 'avl', 'n/a', 'N/A', '0000-00-00', 8000, 8000, 'None'),
+
+('Garden', 101, 'avl', 'n/a', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 102, 'avl', 'n/a', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 103, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 104, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 105, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 106, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 107, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 108, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 109, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 110, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 111, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+('Garden', 112, 'avl', 'N/A', 'N/A', '0000-00-00', 3500, 3500, 'None'),
+
+('Cabana', 101, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Cabana', 102, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Cabana', 103, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Cabana', 104, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Cabana', 105, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Cabana', 106, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Cabana', 107, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Cabana', 108, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+
+('Small', 101, 'avl', 'N/A', 'N/A', '0000-00-00', 500, 500, 'None'),
+('Small', 102, 'avl', 'N/A', 'N/A', '0000-00-00', 500, 500, 'None'),
+('Small', 103, 'avl', 'N/A', 'N/A', '0000-00-00', 500, 500, 'None'),
+('Small', 104, 'avl', 'N/A', 'N/A', '0000-00-00', 500, 500, 'None'),
+('Small', 105, 'avl', 'N/A', 'N/A', '0000-00-00', 500, 500, 'None'),
+('Small', 106, 'avl', 'N/A', 'N/A', '0000-00-00', 500, 500, 'None'),
+('Small', 107, 'avl', 'N/A', 'N/A', '0000-00-00', 500, 500, 'None'),
+('Small', 108, 'avl', 'N/A', 'N/A', '0000-00-00', 500, 500, 'None'),
+
+('Big', 101, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Big', 102, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None'),
+('Big', 103, 'avl', 'N/A', '0000-00-00', '0000-00-00', 1000, 1000, 'None'),
+('Big', 104, 'avl', 'N/A', '0000-00-00', '0000-00-00', 1000, 1000, 'None'),
+('Big', 105, 'avl', 'N/A', '0000-00-00', '0000-00-00', 1000, 1000, 'None'), 
+('Big', 106, 'avl', 'N/A', '0000-00-00', '0000-00-00', 1000, 1000, 'None'),
+('Big', 107, 'avl', 'N/A', '0000-00-00', '0000-00-00', 1000, 1000, 'None'),
+('Big', 108, 'avl', 'N/A', 'N/A', '0000-00-00', 1000, 1000, 'None')
+('Hall', 101, 'avl', 'N/A', '0000-00-00', '0000-00-00', 1000, 1000, 'None');
+
+
+# admin table
+CREATE TABLE admin (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    contact VARCHAR(11) NOT NULL,
+    code INT(6) NOT NULL,
+    hash_pass VARCHAR(255) NOT NULL,
+    date_pass_change DATE DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+# area_data table
+CREATE TABLE area_table (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    count INT(11) NOT NULL,
+    max INT(11) NOT NULL,
+    rate INT(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO area_table (name, count, max, rate)
+VALUES
+('Premium Villa Room', 4, 12, 10000),
+('Standard Villa Room', 3, 10, 8000),
+('Garden View Room', 12, 4, 3500),
+('Barkada Room', 7, 8, 6500),
+('Family Room', 7, 10, 3000),
+('Cabana Cottage', 8, 30, 1000),
+('Small Cottage', 8, 20, 500),
+('Hall', 1, 100, 3000),
+('Big Cottage', 8, 50, 1000);
+
+
+#promos
+CREATE TABLE promos (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    discount INT(11) NOT NULL,
+    area VARCHAR(100) NOT NULL,
+    end_date DATE NOT NULL,
+    status ENUM('Active', 'Expired') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
