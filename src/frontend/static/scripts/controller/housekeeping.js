@@ -1,16 +1,44 @@
 
 // -------------------- HELPERS ------------------------- //
+function successMessageCard(message){
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
+                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('messagePortal').innerHTML += msg;
+}
+
+function failedMessageCard(message){
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
+                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
+                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('messagePortal').innerHTML += msg;
+}
+
 function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied){
       const row = `
-            <tr data-room="${acc_name}">
+            <tr data-room="${acc_name}" class="fade-in-up">
                   <td class="px-6 py-4 font-semibold text-gray-800">${acc_name}</td>
                   <td class="px-6 py-4">${acc_count}</td>
                   <td class="px-6 py-4 text-blue-600 font-bold">${need_clean}</td>
                   <td class="px-6 py-4 text-yellow-600 font-bold">${on_clean}</td>
                   <td class="px-6 py-4 text-green-600 font-bold">${ready}</td>
                   <td class="px-6 py-4 text-purple-600 font-bold">${occupied}</td>
-                  <td class="px-6 py-4">
-                        <button class="px-4 py-2 text-sm bg-primary-blue text-white rounded-md hover:bg-blue-700 transition" id="view-room-details">View Details</button>
+                  <td class="px-6 py-4 flex justify-center">
+                        <button class="px-4 py-2 text-sm bg-primary-blue text-white rounded-md hover:bg-blue-700 transition flex gap-2 items-center" id="view-room-details"><i class="ti ti-building text-lg"></i>View Rooms</button>
                   </td>
             </tr>
       `;
@@ -26,7 +54,8 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
       let new_status = null;
       let bg_color = null;;
       let action_name = status === "need-clean" ? 'Assign' : status === "on-clean" ? 'Mark Ready' : 'View Info';
-      let btn_color = status === "need-clean" ? ' bg-yellow' : status === "on-clean" ? 'bg-green' : 'bg-teal';
+      let btn_color = status === "need-clean" ? 'bg-red-500 hover:bg-red-600' : status === "on-clean" ? 'bg-green-500 hover:bg-green-600' : 'bg-teal-500 hover:bg-teal-600';
+      let icon = action_name === 'View Info' ? '<i class="ti ti-eye text-lg"></i>' : action_name === 'Mark Ready' ? '<i class="ti ti-clipboard-check text-lg"></i>' : '<i class="ti ti-user-plus text-lg"></i>' 
       
       if (status === 'avl') (new_status = 'Ready/Available', bg_color = 'bg-green-100 text-green-700');
       if (status === 'occupied') (new_status = 'Occupied', bg_color = 'bg-purple-100 text-purple-700');
@@ -34,6 +63,7 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
       if (status === 'on-clean') (new_status = 'Cleaning', bg_color = 'bg-yellow-100 text-yellow-700');
 
       const formattedDate = new Date(date).toLocaleString("en-US", { month: "short", day: "numeric" });
+
       const row = `
             <tr data-room="${room_name}">
                   <td class="px-4 py-3 font-medium">${room_no}</td>
@@ -41,7 +71,7 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
                   <td class="px-4 py-3 text-gray-700">${assign_staff}</td>
                   <td class="px-4 py-3 text-gray-700">${ date !== '0000-00-00' ? formattedDate : "N/A" }</td>
                   <td class="px-4 py-3">
-                        <button class="text-sm ${btn_color}-500 text-white py-2 px-3 rounded-md hover:${btn_color}-600" id="${action_name === 'View Info' ? 'view-info' : action_name === 'Mark Ready' ? 'mark-ready' : 'assign-staff'}">${action_name}</button>
+                        <button class="room-action-btn text-sm ${btn_color} text-white py-2 px-3 rounded-md cursor-pointer" id="${action_name === 'View Info' ? 'view-info' : action_name === 'Mark Ready' ? 'mark-ready' : 'assign-staff'}">${icon}</button>
                   </td>
             </tr>
       `;
@@ -51,7 +81,7 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
 
 function renderViewDetailsModal(roomType){
       const modal = `
-            <div id="roomDetailsModal" class="absolute w-full h-full inset-0 bg-black/30 flex items-center justify-center z-[50]">
+            <div id="roomDetailsModal" class="absolute w-full h-full inset-0 bg-black/30 flex items-center justify-center z-[50] fade-in-up">
                   <div class="bg-white w-full max-w-5xl rounded-lg shadow-xl p-6 relative">
                         <span class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 text-[25px] cursor-pointer" id="closeRoomDetails">&times;</span>
                         <h3 id="modalRoomTitle" class="text-2xl font-semibold text-primary-blue mb-4">${roomType} Room - Details</h3>
@@ -80,8 +110,8 @@ function renderViewDetailsModal(roomType){
       document.getElementById('housekeepingPortal').innerHTML += modal;
 }
 
-function render_openViewInfoRoomDetails(e) {
-      const row = e.target.closest('tr'); 
+function render_openViewInfoRoomDetails(btn) {
+      const row = btn.closest('tr'); 
       const cells = row.querySelectorAll('td');
 
       const room_name = document.getElementById('modalRoomTitle').textContent.split(' ');
@@ -91,7 +121,7 @@ function render_openViewInfoRoomDetails(e) {
       const lastCleaned = cells[3].textContent.trim();
 
       const modal = `
-            <div id="view-info-modal" class="fixed inset-0 w-full h-full bg-black/30 flex items-center justify-center z-50">
+            <div id="view-info-modal" class="fixed inset-0 w-full h-full bg-black/30 flex items-center justify-center z-50 fade-in-up">
                   <div class="bg-card-bg w-full max-w-[500px] rounded-2xl shadow-2xl px-6 py-4 relative border border-gray-200">
                   <span class="absolute top-3 right-4 text-gray-500 text-[25px]  cursor-pointer transition" id="close-view-info-modal">&times;</span>
                         <!-- Title -->
@@ -113,7 +143,7 @@ function render_openViewInfoRoomDetails(e) {
 
 function renderAssignStaffModal(){
       const modal = `
-            <div id="assign-staff-modal" class="fixed inset-0 bg-black/30 z-[50] flex items-center justify-center z-[50]">
+            <div id="assign-staff-modal" class="fixed inset-0 bg-black/30 z-[50] flex items-center justify-center z-[50] fade-in-up">
                   <div class="bg-card-bg w-full max-w-[800px] rounded-2xl shadow-2xl p-6 relative border border-gray-200">
                         <h3 class="text-2xl font-bold text-primary-blue mb-5 text-center flex items-center justify-center gap-2"><i class="fas fa-user-tag text-primary-blue"></i> Assign Staff </h3>
                         <form id="assignStaffForm">
@@ -147,8 +177,8 @@ function removePrevRoomDetailsRow(){
       document.querySelectorAll('#room-details tr').forEach(row => row.remove());
 }
 
-function openStaffDetails(e) {
-      const row = e.target.closest('tr'); 
+function openStaffDetails(btn) {
+      const row = btn.closest('tr'); 
       const cells = row.querySelectorAll('td');
       
       const room_name = document.getElementById('modalRoomTitle').textContent.split(' ');
@@ -158,7 +188,6 @@ function openStaffDetails(e) {
       document.querySelector('input[name="area_name"]').value = room_name[0];
       document.querySelector('input[name="room_no"]').value = roomNo;
 }
-
 
 // -------------------- DATA ------------------------- //
 async function accomodationData(){
@@ -171,7 +200,7 @@ async function accomodationData(){
                   createRowData(data.name, data.total_room, data.need_clean, data.on_clean, data.ready, data.occupied, data.maintenance);
             });
       }else{
-            alert('Error fecthing data');
+            failedMessageCard('Error fecthing data');
       }
 }
 
@@ -187,13 +216,13 @@ async function submitAssignStaff(e){
       const result = await response.json();
 
       if(result.success){
-            alert(result.message);
+            successMessageCard(result.message);
             document.getElementById('assign-staff-modal').remove();
             openRoomDetails(form.get('area_name'));
             getSummarryCardData();
             accomodationData();
       }else{
-            alert(result.message);
+            failedMessageCard(result.message);
       }
 }
 
@@ -208,8 +237,8 @@ async function getSummarryCardData(){
       document.getElementById('all-areas').textContent = result.total_room;
 }
 
-async function markReady(e){
-      const row = e.target.closest('tr'); 
+async function markReady(btn){
+      const row = btn.closest('tr'); 
       const cells = row.querySelectorAll('td');
       const roomNo = cells[0].textContent.trim();
       
@@ -219,12 +248,12 @@ async function markReady(e){
       const result = await response.json();
 
       if(result.success){
-            alert(result.message);
+            successMessageCard(result.message);
             openRoomDetails(row.dataset.room);
             getSummarryCardData();
             accomodationData();
       }else{
-            alert(result.message);
+            failedMessageCard(result.message);
       }
 }
 
@@ -237,18 +266,29 @@ async function openRoomDetails(roomType){
                   createRowForRoomDetails(roomType, data.room, data.status, data.staff_assign, data.date);
             });
       }else{
-            alert('Error fecthing data');
+            failedMessageCard('Error fecthing data');
       }
 }
 
 // ---------------- EVENT LISTENERS ----------------
 document.addEventListener('click', (e) => {
       // buttons
+      const btn = e.target.closest('.room-action-btn');
+      if (btn) {
+            switch (btn.id) {
+                  case 'assign-staff':
+                        openStaffDetails(btn); // pass btn if needed
+                        break;
+                  case 'mark-ready':
+                        markReady(btn);
+                        break;
+                  case 'view-info':
+                        render_openViewInfoRoomDetails(btn);
+                        break;
+            }
+      }
       if (e.target.matches('#view-room-details')) (renderViewDetailsModal(e.target.closest('tr').dataset.room), openRoomDetails(e.target.closest('tr').dataset.room));
-      if (e.target.matches('#assign-staff')) openStaffDetails(e);
-      if (e.target.matches('#mark-ready')) markReady(e);
-      if (e.target.matches('#view-info')) render_openViewInfoRoomDetails(e);
-
+    
       // spans
       if (e.target.matches('#closeRoomDetails')) document.getElementById('roomDetailsModal').remove();
       if (e.target.matches('#close-assign-staff-modal')) document.getElementById('assign-staff-modal').remove();

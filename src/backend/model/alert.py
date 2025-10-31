@@ -40,12 +40,13 @@ class Alerts:
                   for d, v in zip(dates, values)
                         if next_week_start <= datetime.strptime(d, "%Y-%m-%d").date() <= next_week_end
             ]
+            avg_next_week = 0
 
             if next_week_forecast:
                   avg_next_week = sum(item["value"] for item in next_week_forecast) / len(next_week_forecast)
                   
             if avg_next_week < 60:
-                  return {'message': "Next week's forecasted occupancy is below 50%!", 'data': avg_next_week}
+                  return {'message': "Next week's forecasted occupancy is below 50%!", 'data': round(avg_next_week, 2)}
             else:
                   return {'message': None}
 
@@ -56,7 +57,7 @@ class Alerts:
                         SELECT 
                               COALESCE(COUNT(*), 0)AS total_need_clean
                         FROM accomodation_spaces
-                        WHERE status = 'need-clean';
+                        WHERE status = 'need-clean' AND name NOT IN ('Cabana', 'Small', 'Big', 'Hall');
                   ''')
             data = cursor.fetchone()
 

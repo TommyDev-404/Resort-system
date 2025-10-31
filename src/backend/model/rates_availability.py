@@ -43,8 +43,8 @@ class RatesAndAvailability:
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'cabana',
-                                    2 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN family ELSE 0 END),
-                                    2 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN family ELSE 0 END)
+                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN family ELSE 0 END),
+                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN family ELSE 0 END)
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'small',

@@ -5,9 +5,37 @@ const adminEmail = document.getElementById('admin-email');
 const datePasswordChange = document.getElementById('date-pass-change');
 
 // ------------- HELPERS ---------------- //
+function successMessageCard(message){
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
+                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('messagePortal').innerHTML += msg;
+}
+
+function failedMessageCard(message){
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
+                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
+                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('messagePortal').innerHTML += msg;
+}
+
 function renderChangePassword(email){
       const modal = `
-            <div id="passwordModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div id="passwordModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in-up">
                   <div class="bg-white p-6 rounded-xl w-110 relative">
                         <h3 class="text-xl font-bold mb-4 text-center">Change Password</h3>
                         <form id="changePassForm">
@@ -49,7 +77,7 @@ function showPassword() {
 
 function renderEditModal(type, value){
       const modal = `
-            <div id="editModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div id="editModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in-up">
                   <div class="bg-white p-6 rounded-xl w-96 relative">
                         <h3 class="text-xl font-bold mb-4 text-center">Edit ${type}</h3>
                               <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="text" name="${type ==+ "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border rounded" placeholder="Enter ${type}" value="${value}">
@@ -66,7 +94,7 @@ function renderEditModal(type, value){
 
 function renderCodeModal(){
       const modal = `
-            <div id="codeModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div id="codeModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in-up">
                   <div class="bg-white rounded-2xl shadow-lg p-6 w-90 max-w-full">
                         <h2 class="text-xl font-bold mb-4 text-center">Enter 6-Digit Code</h2>
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-2 mt-2 mb-4">
@@ -116,10 +144,10 @@ async function changePassv2(e) {
       const result = await response.json();
 
       if (result.success){
-            alert(result.message);
+            successMessageCard(result.message);
             document.querySelector('#codeModal').remove();
       }else{
-            alert(result.message);
+            failedMessageCard(result.message);
       }
 }
 
@@ -145,16 +173,16 @@ async function changePass(e) {
             const result = await response.json();
 
             if (result.success) {
-                  alert(result.message);
+                  successMessageCard(result.message);
                   e.target.reset();
                   renderCodeModal();
             } else {
-                  alert(result.message);
+                  failedMessageCard(result.message);
                   renderChangePassword(adminEmail.textContent);
             }
       } catch (error) {
             console.error('Error:', error);
-            alert('Something went wrong. Please try again.');
+            failedMessageCard('Something went wrong. Please try again.');
       } finally {
             document.getElementById('loading').remove();
       }
@@ -170,11 +198,11 @@ async function editInfo(type) {
       const result = await response.json();
 
       if (result.success){
-            alert(result.message);
+            successMessageCard(result.message);
             document.querySelector('#editModal').remove();
             adminProfile();
       }else{
-            alert(result.message);
+            failedMessageCard(result.message);
       }
 }
 
@@ -190,7 +218,7 @@ async function adminProfile() {
             adminNum.textContent = result.data.contact;
             datePasswordChange.textContent = formatDate;
       }else{
-            alert(result.message);
+            failedMessageCard(result.message);
       }
 }
 

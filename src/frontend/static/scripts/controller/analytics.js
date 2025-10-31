@@ -4,7 +4,7 @@ let revenueChart = null;
 
 // ---------------------- HELPERS -------------------------
 async function drawCheckinForecastChart(result) {
-      const ctx = document.getElementById('occupancy-forecast-chart').getContext('2d');
+      const ctx = document.getElementById('checkin-forecast-chart').getContext('2d');
 
       // Convert dates to ISO internally
       const historicalDatesISO = result.historical.date.map(d => new Date(d).toISOString().split('T')[0]);
@@ -33,7 +33,7 @@ async function drawCheckinForecastChart(result) {
                   {
                         label: 'Historical Check-in: ',
                         data: historicalValues,
-                        borderColor: '#10569c',  // Blue
+                        borderColor: '#1ed40eff',  // Blue
                         borderWidth: 3,
                         fill: false,
                         tension: 0.4,
@@ -42,7 +42,7 @@ async function drawCheckinForecastChart(result) {
                   {
                         label: 'Forecasted Check-in: ',
                         data: forecastValues,
-                        borderColor: '#16a34a',  // Green
+                        borderColor: '#e42e0eff',  // Green
                         borderWidth: 3,
                         fill: false,
                         tension: 0.4,
@@ -70,6 +70,14 @@ async function drawCheckinForecastChart(result) {
                   tooltip: {
                         mode: 'index',
                         intersect: false,
+                        backgroundColor: '#111827',
+                        titleColor: '#FBBF24',
+                        bodyColor: '#F9FAFB',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        padding: 10,
+                        titleFont: { size: 23, weight: 'bold' },
+                        bodyFont: { size: 22 },
                         callbacks: {
                               label: function (context) {
                               // Show ISO date in tooltip
@@ -84,11 +92,7 @@ async function drawCheckinForecastChart(result) {
 }
 
 async function drawRevenueChart(result) {
-      // Months labels
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-      // Fill the latestRevenue (historical) and forecastedRevenue arrays
-      // We'll map backend month (1-12) to JS array (0-11)
       const latestRevenue = Array(12).fill(null);
       const forecastedRevenue = Array(12).fill(null);
 
@@ -112,38 +116,58 @@ async function drawRevenueChart(result) {
       revenueChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                  labels: months,
-                  datasets: [
-                  {
+                labels: months,
+                datasets: [
+                    {
                         label: 'Historical Revenue (₱)',
                         data: latestRevenue,
-                        backgroundColor: 'rgba(34, 197, 94, 0.5)',
-                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(233, 195, 24, 1)',
                         borderWidth: 1,
                         borderRadius: 6
-                  },
-                  {
+                    },
+                    {
                         label: 'Forecasted Revenue (₱)',
                         data: forecastedRevenue,
-                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(230, 7, 174, 1)',
                         borderWidth: 1,
                         borderRadius: 6
-                  }
-                  ]
+                    }
+                ]
             },
             options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { display: true } },
-                  scales: {
-                  y: { beginAtZero: true, 
-                              max: 1000000, // set maximum to 1 million
-                              title: { display: true, text: 'Revenue (₱)' } },
-                  x: { ticks: { autoSkip: false } }
-                  }
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true },
+                    tooltip: {
+                        backgroundColor: '#111827',  // dark background
+                        titleColor: '#FBBF24',       // title (month) color
+                        bodyColor: '#F9FAFB',        // value text color
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        padding: 10,
+                        titleFont: { size: 23, weight: 'bold' },
+                        bodyFont: { size: 22 },
+                        callbacks: {
+                            // Format tooltip text
+                            label: function(context) {
+                                const value = context.parsed.y;
+                                return `${context.dataset.label}: ₱${value?.toLocaleString() ?? '-'}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 1000000,
+                        title: { display: true, text: 'Revenue (₱)' } 
+                    },
+                    x: { ticks: { autoSkip: false } }
+                }
             }
-      });            
+        });
+        
 }
 
 async function forecastCheckin(type=null) {

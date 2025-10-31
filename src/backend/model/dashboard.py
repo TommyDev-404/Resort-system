@@ -203,5 +203,37 @@ class Dashboard:
                         value.append(int(d.get('total_guest')))
 
                   return {'month': month, 'value': value}
+            
+            
+
+      def most_booked_area(self):
+            with self.db.connect() as con:
+                  cursor = con.cursor()
+                  cursor.execute('''
+                        SELECT
+                              SUM(premium) AS pr, 
+                              SUM(standard) AS st, 
+                              SUM(family) AS fm, 
+                              SUM(barkada) AS bd, 
+                              SUM(garden) AS gr, 
+                              SUM(cabana) AS cb, 
+                              SUM(small) AS sm, 
+                              SUM(big) AS big, 
+                              SUM(hall) AS hall
+                        FROM accomodation_data
+                  ''')
+                  data = cursor.fetchone()
+
+                  return {
+                        'premium': data.get('pr'),
+                        'standard': data.get('st'),
+                        'garden': data.get('gr'),
+                        'family': data.get('fm'),
+                        'barkada': data.get('bd'), 
+                        'cabana': data.get('cb'),
+                        'small': data.get('sm'),
+                        'big': data.get('bg'),
+                        'hall': data.get('hall')
+                        }
 
 

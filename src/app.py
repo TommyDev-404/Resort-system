@@ -125,6 +125,10 @@ def revenue():
 def heavy_month():
       return jsonify(dashboard.heavy_guest_month())
 
+@app.route('/most-booked-area', methods=['GET'])
+def most_booked_area():
+      return jsonify(dashboard.most_booked_area())
+
 
 #----------------- ANALYTICS ------------------#
 @app.route('/mtd-occupancy-all', methods=['GET'])
@@ -181,6 +185,14 @@ def avl_spaces():
 def avl_rooms():
       return jsonify(reserve.get_avl_room(request.args.get('room_name')))
 
+@app.route('/avl-rooms-all', methods=['GET'])
+def avl_rooms_all():
+      return jsonify(reserve.get_avl_room_all())
+
+@app.route('/totals', methods=['GET'])
+def totals():
+      return jsonify(reserve.totals(request.args.get('month'), request.args.get('year')))
+
 @app.route('/add-booking', methods=['POST'])
 def add_booking():
       return jsonify(reserve.add_booking(**request.get_json()))
@@ -188,6 +200,10 @@ def add_booking():
 @app.route('/recent-bookings', methods=['GET'])
 def recent_bookings():
       return jsonify(reserve.recent_bookings(request.args.get('year'), request.args.get('month')))
+
+@app.route('/category-bookings', methods=['GET'])
+def category_bookings():
+      return jsonify(reserve.booking_category(request.args.get('year'), request.args.get('month'), request.args.get('category')))
 
 @app.route('/current-bookings', methods=['GET'])
 def current_bookings():
@@ -232,6 +248,18 @@ def view_details(id):
 @app.route('/cancelled-bookings', methods=['GET'])
 def cancelled():
       return jsonify(reserve.total_cancelled())
+
+@app.route('/get-reservation-date', methods=['GET'])
+def reservation_date():
+      return jsonify(reserve.get_reservation_date(request.args.get('id')))
+
+@app.route('/update-reservation-date', methods=['POST'])
+def update_reservation_date():
+      return jsonify(reserve.update_reservation_date(**request.get_json()))
+
+@app.route('/get-data-to-update', methods=['GET'])
+def get_data_to_update():
+      return jsonify(reserve.get_data_to_update(request.args.get('id')))
 
 
 #--------------- HOUSEKEEPING ------------------#

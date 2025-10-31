@@ -1,4 +1,22 @@
 
+# trigger
+DELIMITER $$
+
+CREATE TRIGGER after_booking_update
+AFTER UPDATE ON bookings
+FOR EACH ROW
+BEGIN
+    IF (OLD.check_in <> NEW.check_in) OR (OLD.check_out <> NEW.check_out) THEN
+        UPDATE accomodation_data
+        SET check_in = NEW.check_in,
+            check_out = NEW.check_out
+        WHERE booking_id = NEW.booking_id;
+    END IF;
+END$$
+
+DELIMITER ;
+
+
 # accomodation_spaces table
 CREATE TABLE accomodation_spaces (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,

@@ -6,7 +6,25 @@
 	<title>Admin Login</title>
 	<link rel="stylesheet" href="{{ url_for('static', filename='style/output.css') }}" />
       <link rel="icon" type="image/x-icon" href="/static/assets/user.png">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
 </head>
+<style>
+	@keyframes fadeInUp {
+		0% {
+			opacity: 0;
+			transform: translateY(10px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.fade-in-up {
+		animation: fadeInUp 0.6s ease-out forwards;
+	}
+</style>
+
 <body>
 
 <!-- Navigation bar-->
@@ -37,7 +55,7 @@
 
 
 <!-- Overlay Container -->
-<div class="absolute top-0 left-0 w-full h-full bg-black/40 login-overlay flex z-10 hidden">
+<div class="absolute top-0 left-0 w-full h-full bg-black/40 login-overlay flex z-10 hidden fade-in-up">
 	<div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[80vh] w-[70%] bg-card-bg rounded-lg shadow-lg shadow-black/60 flex overflow-hidden">
 		<!-- LEFT SIDE IMAGE -->
 		<div class="bg-cover w-[62%] rounded-tr-[5%] rounded-br-[5%] relative overflow-hidden" style="background-image: url('{{ url_for('static', filename='assets/resort.jpg') }}')">
@@ -78,9 +96,9 @@
 					<button type="submit" class="bg-primary-blue py-3 w-full text-white font-semibold rounded-full mt-8 hover:bg-blue-600 cursor-pointer text-center transition-all duration-300">Login</button>
 				</form>
 				<div class="flex gap-8 justify-center mt-6">
-					<img src="{{ url_for('static', filename='assets/fbs.png') }}" width="45" class="hover:scale-105 transition">
-					<img src="{{ url_for('static', filename='assets/insta.avif') }}" width="42" class="hover:scale-105 transition">
-					<img src="{{ url_for('static', filename='assets/tiktok.avif') }}" width="45" class="hover:scale-105 transition">
+					<a href="https://www.facebook.com/grandvillalaguna"><img src="{{ url_for('static', filename='assets/fbs.png') }}" width="45" class="hover:scale-105 transition"></a>
+					<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw"><img src="{{ url_for('static', filename='assets/insta.avif') }}" width="42" class="hover:scale-105 transition  rounded-4xl"></a>
+					<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09"><img src="{{ url_for('static', filename='assets/twitter.png') }}" width="40" class="hover:scale-105 transition"></a>
 				</div>
 			</div>
 
@@ -116,6 +134,7 @@
 </div>
 
 <div id="loadingPortal"></div>
+<div id="messagePortal"></div>
 
 <script type="module" src="{{ url_for('static', filename='scripts/controller/login.js') }}"></script>
 

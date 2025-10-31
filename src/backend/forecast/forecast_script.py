@@ -82,7 +82,8 @@ class Forecast:
             forecast = model.predict(future)
 
             # Historical (actual) data
-            historical = df[['ds', 'y']].copy()
+            current_year = today.year
+            historical = df[df['ds'].dt.year == current_year][['ds', 'y']].copy()
             historical = historical.rename(columns={'y': 'value'})
 
             # Forecasted data: only dates after last_date
@@ -131,8 +132,9 @@ class Forecast:
             future = model.make_future_dataframe(periods=periods)
             forecast = model.predict(future)
 
-            # Historical (actual) data
-            historical = df[['ds', 'y']].copy()
+            # Historical (actual) data: only this year
+            current_year = today.year
+            historical = df[df['ds'].dt.year == current_year][['ds', 'y']].copy()
             historical = historical.rename(columns={'y': 'value'})
 
             # Forecasted data: only dates after last_date

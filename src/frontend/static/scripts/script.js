@@ -116,6 +116,11 @@ sidebarItems.forEach(item => {
     });
 });
 
+document.addEventListener('click', (e) => {
+    if (e.target.matches('#admin-profile-shortcut')){
+        switchContent('admin-profile')
+    }
+}); 
 
 /*---------------- INITIAL LOAD ----------------*/
 window.addEventListener('DOMContentLoaded', () => {

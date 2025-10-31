@@ -1,7 +1,36 @@
 
+// ---------------------- HELPERS ---------------------
+function successMessageCard(message){
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
+                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('messagePortal').innerHTML += msg;
+}
+
+function failedMessageCard(message){
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
+                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
+                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('messagePortal').innerHTML += msg;
+}
+
 function createRow(date, promo_name, discount, area, end, status){
       const row = `
-            <tr class="hover:bg-blue-50 transition ">
+            <tr class="hover:bg-blue-50 transition fade-in-up">
                   <td class="py-3 px-4 text-gray-700">${date}</td>
                   <td class="py-3 px-4 text-gray-700">${end}</td>
                   <td class="py-3 px-4 font-medium text-gray-800">${promo_name}</td>
@@ -16,7 +45,7 @@ function createRow(date, promo_name, discount, area, end, status){
 
 function renderAddPromoModal(){
       const modal = `
-            <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-50" id="promo-overlay">
+            <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-50 fade-in-up" id="promo-overlay">
                   <div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card-bg py-2 pb-4 px-[20px] max-w-[800px] rounded-xl shadow-lg border border-gray-100">
                         <span id="close-promo-modal" class="text-[26px] flex justify-end cursor-pointer">&times;</span>
                         <h3 class="text-xl font-semibold mb-4 text-center">Promotions</h3>
@@ -76,12 +105,12 @@ async function applyPromo(e) {
       const res = await response.json();
 
       if (res.success){
-            alert(res.message);
+            successMessageCard(res.message);
             e.target.reset();
             document.querySelector('#promo-overlay').remove();
             getAllPromo();
       }else{
-            alert(res.message);
+            failedMessageCard(res.message);
       }
 }
 

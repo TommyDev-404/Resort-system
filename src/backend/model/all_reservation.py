@@ -74,13 +74,31 @@ class Reservation:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
+      
+
+      def get_avl_room_all(self):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(''' SELECT room as avl_room from accomodation_spaces''')
+                        data = cursor.fetchall()
+
+                        list = []
+                        for d in data:
+                              print(d)
+                              list.append(d.get('avl_room'))
+
+                        return {'rooms' : list}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
-      def add_booking(self, name, total_guest, inquiry_type, payment, accomodations, checkin, checkout):
+      def add_booking(self, name, total_guest, inquiry_type, payment, accomodations_selected, checkin, checkout):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                   
-                        parts = accomodations.split(',')
+                        parts = accomodations_selected.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
                         counts = Counter(rooms)
@@ -111,7 +129,7 @@ class Reservation:
                               amount += room_rate.get(room)
                         
                         cursor.execute(''' INSERT INTO bookings (name, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s) 
-                        ''', (name, checkin, checkout, accomodations, total_guest, inquiry_type, payment, status, amount))
+                        ''', (name, checkin, checkout, accomodations_selected, total_guest, inquiry_type, payment, status, amount))
                         
                         if cursor.rowcount != 0: result_list.append(True)
 
@@ -180,6 +198,136 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      def booking_category(self, year, month, category):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        
+                        if category == 'all-data':
+                              cursor.execute('''
+                                    SELECT 
+                                          booking_id,
+                                          name, 
+                                          check_in, 
+                                          check_out, 
+                                          accomodations, 
+                                          status, 
+                                          payment,
+                                          DATE(check_out) - DATE(check_in) AS stay_gap
+                                    FROM bookings
+                                    WHERE YEAR(check_in) = %s
+                                    AND MONTH(check_in) = %s;
+                              ''', (year, month))
+                        
+                        if category == 'check_out-data':
+                              cursor.execute('''
+                                    SELECT 
+                                          booking_id,
+                                          name, 
+                                          check_in, 
+                                          check_out, 
+                                          accomodations, 
+                                          status, 
+                                          payment,
+                                          DATE(check_out) - DATE(check_in) AS stay_gap
+                                    FROM bookings
+                                    WHERE YEAR(check_in) = %s
+                                    AND MONTH(check_in) = %s AND status = "Checked-out";
+                              ''', (year, month))
+
+                        if category == 'reserved-data':
+                              cursor.execute('''
+                                    SELECT 
+                                          booking_id,
+                                          name, 
+                                          check_in, 
+                                          check_out, 
+                                          accomodations, 
+                                          status, 
+                                          payment,
+                                          DATE(check_out) - DATE(check_in) AS stay_gap
+                                    FROM bookings
+                                    WHERE YEAR(check_in) = %s
+                                    AND MONTH(check_in) = %s AND status = "Reserved";
+                              ''', (year, month))
+                        
+                        if category == 'cancelled-reservation-data':
+                              cursor.execute('''
+                                    SELECT 
+                                          booking_id,
+                                          name, 
+                                          check_in, 
+                                          check_out, 
+                                          accomodations, 
+                                          status, 
+                                          payment,
+                                          DATE(check_out) - DATE(check_in) AS stay_gap
+                                    FROM bookings
+                                    WHERE YEAR(check_in) = %s
+                                    AND MONTH(check_in) = %s AND status = "Cancelled";
+                              ''', (year, month))
+
+                        if category == 'check_in-data':
+                              cursor.execute('''
+                                    SELECT 
+                                          booking_id,
+                                          name, 
+                                          check_in, 
+                                          check_out, 
+                                          accomodations, 
+                                          status, 
+                                          payment,
+                                          DATE(check_out) - DATE(check_in) AS stay_gap
+                                    FROM bookings
+                                    WHERE YEAR(check_in) = %s
+                                    AND MONTH(check_in) = %s AND status = "Checked-in";
+                              ''', (year, month))
+                        
+                        if category == 'paid-data':
+                              cursor.execute('''
+                                    SELECT 
+                                          booking_id,
+                                          name, 
+                                          check_in, 
+                                          check_out, 
+                                          accomodations, 
+                                          status, 
+                                          payment,
+                                          DATE(check_out) - DATE(check_in) AS stay_gap
+                                    FROM bookings
+                                    WHERE YEAR(check_in) = %s
+                                    AND MONTH(check_in) = %s AND payment != "Pending";
+                              ''', (year, month))
+
+                        if category == 'not_paid-data':
+                              cursor.execute('''
+                                    SELECT 
+                                          booking_id,
+                                          name, 
+                                          check_in, 
+                                          check_out, 
+                                          accomodations, 
+                                          status, 
+                                          payment,
+                                          DATE(check_out) - DATE(check_in) AS stay_gap
+                                    FROM bookings
+                                    WHERE YEAR(check_in) = %s
+                                    AND MONTH(check_in) = %s AND payment = "Pending";
+                              ''', (year, month))
+                        
+                        data = cursor.fetchall()
+                        new_data = []
+
+                        for d in data:
+                              formatted_checkin  = d.get('check_in').strftime("%b %-d")  
+                              formatted_checkout  = d.get('check_out').strftime("%b %-d")  
+
+                              new_data.append({'id': d.get('booking_id'), 'name': d.get('name'), 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
+                              
+                        return {'success': bool(data), 'data': new_data}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def current_bookings(self):
             try:
@@ -329,7 +477,8 @@ class Reservation:
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
                         
                         for room, number in set(zip(rooms, room_no)):
-                              cursor.execute('''UPDATE accomodation_spaces SET status = "need-clean" WHERE name=%s AND room=%s''', (room.capitalize(), number))
+                              if room not in ['cabana', 'small', 'big', 'hall']:
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = "need-clean" WHERE name=%s AND room=%s''', (room.capitalize(), number))
                         
                         con.commit()
 
@@ -385,4 +534,118 @@ class Reservation:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
+            
+      def get_reservation_date(self, id):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(''' SELECT check_in, check_out FROM bookings where booking_id = %s ''', (id,))
+                        data = cursor.fetchone()
 
+                        return {'check_in': data.get('check_in'), 'check_out': data.get('check_out')}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+
+      def update_reservation_date(self, id, edit_checkin, edit_checkout):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(''' UPDATE bookings SET check_in = %s, check_out = %s WHERE booking_id = %s ''', (edit_checkin, edit_checkout, id))
+                        con.commit()
+
+                        return {'success': bool(cursor.rowcount != 0), 'message': "Updated successfully!" if cursor.rowcount != 0 else 'Failed to update.'}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+            
+      def get_data_to_update(self, id):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(''' SELECT accomodations, check_in, check_out FROM bookings WHERE booking_id = %s''', (id,))
+                        data = cursor.fetchone()
+
+                        return {'success': bool(data), 'checkin': data.get('check_in'), 'checkout': data.get('check_out'), 'accomodations': data.get('accomodations')}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+            
+      def totals(self, month, year):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute("""
+                              WITH check_in AS (
+                                    SELECT COALESCE(COUNT(status), 0) AS total_checkin 
+                                    FROM bookings 
+                                    WHERE MONTH(check_in) = %s
+                                    AND YEAR(check_in) = %s
+                                    AND status IN ('Checked-in', 'Day Guest')
+                              ),
+                              reserved AS (
+                                    SELECT COALESCE(COUNT(status), 0) AS total_reserved 
+                                    FROM bookings 
+                                    WHERE MONTH(check_in) = %s
+                                    AND YEAR(check_in) = %s
+                                    AND status = 'Reserved'
+                              ),
+                              check_out AS (
+                                    SELECT COALESCE(COUNT(status), 0) AS total_checkout 
+                                    FROM bookings 
+                                    WHERE MONTH(check_out) = %s
+                                    AND YEAR(check_out) = %s
+                                    AND status = 'Checked-out' 
+                              ),
+                              paid AS (
+                                    SELECT COALESCE(COUNT(payment), 0) AS total_paid 
+                                    FROM bookings 
+                                    WHERE MONTH(check_in) = %s
+                                    AND YEAR(check_in) = %s
+                                    AND payment NOT IN ('Refunded', 'Pending')
+                              ),
+                              not_paid AS (
+                                    SELECT COALESCE(COUNT(payment), 0) AS total_npaid 
+                                    FROM bookings 
+                                    WHERE MONTH(check_in) = %s
+                                    AND YEAR(check_in) = %s
+                                    AND payment = 'Pending'
+                              ),
+                              cancelled AS (
+                                    SELECT COALESCE(COUNT(payment), 0) AS total_cancel
+                                    FROM bookings 
+                                    WHERE MONTH(check_in) = %s
+                                    AND YEAR(check_in) = %s
+                                    AND status = 'Cancelled'
+                              ),
+                              all_data AS (
+                                    SELECT COALESCE(COUNT(*), 0) AS total_all 
+                                    FROM bookings 
+                                    WHERE MONTH(check_in) = %s
+                                    AND YEAR(check_in) = %s
+                              )
+                              SELECT 
+                                    c.total_checkin,
+                                    r.total_reserved,
+                                    co.total_checkout,
+                                    p.total_paid,
+                                    np.total_npaid,
+                                    cn.total_cancel,
+                                    a.total_all
+                              FROM 
+                                    check_in c,
+                                    reserved r,
+                                    check_out co,
+                                    paid p,
+                                    not_paid np,
+                                    cancelled cn,
+                                    all_data a;
+                        """, (month, year, month, year, month, year, month, year, month, year, month, year, month, year))
+
+                        data = cursor.fetchone()
+                        print(data)
+                        return {'success': bool(data), 'checkin': data.get('total_checkin'), 'cancelled': data.get('total_cancel'), 'checkout': data.get('total_checkout'), 'reserved': data.get('total_reserved'), 'paid': data.get('total_paid'), 'not_paid': data.get('total_npaid'), 'all': data.get('total_all')}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+           

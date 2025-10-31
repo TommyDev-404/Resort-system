@@ -100,7 +100,7 @@ class Housekeeping:
                         ''', (area_name, room_no))
                         con.commit()
 
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if bool(cursor.rowcount ) else 'Failed inserting data!'}
+                        return {'success': bool(cursor.rowcount != 0), 'message': 'Marked ready successfully!' if bool(cursor.rowcount ) else 'Failed inserting data!'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
