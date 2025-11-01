@@ -29,7 +29,7 @@ class RatesAndAvailability:
                               UNION ALL
                               SELECT 'barkada',
                                     7 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN barkada ELSE 0 END),
-                                    7 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN garden ELSE 0 END)
+                                    7 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN barkada ELSE 0 END)
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'family',
@@ -43,23 +43,23 @@ class RatesAndAvailability:
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'cabana',
-                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN family ELSE 0 END),
-                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN family ELSE 0 END)
+                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN cabana ELSE 0 END),
+                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN cabana ELSE 0 END)
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'small',
-                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN family ELSE 0 END),
-                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN family ELSE 0 END)
+                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN small ELSE 0 END),
+                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN small ELSE 0 END)
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'hall',
-                                    1 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN family ELSE 0 END),
-                                    1 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN family ELSE 0 END)
+                                    1 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN hall ELSE 0 END),
+                                    1 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN hall ELSE 0 END)
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'big',
-                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN family ELSE 0 END),
-                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN family ELSE 0 END)
+                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN big ELSE 0 END),
+                                    8 - SUM(CASE WHEN check_in = CURRENT_DATE() + INTERVAL 1 DAY THEN big ELSE 0 END)
                               FROM accomodation_data
                               ) AS a
                               JOIN (

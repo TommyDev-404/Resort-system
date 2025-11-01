@@ -85,16 +85,22 @@ class Analytics:
                               WITH current_mtd AS (
                                     SELECT 
                                           ROUND(COALESCE(SUM({accomodation_type}* {rate.get(accomodation_type)}) / NULLIF(SUM({accomodation_type}),0), 0)) AS adr
-                                    FROM accomodation_data
-                                    WHERE MONTH(check_in) = MONTH(CURDATE())
-                                    AND YEAR(check_in) = YEAR(CURDATE())
+                                    FROM accomodation_data AS a
+                                    JOIN bookings AS b
+                                    ON a.booking_id = b.booking_id
+                                    WHERE MONTH(a.check_in) = MONTH(CURDATE())
+                                    AND YEAR(a.check_in) = YEAR(CURDATE())
+                                    AND b.payment <> 'Pending'
                               ),
                               previous_mtd AS (
                                     SELECT 
                                           ROUND(COALESCE(SUM({accomodation_type} * {rate.get(accomodation_type)}) / NULLIF(SUM({accomodation_type}),0), 0)) AS adr
-                                    FROM accomodation_data
-                                    WHERE MONTH(check_in) = MONTH(CURDATE()) - 1
-                                    AND YEAR(check_in) = YEAR(CURDATE())
+                                    FROM accomodation_data AS a
+                                    JOIN bookings AS b
+                                    ON a.booking_id = b.booking_id
+                                    WHERE MONTH(a.check_in) = MONTH(CURDATE())
+                                    AND YEAR(a.check_in) = YEAR(CURDATE())
+                                    AND b.payment <> 'Pending'
                               )
                               SELECT 
                               current_mtd.adr AS current_mtd_adr,
@@ -114,44 +120,50 @@ class Analytics:
                   else:
                         cursor.execute('''                                                  
                               WITH current_mtd AS (
-                              SELECT 
+                                    SELECT 
                                     ROUND(
                                           COALESCE(
-                                          (SUM(premium  * 10000) +
-                                          SUM(standard * 8000) +
-                                          SUM(garden   * 3500) +
-                                          SUM(barkada  * 6500) +
-                                          SUM(family   * 5000) +
-                                          SUM(cabana   * 1000) +
-                                          SUM(small    * 500) +
-                                          SUM(big      * 1000) +
-                                          SUM(hall     * 3000)
-                                          ) / NULLIF(SUM(total),0), 0
-                                          )
-                                    , 2) AS adr_all
-                              FROM accomodation_data
-                              WHERE MONTH(check_in) = MONTH(CURDATE())
-                                    AND YEAR(check_in) = YEAR(CURDATE())
+                                                (
+                                                SUM(a.premium  * 10000) +
+                                                SUM(a.standard * 8000) +
+                                                SUM(a.garden   * 3500) +
+                                                SUM(a.barkada  * 6500) +
+                                                SUM(a.family   * 5000) +
+                                                SUM(a.cabana   * 1000) +
+                                                SUM(a.small    * 500) +
+                                                SUM(a.big      * 1000) +
+                                                SUM(a.hall     * 3000)
+                                                ) / NULLIF(SUM(a.total), 0), 
+                                          0)) AS adr_all
+                                    FROM accomodation_data AS a
+                                    JOIN bookings AS b 
+                                    ON a.booking_id = b.booking_id
+                                    WHERE 
+                                    MONTH(a.check_in) = MONTH(CURDATE())
+                                    AND YEAR(a.check_in) = YEAR(CURDATE())
+                                    AND b.payment <> 'Pending'
                               ),
                               previous_mtd AS (
-                              SELECT 
-                                    ROUND(
-                                          COALESCE(
-                                          (SUM(premium  * 10000) +
-                                          SUM(standard * 8000) +
-                                          SUM(garden   * 3500) +
-                                          SUM(barkada  * 6500) +
-                                          SUM(family   * 5000) +
-                                          SUM(cabana   * 1000) +
-                                          SUM(small    * 500) +
-                                          SUM(big      * 1000) +
-                                          SUM(hall     * 3000)
-                                          ) / NULLIF(SUM(total),0), 0
-                                          )
-                                    , 2) AS adr_all
-                              FROM accomodation_data
-                              WHERE MONTH(check_in) = MONTH(CURDATE()) - 1
-                                    AND YEAR(check_in) = YEAR(CURDATE())
+                                    SELECT 
+                                          ROUND(
+                                                COALESCE(
+                                                (SUM(premium  * 10000) +
+                                                SUM(standard * 8000) +
+                                                SUM(garden   * 3500) +
+                                                SUM(barkada  * 6500) +
+                                                SUM(family   * 5000) +
+                                                SUM(cabana   * 1000) +
+                                                SUM(small    * 500) +
+                                                SUM(big      * 1000) +
+                                                SUM(hall     * 3000)
+                                                ) / NULLIF(SUM(total),0), 0
+                                          )) AS adr_all
+                                    FROM accomodation_data AS a
+                                    JOIN bookings AS b
+                                    ON a.booking_id = b.booking_id
+                                    WHERE MONTH(a.check_in) = MONTH(CURDATE()) - 1
+                                    AND YEAR(a.check_in) = YEAR(CURDATE()) 
+                                    AND b.payment <> 'Pending'
                               )
                               SELECT
                               current_mtd.adr_all AS current_mtd_adr,

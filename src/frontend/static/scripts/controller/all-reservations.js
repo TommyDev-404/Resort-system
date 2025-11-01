@@ -283,21 +283,38 @@ function enableActionBtns(e){
 
             // --- Apply your conditions
             allBtns.forEach(btn => {
+                  const date = tr.querySelectorAll('td')[2].textContent.split('-');
+                  const year = document.getElementById('yearSelect').value;
+                  const reservationDate = new Date(`${date[0]}${year}`);
+                  const todayDate = new Date();
+
+                  // Paid
                   if (payment !== 'Pending') {
+                        // enable check-out btn only
                         if (status === 'Checked-in' && btn.getAttribute('id') === 'mark-checkout') {
                               btn.style.opacity = '1';
                               btn.style.pointerEvents = 'auto';
                         }
-                        if (status === 'Reserved' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
+                        // enable change date, checkin,  & cancel reservation btns
+                        if (status === 'Reserved' && reservationDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
                               btn.style.opacity = '1';
                               btn.style.pointerEvents = 'auto';
                         }
-                  } else {
+                        // enable change date & cancel reservation btns
+                        if (status === 'Reserved' && reservationDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
+                              btn.style.opacity = '1';
+                              btn.style.pointerEvents = 'auto';
+                        }
+                  } else { // Not Paid
                         if (status === 'Checked-in' && (btn.getAttribute('id') === 'mark-checkout' || btn.getAttribute('id') === 'mark-paid')) {
                               btn.style.opacity = '1';
                               btn.style.pointerEvents = 'auto';
                         }
-                        if (status === 'Reserved' && btn.getAttribute('id') !== 'mark-checkout') {
+                        if (status === 'Reserved' && reservationDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
+                              btn.style.opacity = '1';
+                              btn.style.pointerEvents = 'auto';
+                        }
+                        if (status === 'Reserved' && reservationDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout') {
                               btn.style.opacity = '1';
                               btn.style.pointerEvents = 'auto';
                         }
@@ -401,6 +418,7 @@ async function markAsCheckin(){
             successMessageCard(result.message);
             totalCheckin();
             recentBookings();
+            upcomingArrivals();
             resetButtonAndCheckBox();
       }else{
             failedMessageCard(result.message);

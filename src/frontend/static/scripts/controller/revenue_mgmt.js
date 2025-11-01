@@ -29,14 +29,27 @@ function failedMessageCard(message){
 }
 
 function createRow(date, promo_name, discount, area, end, status){
+      const all_area = {
+            'Premium': 'Premium Villa Room',
+            'Standard': 'Standard Villa Room',
+            'Family': 'Family Room',
+            'Barkada': 'Barkada Room',
+            'Garden': 'Garden View Room',
+            'Cabana': 'Cabana Cottage',
+            'Small': 'Small Cottage',
+            'Big': 'Big Cottage',
+            'Hall': 'Hall'
+      }
+      const formatted_area_name = area.split(',').map(a => all_area[a]);
+
       const row = `
-            <tr class="hover:bg-blue-50 transition fade-in-up">
+            <tr class="hover:bg-blue-50 transition fade-in-up text-[17px]">
                   <td class="py-3 px-4 text-gray-700">${date}</td>
                   <td class="py-3 px-4 text-gray-700">${end}</td>
                   <td class="py-3 px-4 font-medium text-gray-800">${promo_name}</td>
                   <td class="py-3 px-4 text-gray-700">${discount}</td>
-                  <td class="py-3 px-4 text-gray-700">${area}</td>
-                  <td class="text-green-500 rounded-lg text-sm font-bold">${status}</td>
+                  <td class="py-3 px-4 text-gray-700">${formatted_area_name}</td>
+                  <td class="text-white rounded-lg text-sm font-bold"><span class="bg-green-500 py-2 px-4 rounded-lg">${status}</span></td>
             </tr>
       `;
 

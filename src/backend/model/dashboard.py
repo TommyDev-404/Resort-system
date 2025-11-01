@@ -85,13 +85,13 @@ class Dashboard:
                                     SELECT COUNT(*) AS today_checkin
                                     FROM bookings
                                     WHERE DATE(check_in) = CURRENT_DATE()
-                                    AND status = 'Checked-in'
+                                    AND status IN ('Checked-in', 'Day Guest')
                               ),
                               yesterday AS (
                                     SELECT COUNT(*) AS yesterday_checkin
                                     FROM bookings
                                     WHERE DATE(check_in) = (CURRENT_DATE() - INTERVAL 1 DAY)
-                                    AND status NOT IN ('Cancelled')
+                                    AND status NOT IN ('Cancelled', 'Reserved')
                               )
                         SELECT 
                               today.today_checkin as today_data,

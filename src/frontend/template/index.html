@@ -444,7 +444,7 @@
                               <div class="group relative overflow-hidden bg-white/80 backdrop-blur-md border-b-4 border-blue-500 p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                                     <div class="flex items-center justify-between">
                                           <div>
-                                                <p class="text-sm font-medium text-gray-500">Total Check-Ins (This Week)</p>
+                                                <p class="text-sm font-medium text-gray-500">Total Check-Ins <span class="text-[13px] text-gray-400">( This Week )</span> </p>
                                                 <p class="text-4xl font-bold mt-1 text-blue-600" id="total_checkin">45</p>
                                                 <span class="text-xs text-gray-400"><span id="change_checkins" class="text-green-500 font-semibold">+12%</span> from last week</span>
                                           </div>
@@ -470,9 +470,9 @@
                               <div class="group relative overflow-hidden bg-white/80 backdrop-blur-md border-b-4 border-indigo-500 p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                                     <div class="flex items-center justify-between">
                                           <div>
-                                                <p class="text-sm font-medium text-gray-500">Upcoming Arrivals</p>
+                                                <p class="text-sm font-medium text-gray-500">Upcoming Arrivals <span class="text-[13px] text-gray-400">( Reservation )</span></p>
                                                 <p class="text-4xl font-bold mt-1 text-indigo-600" id="upcoming_arrivals">45</p>
-                                                <span class="text-xs text-gray-400">Next 48 hours</span>
+                                                <span class="text-xs text-gray-400">All Reservations</span>
                                           </div>
                                           <div class="bg-indigo-100 p-3 rounded-xl group-hover:bg-indigo-200 transition-colors duration-300"><i data-lucide="calendar-days" class="w-6 h-6 text-indigo-600"></i> </div>
                                     </div>
@@ -483,7 +483,7 @@
                               <div class="group relative overflow-hidden bg-white/80 backdrop-blur-md border-b-4 border-rose-500 p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                                     <div class="flex items-center justify-between">
                                           <div>
-                                                <p class="text-sm font-medium text-gray-500">Cancelled Bookings (This Month)</p>
+                                                <p class="text-sm font-medium text-gray-500">Cancelled Bookings <span class="text-[13px] text-gray-400">( This Month )</span> </p>
                                                 <p class="text-4xl font-bold mt-1 text-rose-600" id="cancelled">12</p>
                                                 <span class="text-xs text-gray-400">As of Oct 31</span>
                                           </div>
@@ -710,7 +710,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                               <div class="metric-card bg-card-bg p-6 rounded-xl border-b-4 border-green-500 flex items-center justify-between">
                               <div>
-                              <p class="text-sm font-medium text-gray-500">Direct Payment</p>
+                              <p class="text-sm font-medium text-gray-500">Direct Payment <span class="text-[13px] text-gray-400">( Today )</span></p>
                               <p class="text-3xl font-semibold mt-1 text-green-600" id="direct-payment">$5,100</p>
                               </div>
                               <i data-lucide="credit-card" class="w-8 h-8 text-green-600 opacity-80"></i>
@@ -718,7 +718,7 @@
 
                               <div class="metric-card bg-card-bg p-6 rounded-xl border-b-4 border-blue-500 flex items-center justify-between">
                               <div>
-                              <p class="text-sm font-medium text-gray-500">ZUZU Payment (Online)</p>
+                              <p class="text-sm font-medium text-gray-500">ZUZU Payment (Online) <span class="text-[13px] text-gray-400">( Today )</span></p>
                               <p class="text-3xl font-semibold mt-1 text-blue-600" id="online-payment">$8,900</p>
                               </div>
                               <i data-lucide="globe" class="w-8 h-8 text-blue-600 opacity-80"></i>
@@ -726,7 +726,7 @@
 
                               <div class="metric-card bg-card-bg p-6 rounded-xl border-b-4 border-yellow-500 flex items-center justify-between">
                               <div>
-                              <p class="text-sm font-medium text-gray-500">Total Booking Revenue Today</p>
+                              <p class="text-sm font-medium text-gray-500">Total Booking Revenue <span class="text-[13px] text-gray-400">( Today )</span></p>
                               <p class="text-3xl font-semibold mt-1 text-yellow-600" id="booking-revenue">$14,000</p>
                               </div>
                               <i data-lucide="bar-chart-3" class="w-8 h-8 text-yellow-600 opacity-80"></i>
@@ -746,7 +746,7 @@
                               <h3 class="text-xl font-semibold mb-4 flex items-center"><span data-lucide="receipt" class="w-5 h-5 mr-2 text-primary-blue"></span> Booking Revenue Report (Last 7 Days)</h3>
                               <div class="overflow-y-auto max-h-[50vh]">
                                     <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50 sticky top-0">
+                                    <thead class="bg-gray-50 sticky top-0 z-30">
                                           <tr>
                                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Online Payment</th>

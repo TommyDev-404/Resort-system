@@ -412,7 +412,7 @@ class Reservation:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute('''SELECT COALESCE(COUNT(*), 0) as arrivals FROM bookings where status = 'Reserved' AND check_in > CURRENT_DATE() ''')
+                        cursor.execute(''' SELECT COALESCE(COUNT(*), 0) as arrivals FROM bookings where status = 'Reserved' AND check_in > CURRENT_DATE() OR status = 'Reserved' ''')
                         data = cursor.fetchone()
 
                         return {'upcoming_checkin': data.get('arrivals')}
