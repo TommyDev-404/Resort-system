@@ -150,6 +150,8 @@ async function loginAdmin(e) {
 
 async function forgotPassword() {
       const email = document.querySelector('input[name="email"]').value;
+
+      if (email === '') return failedMessageCard('Empty input! Please fill in before getting code.')
       try {
             loadingAnimation();
 
@@ -178,22 +180,26 @@ async function forgotPassword() {
 async function verifyCode() {
       const code = document.querySelector('input[name="code"]').value;
 
-      const response = await fetch(`/forgot-password/code-verification`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ code : code })
-      });
-      const result = await response.json();
-
-      if (result.success){
-            changePasswordForm.classList.add('opacity-0');
-            setTimeout(() => {
-                  forgotForm.classList.add('hidden');
-                  changePasswordForm.classList.remove('hidden');
-                  setTimeout(() => changePasswordForm.classList.add('opacity-100'), 50);
-            }, 300);
-      }else{
-            failedMessageCard(result.message);
+      if (code !== ''){
+            const response = await fetch(`/forgot-password/code-verification`, {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify({ code : code })
+            });
+            const result = await response.json();
+      
+            if (result.success){
+                  changePasswordForm.classList.add('opacity-0');
+                  setTimeout(() => {
+                        forgotForm.classList.add('hidden');
+                        changePasswordForm.classList.remove('hidden');
+                        setTimeout(() => changePasswordForm.classList.add('opacity-100'), 50);
+                  }, 300);
+            }else{
+                  failedMessageCard(result.message);
+            }
+      }else {
+            failedMessageCard('No code inputted!');
       }
 }
 
