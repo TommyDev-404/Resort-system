@@ -461,15 +461,19 @@ class Reservation:
                         cursor = con.cursor()
                         cursor.execute(''' UPDATE bookings SET status = 'Checked-in' where booking_id = %s ''', (id))
                         con.commit()
-
+                        print(accomodation)
                         parts = accomodation.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
                         
                         for room, number in set(zip(rooms, room_no)):
                               if room not in ['cabana', 'small', 'big', 'hall']:
+                                    print('updating...')
+                                    print(room, number)
                                     cursor.execute('''UPDATE accomodation_spaces SET status = "occupied" WHERE name=%s AND room=%s''', (room.capitalize(), number))
-
+                        
+                        con.commit()
+                        
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
                   con.rollback()
@@ -590,7 +594,7 @@ class Reservation:
                                     FROM bookings 
                                     WHERE MONTH(check_in) = %s
                                     AND YEAR(check_in) = %s
-                                    AND status IN ('Checked-in', 'Day Guest')
+                                    AND status IN ('Checked-in')
                               ),
                               reserved AS (
                                     SELECT COALESCE(COUNT(status), 0) AS total_reserved 
