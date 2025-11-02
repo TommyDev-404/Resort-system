@@ -50,7 +50,15 @@
 		<h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4">'Grand-Villa Laguna Resort'</h1>
 		<label class="text-white mb-6 block max-w-xl">Escape the ordinary — find your paradise today.</label>
 		<button id="search-btn" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-500 transition-colors">🏖️ Explore & Relax →</button>
-	</div>
+		<div class="flex flex-col gap-2 mt-6">
+			<label class="text-white font-medium">Visit us on: </label>
+			<div class="flex gap-8 justify-center">
+				<a href="https://www.facebook.com/grandvillalaguna"><img src="{{ url_for('static', filename='assets/fbs.png') }}" width="42" class="hover:scale-105 transition rounded-4xl"></a>
+				<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw"><img src="{{ url_for('static', filename='assets/insta.avif') }}" width="42" class="hover:scale-105 transition  rounded-4xl"></a>
+				<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09"><img src="{{ url_for('static', filename='assets/twitter.png') }}" width="40" class="hover:scale-105 transition"></a>
+			</div>
+		</div>
+		</div>
 </section>
 
 
@@ -95,11 +103,7 @@
 
 					<button type="submit" class="bg-primary-blue py-3 w-full text-white font-semibold rounded-full mt-8 hover:bg-blue-600 cursor-pointer text-center transition-all duration-300">Login</button>
 				</form>
-				<div class="flex gap-8 justify-center mt-6">
-					<a href="https://www.facebook.com/grandvillalaguna"><img src="{{ url_for('static', filename='assets/fbs.png') }}" width="45" class="hover:scale-105 transition"></a>
-					<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw"><img src="{{ url_for('static', filename='assets/insta.avif') }}" width="42" class="hover:scale-105 transition  rounded-4xl"></a>
-					<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09"><img src="{{ url_for('static', filename='assets/twitter.png') }}" width="40" class="hover:scale-105 transition"></a>
-				</div>
+			
 			</div>
 
 			<!-- FORGOT PASSWORD FORM -->

@@ -113,39 +113,67 @@
                               <p class="text-sm text-gray-300 tracking-wide">Analytics & Management</p>
                         </div>
                   </div>
-
+                  
                   <!-- Navigation -->
                   <nav class="p-5 space-y-1">
-                        <div id="nav-home-dashboard" data-section="home-dashboard" class="sidebar-item active flex items-center gap-3 px-5 py-3 rounded-xl bg-white/10 font-semibold cursor-pointer text-yellow-400 hover:text-yellow-500 transition-all duration-200"><i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                              <span>Dashboard</span>
+                        <!-- Dashboard (active) -->
+                        <div id="nav-home-dashboard" data-section="home-dashboard" class="sidebar-item active relative flex items-center gap-3 px-5 py-3 rounded-xl bg-white/10 text-green font-semibold cursor-pointer transition-all duration-200">
+                                    <i data-lucide="layout-dashboard" class="w-5 h-5 text-green"></i>
+                                    <span class="relative z-10 text-green">Dashboard</span>
                         </div>
-                        <div id="nav-analytics" data-section="analytics" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl cursor-pointer hover:bg-purple-500/10 font-semibold !text-purple-400 hover:text-purple-600 transition-all duration-200"> <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                              <span>Analytics & Reports</span>
+                  
+                        <!-- Analytics -->
+                        <div id="nav-analytics" data-section="analytics" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl cursor-pointer font-semibold transition-all duration-200">
+                              <i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i>
+                              <span class="relative z-10 text-white">Analytics & Reports</span>
                         </div>
-                        <div id="nav-all-reservations" data-section="all-reservations" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold !text-blue-500 cursor-pointer hover:bg-blue-400/10  hover:text-blue-600 transition-all duration-200"><i data-lucide="calendar-check" class="w-5 h-5"></i>
-                              <span>Reservations</span>
+                  
+                        <!-- Reservations -->
+                        <div id="nav-all-reservations" data-section="all-reservations" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200">
+                              <i data-lucide="calendar-check" class="w-5 h-5 text-white"></i>
+                              <span class="relative z-10 text-white">Reservations</span>
                         </div>
-                        <div id="nav-housekeeping" data-section="housekeeping" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold cursor-pointer hover:bg-yellow-400/10 text-yellow-400 hover:text-yellow-500 transition-all duration-200"><i data-lucide="sparkles" class="w-5 h-5"></i>
-                              <span>Housekeeping</span>
+                  
+                        <!-- Housekeeping -->
+                        <div id="nav-housekeeping" data-section="housekeeping" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200">
+                              <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+                              <span class="relative z-10 text-white">Housekeeping</span>
                         </div>
-                        <div id="nav-rates-availability" data-section="rates-availability" class="sidebar-item flex items-center gap-3 px-5 py-3 font-semibold rounded-xl cursor-pointer hover:bg-indigo-400/10 !text-indigo-400 hover:text-indigo-500 transition-all duration-200"><i data-lucide="calendar" class="w-5 h-5"></i>
-                              <span>Rates & Availability</span>
+                  
+                        <!-- Rates & Availability -->
+                        <div id="nav-rates-availability" data-section="rates-availability" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200">
+                              <i data-lucide="calendar" class="w-5 h-5 text-white"></i>
+                              <span class="relative z-10 text-white">Rates & Availability</span>
                         </div>
-                        <div id="nav-revenue-management" data-section="revenue-management" class="sidebar-item flex items-center gap-3 px-5 py-3 font-semibold rounded-xl cursor-pointer hover:bg-teal-400/10 !text-teal-400 hover:text-teal-500 transition-all duration-200"><i data-lucide="trending-up" class="w-5 h-5"></i>
-                              <span>Revenue Management</span>
+                  
+                        <!-- Revenue Management -->
+                        <div id="nav-revenue-management" data-section="revenue-management" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200">
+                              <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
+                              <span class="relative z-10 text-white">Revenue Management</span>
                         </div>
-                        <div id="nav-accounting" data-section="accounting" class="sidebar-item flex items-center font-semibold gap-3 px-5 py-3 rounded-xl cursor-pointer hover:bg-amber-400/10 !text-green-400 hover:text-green-500 transition-all duration-200"><i data-lucide="wallet" class="w-5 h-5"></i>
-                              <span>Accounting</span>
+                        
+                        <!-- Accounting -->
+                        <div id="nav-accounting" data-section="accounting" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200">
+                              <i data-lucide="wallet" class="w-5 h-5 text-white"></i>
+                              <span class="relative z-10 text-white">Accounting</span>
                         </div>
-                        <div id="nav-admin-profile" data-section="admin-profile" class="sidebar-item font-semibold flex items-center gap-3 px-5 py-3 rounded-xl cursor-pointer hover:bg-fuchsia-400/10 !text-indigo-500 hover:text-indigo-600 transition-all duration-200"><i data-lucide="user" class="w-5 h-5"></i>
-                              <span>Admin Profile</span>
+                        
+                        <!-- Admin Profile -->
+                        <div id="nav-admin-profile" data-section="admin-profile" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200">
+                              <i data-lucide="user" class="w-5 h-5 text-white hover:bg-fuchsia-400/10 hover:text-indigo-600"></i>
+                              <span class="relative z-10 text-white">Admin Profile</span>
                         </div>
+                        
                         <!-- Divider -->
                         <div class="border-t border-white/10 my-3"></div>
-                        <div id="nav-logout" data-section="logout" class="sidebar-item font-semibold flex items-center gap-3 px-5 py-3 rounded-xl cursor-pointer hover:bg-red-500/10 !text-red-500 hover:text-red-600 transition-all duration-200"><i data-lucide="log-out" class="w-5 h-5"></i>
-                              <span>Log Out</span>
+                        
+                        <!-- Logout -->
+                        <div id="nav-logout" data-section="logout" class="sidebar-item flex items-center gap-3 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200">
+                              <i data-lucide="log-out" class="w-5 h-5 text-red-500"></i>
+                              <span class="relative z-10 text-red-500">Log Out</span>
                         </div>
                   </nav>
+                  
             </aside>
 
             <!-- Main Content Area -->

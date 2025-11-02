@@ -152,7 +152,8 @@ class Reservation:
                         if cursor.rowcount != 0: result_list.append(True)
 
                         for room, number in set(zip(rooms, room_no)):
-                              cursor.execute('''UPDATE accomodation_spaces SET status = "occupied" WHERE name=%s AND room=%s''', (room.capitalize(), number))
+                              if inquiry_type == 'Walk-in':
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = "occupied" WHERE name=%s AND room=%s''', (room.capitalize(), number))
 
                         con.commit()
 
@@ -454,12 +455,20 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def mark_checkin(self, id):
+      def mark_checkin(self, id, accomodation):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' UPDATE bookings SET status = 'Checked-in' where booking_id = %s ''', (id))
                         con.commit()
+
+                        parts = accomodation.split(',')
+                        rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
+                        room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
+                        
+                        for room, number in set(zip(rooms, room_no)):
+                              if room not in ['cabana', 'small', 'big', 'hall']:
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = "occupied" WHERE name=%s AND room=%s''', (room.capitalize(), number))
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:

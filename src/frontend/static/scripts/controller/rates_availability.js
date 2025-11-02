@@ -139,7 +139,7 @@ async function updatePrice(e){
 // --------------  EVENT LISTENERS --------------- //
 document.addEventListener('click', (e) => {
       const btn = e.target.closest('.update-btn'); // ensures we get the button even if child is clicked
-      console.log(btn);
+      
       if (btn) {
           const areaId = btn.id;
           openUpdateAreaModal(e); // pass the ID to the modal

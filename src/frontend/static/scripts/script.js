@@ -107,9 +107,26 @@ function switchContent(sectionId) {
     // Update sidebar active state
     sidebarItems.forEach(item => {
         const isActive = item.dataset.section === sectionId;
-        item.classList.toggle('active', isActive);
-        item.classList.toggle('text-white', isActive);
-        item.classList.toggle('text-gray-700', !isActive);
+        const icon = item.querySelector('svg');
+        const span = item.querySelector('span');
+        
+        if (item.getAttribute('data-section') !== 'logout'){
+            // Change color for the icon
+            if (icon) {
+                icon.classList.toggle('text-green-500', isActive);
+                icon.classList.toggle('text-white', !isActive);
+            }
+        
+            // Change color for the text span
+            if (span) {
+                span.classList.toggle('text-green-500', isActive);
+                span.classList.toggle('text-white', !isActive);
+            }
+    
+            item.classList.toggle('active', isActive);
+            item.classList.toggle('text-green-500', isActive);
+            item.classList.toggle('text-white', !isActive);
+        }
     });
 
     // Hide sidebar on mobile after selection

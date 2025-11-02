@@ -407,8 +407,9 @@ async function markAsCheckout(){
 
 async function markAsCheckin(){
       const id = retrieveCheckboxId().id;
+      const accommodations = retrieveCheckboxId().accomodations;
 
-      const response = await fetch(`/mark-checkin/${id}`,{
+      const response = await fetch(`/mark-checkin?id=${id}&accomodation=${accommodations}`,{
             method: 'POST',
             headers: {'Content-Type': 'application/json'}
       });

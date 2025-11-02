@@ -229,9 +229,9 @@ def get_years():
 def mark_paid():
       return jsonify(reserve.mark_paid(request.args.get('payment'), request.args.get('id')))
 
-@app.route('/mark-checkin/<int:id>', methods=['POST'])
-def mark_checkin(id):
-      return jsonify(reserve.mark_checkin(id))
+@app.route('/mark-checkin', methods=['POST'])
+def mark_checkin():
+      return jsonify(reserve.mark_checkin(request.args.get('id'), request.args.get('accomodation')))
 
 @app.route('/mark-checkout', methods=['POST'])
 def mark_checkout():
