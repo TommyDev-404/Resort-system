@@ -1,3 +1,6 @@
+-- CREATE DATABASE
+CREATE DATABASE resort_db;
+
 
 -- trigger
 DELIMITER $$
@@ -33,9 +36,9 @@ CREATE TABLE accomodation_spaces (
 
 INSERT Into accomodation_spaces (name, room, avl) VALUES
 ('Standard', 101, 1), ('Standard', 102, 1), ('Standard', 103, 1), ('Garden', 101, 1), ('Garden', 102, 1), ('Garden', 103, 1), ('Garden', 104, 1), ('Garden', 105, 1), ('Garden', 106, 1), ('Garden', 107, 1), ('Garden', 108, 1),('Garden', 109, 1),('Garden', 110, 1),('Garden', 111, 1),('Garden', 112, 1), ('Premium', 101, 1),  ('Premium', 102, 1),  ('Premium', 103, 1),  ('Premium', 104, 1),  ('Barkada', 101, 1),  ('Barkada', 102, 1),  ('Barkada', 103, 1),
- ('Barkada', 104, 1),  ('Barkada', 105, 1),  ('Barkada', 106, 1),  ('Barkada', 107, 1),  ('Family', 101, 1), ('Family', 102, 1), ('Family', 103, 1), ('Family', 104, 1), ('Family', 105, 1), ('Family', 106, 1), ('Family', 107, 1), 
- ('Cabana', 101, 1), ('Cabana', 102, 1), ('Cabana', 103, 1), ('Cabana', 104, 1), ('Cabana', 101, 1), ('Cabana', 102, 1), ('Cabana', 103, 1), ('Cabana', 104, 1), ('Small', 101, 1), ('Small', 102, 1), ('Small', 103, 1), ('Small', 104, 1), ('Small', 105, 1), ('Small', 106, 1), ('Small', 107, 1), ('Small', 108, 1),
- ('Big', 101, 1), ('Big', 102, 1), ('Big', 103, 1), ('Big', 104, 1), ('Big', 105, 1), ('Big', 106, 1), ('Big', 107, 1), ('Big', 108, 1), ('Hall', 101, 1)
+('Barkada', 104, 1),  ('Barkada', 105, 1),  ('Barkada', 106, 1),  ('Barkada', 107, 1),  ('Family', 101, 1), ('Family', 102, 1), ('Family', 103, 1), ('Family', 104, 1), ('Family', 105, 1), ('Family', 106, 1), ('Family', 107, 1), 
+('Cabana', 101, 1), ('Cabana', 102, 1), ('Cabana', 103, 1), ('Cabana', 104, 1), ('Cabana', 101, 1), ('Cabana', 102, 1), ('Cabana', 103, 1), ('Cabana', 104, 1), ('Small', 101, 1), ('Small', 102, 1), ('Small', 103, 1), ('Small', 104, 1), ('Small', 105, 1), ('Small', 106, 1), ('Small', 107, 1), ('Small', 108, 1),
+('Big', 101, 1), ('Big', 102, 1), ('Big', 103, 1), ('Big', 104, 1), ('Big', 105, 1), ('Big', 106, 1), ('Big', 107, 1), ('Big', 108, 1), ('Hall', 101, 1)
 
 INSERT INTO accomodation_spaces (name, room, status, staff_assign, role, date, rate, orig_rate, promo)
 VALUES
