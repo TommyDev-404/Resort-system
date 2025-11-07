@@ -16,8 +16,8 @@ def add_header(response):
 # Create DB object once here
 db = Database(
       host="localhost",
-      user="tommy",
-      password="2006",
+      user="root",
+      password="",
       database="resort_db",
       cursor=pymysql.cursors.DictCursor
 )
