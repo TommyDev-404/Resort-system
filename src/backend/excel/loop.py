@@ -27,7 +27,7 @@ df = df.rename(columns={
     "total": "total"
 })
 
-db = pymysql.connect( host="localhost", user="tommy", password="2006", database="resort_db", ) 
+db = pymysql.connect( host="localhost", user="root", password="", database="resort_db2", ) 
 cursor = db.cursor() # Use the connection directly
 
 # 4️⃣ Loop through dataframe and insert

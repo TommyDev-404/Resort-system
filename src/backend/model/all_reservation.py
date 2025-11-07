@@ -110,6 +110,7 @@ class Reservation:
                         if inquiry_type == 'Walk-in': status = 'Checked-in'
                         if inquiry_type == 'Day Guest': status = 'Day Guest'
                         
+                        print(status)
                         room_rate = {
                               'premium' : 1000, 
                               'standard' : 8000,
@@ -189,8 +190,8 @@ class Reservation:
                         new_data = []
 
                         for d in data:
-                              formatted_checkin  = d.get('check_in').strftime("%b %-d")  
-                              formatted_checkout  = d.get('check_out').strftime("%b %-d")  
+                              formatted_checkin  = d.get('check_in').strftime("%b %d").lstrip("0")    
+                              formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0")    
 
                               new_data.append({'id': d.get('booking_id'), 'name': d.get('name'), 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
                               
@@ -319,9 +320,9 @@ class Reservation:
                         data = cursor.fetchall()
                         new_data = []
 
-                        for d in data:
-                              formatted_checkin  = d.get('check_in').strftime("%b %-d")  
-                              formatted_checkout  = d.get('check_out').strftime("%b %-d")  
+                        for d in data: 
+                              formatted_checkin  = d.get('check_in').strftime("%b %d").lstrip("0")  
+                              formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0")    
 
                               new_data.append({'id': d.get('booking_id'), 'name': d.get('name'), 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
                               
@@ -352,8 +353,8 @@ class Reservation:
                         new_data = []
 
                         for d in data:
-                              formatted_checkin  = d.get('check_in').strftime("%b %-d")  
-                              formatted_checkout  = d.get('check_out').strftime("%b %-d")  
+                              formatted_checkin = d.get('check_in').strftime("%b %d").lstrip("0")
+                              formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0")  
 
                               new_data.append({'id': d.get('booking_id'), 'name': d.get('name'), 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
                               

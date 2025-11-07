@@ -104,7 +104,7 @@
 <body class="bg-[#fefcfb] text-slate-800">
 
       <div id="app" class="main-container">
-            <aside id="sidebar" class="fixed lg:static h-screen w-76 bg-gradient-to-b from-slate-800 via-slate-900 to-black shadow-2xl border-r border-white/10 z-30 transition-transform transform -translate-x-full lg:translate-x-0 backdrop-blur-lg">
+            <aside id="sidebar" class="fixed lg:static h-screen w-75 bg-gradient-to-b from-slate-800 via-slate-900 to-black shadow-2xl border-r border-white/10 z-30 transition-transform transform -translate-x-full lg:translate-x-0 backdrop-blur-lg">
                   <div class="relative h-52 flex flex-col items-center justify-center border-b border-white/10">
                         <div class="absolute inset-0 bg-cover bg-center opacity-40" style="background-image: url('{{ url_for('static', filename='assets/resort.jpg') }}');"></div>
                         <div class="relative z-10 flex flex-col items-center space-y-2">
@@ -173,11 +173,10 @@
                               <span class="relative z-10 text-red-500">Log Out</span>
                         </div>
                   </nav>
-                  
             </aside>
 
             <!-- Main Content Area -->
-            <main class="flex-1 lg:ml-10 py-4 px-8 overflow-y-auto h-screen bg-gray-200">
+            <main class="flex-1 lg:ml-10 py-4 px-8 overflow-y-auto h-screen">
                   <img src="{{ url_for('static', filename='assets/user.png') }}" width="35" class="fixed z-50 right-8 cursor-pointer"  id="admin-profile-shortcut">
 
                   <!-- OCCUPANCY -->
@@ -575,7 +574,7 @@
                                     <button id="mark-paid" class="btn flex items-center gap-2 bg-green-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-green-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-circle-check text-lg"></i> Mark as Paid</button>
                                     <button id="mark-checkin" class="btn flex items-center gap-2 bg-blue-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-blue-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-login text-lg"></i> Check-In</button>
                                     <button id="mark-checkout" class="btn flex items-center gap-2 bg-amber-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-amber-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-logout text-lg"></i> Check-Out</button>
-                                    <button id="cancel-bookings" class="btn flex items-center gap-2 bg-rose-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-rose-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-trash text-lg"></i> Cancel Reservation</button>
+                                    <button id="cancel-bookings" class="btn flex items-center gap-2 bg-rose-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-rose-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-trash text-lg"></i> Cancel Booking</button>
                               </div>
                               
                               <!-- Table -->
@@ -721,6 +720,7 @@
                                                       <th class="py-3 px-4 font-semibold">Discount%</th>
                                                       <th class="py-3 px-4 font-semibold">Applied Rooms</th>
                                                       <th class="py-3 px-4 font-semibold">Status</th>
+                                                      <th class="py-3 px-4 font-semibold">Action</th>
                                                       </tr>
                                                 </thead>
                                                 <tbody id="promo-tbody" class="divide-y divide-gray-200 text-gray-600 text-[14px]"></tbody>

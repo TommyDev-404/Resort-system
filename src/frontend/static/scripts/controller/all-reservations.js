@@ -31,6 +31,7 @@ function failedMessageCard(message){
 }
 
 function createTable(id, guest_name, checkin, checkout, stay_count, accomodations, status, payment_status){
+      console.log(status);
       const row = `
             <tr class="text-[16px] bg-gray-50 hover:bg-blue-50 transition text-gray-600 fade-in-up" id="${id}" data-set="${accomodations}">
                   <td class="px-3 py-4"><input type="checkbox" name="select" class="w-6 h-5"></td>
@@ -286,15 +287,23 @@ function enableActionBtns(e){
                   const date = tr.querySelectorAll('td')[2].textContent.split('-');
                   const year = document.getElementById('yearSelect').value;
                   const reservationDate = new Date(`${date[0]}${year}`);
+                  const checkoutDate = new Date(`${date[1]}${year}`);
                   const todayDate = new Date();
 
                   // Paid
                   if (payment !== 'Pending') {
                         // enable check-out btn only
-                        if (status === 'Checked-in' && btn.getAttribute('id') === 'mark-checkout') {
+                        if (status === 'Checked-in' && checkoutDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid') {
                               btn.style.opacity = '1';
                               btn.style.pointerEvents = 'auto';
                         }
+                        
+                        if (status === 'Checked-in' && checkoutDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout') {
+                              btn.style.opacity = '1';
+                              btn.style.pointerEvents = 'auto';
+                        }
+
+
                         // enable change date, checkin,  & cancel reservation btns
                         if (status === 'Reserved' && reservationDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
                               btn.style.opacity = '1';
@@ -306,10 +315,21 @@ function enableActionBtns(e){
                               btn.style.pointerEvents = 'auto';
                         }
                   } else { // Not Paid
-                        if (status === 'Checked-in' && (btn.getAttribute('id') === 'mark-checkout' || btn.getAttribute('id') === 'mark-paid')) {
+                        if (status === 'Checked-in'  && checkoutDate.toDateString() === todayDate.toDateString() && (btn.getAttribute('id') === 'mark-checkout' || btn.getAttribute('id') === 'mark-paid')) {
                               btn.style.opacity = '1';
                               btn.style.pointerEvents = 'auto';
                         }
+                        
+                        if (status === 'Checked-out' && btn.getAttribute('id') === 'mark-paid') {
+                              btn.style.opacity = '1';
+                              btn.style.pointerEvents = 'auto';
+                        }
+                        
+                        if (status === 'Checked-in' && checkoutDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-checkout') {
+                              btn.style.opacity = '1';
+                              btn.style.pointerEvents = 'auto';
+                        }
+
                         if (status === 'Reserved' && reservationDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
                               btn.style.opacity = '1';
                               btn.style.pointerEvents = 'auto';
@@ -354,7 +374,7 @@ function retrieveCheckboxId(){
 async function addBooking(e){
       e.preventDefault();      
       const form = new FormData(e.target);
-      
+      console.log(form);
       try{
             const response = await fetch('/add-booking', {
                   method: 'POST', 

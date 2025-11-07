@@ -318,13 +318,28 @@ def promo():
       start = data.get('date')
       end = data.get('end_date')
 
-      print(promo_name, discount_rate, selected_rooms, start, end)
-
       return jsonify(rev.apply_promo(start, promo_name, end, discount_rate, selected_rooms))
+
+@app.route('/update-promo', methods=['POST'])
+def update_promo():
+      data = request.get_json()
+      id = data.get('id')
+      promo_name = data.get('promo_name')
+      discount_rate = data.get('promo_rate')
+      selected_rooms = data.get('area_list')  # array
+      start = data.get('date')
+      end = data.get('end_date')
+      prev_area = data.get('prev_area')
+
+      return jsonify(rev.update_promo(id, start, promo_name, end, discount_rate, selected_rooms, prev_area))
 
 @app.route('/get-all-promo', methods=['GET'])
 def get_all_promo():
       return jsonify(rev.get_promo_data())
+
+@app.route('/remove-promo', methods=['DELETE'])
+def remove_promo():
+      return jsonify(rev.remove_promo(request.args.get('id'), request.args.get('area_promos')))
 
 
 #--------------- ADMIN PROFILE ------------------#

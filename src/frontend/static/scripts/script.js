@@ -32,9 +32,9 @@ function toggleSidebar() {
     const isHidden = sidebar.classList.contains('-translate-x-full');
     sidebar.classList.toggle('-translate-x-full', !isHidden);
     sidebar.classList.toggle('translate-x-0', isHidden);
-    sidebarOverlay.classList.toggle('opacity-0', isHidden);
-    sidebarOverlay.classList.toggle('pointer-events-none', isHidden);
-    sidebarOverlay.classList.toggle('opacity-50', !isHidden);
+    sidebar.classList.toggle('opacity-0', isHidden);
+    sidebar.classList.toggle('pointer-events-none', isHidden);
+    sidebar.classList.toggle('opacity-50', !isHidden);
 }
 
 function logoutCard(){
