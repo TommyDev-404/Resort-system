@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Admin System</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='style/output.css') }}" />
+      <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
+	
+      <script src="https://unpkg.com/lucide@latest"></script>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+		
+		.metric-card {
+				transition: transform 0.2s;
+		}
+
+		.metric-card:hover {
+				transform: translateY(-2px);
+		}
+
+		@keyframes fadeInUp {
+			0% { opacity: 0; transform: translateY(10px); }
+			100% { opacity: 1; transform: translateY(0); }
+		}
+
+		.fade-in-up {
+			animation: fadeInUp 0.6s ease-out forwards;
+		}
+
+		.sidebar-item {
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.sidebar-item.active {
+			background-color: #2554f1; /* Blue-100 */
+			font-weight: 600;
+                  padding-left: 0.9rem;
+		}
+
+	</style>
+</head>
+
+<body class="flex bg-gray-100 dark:bg-gray-800 text-gray-100 max-h-screen font-[Inter]">
+
+	<!-- SIDEBAR -->
+	<aside id="sidebar" class="dark:bg-gray-900 bg-white flex flex-col relative transition-all duration-500 ease-in-out shadow-lg w-17 relative z-50">
+		<!-- HEADER / LOGO AREA -->
+		<div class="absolute top-3 left-0 w-full border-b border-gray-300 dark:border-gray-700 pb-6 flex items-center justify-between px-4 transition-all duration-300 ease-in-out">
+			<div id="logoText" class="flex items-center gap-2 whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0">
+				<img src="{{ url_for('static', filename='assets/logo2.png') }}" alt="logo" class="w-8 h-8 rounded-md flex-shrink-0">
+				<span class="text-blue-600 dark:text-gray-200 font-semibold text-[20px]">Resort<span class="text-yellow-500 font-bold">-HUB</span></span>
+			</div>
+			<button id="toggleSidebar" class="dark:bg-white/10 bg-black/3 hover:bg-black/7 dark:hover:bg-white/20 p-2 rounded-lg transition-all duration-300 ease-in-out flex-shrink-0">
+				<i id="hamburgerIcon" data-lucide="menu" class="w-6 h-6 text-gray-900 dark:text-white"></i>
+				<i id="closeSidebar" data-lucide="chevron-left" class="w-6 h-6 text-gray-900 dark:text-white hidden"></i>
+			</button>
+		</div>
+
+
+		<!-- NAV LINKS -->
+		<nav class="relative flex flex-col mt-24 gap-2 w-full text-[16px] ">
+			<span class="text-[12px] dark:text-gray-500 text-gray-900 font-semibold whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 ml-6">MENU</span>
+
+			<div id="nav-home-dashboard" data-section="home-dashboard"  class="sidebar-item flex items-center gap-3 cursor-pointer text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10  transition-all rounded-sm px-3 py-4 duration-300 ease-in-out">
+				<i data-lucide="home" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Dashboard<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+			
+			<div id="nav-analytics" data-section="analytics" class="sidebar-item flex items-center gap-3 cursor-pointer text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4 transition-all duration-300 ease-in-out">
+				<i data-lucide="bar-chart-3" class="w-5 h-5 ml-3"></i>
+				<span class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Analytics & Reports<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+			
+			<div id="nav-all-reservations" data-section="all-reservations"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10  rounded-sm px-3 py-4  duration-300 ease-in-out">
+				<i data-lucide="calendar-check" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Manage Bookings<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+
+			<div id="nav-housekeeping" data-section="housekeeping"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+				<i data-lucide="sparkles" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Housekeeping<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+
+			<div  id="nav-rates-availability" data-section="rates-availability" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+				<i data-lucide="calendar" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Rates & Availability<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+
+                  <div id="nav-accounting" data-section="accounting" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+				<i data-lucide="wallet" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Accounting<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+			
+			<div  id="nav-revenue-management" data-section="revenue-management" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+				<i data-lucide="trending-up" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText"class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Revenue Management<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+
+			<div id="nav-staff-management" data-section="staff-management" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+				<i data-lucide="users" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Staff Management<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+
+			<div id="nav-admin-profile" data-section="admin-profile"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+				<i data-lucide="user" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Admin Profile<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+
+			<!-- Divider -->
+			<div class="border-t border-white/10 mt-25"></div>
+				
+			<div id="nav-logout" data-section="logout"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4 duration-300 ease-in-out">
+				<i data-lucide="log-out" class="w-5 h-5 ml-3"></i>
+				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Log Out<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+			</div>
+		</nav>
+	</aside>
+
+	<!-- MAIN CONTENT -->
+	<div id="main-container" class="flex-1 transition-all duration-500 ease-in-out overflow-y-auto">
+		<!-- HEADER -->
+		<header class="fixed top-0 left-17 right-0 flex items-center justify-between bg-white dark:bg-gray-900 py-1 px-4 dark:shadow-md shadow-sm transition-all duration-500 ease-in-out z-10">
+			<h1 class="font-semibold text-lg text-gray-900 dark:text-white">Welcome back, <span class="text-blue-500">Admin!</span></h1>
+
+			<div class="flex items-center gap-4">
+				<button id="darkModeToggle" class="hover:bg-black/7  dark:hover:bg-white/10 p-2 rounded-lg">
+					<i data-lucide="moon" class="w-5 h-5 text-gray-900 ease-in-out hidden" id="darkIcon"></i>
+					<i data-lucide="sun" class="w-5 h-5 dark:text-white ease-in-out hidden" id="lightIcon"></i>
+				</button>
+
+				<div class="relative">
+					<button id="notification" class="hover:bg-black/7 dark:hover:bg-white/10 p-2 rounded-lg transition">
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-900 dark:text-white transition-colors duration-500" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a2 2 0 002-2H8a2 2 0 002 2z"/>
+						</svg>
+					</button>
+					<span class="absolute top-1 right-0 -translate-x-1/2 -translate-y-1/2 text-[12px] font-bold text-white bg-red-500 rounded-full px-1.5 py-0.5" id="notification-count"></span>
+					
+					<!-- Notification Modal -->
+					<div id="notification-modal" class="absolute top-10 left-1/2 -translate-x-1/2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg hidden z-50 overflow-hidden">
+						<!-- Header -->
+						<div class="flex items-center justify-between px-4 py-2 border-b border-gray-700">
+							<h3 class="text-sm font-semibold dark:text-gray-200 text-gray-900">Notifications</h3>
+							<button class="text-xs text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 hover:text-gray-600 transition cursor-pointer">Clear All</button>
+						</div>
+					
+						<!-- Scrollable content -->
+						<div class="max-h-64 overflow-y-auto" id="notif-modal"></div>
+						<!-- Footer -->
+						<div class="border-t border-gray-700 px-4 py-2 text-center">
+							<label id="viewAllNotifications" class="text-sm text-blue-500 dark:text-blue-400 hover:underline">View all notifications</label>
+						</div>
+					</div>
+				</div>
+				
+				<!-- Admin dropdown -->
+				<div id="admin-profile-shortcut" class="relative">
+					<button id="adminButton" class="flex items-center gap-2 py-3 px-8  bg-blue-500 shadow-md dark:bg-gray-700/40 rounded-sm dark:hover:bg-gray-700/60 hover:bg-blue-600 transition cursor-pointer">
+						<i data-lucide="user-circle" class="w-6 h-6 dark:text-white text-white"></i>
+						<span class="text-sm font-semibold text-white">Admin</span>
+						<i data-lucide="chevron-down" class="w-4 h-4 dark:text-gray-300 text-white"></i>
+					</button>
+					<div id="adminMenu" class="absolute top-10.5 right-0 w-41 dark:bg-gray-700 bg-white rounded-bl-sm rounded-br-sm shadow-lg hidden z-50">
+						<a id="profile-shortcut" class="flex w-full items-center gap-2 px-4 py-2 text-gray-900 dark:text-gray-100 dark:hover:bg-gray-500 hover:bg-black/7 transition"><i data-lucide="user" class="w-4 h-4"></i> View Profile</a>
+						<a id="logoutButton" class="flex w-full items-center gap-2 px-4 py-2 text-gray-900 dark:text-gray-100 dark:hover:bg-gray-500  hover:bg-black/7 transition hover:rounded-bl-sm rounded-br-sm"><i data-lucide="log-out" class="w-4 h-4"></i> Logout</a>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<main class="mt-12 p-6">
+			<!-- DASHBOARD -->
+			<section id="home-dashboard" class="content-section fade-in-up space-y-10">
+				<!-- Header -->
+				<div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Home Dashboard</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Dashboard <i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Dashboard</span></p>
+				</div>
+				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-33px]">Quick overview of today's key metrics, revenue forecasting, and historical guest trends.</p>
+			
+				<!-- Main Grid -->
+				<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+					<!-- Left Column: Metric Cards + Circular Gauge -->
+					<div class="flex flex-col gap-4 lg:col-span-3">
+						<!-- Metric Cards Grid -->
+						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+							<!-- Card 1: Today's Guests -->
+							<div class="metric-card dark:bg-gray-900 bg-white p-6 rounded-sm shadow-lg hover:shadow-xl border-b-8 border-purple-500 flex flex-col justify-between">
+								<div class="flex justify-between items-start">
+									<p class="text-sm text-gray-800 dark:text-gray-400 font-medium">Today's Guest</p>
+									<span data-lucide="user-check" class="w-6 h-6 dark:text-white text-purple-500 bg-gray-100 dark:bg-purple-500 p-1 rounded-full"></span>
+								</div>
+								<p class="text-4xl font-extrabold mt-3 dark:text-white text-purple-600" id="today-guest">188</p>
+								<div class="text-xs mt-3 flex items-center text-purple-500 font-medium">
+									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+									<span><label id="change-rate-today-guest">+0</label>% vs Yesterday</span>
+								</div>
+							</div>
+
+							<!-- Card 2: Today's Check-Ins -->
+							<div class="metric-card dark:bg-gray-900 bg-white p-6 rounded-sm shadow-lg hover:shadow-xl border-b-8 border-blue-500 flex flex-col justify-between">
+								<div class="flex justify-between items-start">
+									<p class="text-sm font-medium dark:text-gray-400 text-gray-800">Today's Check-Ins</p>
+									<span data-lucide="calendar-plus" class="w-6 h-6 dark:text-white text-blue-500 bg-gray-100 dark:bg-blue-500 p-1 rounded-full"></span>
+								</div>
+								<p class="text-4xl font-extrabold mt-3 dark:text-white text-blue-500" id="check-ins-data">22</p>
+								<div class="text-xs mt-3 flex items-center text-blue-500 font-medium">
+									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+									<span><label id="change-rate-checkin">+0</label>% vs Yesterday</span>
+								</div>
+							</div>
+
+							<!-- Card 3: Total Guests In-House -->
+							<div class="metric-card dark:bg-gray-900 bg-white p-6 rounded-sm shadow-lg hover:shadow-xl border-b-8 border-teal-500 flex flex-col justify-between">
+								<div class="flex justify-between items-start">
+									<p class="text-sm font-medium dark:text-gray-400 text-gray-800">Total Guests In-House</p>
+									<span data-lucide="user-check" class="w-6 h-6 dark:text-white text-teal-500 dark:bg-teal-500 bg-gray-100 p-1 rounded-full"></span>
+								</div>
+								<p class="text-4xl font-extrabold mt-3 dark:text-white text-teal-500" id="total-guest-in-house">188</p>
+								<div class="text-xs mt-3 flex items-center text-teal-500 font-medium">
+									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+									<span><label id="change-rate-guest">+0</label>% vs Last Week</span>
+								</div>
+							</div>
+				
+							<!-- Card 4: Projected Revenue -->
+							<div class="metric-card dark:bg-gray-900 bg-white p-6 rounded-sm shadow-lg hover:shadow-xl border-b-8 border-green-500 flex flex-col justify-between">
+								<div class="flex justify-between items-start">
+									<p class="text-sm font-medium dark:text-gray-400 text-gray-800">Revenue <span class="text-[12px] text-gray-400">(This month)</span></p>
+									<span data-lucide="dollar-sign" class="w-6 h-6 dark:text-white text-green-500 dark:bg-green-500 bg-gray-100 p-1 rounded-full"></span>
+								</div>
+								<p class="text-4xl font-extrabold mt-3 dark:text-white text-green-500" id="total-revenue">$45,900</p>
+								<div class="text-xs mt-3 flex items-center text-green-500 font-medium">
+									<span id="revenue-this-month" data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+									<span><label id="target-revenue">-2%</label> vs Target</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="grid grid-cols-2 gap-4">
+							<div class="relative bg-white p-4 rounded-lg dark:bg-gray-900 shadow-xl h-[600px] flex flex-col overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+                                                <h4 class="text-lg font-semibold mb-4 mt-2 flex items-center dark:text-gray-200 text-gray-800 group-hover:text-indigo-600 transition-colors duration-300 antialiased">
+                                                      <span data-lucide="pie-chart" class="w-5 h-5 mr-2 text-indigo-500 group-hover:text-indigo-600 transition-colors duration-300"></span>Resort Area Booking Data<span class="hidden sm:inline text-gray-500 dark:text-gray-400 text-sm font-medium ml-1">(Historical)</span>
+                                                </h4>
+                                          
+                                                <div class="relative flex-grow rounded-md bg-gray-50 dark:bg-gray-800 flex items-center justify-center shadow-inner overflow-hidden transition-all duration-300">
+                                                      <div class="absolute inset-0 opacity-5 bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/dot-grid.png')] bg-repeat pointer-events-none z-0"></div>
+                                                      <canvas id="mostBookedAreaChart" class="w-full h-full relative z-10 p-4"></canvas>
+                                                      <div class="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-white/20 dark:from-gray-900/20 to-transparent pointer-events-none z-0"></div>
+                                                </div>
+                                          </div>
+                                          
+		
+							<div class="relative bg-card-bg p-3 rounded-sm shadow-xl dark:bg-gray-900 h-[600px] flex flex-col overflow-hidden group transition-all duration-200 hover:shadow-2xl hover:scale-[1.01]">
+								<h3 class="text-xl font-semibold mb-4 mt-2 flex items-center dark:text-gray-200 text-gray-800 group-hover:text-blue-600 transition-colors duration-200"><span data-lucide="calendar-heart" class="w-5 h-5 mr-2 text-primary-blue"></span>Heavy Guest Month Tracking <span class="hidden sm:inline text-gray-500 text-sm font-medium ml-1">(Historical)</span></h3>
+								<div class="relative w-full flex-grow rounded-sm bg-gray-50 dark:bg-gray-800 flex items-center justify-center shadow-inner overflow-hidden">
+									<div class="absolute inset-0 opacity-[0.05] bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/dot-grid.png')] bg-repeat z-0"></div>
+									<canvas id="heavy-month-chart" class="w-full h-full relative z-10"></canvas>
+									<div class="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-white/20 to-transparent z-0"></div>
+								</div>
+							</div>
+						</div>
+				
+					</div>
+			
+					<!-- Right Column: Top Booked Areas -->
+					<div class="flex flex-col gap-6">
+						<!-- Circular Occupancy Gauge -->
+						<div class="dark:bg-gray-900 bg-white p-6 rounded-sm shadow-lg hover:shadow-xl hover:shadow-2xl hover:scale-[1.01] flex flex-col items-center space-y-4 transition-transform duration-300">
+							<div class="flex items-center justify-between w-full">
+								<p class="text-sm font-semibold dark:text-gray-200 text-gray-800">Current Occupancy</p>
+								<span data-lucide="bar-chart-2" class="w-6 h-6 dark:text-yellow-400 text-yellow-500 dark:bg-yellow-50 bg-gray-100 p-1 rounded-full"></span>
+							</div>
+							<div class="relative w-48 h-48">
+								<canvas id="occupancyChart" class="w-full h-full"></canvas>
+							</div>
+							<div class="flex items-center text-xs dark:text-gray-200 text-gray-800 space-x-1">
+								<span data-lucide="hotel" class="w-4 h-4"></span>
+								<span>Available Areas: <span id="total-avl-rooms" class="font-medium dark:text-white text-black">220</span></span>
+							</div>
+						</div>
+						<div class="bg-white dark:bg-gray-900 h-[70vh] p-6 rounded-sm shadow-lg hover:shadow-xl hover:shadow-2xl hover:scale-[1.01] flex flex-col h-full">
+							<div class="flex items-center justify-between w-full pb-2 border-b dark:border-gray-800 border-gray-200">
+								<p class="text-lg font-semibold dark:text-gray-200 text-gray-800 flex gap-2 items-center">Top 5 Most Booked <span class="text-[14px] font-light">( This Year )</span></p>
+								<span data-lucide="trending-up" class="w-6 h-6 dark:text-green-400 text-green-500"></span>
+							</div>
+				
+							<!-- List of areas -->
+							<div id="top-booked-area" class="mt-4 space-y-3 flex-1"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Forecasted Occupancy (Next 30 Days) -->
+                        <div class="relative bg-card-bg p-3 rounded-sm shadow-xl dark:bg-gray-900 h-[600px] flex flex-col overflow-visible group transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]">
+                              <h4 class="text-lg font-semibold mb-4 mt-2 flex items-center text-gray-800 dark:text-gray-200 group-hover:text-amber-600 transition-colors duration-200"><span data-lucide="trending-up" class="w-5 h-5 mr-2 text-primary-blue flex items-center"></span>Occupancy Data<span class="text-[13px] ml-2 text-gray-400">(Historical & Forecasted)</span></h4>
+                              <div class="relative w-full flex-grow rounded-sm dark:bg-gray-800 bg-gray-50 flex items-center justify-center overflow-visible">
+                                    <canvas id="occupancyChartForecast"  width="800" height="200"  class="w-full h-full"></canvas>
+                                    <div class="absolute inset-0 opacity-[0.05] bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/dot-grid.png')] bg-repeat pointer-events-none"></div>
+                        
+                                    <div class="absolute inset-0 pointer-events-none rounded-xl"></div>
+                              </div>
+                        </div>
+			</section>
+			
+
+			<!-- ANALYTICS -->
+                  <section id="analytics" class="content-section space-y-10 fade-in-up">
+				<div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Analytics & Reports</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Analytics <i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Analytics</span></p>
+				</div>
+                        <p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-33px]">Provides key insights and forecasts for occupancy, ADR, RevPAR, and revenue, helping management make informed decisions.</p>
+                  
+                        <!-- Filters -->
+                        <div class="flex space-x-4 my-4 items-center">
+                              <label class="font-semibold text-gray-800 dark:text-gray-100 text-sm">Filter by: </label>
+                              <div class="relative w-full max-w-xs">
+                                    <select id="roomTypeFilter" class="block w-full appearance-none bg-white dark:bg-gray-900 border border-gray-300 text-gray-700 dark:text-gray-100 py-2 px-4 pr-10 rounded-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200 hover:border-gray-400 cursor-pointer">
+                                          <option value="all">All Resort Areas</option>
+                                          <option value="premium">Premium Villa</option>
+                                          <option value="standard">Standard Villa</option>
+                                          <option value="family">Family Room</option>
+                                          <option value="garden">Garden View</option>
+                                          <option value="barkada">Barkada Room</option>
+                                          <option value="cabana">Cabana Cottage</option>
+                                          <option value="small">Small Cottage</option>
+                                          <option value="big">Big Cottage</option>
+                                          <option value="hall">Hall</option>
+                                    </select>
+                                    <!-- Arrow Icon -->
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400 dark:text-gray-100">
+                                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                          </svg>
+                                    </div>
+                              </div>
+                        </div>
+
+                        <!-- Key Metrics -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                              <!-- Occupancy -->
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-6 rounded-sm shadow-xl border-b-8 border-indigo-500">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Occupancy (MTD)</p>
+                                                <p class="text-3xl font-semibold mt-3 dark:text-white text-gray-900" id="occupancy-percentage">78%</p>
+                                                <span class="text-green-500 text-sm mt-2" id="occupancy-change">+5%</span>
+                                          </div>
+                                          <div class="bg-indigo-100 dark:bg-indigo-500 p-3 rounded-full">
+                                                <i data-lucide="building-2" class="w-6 h-6 text-indigo-600 dark:text-white"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        
+                              <!-- ADR (Average Daily Rate) -->
+                              <div class="metric-card bg-card-bg p-6 dark:bg-gray-900 rounded-sm shadow-xl  border-b-8 border-blue-500">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">ADR (MTD)</p>
+                                                <p class="text-3xl font-semibold mt-3 text-primary-blue dark:text-white" id="adr">$215</p>
+                                                <span class="text-red-500 text-sm" id="adr-change">-3%</span>
+                                          </div>
+                                          <div class="bg-primary-blue/10 dark:bg-blue-500 p-3 rounded-full">
+                                                <i data-lucide="credit-card" class="w-6 h-6 text-primary-blue dark:text-white"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        
+                              <!-- RevPAR -->
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-6 rounded-sm shadow-xl border-b-8 border-green-500">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">RevPAR (MTD)</p>
+                                                <p class="text-3xl font-semibold mt-3 text-green-600 dark:text-white" id="revpar">$167.70</p>
+                                                <span class="text-green-500 text-sm" id="revpar-change">+2%</span>
+                                          </div>
+                                          <div class="bg-green-100 dark:bg-green-500 p-3 rounded-full">
+                                                <i data-lucide="trending-up" class="w-6 h-6 text-green-600 dark:text-white"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        
+                              <!-- Target Revenue -->
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-6 rounded-sm shadow-xl  border-b-8 border-red-500">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Target Revenue (This month)</p>
+                                                <p class="text-3xl font-semibold mt-3 text-red-600 dark:text-white" id="target">$62,500</p>
+                                          </div>
+                                          <div class="bg-red-100 dark:bg-red-500 p-3 rounded-full mt-6"> 
+                                                <i data-lucide="target" class="w-6 h-6 text-red-600 dark:text-white"></i>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+
+                        <!-- Trend Charts -->
+                        <div class="flex flex-col gap-6 mt-6">
+                              <div class="relative bg-card-bg dark:bg-gray-900 p-3 rounded-sm shadow-xl h-[600px] flex flex-col overflow-visible group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                                    <h4 class="text-lg font-semibold mb-4 mt-2 flex items-center text-gray-800 dark:text-gray-100 group-hover:text-green-600 transition-all duration-200"><span data-lucide="user-check" class="w-5 h-5 mr-2 text-green-500 font-extrabold"></span>Checkin Analytics (<span class="hidden sm:inline text-gray-500 text-sm font-medium ml-1" id="accomodation_type"></span>)</h4>
+                                    <div class="relative w-full flex-grow rounded-sm dark:bg-gray-800 bg-gray-50 flex items-center justify-center overflow-visible">
+                                          <canvas id="checkin-forecast-chart"  width="800" height="200"  class="w-full h-full"></canvas>
+                                          <div class="absolute inset-0 opacity-[0.05] bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/dot-grid.png')] bg-repeat pointer-events-none"></div>
+                                          <div class="absolute inset-0 pointer-events-none rounded-xl"></div>
+                                    </div>
+                              </div>
+
+                              <div class="relative bg-card-bg dark:bg-gray-900 p-3 rounded-sm shadow-xl h-[600px] flex flex-col overflow-visible group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                                    <h4 class="text-lg font-semibold mb-4 mt-2 flex items-center text-gray-800 dark:text-gray-100 group-hover:text-yellow-600 transition-all duration-200"><span data-lucide="dollar-sign" class="w-5 h-5 mr-2 text-yellow-500 font-extrebold"></span>Revenue Forecast (<span class="hidden sm:inline text-gray-500 text-sm font-medium ml-1" id="accomodation_type"></span>)</h4>
+                                    <div class="relative w-full flex-grow rounded-sm bg-gray-50 dark:bg-gray-800 flex items-center justify-center overflow-visible">
+                                          <canvas id="revenueForecastChart"  width="800" height="200"  class="w-full h-full"></canvas>
+                                          <div class="absolute inset-0 opacity-[0.05] bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/dot-grid.png')] bg-repeat pointer-events-none"></div>
+                                          <div class="absolute inset-0 pointer-events-none rounded-xl"></div>
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+
+
+			<!--  ALL RESERVATIONs -->
+                  <section id="all-reservations" class="content-section space-y-2 fade-in-up hidden">
+				<div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Manage Reservations</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Reservations<i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Reservations</span></p>
+				</div>
+				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed ">Manage room cleaning, inspection, and readiness. Automatically updates based on guest check-in/check-out activities.</p>
+                        
+                        <!-- Quick Stats -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                              <!-- Total Check-Ins -->
+                              <div class="group relative overflow-hidden bg-white/80 dark:bg-gray-900 backdrop-blur-md border-b-8 border-blue-500 p-6 rounded-sm shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Check-Ins <span class="text-[13px] text-gray-400">( This Week )</span> </p>
+                                                <p class="text-4xl font-bold mt-3 text-blue-600 dark:text-white" id="total_checkin">45</p>
+                                                <span class="text-xs text-gray-400"><span id="change_checkins" class="text-green-500 font-semibold">+12%</span> from last week</span>
+                                          </div>
+                                          <div class="bg-blue-100 dark:bg-blue-500 p-3 rounded-xl"><i data-lucide="log-in" class="w-6 h-6 text-blue-600 dark:text-white"></i></div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-blue-100/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              </div>
+                        
+                              <!-- Today's Check-Outs -->
+                              <div class="group relative overflow-hidden dark:bg-gray-900 bg-white/80 backdrop-blur-md border-b-8 border-red-500 p-6 rounded-sm shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Today's Check-Outs</p>
+                                                <p class="text-4xl font-bold mt-3 text-red-600 dark:text-white" id="today_checkouts">12</p>
+                                                <span class="text-xs text-gray-400">Updated just now</span>
+                                          </div>
+                                          <div class="bg-red-100 dark:bg-red-500 p-3 rounded-xl"><i data-lucide="log-out" class="w-6 h-6 text-red-600 dark:text-white"></i></div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-red-100/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              </div>
+                        
+                              <!-- Upcoming Arrivals -->
+                              <div class="group relative overflow-hidden dark:bg-gray-900 bg-white/80 backdrop-blur-md border-b-8 border-indigo-500 p-6 rounded-sm shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Upcoming Arrivals <span class="text-[13px] text-gray-400">( Reservation )</span></p>
+                                                <p class="text-4xl font-bold mt-3 text-indigo-600 dark:text-white" id="upcoming_arrivals">45</p>
+                                                <span class="text-xs text-gray-400">All Reservations</span>
+                                          </div>
+                                          <div class="bg-indigo-100 dark:bg-indigo-500 p-3 rounded-xl "><i data-lucide="calendar-days" class="w-6 h-6 text-indigo-600 dark:text-white"></i> </div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-indigo-100/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              </div>
+                        
+                              <!-- Cancelled Bookings -->
+                              <div class="group relative overflow-hidden dark:bg-gray-900 bg-white/80 backdrop-blur-md border-b-8 border-rose-500 p-6 rounded-sm shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Cancelled Bookings <span class="text-[13px] text-gray-400">( This Month )</span> </p>
+                                                <p class="text-4xl font-bold mt-3 text-rose-600 dark:text-white" id="cancelled">12</p>
+                                                <span class="text-xs text-gray-400">As of Oct 31</span>
+                                          </div>
+                                          <div class="bg-rose-100 dark:bg-rose-600 p-3 rounded-xl "><i data-lucide="x-circle" class="w-6 h-6 text-rose-600 dark:text-white"></i></div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-rose-100/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              </div>
+                        </div>
+                        
+                        <!-- Filter + Search + Button -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mt-6 mb-4 gap-4 dark:bg-gray-900 bg-white/80 backdrop-blur-md  rounded-sm p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                              <div class="flex flex-wrap items-center gap-4">
+                                    <div class="flex items-center gap-2">
+                                          <label for="yearSelect" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Year:</label>
+                                          <select id="yearSelect" class="py-2.5 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 dark:text-gray-100 text-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"></select>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2">
+                                          <label for="monthSelect" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Month:</label>
+                                          <select id="monthSelect" class="py-2.5 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 text-gray-700 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"></select>
+                                    </div>
+                                    <script>
+                                          const monthSelect = document.getElementById("monthSelect");
+                                          const currentDate = new Date();
+                                          const currentYear = currentDate.getFullYear();
+                                          
+                                          for (let i = 0; i < 12; i++) {
+                                                const date = new Date(currentYear, i, 1);
+                                                const monthName = date.toLocaleString("default", { month: "long" });
+                                                const option = document.createElement("option");
+                                                option.value = i + 1;
+                                                option.textContent = monthName;
+                                                
+                                                if (i === currentDate.getMonth()) option.selected = true;
+                                                monthSelect.appendChild(option);
+                                          }
+                                    </script>
+                              </div>
+                              
+                              <button id="add-booking-btn" type="button" class="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                                    <i data-lucide="plus-circle" class="w-5 h-5"></i>Add Booking
+                              </button>
+                        </div>
+                        
+                        <!-- Recent Bookings Section -->
+                        <div class="bg-white/90 dark:bg-gray-900 backdrop-blur-md rounded-sm overflow-hidden shadow-sm flex flex-col h-[55vh]">
+                              <div id="tab-container" class="flex flex-wrap items-center pb-2">
+                                    <button class="tab-item flex items-center bg-black/10 dark:bg-white/10 gap-1.5 px-8 py-2 border-b-4 border-blue-500 text-blue-500 dark:text-gray-100 transition-all duration-200" id="all-data">All<span class="badge text-[12px] font-semibold text-purple-600 bg-purple-50 dark:text-white dark:bg-purple-500 px-2 py-1 rounded-2xl">15+</span></button>
+                                    <button class="tab-item flex items-center gap-1.5 px-8 py-2 border-b-4 border-gray-300 dark:text-gray-100 text-gray-600 transition-all duration-200" id="reserved-data">Reserved<span class="badge text-[12px] font-semibold text-teal-600 bg-teal-50 dark:text-white dark:bg-teal-500 px-2 py-1 rounded-2xl">15+</span></button>
+                                    <button class="tab-item flex items-center gap-1.5 px-8 py-2 border-b-4 border-gray-300 dark:text-gray-100  text-gray-600 transition-all duration-200" id="check_out-data">Checkout<span class="badge text-[12px] font-semibold text-red-600 bg-red-50 dark:text-white dark:bg-red-500 px-2 py-1 rounded-2xl">15+</span></button>
+                                    <button class="tab-item flex items-center gap-1.5 px-8 py-2 border-b-4 border-gray-300 dark:text-gray-100  text-gray-600 transition-all duration-200" id="check_in-data">Check-In<span class="badge text-[12px] font-semibold text-blue-600 bg-blue-50 dark:text-white dark:bg-blue-500 px-2 py-1 rounded-2xl">15+</span></button> 
+                                    <button class="tab-item flex items-center gap-1.5 px-8 py-2 border-b-4 border-gray-300 dark:text-gray-100 text-gray-600 transition-all duration-200" id="cancelled-reservation-data">Cancelled<span class="badge text-[12px] font-semibold text-red-600 bg-red-50 dark:text-white dark:bg-red-500 px-2 py-1 rounded-2xl">15+</span></button> 
+                                    <button class="tab-item flex items-center gap-1.5 px-8 py-2 border-b-4 border-gray-300 dark:text-gray-100  text-gray-600 transition-all duration-200" id="paid-data">Paid<span class="badge text-[12px] font-semibold text-green-600 bg-green-50 dark:text-white dark:bg-green-500 px-2 py-1 rounded-2xl">15+</span></button> 
+                                    <button class="tab-item flex items-center gap-1.5 px-8 py-2 border-b-4 border-gray-300 dark:text-gray-100 text-gray-600 transition-all duration-200" id="not_paid-data">Not Paid<span class="badge text-[12px] font-semibold text-amber-600 bg-amber-50 dark:text-white dark:bg-amber-500 px-2 py-1 rounded-2xl">15+</span></button> 
+                                    <p class="flex-1 border-b-4 py-2 border-gray-300 text-transparent">.</p>
+                              </div>
+                              
+                              <!-- Action Buttons -->
+                              <div class="flex flex-wrap items-center gap-3 mt-4 ml-4">
+                                    <button id="update-reservation-date" class="btn flex items-center gap-2 bg-teal-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-teal-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-edit text-lg"></i> Change Date</button>
+                                    <button id="mark-paid" class="btn flex items-center gap-2 bg-green-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-green-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-circle-check text-lg"></i> Mark as Paid</button>
+                                    <button id="mark-checkin" class="btn flex items-center gap-2 bg-blue-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-blue-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-login text-lg"></i> Check-In</button>
+                                    <button id="mark-checkout" class="btn flex items-center gap-2 bg-amber-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-amber-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-logout text-lg"></i> Check-Out</button>
+                                    <button id="cancel-bookings" class="btn flex items-center gap-2 bg-rose-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-rose-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i class="ti ti-trash text-lg"></i> Cancel Booking</button>
+                              </div>
+                              
+                              <!-- Table -->
+                              <div class="overflow-y-auto mt-4 flex-1">
+                                    <table class="min-w-full text-sm text-center border-collapse">
+                                          <thead class="bg-gray-800 dark:bg-gray-700 text-white sticky top-0 z-10">
+                                                <tr>
+                                                      <th class="px-3 py-3 font-semibold uppercase tracking-wider">Select</th>
+                                                      <th class="px-4 py-3 font-semibold uppercase tracking-wider">Traveler Details</th>
+                                                      <th class="px-4 py-3 font-semibold uppercase tracking-wider">Booking Details</th>
+                                                      <th class="px-6 py-3 font-semibold uppercase tracking-wider">Accommodations</th>
+                                                      <th class="px-5 py-3 font-semibold uppercase tracking-wider">Status</th>
+                                                      <th class="px-5 py-3 font-semibold uppercase tracking-wider">Payment</th>
+                                                      <th class="px-4 py-3 font-semibold uppercase tracking-wider">Action</th>
+                                                </tr>
+                                          </thead>
+                                          <tbody id="tbody"></tbody>
+                                    </table>
+                              </div>
+                        </div>
+                  </section>
+
+
+			<!-- HOUSEKEEPING -->
+                  <section id="housekeeping" class="content-section space-y-8 fade-in-up">
+				<div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Housekeeping</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Housekeeping<i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Housekeeping</span></p>
+				</div>
+				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-25px]">Manage room cleaning, inspection, and readiness. Automatically updates based on guest check-in/check-out activities.</p>
+
+                        <!-- Summary Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-5 rounded-sm text-center border-b-8 border-blue-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="sparkles" class="w-8 h-8 text-blue-600 dark:text-blue-400 mb-2 opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">To Be Cleaned</p>
+                                          <p class="text-3xl font-extrabold mt-3 text-blue-600 dark:text-white" id="to-be-clean">6</p>
+                                    </div>
+                              </div>
+
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-5 rounded-sm text-center border-b-8 border-yellow-400">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="loader" class="w-8 h-8 text-yellow-500 dark:text-yellow-400 mb-2 animate-spin opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cleaning in Progress</p>
+                                          <p class="text-3xl font-extrabold mt-3 text-yellow-500 dark:text-white" id="on-clean">3</p>
+                                    </div>
+                              </div>
+
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-5 rounded-sm text-center border-b-8 border-green-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="check-circle" class="w-8 h-8 text-green-600 dark:text-green-400 mb-2 opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ready / Cleaned</p>
+                                          <p class="text-3xl font-extrabold mt-3 text-green-600 dark:text-white" id="ready">45</p>
+                                    </div>
+                              </div>
+
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-5 rounded-sm text-center border-b-8 border-purple-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="bed" class="w-8 h-8 text-purple-600 dark:text-purple-400 mb-2 opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Occupied</p>
+                                          <p class="text-3xl font-extrabold mt-3 text-purple-600 dark:text-white" id="occupied">4</p>
+                                    </div>
+                              </div>
+
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-5 rounded-sm text-center border-b-8 border-gray-400">
+                                    <div class="flex flex-col items-center justify-center">
+                                          <i data-lucide="building" class="w-8 h-8 text-gray-700 dark:text-gray-400 mb-2 opacity-80"></i>
+                                          <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Total Rooms</p>
+                                          <p class="text-3xl font-extrabold mt-3 text-gray-700 dark:text-white" id="all-areas">83</p>
+                                    </div>
+                              </div>
+                        </div>
+
+                        <!-- Room Type Summary Table -->
+                        <div class="bg-card-bg dark:bg-gray-900 p-6 rounded-sm shadow-lg ">
+                              <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Room Summary by Type</h3>
+                              </div>
+                              <div class="overflow-x-auto">
+                                    <table class="min-w-full text-center">
+                                          <thead class="dark:bg-gray-700 bg-gray-900 text-white text-sm">
+                                                <tr>
+                                                      <th class="px-6 py-3 font-semibold uppercase">Room Type</th>
+                                                      <th class="px-6 py-3 font-semibold uppercase">Total Rooms</th>
+                                                      <th class="px-6 py-3 font-semibold uppercase">To Be Cleaned</th>
+                                                      <th class="px-6 py-3 font-semibold uppercase">Cleaning</th>
+                                                      <th class="px-6 py-3 font-semibold uppercase">Ready</th>
+                                                      <th class="px-6 py-3 font-semibold uppercase">Occupied</th>
+                                                      <th class="px-6 py-3 font-semibold uppercase">Action</th>
+                                                </tr>
+                                          </thead>
+                                          <tbody id="acc-tbody"></tbody>
+                                    </table>
+                              </div>
+                        </div>
+                  </section>
+
+
+			<!-- RATES & AVAILABILITY -->
+                  <section id="rates-availability" class="content-section space-y-8 fade-in-up">
+				<div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Rates & Availability</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Rates & Availability<i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Rates & Availability</span></p>
+				</div>
+				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-25px]">Provides a centralized view and control over room inventory and pricing, which is crucial for maximizing occupancy and revenue.</p>
+
+                        <div class="bg-card-bg dark:bg-gray-900 p-6 rounded-sm shadow-lg">
+                              <!-- Modern Category Buttons -->
+                              <div class="mb-2 flex justify-between items-center">
+                                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-4">
+                                          <span data-lucide="calendar" class="w-6 h-6 text-primary-blue dark:text-blue-500"></span> 
+                                          <span id="calendar-title" class="text-gray-900 dark:text-white">Area Availability Data</span>
+                                    </h3>      
+                              </div>
+                              <div class="overflow-x-auto">
+                                    <table class="min-w-full">
+                                          <thead class="bg-gray-900 text-white dark:bg-gray-700 dark:text-white text-sm" id="table-header"></thead>
+                                          <tbody id="table2-body"></tbody>
+                                    </table>
+                              </div>
+                        </div>
+                  </section>
+
+
+                  <!-- ACCOUNTING  -->
+                  <section id="accounting" class="content-section space-y-4 fade-in-up">
+                        <div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Accounting</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Accounting<i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Accounting</span></p>
+				</div>
+				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-10px]">Manages all financial transactions related to bookings, including payment processing, reconciliation, and detailed reporting of revenue sources.</p>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+                              <div class="metric-card bg-card-bg dark:bg-gray-900 p-6 rounded-sm border-b-8 border-green-500 flex items-center justify-between">
+						<div>
+							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Direct Payment <span class="text-[13px] text-gray-400">( Today )</span></p>
+							<p class="text-3xl font-semibold mt-3 text-green-600 dark:text-white" id="direct-payment">$5,100</p>
+						</div>
+						<i data-lucide="credit-card" class="w-8 h-8 text-green-600 opacity-80"></i>
+                              </div>
+
+                              <div class="metric-card bg-card-bg p-6 rounded-sm dark:bg-gray-900  border-b-8 border-blue-500 flex items-center justify-between">
+						<div>
+							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">ZUZU Payment (Online) <span class="text-[13px] text-gray-400">( Today )</span></p>
+							<p class="text-3xl font-semibold mt-3 text-blue-600 dark:text-white" id="online-payment">$8,900</p>
+						</div>
+						<i data-lucide="globe" class="w-8 h-8 text-blue-600 opacity-80"></i>
+                              </div>
+
+                              <div class="metric-card bg-card-bg p-6 rounded-sm dark:bg-gray-900  border-b-8 border-yellow-500 flex items-center justify-between">
+						<div>
+							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Booking Revenue <span class="text-[13px] text-gray-400">( Today )</span></p>
+							<p class="text-3xl font-semibold mt-3 text-yellow-600 dark:text-white" id="booking-revenue">$14,000</p>
+						</div>
+						<i data-lucide="bar-chart-3" class="w-8 h-8 text-yellow-600 opacity-80"></i>
+                              </div>
+                        </div>
+
+                        <div class="flex flex-col lg:flex-row items-center justify-between gap-4 p-4 bg-white dark:bg-gray-900 rounded-sm shadow-md w-full">
+                              <div class="flex items-center gap-3">
+                                    <label for="filter-payment" class="text-gray-700 dark:text-gray-100 font-medium text-[15px]">Year:</label>
+                                    <select id="filter-payment" class="border border-gray-300 rounded-sm py-2 px-3 dark:text-gray-100 dark:bg-gray-800 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                                          <option value="">Select Year</option>
+                                    </select>
+                              </div>
+                        </div>
+
+                        <div class="bg-card-bg dark:bg-gray-900 p-6 rounded-sm shadow-lg ">
+                              <h3 class="text-xl font-semibold mb-4 flex items-center text-gray-900 dark:text-gray-100 flex items-center gap-2"><label data-lucide="receipt" class="w-5 h-5 mr-2 text-green-600 dark:text-green-400"></label>Booking Revenue Report<span class="text-[20px] text-gray-600">(Last 7 Days)</span></h3>
+                              <div class="overflow-y-auto max-h-[50vh]">
+                                    <table class="min-w-full">
+							<thead class="bg-gray-900 dark:bg-gray-700 text-white text-sm sticky top-0 z-30">
+								<tr>
+									<th class="px-6 py-3 text-center font-medium uppercase tracking-wider">Date</th>
+									<th class="px-6 py-3 text-center font-medium uppercase tracking-wider">Online Payment</th>
+									<th class="px-6 py-3 text-center font-medium uppercase tracking-wider">Direct Payment</th>
+								</tr>
+							</thead>
+							<tbody id="accounting-tbody"></tbody>
+						</table>
+                              </div>
+                        </div>
+                  </section>
+                  
+
+			<!-- REVENUE MANAGEMENT -->
+                  <section id="revenue-management" class="content-section space-y-8 fade-in-up">
+				<div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Revenue Management</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Revenue Management<i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Revenue Management</span></p>
+				</div>
+				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-25px]">Manages strategies and executing pricing and promotion decisions to achieve the optimal balance of occupancy and Average Daily Rate (ADR).</p>
+
+                        <div class="space-y-6">
+                              <div class="flex justify-start">
+                                    <button id="add-promo" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[16px] py-2 px-6 rounded-md shadow-md flex items-center gap-2 transition-all duration-200">
+                                          <i data-lucide="plus"></i> Add Promotion
+                                    </button>
+                              </div>
+                              
+                              <div class="bg-white dark:bg-gray-900 rounded-sm shadow p-4 w-full h-[70vh] flex flex-col">
+                                    <h1 class="text-gray-700 dark:text-gray-100 font-semibold text-lg mb-4 text-center">Recent Promotions Applied</h1>
+                                    
+                                    <div class="overflow-x-auto overflow-y-auto flex-1">
+                                          <table class="min-w-full rounded-lg text-center">
+                                                <thead class="bg-gray-900 dark:bg-white/10 text-white text-md font-bold sticky top-0">
+                                                      <tr>
+                                                            <th class="py-3 px-4 font-semibold">Start</th>
+                                                            <th class="py-3 px-4 font-semibold">End</th>
+                                                            <th class="py-3 px-4 font-semibold">Promotion Name</th>
+                                                            <th class="py-3 px-4 font-semibold">Discount%</th>
+                                                            <th class="py-3 px-4 font-semibold">Applied Rooms</th>
+                                                            <th class="py-3 px-4 font-semibold">Status</th>
+                                                            <th class="py-3 px-4 font-semibold">Action</th>
+                                                      </tr>
+                                                </thead>
+                                                <tbody id="promo-tbody"></tbody>
+                                          </table>
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+
+
+			<!-- STAFF MANAGEMENT  -->
+                  <section id="staff-management" class="content-section space-y-4 fade-in-up">
+                        <div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Staff Management</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Staff Management<i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Staff Management</span></p>
+				</div>
+				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-10px]">Manages all staff-related activities, including employee records, role assignments, attendance tracking, and performance monitoring to ensure smooth operations and effective team management.</p>
+
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
+                              <!-- Total Staff -->
+                              <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col gap-5">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Staff <span class="text-[13px] text-gray-400">(Overall)</span></p>
+                                                <p class="text-4xl font-bold mt-2 text-blue-600 dark:text-blue-400" id="total-staff">3</p>
+                                          </div>
+
+                                          <div class="bg-blue-100 dark:bg-blue-700/20 p-3 rounded-xl">
+                                                <i data-lucide="users" class="w-7 h-7 text-blue-600 dark:text-blue-400"></i>
+                                          </div>
+                                    </div>
+                              </div>
+
+                              <!-- Total On Duty -->
+                              <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col gap-5">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total On Duty <span class="text-[13px] text-gray-400">(Today)</span></p>
+                                                <p class="text-4xl font-bold mt-2 text-green-600 dark:text-green-400" id="on-duty">2</p>
+                                          </div>
+
+                                          <div class="bg-green-100 dark:bg-green-700/20 p-3 rounded-xl">
+                                                <i data-lucide="user-check" class="w-7 h-7 text-green-600 dark:text-green-400"></i>
+                                          </div>
+                                    </div>
+                              </div>
+
+                              <!-- Total Absent -->
+                              <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col gap-5">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Absent <span class="text-[13px] text-gray-400">(Today)</span></p>
+                                                <p class="text-4xl font-bold mt-2 text-red-600 dark:text-red-400" id="absent">1</p>
+                                          </div>
+
+                                          <div class="bg-red-100 dark:bg-red-700/20 p-3 rounded-xl">
+                                                <i data-lucide="user-minus" class="w-7 h-7 text-red-600 dark:text-red-400"></i>
+                                          </div>
+                                    </div>
+                              </div>
+
+                              <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col gap-5">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total On Leave<span class="text-[13px] text-gray-400">(This Week)</span></p>
+                                                <p class="text-4xl font-bold mt-2 text-yellow-600 dark:text-yellow-400" id="on-leave">0</p>
+                                          </div>
+                              
+                                          <div class="bg-yellow-100 dark:bg-yellow-700/20 p-3 rounded-xl flex items-center justify-center">
+                                                <i data-lucide="umbrella" class="w-7 h-7 text-yellow-600 dark:text-yellow-400"></i>
+                                          </div>
+                                    </div>
+
+                                    <button id="viewOnLeave" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow flex items-center gap-2 justify-center">
+                                          <i data-lucide="eye" class="w-5 h-5"></i>View
+                                    </button>
+                              
+                              </div>
+                              
+                        </div>
+
+                        <div class="flex h-[60vh] mt-8">
+                              <!-- LEFT SIDE: STAFF LIST -->
+                              <div class="w-1/3 border-r border-gray-300 dark:border-gray-800 dark:bg-gray-900 bg-white flex flex-col rounded-tl-sm rounded-bl-sm">
+                                    <div class="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-800">
+                                          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Staff Management</h2>
+                                          <button id="addStaffBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm">+ Add</button>
+                                    </div>
+                                    <div class="p-3">
+                                          <input type="text" name="search-staff" placeholder="Search staff..." class="w-full p-2 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <!-- Staff List -->
+                                    <ul id="staffList" class="flex-1 overflow-y-auto space-y-2 p-3"></ul>
+                              </div>
+                              
+                              <!-- RIGHT SIDE: ATTENDANCE TABLE -->
+                              <div class="flex-1 p-6 overflow-y-auto bg-white dark:bg-gray-900 rounded-tr-sm rounded-br-sm">
+                                    <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 text-center">Daily Attendance Overview</h2>
+                                          
+                                    <div class="flex justify-between items-center mb-4 mt-5">
+                                          <div class="flex gap-4">
+                                                <div class="flex items-center gap-2">
+                                                      <label for="monthSelect2" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Month:</label>
+                                                      <select id="monthSelect2" class="py-1 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 dark:text-gray-100 text-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"></select>
+                                                </div>
+                                                <script>
+                                                      const monthSelect2 = document.getElementById("monthSelect2");
+                                                      const currentDate2 = new Date();
+                                                      const currentYear2 = currentDate2.getFullYear();
+                                                      
+                                                      for (let i = 0; i < 12; i++) {
+                                                            const date = new Date(currentYear2, i, 1);
+                                                            const monthName = date.toLocaleString("default", { month: "long" });
+                                                            const option = document.createElement("option");
+                                                            option.value = i + 1;
+                                                            option.textContent = monthName;
+                                                            
+                                                            if (i === currentDate2.getMonth()) option.selected = true;
+                                                            monthSelect2.appendChild(option);
+                                                      }
+                                                </script>
+                                                <div class="flex items-center gap-2 relative overflow-visible">
+                                                      <label for="daySelect" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Day:</label>
+                                                      <select id="daySelect" class="py-1 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 dark:text-gray-100 text-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"> </select>
+                                                </div>
+                                                <script>
+                                                      const daySelect = document.getElementById("daySelect");
+                                                      const currentDate3 = new Date();
+                                                      const currentYear3 = currentDate3.getFullYear();
+                                                      const currentMonth3 = currentDate3.getMonth(); // 0-11
+                                                      const currentDay = currentDate3.getDate();    // 1-31
+                                                
+                                                      // Get number of days in the current month
+                                                      const monthDays = new Date(currentYear3, currentMonth3 + 1, 0).getDate();
+                                                
+                                                      for (let day = 1; day <= monthDays; day++) {
+                                                            const option = document.createElement("option");
+                                                            option.value = day;
+                                                            option.textContent = day;
+                                                      
+                                                            if (day === currentDay) option.selected = true;
+                                                      
+                                                            daySelect.appendChild(option);
+                                                      }
+                                                </script>
+                                                
+                                          </div>
+                                          
+                                          <div class="flex items-center gap-2">
+                                                <button id="updateStaffAttendance" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2" style="pointer-events: none; opacity: 0.4;">
+                                                      <i data-lucide="edit" class="w-4 h-4"></i>Time Out
+                                                </button>
+                                                <button id="addAttendanceBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Attendance</button>
+                                          </div>
+                                    </div>
+                                    <!-- Attendance Table -->
+                                    <div class="overflow-x-auto rounded-xl shadow-sm">
+                                          <table class="min-w-full">
+                                                <thead class="bg-gray-900 dark:bg-white/20">
+                                                      <tr>
+                                                            <th class="px-4 py-2 text-center text-xs font-semibold uppercase tracking-wider">Name</th>
+                                                            <th class="px-4 py-2 text-center text-xs font-semibold uppercase tracking-wider">Time In</th>
+                                                            <th class="px-4 py-2 text-center text-xs font-semibold uppercase tracking-wider">Time Out</th>
+                                                            <th class="px-4 py-2 text-center text-xs font-semibold uppercase tracking-wider">Date</th>
+                                                            <th class="px-4 py-2 text-center text-xs font-semibold uppercase tracking-wider">Status</th>
+                                                            <th class="px-4 py-2 text-center text-xs font-semibold uppercase tracking-wider">Action</th>
+                                                      </tr>
+                                                </thead>
+                                                <tbody id="attendanceTable" ></tbody>
+                                          </table>
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+            
+
+			<!-- ADMIN SETTINGS -->
+                  <section id="admin-profile" class="content-section space-y-8 fade-in-up">
+				<div class="flex justify-between">
+					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Admin Settings</h1>
+					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Admin Settings<i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Admin Settings</span></p>
+				</div>
+				
+				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-3xl leading-relaxed mt-[-25px]">Manage your profile details, change your password, and update your account email.</p>
+
+                        <div class="max-w-full mx-auto mt-10 p-6 bg-white dark:bg-gray-900 rounded-sm shadow-md">
+                              <div class="rounded-lg mb-[8%]" style="background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),  url('{{ url_for('static', filename='assets/resort.jpg') }}'); background-repeat: no-repeat; background-position: center center; background-size: cover; height: 350px;">
+                                    <div class="w-[330px] h-[30vh] rounded-[100%] absolute top-[23%] left-1/2 -translate-x-1/2 border-8 border-white dark:border-gray-900 " style="background-image: url('{{ url_for('static', filename='assets/logo2.png') }}'); background-repeat: no-repeat; background-position: center center; background-size: cover;" >       
+                                          <h1 class="font-bold text-2xl mt-[290px] text-center dark:text-white text-gray-900">Admin Profile</h1>
+                                    </div>
+                              </div>
+
+                              <!-- Profile Details -->
+                              <div class="space-y-4">
+                                    <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                                          <div class="flex items-center gap-4">
+                                                <i data-feather="user" class="w-6 h-6 text-gray-500"></i>
+                                                <div>
+                                                      <p class="text-gray-600 dark:text-gray-400 text-sm">Name</p>
+                                                      <p id="admin-name" class="text-gray-800 dark:text-gray-100 font-medium mt-1">Rustom Galicia</p>
+                                                </div>
+                                          </div>
+                                          <button id="change-name" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Edit</button>
+                                    </div>
+                              
+                                    <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                                          <div class="flex items-center gap-4">
+                                                <i data-feather="mail" class="w-6 h-6 text-gray-500"></i>
+                                                <div>
+                                                      <p class="text-gray-600 dark:text-gray-400 text-sm">Email</p>
+                                                      <p id="admin-email" class="text-gray-800 dark:text-gray-100 font-medium mt-1">galiciarustom14@gmail.com</p>
+                                                </div>
+                                          </div>
+                                          <button id="change-email" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Edit</button>
+                                    </div>
+                              
+                                    <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                                          <div class="flex items-center gap-4">
+                                                <i data-feather="phone" class="w-6 h-6 text-gray-500"></i>
+                                                <div>
+                                                      <p class="text-gray-600 dark:text-gray-400 text-sm">Contact Number</p>
+                                                      <p id="admin-num" class="text-gray-800 dark:text-gray-100 font-medium mt-1">+63 912 345 6789</p>
+                                                </div>
+                                          </div>
+                                          <button id="change-num" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Edit</button>
+                                    </div>
+                              
+                                    <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                                          <div class="flex items-center gap-4">
+                                                <i data-feather="lock" class="w-6 h-6 text-gray-500"></i>
+                                                <div>
+                                                      <p class="text-gray-600 dark:text-gray-400 text-sm">Password Last Changed</p>
+                                                      <p id="date-pass-change" class="text-gray-800 dark:text-gray-100 font-medium mt-1">October 10, 2025</p>
+                                                </div>
+                                          </div>
+                                          <button id="change-pass" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Change Password</button>
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+
+		</main>
+	</div>
+      
+
+      <!-- MODAL INSERTION -->
+      <div id="notificationPortal"></div>
+      <div id="reservationPortal"></div>
+      <div id="housekeepingPortal"></div>
+      <div id="ratesAvailabilityPortal"></div>
+      <div id="promoModalPortal"></div>
+      <div id="adminModalPortal"></div>
+      <div id="logoutPortal"></div>
+      <div id="messagePortal"></div>
+      <div id="staffManagementPortal"></div>
+
+      <script type="module" src="{{ url_for('static', filename='scripts/chart.umd.js') }}"></script>
+      <script type="module" src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+</body>
+</html>
+

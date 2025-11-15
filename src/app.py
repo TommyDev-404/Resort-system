@@ -1,6 +1,6 @@
 import pymysql
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
-from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login
+from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
 
 app = Flask(__name__, template_folder='frontend/template', static_folder='frontend/static')
 app.secret_key = 'i_love_u'  # secret key
@@ -16,8 +16,8 @@ def add_header(response):
 # Create DB object once here
 db = Database(
       host="localhost",
-      user="root",
-      password="",
+      user="tommy",
+      password="2006",
       database="resort_db",
       cursor=pymysql.cursors.DictCursor
 )
@@ -31,6 +31,7 @@ house = Housekeeping(db)
 avl = RatesAndAvailability(db)
 acc = Accounting(db)
 rev = RevenueMgmt(db)
+staff = Staff_Management(db)
 login = Login(db)
 
 
@@ -61,9 +62,27 @@ def system_page():
                   WHERE p.end_date < CURDATE()
                   AND LOWER(TRIM(a.promo)) != 'None';
             """)
+
+            #reset salary data 
+            cursor.execute(''' 
+                  UPDATE staff_details
+                  SET 
+                        weekly_salary = 0,
+                        monthly_salary = CASE
+                        WHEN MONTH(reset_date) != MONTH(CURRENT_DATE()) OR YEAR(reset_date) != YEAR(CURRENT_DATE())
+                        THEN 0
+                        ELSE monthly_salary
+                        END,
+                        reset_date = CURRENT_DATE()
+                  WHERE 
+                        WEEK(reset_date, 1) != WEEK(CURRENT_DATE(), 1)
+                        OR MONTH(reset_date) != MONTH(CURRENT_DATE())
+                        OR YEAR(reset_date) != YEAR(CURRENT_DATE());
+            ''')
+
             conn.commit()
 
-      return render_template('index.html')
+      return render_template('admin.html')
 
 # api
 #------------------ ALERTS ------------------#
@@ -74,6 +93,10 @@ def occupancy_alert():
 @app.route('/housekeeping-alert', methods=['GET'])
 def housekeeping_alert():
       return jsonify(alert.housekeeping_alert())
+
+@app.route('/notification-count', methods=['GET'])
+def notif_count():
+      return jsonify(alert.notification_count())
 
 
 #------------------ LOGIN API ------------------#
@@ -128,6 +151,10 @@ def heavy_month():
 @app.route('/most-booked-area', methods=['GET'])
 def most_booked_area():
       return jsonify(dashboard.most_booked_area())
+
+@app.route('/top-booked-area', methods=['GET'])
+def top_booked_area():
+      return jsonify(dashboard.top_most_booked_area())
 
 
 #----------------- ANALYTICS ------------------#
@@ -340,6 +367,72 @@ def get_all_promo():
 @app.route('/remove-promo', methods=['DELETE'])
 def remove_promo():
       return jsonify(rev.remove_promo(request.args.get('id'), request.args.get('area_promos')))
+
+
+#--------------- STAFF MANAGEMENT ------------------#
+@app.route('/add-staff', methods=['POST'])
+def add_staff():
+      return jsonify(staff.add_staff(**request.get_json()))
+
+@app.route('/update-staff-info', methods=['POST'])
+def update_staff():
+      return jsonify(staff.update_staff(**request.get_json()))
+
+@app.route('/view-staff-info', methods=['GET'])
+def view_staff_info():
+      return jsonify(staff.view_staff_info(request.args.get('id')))
+
+@app.route('/remove-staff-attendance', methods=['DELETE'])
+def remove_staff_attendance():
+      return jsonify(staff.remove_staff_attendance(request.args.get('id'), request.args.get('status'),  request.args.get('date')))
+
+@app.route('/remove-staff', methods=['DELETE'])
+def remove_staff():
+      return jsonify(staff.remove_staff(request.args.get('id')))
+
+@app.route('/all-staff', methods=['GET'])
+def all_staff():
+      return jsonify(staff.all_staff())
+
+@app.route('/search-staff', methods=['GET'])
+def search_staff():
+      return jsonify(staff.search_staff(request.args.get('staff_name')))
+
+@app.route('/staff-list', methods=['GET'])
+def all_staff_list():
+      return jsonify(staff.staff_list())
+
+@app.route('/all-staff-attendance', methods=['GET'])
+def all_staff_attendance():
+      return jsonify(staff.all_staff_attendance())
+
+@app.route('/all-present-staff', methods=['GET'])
+def all_present_staff():
+      return jsonify(staff.all_present_staff())
+
+@app.route('/individual-staff-attendance', methods=['GET'])
+def individual_staff_attendance():
+      return jsonify(staff.individual_staff_attendance(request.args.get('id')))
+
+@app.route('/add-staff-attendance', methods=['POST'])
+def add_staff_attendance():
+      return jsonify(staff.add_staff_attendance(request.get_json()))
+
+@app.route('/update-staff-attendance', methods=['POST'])
+def update_staff_attendance():
+      return jsonify(staff.update_staff_attendance(request.get_json()))
+
+@app.route('/summary-cards-data', methods=['GET'])
+def summary_cards():
+      return jsonify(staff.staff_summary_cards())
+
+@app.route('/thisweek-onleave-data', methods=['GET'])
+def on_leave():
+      return jsonify(staff.this_week_onleave())
+
+@app.route('/sort-attendance-data', methods=['GET'])
+def sort_attendance():
+      return jsonify(staff.find_attendance(request.args.get('month'), request.args.get('day')))
 
 
 #--------------- ADMIN PROFILE ------------------#

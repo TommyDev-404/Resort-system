@@ -1,5 +1,6 @@
 from collections import Counter
-from datetime import date
+from datetime import datetime, timezone
+
 
 class Reservation:
       def __init__(self, db):
@@ -489,11 +490,15 @@ class Reservation:
                         parts = accomodation.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
-                        
+                        now = datetime.now(timezone.utc)
+
+                        count = 0
                         for room, number in set(zip(rooms, room_no)):
                               if room not in ['cabana', 'small', 'big', 'hall']:
                                     cursor.execute('''UPDATE accomodation_spaces SET status = "need-clean" WHERE name=%s AND room=%s''', (room.capitalize(), number))
-                        
+                                    cursor.execute(''' INSERT INTO notifications(name, date, room_name, room_no) VALUES(%s, %s, %s, %s) ''', (f'Housekeeping requested for {parts[count]}', now, room, number))
+                              count += 1
+
                         con.commit()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
@@ -662,4 +667,4 @@ class Reservation:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-           
+      

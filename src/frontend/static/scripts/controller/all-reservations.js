@@ -31,52 +31,59 @@ function failedMessageCard(message){
 }
 
 function createTable(id, guest_name, checkin, checkout, stay_count, accomodations, status, payment_status){
-      console.log(status);
       const row = `
-            <tr class="text-[16px] bg-gray-50 hover:bg-blue-50 transition text-gray-600 fade-in-up" id="${id}" data-set="${accomodations}">
-                  <td class="px-3 py-4"><input type="checkbox" name="select" class="w-6 h-5"></td>
+            <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up" id="${id}" data-set="${accomodations}">
+                  <td class="px-3 py-4">
+                        <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
+                              <input type="checkbox" name="select" class="timeout-checkbox hidden peer">
+                              <span
+                                    class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition"><i data-lucide="check" class="w-4 h-4 text-white"></i>
+                              </span>
+                        </label>
+                  </td>
                   <td class="px-4 py-4"><span class="font-medium">${guest_name}</span></td>
                   <td class="px-4 py-4"><span>${checkin} - ${checkout} <label class="text-gray-400 text-sm">(${stay_count} Nights)</label></span></td>
                   <td class="px-6 py-4"><span>${accomodations}</span></td>
-                  <td class="px-5 py-4 text-blue-600 font-semibold text-[14px]"><span class="px-3 py-1 text-xs rounded-full ${status === 'Reserved' ? 'text-green-700 bg-green-100' : status === 'Cancelled' ? 'text-red-700 bg-red-100' : status === 'Checked-out' ? 'text-secondary-gold bg-yellow-100' : 'text-blue-700 bg-blue-100'}">${status}</span></td>
-                  <td class="px-5 py-4 text-yellow-600 font-semibold text-[14px]"><span class="px-3 py-1 text-xs rounded-full ${payment_status === 'ZUZU (Online Payment)' ? 'text-green-700 bg-green-100' : payment_status === 'Refunded' ? 'text-red-700 bg-red-100' : payment_status === 'Direct Payment' ? 'text-blue-700 bg-blue-100' : 'text-yellow-700 bg-yellow-100'}">${payment_status}</span></td>
+                  <td class="px-5 py-4 text-blue-600 font-semibold text-[14px]"><span class="px-3 py-1 text-xs rounded-full ${status === 'Reserved' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500' : status === 'Cancelled' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500' : status === 'Checked-out' ? 'text-secondary-gold bg-yellow-100  dark:text-white dark:bg-yellow-500' : 'text-blue-700 bg-blue-100 dark:text-white dark:bg-blue-500'}">${status}</span></td>
+                  <td class="px-5 py-4 text-yellow-600 font-semibold text-[14px]"><span class="px-3 py-1 text-xs rounded-full ${payment_status === 'ZUZU (Online Payment)' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500' : payment_status === 'Refunded' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500' : payment_status === 'Direct Payment' ? 'text-blue-700 bg-blue-100  dark:text-white dark:bg-blue-500' : 'text-yellow-700 bg-yellow-100 dark:text-white dark:bg-yellow-500'}">${payment_status}</span></td>
                   <td class="px-4 py-4 flex justify-center gap-2">
-                        <button  id="view-full-info" class="text-[14px] bg-purple-700 p-2 rounded-lg text-white flex items-center gap-1"><i class="ti ti-eye text-lg text-white"></i>View Details</button>
+                        <button  id="view-full-info" class="text-[14px] bg-purple-700 dark:bg-purple-500 hover:bg-purple-600 p-2 rounded-lg text-white flex items-center gap-1 cursor-pointer"><i class="ti ti-eye text-lg text-white"></i>View Details</button>
                   </td>
             </tr>
       `;
 
       tbody.innerHTML += row;
+      lucide.createIcons();
 }
 
 function renderAddBookingModal(){
       avl_spaces();
       const form  = `
             <div id="booking-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
-                  <div class="bg-white rounded-2xl shadow-2xl w-[95%] max-w-3xl relative p-8">
-                        <span id="close-add-booking" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-light cursor-pointer">&times;</span>
+                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-3xl relative p-8 fade-in-up">
+                        <span id="close-add-booking" class="absolute top-4 right-4 text-gray-500 dark:text-gray-200 dark:hover:text-gray-400 hover:text-gray-700 text-3xl font-light cursor-pointer">&times;</span>
                         <div class="text-center mb-6">
-                              <h2 class="text-xl font-bold text-gray-700">Add Booking</h2>
-                              <p class="text-gray-500 text-sm">Fill out guest details and choose accommodations below.</p>
+                              <h2 class="text-xl font-bold text-gray-700 dark:text-white">Add Booking</h2>
+                              <p class="text-gray-500 dark:text-gray-400 text-sm">Fill out guest details and choose accommodations below.</p>
                         </div>
                         <form id="addBookingForm" class="flex flex-col gap-6">
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                          <input type="text" name="name" placeholder="Guest Name" class="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
-                                          <input type="number" name="total_guest" placeholder="Total Guests" min="1" class="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                          <input type="text" name="name" placeholder="Guest Name" class="border border-gray-300 dark:text-gray-100 text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                          <input type="number" name="total_guest" placeholder="Total Guests" min="1" class="border dark:text-gray-100 text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                     </div>
                               </section>
             
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                          <select id="booking_type" name="inquiry_type" class="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                          <select id="booking_type" name="inquiry_type" class="border border-gray-300 text-gray-800 dark:text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                                 <option value="" selected disabled>Select Inquiry Type</option>
                                                 <option value="Reservation">Reservation (Booked in advance)</option>
                                                 <option value="Walk-in">Walk-in (No prior booking)</option>
                                                 <option value="Day Guest">Day Guest (Swim or Tour only)</option>
                                           </select>
             
-                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
+                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
                                                 <option value="" selected disabled>Select Payment Method</option>
                                                 <option value="Direct Payment">Direct Payment</option>
                                                 <option value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
@@ -86,7 +93,7 @@ function renderAddBookingModal(){
                               </section>
             
                               <section>
-                                    <h3 class="text-sm font-semibold text-gray-700 mb-3 border-b border-gray-200 text-center">Select Accommodations</h3>
+                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3 border-b border-gray-200 text-center">Select Accommodations</h3>
                                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
                                           <label class="btn-acc bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-center cursor-pointer transition-all" data-section="Premium Villa">Premium Villa (<span id="count-p"></span>)</label>
                                           <label class="btn-acc bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-center cursor-pointer transition-all" data-section="Standard Villa">Standard Villa (<span id="count-s"></span>)</label>
@@ -100,8 +107,8 @@ function renderAddBookingModal(){
                                     </div>
             
                                     <div class="mt-4 text-sm">
-                                          <label class="text-gray-600 block mb-1 font-medium">Selected Accommodations:</label>
-                                          <div id="selected-accomodations" class="grid grid-cols-4 gap-2 border border-gray-200 rounded-md p-3 bg-gray-50 h-30 overflow-y-auto"></div>
+                                          <label class="text-gray-600 dark:text-gray-100 block mb-1 font-medium">Selected Accommodations:</label>
+                                          <div id="selected-accomodations" class="grid grid-cols-4 gap-2 border border-gray-200 rounded-md p-3 bg-gray-50 dark:bg-gray-800 h-30 overflow-y-auto"></div>
                                           <input type="hidden" name="accomodations_selected">
                                     </div>
                               </section>
@@ -109,11 +116,11 @@ function renderAddBookingModal(){
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                           <div>
-                                                <label class="text-gray-600 text-sm mb-1 block">Check-In Date</label>
+                                                <label class="text-gray-600 dark:text-gray-100 text-sm mb-1 block">Check-In Date</label>
                                                 <input type="date" name="checkin" class="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                           </div>
                                           <div>
-                                                <label class="text-gray-600 text-sm mb-1 block">Check-Out Date</label>
+                                                <label class="text-gray-600 dark:text-gray-100 text-sm mb-1 block">Check-Out Date</label>
                                                 <input type="date" name="checkout" class="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                           </div>
                                     </div>
@@ -123,12 +130,12 @@ function renderAddBookingModal(){
                   </div>
 
                   <div class="accomodation-avl-overlay fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
-                        <div class="bg-white rounded-xl shadow-xl p-6 w-[500px] relative">
-                              <span class="absolute right-3 top-1 text-[25px] cursor-pointer" id="close-accomodation-avl">&times;</span>
-                              <h2 class="text-lg font-semibold text-gray-700 text-center" id="accomodation_label">Premium Villa Rooms</h2>
+                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 w-[500px] relative fade-in-up">
+                              <span class="absolute right-3 top-1 text-[25px] text-gray-900 dark:text-gray-100 hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer" id="close-accomodation-avl">&times;</span>
+                              <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 text-center" id="accomodation_label">Premium Villa Rooms</h2>
                               <div class="flex flex-col gap-2 mt-4 h-[200px] overflow-y-auto" id="avl-accomodations"></div>
                               <div class="flex gap-6 justify-between mt-6">
-                                    <label class="bg-primary-blue hover:bg-blue-500 rounded-sm text-white py-2 px-[50px] w-full text-center" id="select-accomodation-avl">Select</label>
+                                    <label class="bg-primary-blue dark:bg-blue-600 dark:hover:bg-blue-500 hover:bg-blue-500 rounded-sm text-white py-2 px-[50px] w-full text-center" id="select-accomodation-avl">Select</label>
                               </div>
                         </div>
                   </div>
@@ -140,22 +147,22 @@ function renderAddBookingModal(){
 
 function renderEditReservedModal(id, check_in, check_out){
       const modal = `
-            <div class="fixed top-0 left-0 w-full h-full bg-black/20 z-50" id="update-reservation-overlay">
-                  <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl max-w-[500px] px-6 py-4">
-                        <span class="font-semibold text-[25px] flex justify-end cursor-pointer" id="close-reservation-overlay">&times;</span>
-                        <h2 class="text-gray-500 text-center font-bold text-[20px]">Update Reservation Date</h2>
+            <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
+                  <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
+                        <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-reservation-overlay">&times;</span>
+                        <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Update Reservation Date</h2>
                         <form id="update-reserved-form">
                               <div class="flex flex-col gap-6 mt-2">
                                     <input type="hidden" name="id" value="${id}">
-                                    <div class="flex flex-col gap1">
+                                    <div class="flex flex-col gap1 text-gray-600 dark:text-gray-200">
                                           Edit Check-In:
-                                          <input type="date" name="edit_checkin" class="border border-gray-300 p-4 rounded-sm" value="${check_in}">
+                                          <input type="date" name="edit_checkin" class="border border-gray-300 text-gray-600 dark:text-gray-100 p-4 rounded-sm" value="${check_in}">
                                     </div>
-                                    <div class="flex flex-col gap1">
+                                    <div class="flex flex-col gap1  text-gray-600 dark:text-gray-200">
                                           Edit Check-out:
-                                          <input type="date" name="edit_checkout" class="border border-gray-300 p-4 rounded-sm" value="${check_out}">
+                                          <input type="date" name="edit_checkout" class="border border-gray-300  text-gray-600 dark:text-gray-100 p-4 rounded-sm" value="${check_out}">
                                     </div>
-                                    <button type="submit" class="bg-primary-blue hover:bg-blue-500 rounded-sm text-white py-2 px-[50px] text-center">Update</button>      
+                                    <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Update</button>      
                               </div>
                         </form>
                   </div>
@@ -167,10 +174,10 @@ function renderEditReservedModal(id, check_in, check_out){
 
 function renderMarkPaidModal(){
       const modal = `
-            <div class="fixed top-0 left-0 w-full h-full bg-black/20 z-50" id="mark-paid-overlay">
-                  <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl max-w-[500px] px-6 py-4">
-                        <span class="font-semibold text-[25px] flex justify-end cursor-pointer" id="close-mark-paid">&times;</span>
-                        <h2 class="text-gray-500 text-center font-bold text-[20px]">Payment</h2>
+            <div class="fixed top-0 left-0 w-full h-full  bg-black/40 backdrop-blur-sm z-50" id="mark-paid-overlay">
+                  <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
+                        <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-mark-paid">&times;</span>
+                        <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Payment</h2>
                         <form id="markpaid-form">
                               <div class="flex flex-col gap-6 mt-2">
                                     <select id="mark-payment" class="border border-gray-300 p-4 rounded-sm" required>
@@ -179,7 +186,7 @@ function renderMarkPaidModal(){
                                           <option value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
                                           <option value="Pending">Pending</option>
                                     </select> 
-                                    <button type="submit" class="bg-primary-blue hover:bg-blue-500 rounded-sm text-white py-2 px-[50px] text-center">Done</button>      
+                                    <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Done</button>      
                               </div>
                         </form>
                   </div>
@@ -239,12 +246,12 @@ function switchTabs(){
             tab.addEventListener("click", () => {
                   // Reset all tabs to gray
                   tabs.forEach(t => {
-                        t.classList.remove("text-blue-500", "border-blue-500", "bg-blue-50", "rounded-t-sm");
+                        t.classList.remove("text-blue-500", "border-blue-500", "bg-black/10", "dark:bg-white/10", "rounded-t-sm");
                         t.classList.add("text-gray-600", "border-gray-300");
                   });
 
                   // Activate the clicked tab
-                  tab.classList.add("text-blue-500", "border-blue-500", "bg-blue-50", "rounded-t-sm");
+                  tab.classList.add("text-blue-500", "border-blue-500", "bg-black/10", "dark:bg-white/10", "rounded-t-sm");
                   tab.classList.remove("text-gray-600", "border-gray-300");
             });
       });
@@ -522,6 +529,7 @@ async function updateReservationDate(e){
 
 // --------------- GET DATA Fetching -------------- //
 async function renderViewReservationDetails(id){
+      console.log('view');
       const response = await fetch(`/view-details/${id}`);
       const result = await response.json();
 
@@ -531,29 +539,29 @@ async function renderViewReservationDetails(id){
 
             const modal = `
                   <div class="fixed top-0 left-0 w-full h-full bg-black/30 backdrop-blur-sm z-50" id="details-overlay">
-                        <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white rounded-lg shadow-2xl max-w-[680px] px-[50px] py-6">
-                              <span id="close-details" class="font-semibold text-[25px] cursor-pointer fixed top-[1%] left-[94.5%] text-gray-400 hover:text-gray-600 transition">&times;</span>
+                        <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-2xl max-w-[680px] px-[50px] py-6">
+                              <span id="close-details" class="font-semibold text-[25px] cursor-pointer fixed top-[1%] left-[94.5%] text-gray-400 dark:text-gray-100 dark:hover:text-gray-200 hover:text-gray-600 transition">&times;</span>
                               <div class="max-h-auto">
-                                    <h2 class="text-gray-700 text-center font-bold text-[20px] mb-4">Guest Details</h2>
-                                    <div class="flex flex-col gap-1 mt-4">
+                                    <h2 class="text-gray-700 dark:text-gray-100 text-center font-bold text-[20px] mb-4">Guest Details</h2>
+                                    <div class="flex flex-col gap-1 mt-4 text-gray-900 dark:text-gray-200">
                                           Name:
-                                          <label id="name" class="font-semibold text-[17px] text-gray-800 bg-gray-50 border border-gray-200 rounded-sm p-2">${result.data.name}</label>
+                                          <label id="name" class="font-semibold text-[17px] text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-gray-200 rounded-sm p-2">${result.data.name}</label>
                                           Check-in:
-                                          <label id="check-in" class="font-medium text-[17px] text-blue-700 bg-blue-50 border border-blue-100 rounded-sm p-2">${check_in}</label>
+                                          <label id="check-in" class="font-medium text-[17px] text-blue-700 bg-blue-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-blue-100 rounded-sm p-2">${check_in}</label>
                                           Check-out:
-                                          <label id="check-out" class="font-medium text-[17px] text-blue-700 bg-blue-50 border border-blue-100 rounded-sm p-2">${check_out}</label>
+                                          <label id="check-out" class="font-medium text-[17px] text-blue-700 bg-blue-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-blue-100 rounded-sm p-2">${check_out}</label>
                                           Accomodations:
-                                          <label id="accomodations" class="font-medium text-[17px] text-gray-800 bg-gray-50 border border-gray-200 rounded-sm p-2">${result.data.accomodations}</label>
+                                          <label id="accomodations" class="font-medium text-[17px] text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-gray-200 rounded-sm p-2">${result.data.accomodations}</label>
                                           Total Guest:
-                                          <label id="total" class="font-medium text-[17px] text-gray-800 bg-gray-50 border border-gray-200 rounded-sm p-2">${result.data.total_guest}</label>
+                                          <label id="total" class="font-medium text-[17px] text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-gray-200 rounded-sm p-2">${result.data.total_guest}</label>
                                           Booking Type:
-                                          <label id="booking" class="font-medium text-[17px] text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-sm p-2">${result.data.booking_type}</label>
+                                          <label id="booking" class="font-medium text-[17px] text-indigo-700 bg-indigo-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-indigo-100 rounded-sm p-2">${result.data.booking_type}</label>
                                           Status:
-                                          <label id="status" class="font-medium text-[17px] text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-sm p-2">${result.data.status}</label>
+                                          <label id="status" class="font-medium text-[17px] text-emerald-700 bg-emerald-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500  border border-emerald-100 rounded-sm p-2">${result.data.status}</label>
                                           Payment:
-                                          <label id="payment_t" class="font-medium text-[17px] text-yellow-700 bg-yellow-50 border border-yellow-100 rounded-sm p-2">${result.data.payment}</label>
+                                          <label id="payment_t" class="font-medium text-[17px] text-yellow-700 bg-yellow-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-yellow-100 rounded-sm p-2">${result.data.payment}</label>
                                           Total Paid:
-                                          <label id="paid-amount" class="font-medium text-[17px] text-teal-700 bg-teal-50 border border-teal-100 rounded-sm p-2">${result.data.total_amount}</label>
+                                          <label id="paid-amount" class="font-medium text-[17px] text-teal-700 bg-teal-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-teal-100 rounded-sm p-2">${result.data.total_amount}</label>
                                     </div>
                               </div>
                         </div>
@@ -586,7 +594,7 @@ async function generateAvlAccomodation(accomodation){
       const rooms = result.rooms;
 
       for (let i = 0; i < rooms.length; i++){
-            const p = `<label class="bg-gray-50 p-2 rounded-lg text-center border border-gray-200 hover:bg-green-200" id="card"><input type="checkbox" name="avl" value="${accomodation} ${rooms[i]}" required> ${accomodation} ${rooms[i]}</label>`;
+            const p = `<label class="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-200 dark:hover:bg-white/10 hover:bg-green-200" id="card"><input type="checkbox" class="text-gray-100 dark:text-gray-800" name="avl" value="${accomodation} ${rooms[i]}" required> ${accomodation} ${rooms[i]}</label>`;
             document.querySelector('#avl-accomodations').innerHTML += p;
       }
 
@@ -619,7 +627,7 @@ async function recentBookings(){
 
       const response = await fetch(`/recent-bookings?year=${year}&month=${month}`);
       const result = await response.json();
-      console.log(result);
+
       if (result.success){
             document.querySelectorAll('tbody tr').forEach(row => row.remove());      
             result.data.forEach(row => {
@@ -628,8 +636,8 @@ async function recentBookings(){
       }else {
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
             const empty_row = `
-                  <tr class="hover:bg-blue-50 transition-all">
-                        <td colspan="6" class="text-center  text-gray-600 py-3 bg-gray-50">No bookings.</td>
+                  <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="7" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
                   </tr>
             `;
             
@@ -641,18 +649,16 @@ async function currentBookings(){
       const response = await fetch(`/current-bookings`);
       const result = await response.json();
       
-      console.log(result);
       if (result.success){
             document.querySelectorAll('tbody tr').forEach(row => row.remove());      
             result.data.forEach(row => {
                   createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['status'], row['payment']);
             });
       }else {
-            console.log('here');
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
             const empty_row = `
-                  <tr class="hover:bg-blue-50 transition-all">
-                        <td colspan="6" class="text-center  text-gray-600 py-3 bg-gray-50">No bookings.</td>
+                  <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="7" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
                   </tr>
             `;
             
@@ -739,8 +745,8 @@ async function bookingsCategories(e){
       }else {
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
             const empty_row = `
-                  <tr class="hover:bg-blue-50 transition-all">
-                        <td colspan="6" class="text-center  text-gray-600 py-3 bg-gray-50">No data.</td>
+                  <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="7" class="text-center bg-gray-50 dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
                   </tr>
             `;
             

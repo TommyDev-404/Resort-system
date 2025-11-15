@@ -53,12 +53,19 @@ class Alerts:
       def housekeeping_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
-                  cursor.execute('''
-                        SELECT 
-                              COALESCE(COUNT(*), 0)AS total_need_clean
-                        FROM accomodation_spaces
-                        WHERE status = 'need-clean' AND name NOT IN ('Cabana', 'Small', 'Big', 'Hall');
+                  cursor.execute('''   
+                        SELECT * FROM notifications
+                  ''')
+            data = cursor.fetchall()
+
+            return {'success': bool(data), 'data': data} 
+
+      def notification_count(self):
+            with self.db.connect() as con:
+                  cursor = con.cursor()
+                  cursor.execute('''   
+                        SELECT COUNT(*) as count FROM notifications
                   ''')
             data = cursor.fetchone()
 
-            return {'message': f"There are {data.get('total_need_clean')} area's that require cleaning today. Please assign housekeeping staff immediately." if data.get('total_need_clean') != 0 else None}
+            return {'count': data.get('count')}

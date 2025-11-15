@@ -2,8 +2,28 @@
 let checkinChart = null;
 let revenueChart = null;
 
+const observer = new MutationObserver(() => {
+      // Safely destroy each chart if it exists
+      if (typeof checkinChart !== 'undefined' && checkinChart) {
+            checkinChart.destroy();
+      }
+
+      if (typeof revenueChart !== 'undefined' && revenueChart) {
+            revenueChart.destroy();
+      }
+
+      drawRevenueChart();
+      drawCheckinForecastChart();
+});
+
+observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
 // ---------------------- HELPERS -------------------------
-async function drawCheckinForecastChart(result) {
+async function drawCheckinForecastChart(type=null) {
+      const url = type ? `/checkin-forecast-type?accomodation_type=${type}` : '/checkin-forecast-all';
+      const response = await fetch(url);
+      const result = await response.json();
+
       const ctx = document.getElementById('checkin-forecast-chart').getContext('2d');
 
       // Convert dates to ISO internally
@@ -25,73 +45,97 @@ async function drawCheckinForecastChart(result) {
             checkinChart.destroy();
       }
 
+      const isDarkMode = document.documentElement.classList.contains('dark');
+
       checkinChart = new Chart(ctx, {
             type: 'line',
             data: {
                   labels: displayLabels,
                   datasets: [
-                  {
-                        label: 'Historical Check-in: ',
-                        data: historicalValues,
-                        borderColor: '#1ed40eff',  // Blue
-                        borderWidth: 3,
-                        fill: false,
-                        tension: 0.4,
-                        pointRadius: 0,
-                  },
-                  {
-                        label: 'Forecasted Check-in: ',
-                        data: forecastValues,
-                        borderColor: '#e42e0eff',  // Green
-                        borderWidth: 3,
-                        fill: false,
-                        tension: 0.4,
-                        pointRadius: 0,
-                  }
+                        {
+                              label: 'Historical Check-in (%)',
+                              data: historicalValues,
+                              borderColor: '#0bda0bff',
+                              backgroundColor: '#18e411ff',
+                              borderWidth: 2,
+                              tension: 0.4,
+                              pointRadius: 0,
+                              spanGaps: true,
+                        },
+                        {
+                              label: 'Forecasted Check-in (%)',
+                              data: forecastValues,
+                              borderColor: '#0a33ebff',
+                              backgroundColor: '#0e24ebff',
+                              borderDash: [8, 5],
+                              borderWidth: 2,
+                              tension: 0.4,
+                              pointRadius: 0,
+                              spanGaps: true,
+                        }
                   ]
             },
             options: {
                   responsive: true,
                   maintainAspectRatio: false,
                   scales: {
-                  y: {
-                        min: 0,
-                        max: 100,
-                        title: { display: true, text: 'Check-in %', color: '#555' },
-                        grid: { color: '#eee' }
-                  },
-                  x: {
-                        ticks: { maxTicksLimit: 15, autoSkip: true },
-                        grid: { display: false }
-                  }
+                        y: {
+                              min: 0,
+                              max: 100,
+                              title: { 
+                                    display: true, 
+                                    text: 'Occupancy %', 
+                                    color: isDarkMode ? '#E5E7EB' : '#111827' // light gray for dark mode, black for light
+                              },
+                              ticks: { 
+                                    color: isDarkMode ? '#E5E7EB' : '#374151' 
+                              },
+                              grid: { 
+                                    color: isDarkMode ? '#374151' : '#E5E7EB' 
+                              }
+                        },
+                        x: {
+                              ticks: { 
+                                    color: isDarkMode ? '#E5E7EB' : '#374151',
+                                    maxTicksLimit: 15,
+                                    autoSkip: true
+                              },
+                              grid: { display: false }
+                        }
                   },
                   plugins: {
-                  legend: { display: true },
-                  tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: '#111827',
-                        titleColor: '#FBBF24',
-                        bodyColor: '#F9FAFB',
-                        borderColor: '#374151',
-                        borderWidth: 1,
-                        padding: 10,
-                        titleFont: { size: 23, weight: 'bold' },
-                        bodyFont: { size: 22 },
-                        callbacks: {
-                              label: function (context) {
-                              // Show ISO date in tooltip
-                              const isoDate = allDatesISO[context.dataIndex];
-                              return `${context.dataset.label}: ${context.parsed.y ?? '-'}`;
+                        legend: { 
+                              labels: { 
+                                    color: isDarkMode ? '#E5E7EB' : '#111827' 
+                              } 
+                        },
+                        tooltip: {
+                              mode: 'nearest',
+                              intersect: false,
+                              backgroundColor: '#111827',
+                              titleColor: '#FBBF24',
+                              bodyColor: '#F9FAFB',
+                              borderColor: '#374151',
+                              borderWidth: 1,
+                              padding: 10,
+                              titleFont: { size: 23, weight: 'bold' },
+                              bodyFont: { size: 25 },
+                              callbacks: {
+                                    label: function (context) {
+                                          return `${context.dataset.label}: ${context.parsed.y ?? '-'}%`;
+                                    }
                               }
                         }
                   }
-                  },
             }
       });
 }
 
-async function drawRevenueChart(result) {
+async function drawRevenueChart(type=null) {
+      const url = type ? `/revenue-forecast-type?accomodation_type=${type}` : '/revenue-forecast-all';
+      const response = await fetch(url);
+      const result = await response.json();
+
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       const latestRevenue = Array(12).fill(null);
       const forecastedRevenue = Array(12).fill(null);
@@ -113,78 +157,84 @@ async function drawRevenueChart(result) {
             revenueChart.destroy();
       }
 
+      const isDarkMode = document.documentElement.classList.contains('dark');
+
       revenueChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: months,
-                datasets: [
-                    {
-                        label: 'Historical Revenue (₱)',
-                        data: latestRevenue,
-                        backgroundColor: 'rgba(233, 195, 24, 1)',
-                        borderWidth: 1,
-                        borderRadius: 6
-                    },
-                    {
-                        label: 'Forecasted Revenue (₱)',
-                        data: forecastedRevenue,
-                        backgroundColor: 'rgba(230, 7, 174, 1)',
-                        borderWidth: 1,
-                        borderRadius: 6
-                    }
-                ]
+                  labels: months,
+                  datasets: [
+                        {
+                              label: 'Historical Revenue (₱)',
+                              data: latestRevenue,
+                              backgroundColor: 'rgba(233, 195, 24, 1)',
+                              borderWidth: 1,
+                              borderRadius: 6
+                        },
+                        {
+                              label: 'Forecasted Revenue (₱)',
+                              data: forecastedRevenue,
+                              backgroundColor: 'rgba(230, 7, 174, 1)',
+                              borderWidth: 1,
+                              borderRadius: 6
+                        }
+                  ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true },
-                    tooltip: {
-                        backgroundColor: '#111827',  // dark background
-                        titleColor: '#FBBF24',       // title (month) color
-                        bodyColor: '#F9FAFB',        // value text color
-                        borderColor: '#374151',
-                        borderWidth: 1,
-                        padding: 10,
-                        titleFont: { size: 23, weight: 'bold' },
-                        bodyFont: { size: 22 },
-                        callbacks: {
-                            // Format tooltip text
-                            label: function(context) {
-                                const value = context.parsed.y;
-                                return `${context.dataset.label}: ₱${value?.toLocaleString() ?? '-'}`;
-                            }
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                        legend: { 
+                              labels: { 
+                                    color: isDarkMode ? '#E5E7EB' : '#111827' 
+                              } 
+                        },
+                        tooltip: {
+                              backgroundColor: '#111827',  // dark background
+                              titleColor: '#FBBF24',       // title (month) color
+                              bodyColor: '#F9FAFB',        // value text color
+                              borderColor: '#374151',
+                              borderWidth: 1,
+                              padding: 10,
+                              titleFont: { size: 23, weight: 'bold' },
+                              bodyFont: { size: 22 },
+                              callbacks: {
+                              // Format tooltip text
+                              label: function(context) {
+                                    const value = context.parsed.y;
+                                    return `${context.dataset.label}: ₱${value?.toLocaleString() ?? '-'}`;
+                              }
+                              }
                         }
-                    }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        max: 1000000,
-                        title: { display: true, text: 'Revenue (₱)' } 
-                    },
-                    x: { ticks: { autoSkip: false } }
-                }
+                  },
+                  scales: {
+                        y: { 
+                              beginAtZero: true, 
+                              max: 1000000,
+                              title: {
+                                    color: isDarkMode ? '#E5E7EB' : '#374151',
+                                    display: true, 
+                                    text: 'Revenue (₱)' 
+                              },
+                              ticks: { 
+                                    color: isDarkMode ? '#E5E7EB' : '#374151' 
+                              },
+                              grid: { 
+                                    color: isDarkMode ? '#374151' : '#E5E7EB' 
+                              }
+                        },
+                        x: { 
+                              ticks: {
+                                    color: isDarkMode ? '#E5E7EB' : '#374151',
+                                    autoSkip: false 
+                              },
+                              grid: { display: false }
+                        }
+                  }
             }
-        });
-        
+      });
 }
 
-async function forecastCheckin(type=null) {
-      const url = type ? `/checkin-forecast-type?accomodation_type=${type}` : '/checkin-forecast-all';
-      const response = await fetch(url);
-      const result = await response.json();
-
-      drawCheckinForecastChart(result);
-}
-
-async function forecastRevenue(type=null) {
-      const url = type ? `/revenue-forecast-type?accomodation_type=${type}` : '/revenue-forecast-all';
-      const response = await fetch(url);
-      const result = await response.json();
-
-      drawRevenueChart(result);
-}
 
 async function occupancyData(type=null) {
       const url = type ? `/mtd-occupancy-type?accomodation_type=${type}` : '/mtd-occupancy-all';
@@ -232,8 +282,8 @@ document.getElementById('roomTypeFilter').addEventListener('change', async(e) =>
             occupancyData(e.target.value);
             adrData(e.target.value);
             revparData(e.target.value);
-            forecastCheckin(e.target.value);
-            forecastRevenue(e.target.value);
+            drawCheckinForecastChart(e.target.value);
+            drawRevenueChart(e.target.value);
             loadAccomodationType(e.target.options[e.target.selectedIndex].text);
       }else {
             occupancyData();
@@ -257,8 +307,8 @@ export function initPageAnalytics() {
       adrData();
       revparData();
       loadAccomodationType();
-      forecastCheckin();
-      forecastRevenue();
+      drawCheckinForecastChart();
+      drawRevenueChart();
       targetRevenue();
 };
 

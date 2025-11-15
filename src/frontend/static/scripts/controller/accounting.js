@@ -2,10 +2,10 @@
 
 function createRow(date, direct, online){
       const row = `
-            <tr class="fade-in-up z-10">
-                  <td class="px-6 py-4 whitespace-nowrap">${date}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">₱${online}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">₱${direct}</td>
+            <tr class="fade-in-up z-10 text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700">
+                  <td class="px-6 py-4 text-center whitespace-nowrap">${date}</td>
+                  <td class="px-6 py-4 text-center  whitespace-nowrap">₱${online}</td>
+                  <td class="px-6 py-4 text-center  whitespace-nowrap">₱${direct}</td>
             </tr>
       `;
 

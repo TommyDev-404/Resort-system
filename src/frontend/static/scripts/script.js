@@ -1,4 +1,6 @@
+
 // Import page initialization functions
+
 import { initPageDashboard } from "./controller/home-dashboard.js";
 import { initPageAnalytics } from "./controller/analytics.js";
 import { initPageReservation } from "./controller/all-reservations.js";
@@ -7,6 +9,7 @@ import { initPageRatesAndAvailability } from "./controller/rates_availability.js
 import { initPageAccounting } from "./controller/accounting.js";
 import { initPageAdmin } from "./controller/admin.js";
 import { initPageRevenueMgmt } from "./controller/revenue_mgmt.js";
+import { initPageStaffMgmt } from "./controller/staff_mgmt.js";
 
 lucide.createIcons()
 
@@ -16,61 +19,209 @@ const contentSections = document.querySelectorAll('.content-section');
 const sidebar = document.getElementById('sidebar');
 
 // Map section IDs to their respective initialization functions
+
 const sectionInitMap = {
-    'home-dashboard': initPageDashboard,
-    'analytics': initPageAnalytics,
-    'all-reservations': initPageReservation,
-    'housekeeping': initPageHousekeeping,
-    'rates-availability': initPageRatesAndAvailability,
-    'accounting': initPageAccounting,
-    'revenue-management':  initPageRevenueMgmt,
-    'admin-profile': initPageAdmin
+      'home-dashboard': initPageDashboard,
+      'analytics': initPageAnalytics,
+      'all-reservations': initPageReservation,
+      'housekeeping': initPageHousekeeping,
+      'rates-availability': initPageRatesAndAvailability,
+      'accounting': initPageAccounting,
+      'revenue-management':  initPageRevenueMgmt,
+      'staff-management':  initPageStaffMgmt,
+      'admin-profile': initPageAdmin
 };
 
 /*---------------- SIDEBAR TOGGLE ----------------*/
 function toggleSidebar() {
-    const isHidden = sidebar.classList.contains('-translate-x-full');
-    sidebar.classList.toggle('-translate-x-full', !isHidden);
-    sidebar.classList.toggle('translate-x-0', isHidden);
-    sidebar.classList.toggle('opacity-0', isHidden);
-    sidebar.classList.toggle('pointer-events-none', isHidden);
-    sidebar.classList.toggle('opacity-50', !isHidden);
+      const isHidden = sidebar.classList.contains('-translate-x-full');
+      sidebar.classList.toggle('-translate-x-full', !isHidden);
+      sidebar.classList.toggle('translate-x-0', isHidden);
+      sidebar.classList.toggle('opacity-0', isHidden);
+      sidebar.classList.toggle('pointer-events-none', isHidden);
+      sidebar.classList.toggle('opacity-50', !isHidden);
 }
 
-function logoutCard(){
-    const modal = `
-        <div id="logoutModal" class="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
-                <h2 class="text-lg font-bold mb-4">Confirm Logout</h2>
-                <p class="text-gray-600 mb-6">Are you sure you want to log out?</p>
-                <div class="flex justify-between">
-                <button id="cancelLogout" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
-                <button id="confirmLogout" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">Logout</button>
-                </div>
-            </div>
-        </div>
-    `;
+/*---------------- SWITCH CONTENT ----------------*/
+function switchContent(sectionId) {
+      if (!sectionId) return;
+      
+      // Hide all sections
+      contentSections.forEach(section => section.classList.add('hidden'));
 
-    document.getElementById('logoutPortal').innerHTML += modal;
+      // Show target section
+      const targetSection = document.getElementById(sectionId);
+      if (targetSection) {
+            targetSection.classList.remove('hidden');
+
+            // Initialize section if a function exists
+            if (sectionInitMap[sectionId]) sectionInitMap[sectionId]();
+      }
+
+      // Update sidebar active state
+      sidebarItems.forEach(item => {
+            const isActive = item.dataset.section === sectionId;
+            
+            if (item.getAttribute('data-section') !== 'logout'){
+                  // Change color for the icon
+                  item.classList.toggle('active', isActive);
+                  item.classList.toggle('text-white', isActive);
+                  item.classList.toggle('text-gray-900', !isActive);
+            }
+      });
+
+      // Hide sidebar on mobile after selection
+      if (window.innerWidth < 1024) toggleSidebar();
+}
+
+function logout(){
+      logoutCard();
+                  
+      // cancel
+      document.querySelector('#cancelLogout').addEventListener('click', (e) => {
+            document.querySelector('#logoutModal').remove();
+      });
+
+      // logout
+      document.querySelector('#confirmLogout').addEventListener('click', async (e) => {
+            try {
+                  const response = await fetch('/logout', { method: 'POST' });
+                  if (response.ok) {
+                        successMessageCard('You have been logged out.', '/login');
+                  }
+            } catch (err) {
+                  failedMessageCard(`Logout failed: ${err}`);
+            }
+      });
+}
+
+/*---------------- EVENT LISTENERS ----------------*/
+sidebarItems.forEach(item => {
+      item.addEventListener('click', () => {
+            
+            if(item.dataset.section === 'logout'){
+                  logout();
+            }
+            else{
+                  switchContent(item.dataset.section)
+            }
+      
+      });
+});
+
+
+document.addEventListener('click', (e) => {
+      const sidebar = document.getElementById('sidebar');
+      const logoText = document.getElementById('logoText');
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const textElements = sidebar.querySelectorAll('span');
+      const header = document.querySelector('header');
+      const notificationModal = document.getElementById('notification-modal');
+      const adminMenu = document.getElementById('adminMenu');
+      const closeSidebar = document.getElementById('closeSidebar');
+      const clickedNotification = e.target.closest('#notification');
+      const clickedAdmin = e.target.closest('#adminButton');
+      const isInsideNotification = notificationModal.contains(e.target);
+      const isInsideAdmin = adminMenu.contains(e.target);
+      
+      // open notif & close admin
+      if (clickedNotification) {
+            adminMenu.classList.add('hidden');
+            notificationModal.classList.toggle('hidden');
+            return; 
+      }
+      
+      // open admin & close notif
+      if (clickedAdmin) {
+            notificationModal.classList.add('hidden');
+            adminMenu.classList.toggle('hidden');
+            return;
+      }
+      
+      // open notif & admin
+      if (e.target.closest('#notification')) notificationModal.classList.toggle('hidden');
+      if (e.target.closest('#adminButton')) adminMenu.classList.toggle('hidden');
+
+      // --- Handle outside click ---
+      if (!isInsideNotification && !isInsideAdmin) {
+            adminMenu.classList.add('hidden');
+            notificationModal.classList.add('hidden');
+      }
+      
+      // toggle sidebar
+      if (e.target.closest('#toggleSidebar')){
+            header.classList.toggle("left-62");
+            logoText.classList.toggle('max-w-[160px]');
+            logoText.classList.toggle('opacity-100');
+            sidebar.classList.toggle('w-[280px]');
+
+            textElements.forEach(span => {
+                  span.classList.toggle('max-w-[200px]');
+                  span.classList.toggle('opacity-100');
+            });
+            
+            hamburgerIcon.classList.toggle('hidden');
+            closeSidebar.classList.toggle('hidden');
+      };
+
+      // toggle darkmode
+      if (e.target.closest('#darkModeToggle')){
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+            document.querySelector('#darkIcon').classList.toggle('hidden'); 
+            document.querySelector('#lightIcon').classList.toggle('hidden');
+            lucide.replace();
+      }
+
+      if (e.target.closest('#profile-shortcut')) switchContent('admin-profile');
+      if (e.target.closest('#logoutButton')) logout();
+});
+
+/*---------------- INITIAL LOAD ----------------*/
+window.addEventListener('DOMContentLoaded', () => {
+      switchContent('home-dashboard'); // Show default section
+      
+      // remember darkmode on load with its icon
+      localStorage.getItem('theme') === 'dark' ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark');
+      localStorage.getItem('theme') === 'dark' ? document.querySelector('#lightIcon').classList.toggle('hidden') : document.querySelector('#darkIcon').classList.toggle('hidden');
+});
+
+
+function logoutCard(){
+      const modal = `
+            <div id="logoutModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                  <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-80 text-center">
+                  <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Confirm Logout</h2>
+                  <p class="text-gray-600 mb-6 dark:text-gray-400">Are you sure you want to log out?</p>
+                  <div class="flex justify-between">
+                        <button id="cancelLogout" class="bg-gray-700 dark:bg-white/5 px-4 py-2 rounded hover:bg-gray-400 dark:bg-white/2">Cancel</button>
+                        <button id="confirmLogout" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">Logout</button>
+                  </div>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('logoutPortal').innerHTML += modal;
 }
 
 
 function successMessageCard(message, redirect=null){
-    const msg = `
-        <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                    <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
-                    <h2 class="text-lg text-gray-600" id="message">${message}</h2>
-                    <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
-                </div>
-        </div>
-    `;
-    document.getElementById('messagePortal').innerHTML += msg;
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
+                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                  </div>
+            </div>
+      `;
+      document.getElementById('messagePortal').innerHTML += msg;
 
-    document.querySelector('#close-message').addEventListener('click', (e) => {
-        if (redirect) window.location.href = redirect;
-        document.querySelector('#logoutModal').remove();
-    });
+      document.querySelector('#close-message').addEventListener('click', (e) => {
+            if (redirect) window.location.href = redirect;
+            document.querySelector('#logoutModal').remove();
+      });
 }
 
 function failedMessageCard(message){
@@ -86,91 +237,3 @@ function failedMessageCard(message){
 
       document.getElementById('messagePortal').innerHTML += msg;
 }
-
-
-/*---------------- SWITCH CONTENT ----------------*/
-function switchContent(sectionId) {
-    if (!sectionId) return;
-    
-    // Hide all sections
-    contentSections.forEach(section => section.style.display = 'none');
-
-    // Show target section
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.style.display = 'block';
-
-        // Initialize section if a function exists
-        if (sectionInitMap[sectionId]) sectionInitMap[sectionId]();
-    }
-
-    // Update sidebar active state
-    sidebarItems.forEach(item => {
-        const isActive = item.dataset.section === sectionId;
-        const icon = item.querySelector('svg');
-        const span = item.querySelector('span');
-        
-        if (item.getAttribute('data-section') !== 'logout'){
-            // Change color for the icon
-            if (icon) {
-                icon.classList.toggle('text-green-500', isActive);
-                icon.classList.toggle('text-white', !isActive);
-            }
-        
-            // Change color for the text span
-            if (span) {
-                span.classList.toggle('text-green-500', isActive);
-                span.classList.toggle('text-white', !isActive);
-            }
-    
-            item.classList.toggle('active', isActive);
-            item.classList.toggle('text-green-500', isActive);
-            item.classList.toggle('text-white', !isActive);
-        }
-    });
-
-    // Hide sidebar on mobile after selection
-    if (window.innerWidth < 1024) toggleSidebar();
-}
-
-/*---------------- EVENT LISTENERS ----------------*/
-sidebarItems.forEach(item => {
-    item.addEventListener('click', () => {
-        
-        if(item.dataset.section === 'logout'){
-            logoutCard();
-            
-            // cancel
-            document.querySelector('#cancelLogout').addEventListener('click', (e) => {
-                document.querySelector('#logoutModal').remove();
-            });
-
-            // logout
-            document.querySelector('#confirmLogout').addEventListener('click', async (e) => {
-                try {
-                    const response = await fetch('/logout', { method: 'POST' });
-                    if (response.ok) {
-                        successMessageCard('You have been logged out.', '/login');
-                    }
-                } catch (err) {
-                    failedMessageCard(`Logout failed: ${err}`);
-                }
-            });
-        }
-        else{
-            switchContent(item.dataset.section)
-        }
-    
-    });
-});
-
-document.addEventListener('click', (e) => {
-    if (e.target.matches('#admin-profile-shortcut')){
-        switchContent('admin-profile')
-    }
-}); 
-
-/*---------------- INITIAL LOAD ----------------*/
-window.addEventListener('DOMContentLoaded', () => {
-    switchContent('home-dashboard'); // Show default section
-});

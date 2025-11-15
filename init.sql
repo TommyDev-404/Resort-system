@@ -3,6 +3,43 @@ CREATE DATABASE resort_db2;
 
 USE resort_db2;
 
+-- notifications
+CREATE TABLE staff_attendance (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    room_name VARCHAR(20)  NOT NULL,
+    room_no INT(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- staff details
+CREATE TABLE staff_details (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(100) NOT NULL,
+    date_started DATE NOT NULL,
+    daily_salary INT(100) NOT NULL,
+    weekly_salary INT(11) NOT NULL,
+    monthly_salary INT(11) NOT NULL,
+    estimate_weekly INT(100) NOT NULL,
+    estimate_month INT(100) NOT NULL,
+    position VARCHAR(100) NOT NULL,
+    avl_leave INT(11) NOT NULL,
+    status ENUM('On Leave', 'Active', 'Absent') NOT NULL,
+    workdays DOUBLE NOT NULL,
+    absent INT(11) NOT NULL,
+    reset_date DATE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- staff_leaves_data 
+CREATE TABLE staff_leaves_data (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    staff_id INT(11) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    position VARCHAR(50) NOT NULL,
+    date DATE NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 -- accomodation_spaces table
 CREATE TABLE accomodation_spaces (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,

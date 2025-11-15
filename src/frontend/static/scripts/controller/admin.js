@@ -35,27 +35,27 @@ function failedMessageCard(message){
 
 function renderChangePassword(email){
       const modal = `
-            <div id="passwordModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in-up">
-                  <div class="bg-white p-6 rounded-xl w-110 relative">
-                        <h3 class="text-xl font-bold mb-4 text-center">Change Password</h3>
+            <div id="passwordModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                  <div class="bg-white dark:bg-gray-900 p-6 rounded-xl w-110 relative  fade-in-up">
+                        <h3 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">Change Password</h3>
                         <form id="changePassForm">
                               <input type="hidden" name="email" value="${email}">
                               <div class="currentPass relative" >
-                                    <label class="block mb-1 text-sm">Current Password</label>
-                                    <input type="password" name="current_password" class="w-full p-4 mb-2 border rounded">
+                                    <label class="block mb-1 text-sm text-gray-900 dark:text-gray-100">Current Password</label>
+                                    <input type="password" name="current_password" class="w-full p-4 mb-2 border rounded border-gray-400 text-gray-900 dark:text-gray-100">
                               </div>
                               <div class="newPass relative">
-                                    <label class="block mb-1 text-sm">New Password</label>
-                                    <input type="password" name="new_password" class="w-full p-4 mb-2 border rounded">
+                                    <label class="block mb-1 text-sm text-gray-900 dark:text-gray-100">New Password</label>
+                                    <input type="password" name="new_password" class="w-full p-4 mb-2 border rounded border-gray-400 text-gray-900 dark:text-gray-100">
                               </div>
                               <div class="confirmPass relative">
-                                    <label class="block mb-1 text-sm">Confirm New Password</label>
-                                    <input type="password" name="confirm_password" class="w-full p-4 mb-2 border rounded">
+                                    <label class="block mb-1 text-sm text-gray-900 dark:text-gray-100">Confirm New Password</label>
+                                    <input type="password" name="confirm_password" class="w-full p-4 mb-2 border rounded border-gray-400 text-gray-900 dark:text-gray-100">
                               </div>
-                              <label class="flex justify-end gap-2 text-sm mb-6"><input type="checkbox" id="show">Show Password</label>
+                              <label class="flex justify-end gap-2 text-sm mb-6 text-gray-900 dark:text-gray-100"><input type="checkbox" id="show">Show Password</label>
                               <div class="flex justify-end gap-2">
-                                    <button id="cancel-change-pass" type="button" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancel</button>
-                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Change</button>
+                                    <button id="cancel-change-pass" type="button" class="px-4 py-2 bg-gray-400 text-white dark:bg-white/10 hover:bg-white/3 rounded hover:bg-gray-500">Cancel</button>
+                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white dark:bg-green-500 dark:hover:bg-green-600 rounded hover:bg-green-700">Change</button>
                               </div>
                         </form>
                   </div>
@@ -77,13 +77,13 @@ function showPassword() {
 
 function renderEditModal(type, value){
       const modal = `
-            <div id="editModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in-up">
-                  <div class="bg-white p-6 rounded-xl w-96 relative">
-                        <h3 class="text-xl font-bold mb-4 text-center">Edit ${type}</h3>
-                              <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="text" name="${type ==+ "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border rounded" placeholder="Enter ${type}" value="${value}">
+            <div id="editModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                  <div class="bg-white dark:bg-gray-900 p-6 rounded-xl w-96 relative  fade-in-up">
+                        <h3 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">Edit ${type}</h3>
+                              <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="text" name="${type ==+ "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border border-gray-400 rounded text-gray-900 dark:text-gray-100" placeholder="Enter ${type}" value="${value}">
                               <div class="flex justify-end gap-2">
-                                    <button id="cancel" type="button" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancel</button>
-                                    <button id="change${type === "Contact Number" ? "ContactNumber" : type}" type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Change</button>
+                                    <button id="cancel" type="button" class="px-4 py-2 bg-gray-400 dark:bg-white/10 dark:hover:bg-white/3 text-white rounded hover:bg-gray-500">Cancel</button>
+                                    <button id="change${type === "Contact Number" ? "ContactNumber" : type}" type="button" class="px-4 py-2 bg-blue-600 text-white dark:bg-blue-500 hover:bg-blue-600 rounded hover:bg-blue-700">Change</button>
                               </div>
                   </div>
             </div>

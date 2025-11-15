@@ -204,8 +204,6 @@ class Dashboard:
 
                   return {'month': month, 'value': value}
             
-            
-
       def most_booked_area(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -236,4 +234,46 @@ class Dashboard:
                         'hall': data.get('hall')
                         }
 
+      def top_most_booked_area(self):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(''' 
+                              SELECT 
+                                    area_name,
+                                    total_bookings,
+                                    ROUND((total_bookings / yearly_total) * 100, 2) AS percentage
+                              FROM (
+                                    SELECT 'premium' AS area_name, SUM(premium) AS total_bookings FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    UNION ALL
+                                    SELECT 'standard', SUM(standard) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    UNION ALL
+                                    SELECT 'garden', SUM(garden) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    UNION ALL
+                                    SELECT 'barkada', SUM(barkada) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    UNION ALL
+                                    SELECT 'family', SUM(family) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    UNION ALL
+                                    SELECT 'cabana', SUM(cabana) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    UNION ALL
+                                    SELECT 'small', SUM(small) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    UNION ALL
+                                    SELECT 'big', SUM(big) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    UNION ALL
+                                    SELECT 'hall', SUM(hall) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                              ) AS summary
+                              CROSS JOIN (
+                                    SELECT SUM(premium + standard + garden + barkada + family + cabana + small + big + hall) AS yearly_total
+                                    FROM accomodation_data
+                                    WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    ) AS total_table
+                              ORDER BY total_bookings DESC
+                              LIMIT 5;
+                        ''')
+                        data = cursor.fetchall()
 
+                        return {'success': bool(data), 'data':data}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+            

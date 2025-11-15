@@ -98,6 +98,11 @@ class Housekeeping:
                         cursor.execute('''
                               UPDATE accomodation_spaces SET status = 'avl' WHERE name = %s AND room = %s
                         ''', (area_name, room_no))
+
+                        cursor.execute('''
+                              DELETE FROM notifications WHERE room_name = %s AND room_no = %s
+                        ''', (area_name, room_no))
+
                         con.commit()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Marked ready successfully!' if bool(cursor.rowcount ) else 'Failed inserting data!'}
