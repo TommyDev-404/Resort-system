@@ -6,10 +6,9 @@
 	<title>Admin System</title>
       <link rel="stylesheet" href="{{ url_for('static', filename='style/output.css') }}" />
       <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
-	
       <script src="https://unpkg.com/lucide@latest"></script>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
-
+      
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 		
@@ -18,8 +17,17 @@
 		}
 
 		.metric-card:hover {
-				transform: translateY(-2px);
+			transform: translateY(-2px);
 		}
+
+            .scroll-hide::-webkit-scrollbar {
+                  display: none;
+            }
+
+            .scroll-hide {
+                  -ms-overflow-style: none;  /* IE + Edge */
+                  scrollbar-width: thin;     /* Firefox */
+            }
 
 		@keyframes fadeInUp {
 			0% { opacity: 0; transform: translateY(10px); }
@@ -44,7 +52,7 @@
 	</style>
 </head>
 
-<body class="flex bg-gray-100 dark:bg-gray-800 text-gray-100 max-h-screen font-[Inter]">
+<body class="flex bg-gray-200 dark:bg-gray-800 text-gray-100 max-h-screen font-[Inter]">
 
 	<!-- SIDEBAR -->
 	<aside id="sidebar" class="dark:bg-gray-900 bg-white flex flex-col relative transition-all duration-500 ease-in-out shadow-lg w-17 relative z-50">
@@ -127,13 +135,13 @@
 			<h1 class="font-semibold text-lg text-gray-900 dark:text-white">Welcome back, <span class="text-blue-500">Admin!</span></h1>
 
 			<div class="flex items-center gap-4">
-				<button id="darkModeToggle" class="hover:bg-black/7  dark:hover:bg-white/10 p-2 rounded-lg">
+				<button id="darkModeToggle" class="hover:bg-black/7  bg-black/5 dark:bg-white/10 p-2 rounded-4xl dark:hover:bg-white/20">
 					<i data-lucide="moon" class="w-5 h-5 text-gray-900 ease-in-out hidden" id="darkIcon"></i>
 					<i data-lucide="sun" class="w-5 h-5 dark:text-white ease-in-out hidden" id="lightIcon"></i>
 				</button>
 
 				<div class="relative">
-					<button id="notification" class="hover:bg-black/7 dark:hover:bg-white/10 p-2 rounded-lg transition">
+					<button id="notification" class="hover:bg-black/7 bg-black/5 dark:bg-white/10 p-2 rounded-4xl dark:hover:bg-white/20 p-2 transition">
 						<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-900 dark:text-white transition-colors duration-500" viewBox="0 0 20 20" fill="currentColor">
 							<path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a2 2 0 002-2H8a2 2 0 002 2z"/>
 						</svg>
@@ -158,7 +166,7 @@
 				
 				<!-- Admin dropdown -->
 				<div id="admin-profile-shortcut" class="relative">
-					<button id="adminButton" class="flex items-center gap-2 py-3 px-8  bg-blue-600 shadow-md dark:bg-gray-700/40 rounded-sm dark:hover:bg-gray-700/60 hover:bg-blue-700 transition cursor-pointer">
+					<button id="adminButton" class="flex items-center gap-2 py-3 px-8  bg-blue-600 shadow-md dark:bg-blue-700 rounded-sm dark:hover:bg-blue-800 hover:bg-blue-700 transition cursor-pointer">
 						<i data-lucide="user-circle" class="w-6 h-6 dark:text-white text-white"></i>
 						<span class="text-sm font-semibold text-white">Admin</span>
 						<i data-lucide="chevron-down" class="w-4 h-4 dark:text-gray-300 text-white"></i>
@@ -744,7 +752,7 @@
                                     <h1 class="text-gray-700 dark:text-gray-100 font-semibold text-lg mb-4 text-center">Recent Promotions Applied</h1>
                                     
                                     <div class="overflow-x-auto overflow-y-auto flex-1">
-                                          <table class="min-w-full rounded-lg text-center">
+                                          <table class="min-w-full rounded-lg text-center table-auto w-full table-fixed">
                                                 <thead class="bg-gray-900 dark:bg-white/20 text-white text-md font-bold sticky top-0">
                                                       <tr>
                                                             <th class="py-3 px-4 font-semibold">Start</th>

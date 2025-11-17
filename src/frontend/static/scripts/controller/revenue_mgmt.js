@@ -44,13 +44,21 @@ function createRow(id, date, promo_name, discount, area, end, status){
 
       const row = `
             <tr class="hover:bg-black/3 text-gray-700 dark:text-gray-100 dark:hover:bg-white/3 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]" data-id=${id}>
-                  <td class="py-3 px-4">${date}</td>
-                  <td class="py-3 px-4">${end}</td>
-                  <td class="py-3 px-4 font-medium">${promo_name}</td>
-                  <td class="py-3 px-4">${discount}</td>
-                  <td class="py-3 px-4">${formatted_area_name}</td>
-                  <td class="text-white rounded-lg text-sm font-bold"><span class="${status === 'Active' ? 'bg-green-500' : 'bg-orange-500 '} py-2 px-4 rounded-lg">${status}</span></td>
-                  <td class="flex gap-2 items-center justify-center py-3 px-4">
+                  <td class="py-3 px-1  w-[150px]">${date}</td>
+                  <td class="py-3 px-1  w-[150px]">${end}</td>
+                  <td class="py-3 px-1 font-medium  w-[250px]">
+                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                              ${promo_name}
+                        </div>
+                  </td>
+                  <td class="py-3 px-1  w-[100px]">${discount}</td>
+                  <td class="py-3 px-1 w-[600px]">
+                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                              ${formatted_area_name.join(', ')}
+                        </div>
+                  </td>
+                  <td class="text-white rounded-lg text-sm font-bold py-3 px-1  w-[100px]"><span class="${status === 'Active' ? 'bg-green-500' : 'bg-orange-500 '} py-2 px-4 rounded-lg">${status}</span></td>
+                  <td class="flex gap-2 items-center justify-center py-3 px-1  w-[200px]">
                         <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i class="ti ti-edit text-white text-lg"></i>Update</button>
                         <button id="remove-promo" class="bg-red-500 hover:bg-red-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i class="ti ti-trash text-white text-lg"></i>Remove</button>
                   </td>
@@ -80,11 +88,11 @@ function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_
                                     
                                     <div>
                                           <label for="promo_name" class="block text-sm font-medium text-gray-700 dark:text-gray-400">Promotion Name</label>
-                                          <input type="text" id="promo_name" name="promo_name" value="${promo_name}" class="mt-1 block w-full rounded-md border-gray-300 text-gray-900 dark:text-gray-100 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
+                                          <input type="text" id="promo_name" name="promo_name" value="${promo_name}" class="mt-1 block w-full rounded-md border-gray-400 text-gray-900 dark:text-gray-100 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
                                     </div>
                                     <div>
                                           <label for="promo_rate" class="block text-sm font-medium text-gray-700 dark:text-gray-400">Discount Rate (%)</label>
-                                          <input type="number" id="promo_rate" name="promo_rate" value="${Number(discount)}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 dark:text-gray-100 p-2 border focus:border-primary-blue focus:ring-primary-blue">
+                                          <input type="number" id="promo_rate" name="promo_rate" value="${Number(discount)}" class="mt-1 block w-full rounded-md border-gray-400 shadow-sm text-gray-900 dark:text-gray-100 p-2 border focus:border-primary-blue focus:ring-primary-blue">
                                     </div>
                                     <div class="bg-gray-50 dark:bg-gray-800 border border-gray-400 rounded-sm p-4">
                                           <h2 class="font-semibold text-[19px] text-gray-900 dark:text-gray-200 mb-4">Area's to apply promotion: </h2>
@@ -102,9 +110,9 @@ function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_
                                     </div>
                                     <div class="flex flex-col text-sm text-gray-800 dark:text-gray-400">
                                           Start Promotion Date:
-                                          <input type="date" name="date" value="${start_date}" required class="border border-gray-200 text-gray-900 dark:text-gray-100 rounded-sm p-4 mb-4">
+                                          <input type="date" name="date" value="${start_date}" required class="border border-gray-400 text-gray-900 dark:text-gray-100 rounded-sm p-4 mb-4">
                                           End PromotionDate:
-                                          <input type="date" name="end_date" value="${end_date}" required class="border border-gray-200 text-gray-900 dark:text-gray-100 rounded-sm p-4">
+                                          <input type="date" name="end_date" value="${end_date}" required class="border border-gray-400 text-gray-900 dark:text-gray-100 rounded-sm p-4">
                                     </div>
                                     <button type="submit" class="w-full bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-2 px-4 mt-4 rounded-lg shadow-md hover:bg-blue-700 transition" id="save-promo">Save Promotion</button>
                               </div>
@@ -121,7 +129,7 @@ function renderAddPromoModal(){
             <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-50" id="promo-overlay">
                   <div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card-bg dark:bg-gray-900 py-2 pb-4 px-[20px] max-w-[800px] rounded-xl shadow-lg fade-in-up">
                         <span id="close-promo-modal" class="text-[26px] flex justify-end cursor-pointer dark:text-white text-gray-900">&times;</span>
-                        <h3 class="text-xl font-semibold mb-4 text-center dark:text-white text-gray-900">Promotions</h3>
+                        <h3 class="text-xl font-semibold mb-4 text-center dark:text-white text-gray-900">Add Promotions</h3>
                         <form id="promosForm">
                               <div class="space-y-4">
                                     <div>

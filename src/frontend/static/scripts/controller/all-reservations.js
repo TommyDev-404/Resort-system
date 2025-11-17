@@ -118,11 +118,11 @@ function renderAddBookingModal(){
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                           <div>
                                                 <label class="text-gray-600 dark:text-gray-100 text-sm mb-1 block">Check-In Date</label>
-                                                <input type="date" name="checkin" class="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                                <input type="date" name="checkin" class="w-full border border-gray-300 text-gray-800 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                           </div>
                                           <div>
                                                 <label class="text-gray-600 dark:text-gray-100 text-sm mb-1 block">Check-Out Date</label>
-                                                <input type="date" name="checkout" class="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                                <input type="date" name="checkout" class="w-full border border-gray-300 text-gray-800 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                           </div>
                                     </div>
                               </section>
@@ -432,7 +432,6 @@ async function markAsCheckout(){
       
       getTotalsCountData();
 }
-
 
 async function markAsCheckin(){
       const id = retrieveCheckboxId().id;

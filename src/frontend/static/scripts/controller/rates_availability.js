@@ -52,7 +52,7 @@ function openUpdateAreaModal(e) {
                         <form id="updateAreaForm">
                               <div class="w-full mb-6 flex flex-col gap-2">
                                     <input type="hidden" name="area-name-update" value="${cells[0].textContent}">
-                                    <input type="number" name="update-price" placeholder="Price (₱)" required class="w-full p-2 border rounded text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800" value="${cells[3].textContent.slice(1)}">
+                                    <input type="number" name="update-price" placeholder="Price (₱)" required class="w-full p-2 border rounded text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800" value="${cells[3].textContent.split('.')[0].slice(1).replace(/,/g, '')}">
                                     <button type="submit" class="px-5 py-2 mt-8 bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"><i class="fas fa-paper-plane mr-1"></i> Update</button>
                               </div>
                         </form>
@@ -89,10 +89,10 @@ async function renderTable() {
             const { name, capacity } = areaTypeInfo(row.room_type);
             return `
                   <tr class="fade-in-up text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700">
-                        <td class="px-6 py-4 text-center font-semibold flex items-center gap-2">${name} ${row.area_condition ? `<span class="text-[13px] font-light">(${row.promo_name})</span>` : ''}</td>
+                        <td class="px-6 py-4 text-center font-semibold flex items-center gap-2">${name} ${row.area_condition ? `<span class="text-[13px] font-medium text-yellow-600 dark:text-yellow-500">(${row.promo_name})</span>` : ''}</td>
                         <td class="px-3 py-4 text-center">${row.total_rooms}</td>
                         <td class="px-3 py-4 text-center font-bold text-lg text-primary-blue">${capacity}</td>
-                        <td class="px-3 py-4 text-center text-green-600 dark:text-green-500 flex items-center justify-center gap-1 font-semibold">${row.area_condition ? `<label class="line-through text-red-500 font-light">₱${row.orig_rate}</label> <p class="text-gray-500 dark:text-gray-200">-</p> <span class="text-green-600 dark:text-green-500">₱${row.rate} </span>` : `₱${row.rate}`}</td> 
+                        <td class="px-3 py-4 text-center text-green-600 dark:text-green-500 flex items-center justify-center gap-1 font-semibold">${row.area_condition ? `<label class="line-through text-red-500 font-light">₱${row.orig_rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</label> <p class="text-gray-500 dark:text-gray-200">-</p> <span class="text-green-600 dark:text-green-500">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} </span>` : `₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</td> 
                         <td class="px-3 py-4 text-center"><span class="font-bold text-lg text-red-500">${row.today_avail}</span></td>
                         <td class="px-3 py-4 text-center"><span class="font-bold text-lg text-green-500">${row.tomorrow_avail}</span></td>
                         <td class="px-3 py-4 flex gap-2 justify-center"><button class="update-btn text-sm text-white bg-teal-500 py-2 px-4 rounded-sm  flex gap-2" id="${row.room_type}"><i class="ti ti-edit text-lg"></i>Update</button></td>

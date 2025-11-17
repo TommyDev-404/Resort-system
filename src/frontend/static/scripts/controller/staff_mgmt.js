@@ -226,29 +226,29 @@ async function renderViewStaffInfo(id, staff_name, date_started, position, daily
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                               <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-800 text-center shadow-sm">
                                     <h3 class="text-sm text-gray-500 dark:text-gray-400">Daily Salary</h3>
-                                    <p id="dailySalary" class="text-xl font-semibold text-gray-800 dark:text-white">₱${daily_salary}</p>
+                                    <p id="dailySalary" class="text-xl font-semibold text-gray-800 dark:text-white">${daily_salary.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</p>
                               </div>
                         
                               <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-800 text-center shadow-sm">
                                     <h3 class="text-sm text-gray-500 dark:text-gray-400">Estimated Weekly</h3>
-                                    <p id="weeklySalary" class="text-xl font-semibold text-gray-800 dark:text-white">₱${estimated_weekly}</p>
+                                    <p id="weeklySalary" class="text-xl font-semibold text-gray-800 dark:text-white">${estimated_weekly.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</p>
                               </div>
                         
                               <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-800 text-center shadow-sm">
                                     <h3 class="text-sm text-gray-500 dark:text-gray-400">Estimated Monthly</h3>
-                                    <p id="monthlySalary" class="text-xl font-semibold text-gray-800 dark:text-white">₱${estimated_monthly}</p>
+                                    <p id="monthlySalary" class="text-xl font-semibold text-gray-800 dark:text-white">${estimated_monthly.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</p>
                               </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4 mb-6">
                               <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/40 text-center shadow-sm">
                                     <h3 class="text-sm text-gray-500 dark:text-gray-400">Actual Monthly</h3>
-                                    <p id="actualMonthlySalary" class="text-xl font-semibold text-green-700 dark:text-green-300">₱${actual_weekly}</p>
+                                    <p id="actualMonthlySalary" class="text-xl font-semibold text-green-700 dark:text-green-300">${actual_weekly.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</p>
                               </div>
                               
                               <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/40 text-center shadow-sm">
                                     <h3 class="text-sm text-gray-500 dark:text-gray-400">Actual Weekly</h3>
-                                    <p id="actualWeeklySalary" class="text-xl font-semibold text-green-700 dark:text-green-300">₱${actual_monthly}</p>
+                                    <p id="actualWeeklySalary" class="text-xl font-semibold text-green-700 dark:text-green-300">${actual_monthly.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</p>
                               </div>
                         </div>
                         
@@ -306,12 +306,12 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
                               <input type="hidden" name="staff_id" value="${staff_id}">
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-                                    <input type="text" id="updateName" name="staff_name" value="${staff_name}" placeholder="Enter full name" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="text" id="updateName" name="staff_name" value="${staff_name}" placeholder="Enter full name" class="w-full p-3 text-gray-800 dark:text-gray-100 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
-                                    <select id="updatePosition" name="position" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <select id="updatePosition" name="position" class="w-full p-3 rounded-lg border border-gray-300 text-gray-800 dark:text-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                           <option value="">Select position</option>
                                           <option value="Front Desk" ${position === 'Front Desk' ? 'selected' : ''}>Front Desk</option>
                                           <option value="Janitor" ${position === 'Janitor' ? 'selected' : ''}>Janitor</option>
@@ -324,22 +324,22 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
                               <div class="grid grid-cols-2 gap-4">
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Daily Salary (₱)</label>
-                                          <input type="number" id="updateDailySalary" value="${daily_salary}" name="daily_salary" min="0" placeholder="e.g., 500" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <input type="number" id="updateDailySalary" value="${daily_salary}" name="daily_salary" min="0" placeholder="e.g., 500" class="w-full p-3 text-gray-800 dark:text-gray-100 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                     </div>
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remaining Leave Days</label>
-                                          <input type="number" id="updateMaxLeave" value="${avl_leave}" name="avl_leave" min="0" placeholder="e.g., 5" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <input type="number" id="updateMaxLeave" value="${avl_leave}" name="avl_leave" min="0" placeholder="e.g., 5" class="w-full p-3 rounded-lg text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                     </div>
                               </div>
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
-                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                                    <select id="addStatus" name="status" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <select id="addStatus" name="status" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700  text-gray-800 dark:text-gray-100dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                           <option value="Active" ${status == 'Active' ? 'selected' : ''}>Active</option>
                                           <option value="Absent" ${status == 'Absent' ? 'selected' : ''}>Absent</option>
                                           <option value="On Leave"  ${status == 'On Leave' ? 'selected' : ''}>On Leave</option>
@@ -390,7 +390,7 @@ async function showAllOnLeave(){
 
 function createStaffListRow(id, staff_name, position, status){
       const row = `
-            <li data-id="${id}" class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 shadow-md flex justify-between items-center fade-in-up">
+            <li data-id="${id}" class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 shadow-md flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:-translate-y-1">
                   <div>
                         <div class="flex items-center gap-2">
                               <span class="font-semibold text-lg text-gray-900 dark:text-gray-100">${staff_name}</span>
@@ -449,7 +449,11 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
       }else{
             const row = `
                   <tr data-id="${staff_id}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/10 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px] overflow-x-auto">
-                        <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${staff_name}</td> 
+                        <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">
+                              <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                                    ${staff_name}
+                              </div>
+                        </td> 
                         <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_in}</td> 
                         <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_out}</td> 
                         <td class="py-3 px-10 text-center text-sm">${date}</td>

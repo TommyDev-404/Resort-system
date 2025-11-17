@@ -252,7 +252,7 @@ async function adrData(type=null){
       const response = await fetch(url);
       const res = await response.json();
 
-      document.getElementById('adr').textContent = `₱${res.current}`;
+      document.getElementById('adr').textContent = Number(res.current).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
       document.getElementById('adr-change').textContent = res.change < 0? `${res.change}%` : `+${res.change}%`;
 }
 
@@ -261,7 +261,7 @@ async function revparData(type=null){
       const response = await fetch(url);
       const res = await response.json();
 
-      document.getElementById('revpar').textContent = `₱${res.revpar}`;
+      document.getElementById('revpar').textContent = Number(res.revpar).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
       document.getElementById('revpar-change').textContent = res.change < 0 ? `${res.change}%` : `+${res.change}%`;    
 }
 
@@ -291,8 +291,8 @@ document.getElementById('roomTypeFilter').addEventListener('change', async(e) =>
             occupancyData();
             adrData();
             revparData();
-            forecastCheckin();
-            forecastRevenue();
+            drawCheckinForecastChart();
+            drawRevenueChart();
             loadAccomodationType();
       }
 });

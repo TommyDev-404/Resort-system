@@ -7,6 +7,8 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='style/output.css') }}" />
       <link rel="icon" type="image/x-icon" href="/static/assets/user.png">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+      <script src="https://unpkg.com/lucide@latest"></script>
+      
 </head>
 <style>
 	@keyframes fadeInUp {
@@ -27,43 +29,8 @@
 
 <body>
 
-<!-- Navigation bar-->
-<header>
-	<nav class="flex items-center justify-between bg-primary-blue px-6 py-4 shadow-md fixed top-0 z-50 w-full">
-		<div class="logo text-2xl font-bold text-white">Resto-<span class="text-secondary-gold">Hub</span></div>
-		<ul class="flex space-x-6 items-center text-white">
-			<li class="active"><a href="#" class="no-hover font-semibold">Home</a></li>
-			<li><a href="/template/find.html" class="hover:text-yellow-600">Find BH</a></li>
-			<li><a href="#" class="hover:text-yellow-600">About</a></li>
-			<li><a href="#" class="hover:text-yellow-600">Contact Us</a></li>
-			<li><a href="#" class="hover:text-yellow-600">Help</a></li>
-			<li class="nav-login"><a href="#" id="open-login" class="no-hover text-white bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-500">Login</a></li>
-		</ul>
-	</nav>
-</header>
-
-<!-- Hero Section -->
-<section class="hero relative h-[100vh] bg-blue-50 bg-cover bg-center" style="background-image: url('{{ url_for('static', filename='assets/resort.jpg') }}');">
-	<div class="hero-overlay absolute inset-0 bg-black/25"></div> <!-- optional dark overlay -->
-	<div class="content relative z-10 flex flex-col items-center justify-center text-center h-full px-6">
-		<h3 class="text-lg font-medium text-white mb-2">Welcome to</h3>
-		<h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4">'Grand-Villa Laguna Resort'</h1>
-		<label class="text-white mb-6 block max-w-xl">Escape the ordinary — find your paradise today.</label>
-		<button id="search-btn" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-500 transition-colors">🏖️ Explore & Relax →</button>
-		<div class="flex flex-col gap-2 mt-6">
-			<label class="text-white font-medium">Visit us on: </label>
-			<div class="flex gap-8 justify-center">
-				<a href="https://www.facebook.com/grandvillalaguna"><img src="{{ url_for('static', filename='assets/fbs.png') }}" width="42" class="hover:scale-105 transition rounded-4xl"></a>
-				<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw"><img src="{{ url_for('static', filename='assets/insta.avif') }}" width="42" class="hover:scale-105 transition  rounded-4xl"></a>
-				<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09"><img src="{{ url_for('static', filename='assets/twitter.png') }}" width="40" class="hover:scale-105 transition"></a>
-			</div>
-		</div>
-		</div>
-</section>
-
-
 <!-- Overlay Container -->
-<div class="absolute top-0 left-0 w-full h-full bg-black/40 login-overlay flex z-10 hidden fade-in-up">
+<div class="absolute top-0 left-0 w-full h-full bg-black/40 login-overlay flex z-10 fade-in-up">
 	<div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[80vh] w-[70%] bg-card-bg rounded-lg shadow-lg shadow-black/60 flex overflow-hidden">
 		<!-- LEFT SIDE IMAGE -->
 		<div class="bg-cover w-[62%] rounded-tr-[5%] rounded-br-[5%] relative overflow-hidden" style="background-image: url('{{ url_for('static', filename='assets/resort.jpg') }}')">
@@ -71,6 +38,14 @@
 				<h1 class="text-white font-bold text-[20px]">Welcome to</h1>
 				<h1 class="text-white font-bold text-[40px] tracking-wider mt-2">🏖️ Laguna Grand-Villa Resort</h1>
 				<p class="text-lg mb-1 text-white text-[17px] mt-4">Escape the ordinary — find your paradise today.</p>
+				<div class="flex flex-col gap-2 mt-6">
+					<label class="text-white font-medium text-sm">Visit us on: </label>
+					<div class="flex gap-8 justify-center">
+						<a href="https://www.facebook.com/grandvillalaguna"><img src="{{ url_for('static', filename='assets/fbs.png') }}" width="42" class="hover:scale-105 transition rounded-4xl"></a>
+						<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw"><img src="{{ url_for('static', filename='assets/insta.avif') }}" width="42" class="hover:scale-105 transition  rounded-4xl"></a>
+						<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09"><img src="{{ url_for('static', filename='assets/twitter.png') }}" width="40" class="hover:scale-105 transition"></a>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -84,7 +59,6 @@
 
 			<!-- LOGIN FORM -->
 			<div id="loginForm" class="transition-all duration-500 ease-in-out opacity-100 flex flex-col items-center w-full mt-10 p-8">
-				<span class="absolute text-3xl top-2 right-4 cursor-pointer" id="close-login">&times;</span>
 				<img src="{{ url_for('static', filename='assets/user.png') }}" class="w-[80px] h-[80px] mb-2">
 				<h1 class="text-[25px] font-bold tracking-wider mb-6">Admin Login</h1>
 				<form class="loginForm w-full">
@@ -140,6 +114,7 @@
 <div id="loadingPortal"></div>
 <div id="messagePortal"></div>
 
+<script> lucide.createIcons() </script>
 <script type="module" src="{{ url_for('static', filename='scripts/controller/login.js') }}"></script>
 
 </body>
