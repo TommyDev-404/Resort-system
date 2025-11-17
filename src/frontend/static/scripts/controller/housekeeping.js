@@ -1,25 +1,25 @@
+import { notifications } from "./home-dashboard.js";
 
 // -------------------- HELPERS ------------------------- //
-function successMessageCard(message){
+function successMessageCard(message, redirect=null){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
       `;
-
       document.getElementById('messagePortal').innerHTML += msg;
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
             </div>
@@ -69,7 +69,7 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
                   <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">${room_no}</td>
                   <td class="px-4 py-3"><span class="px-2 py-1 rounded-full ${bg_color} text-xs font-semibold">${new_status}</td>
                   <td class="px-4 py-3 text-gray-700 dark:text-gray-100">${assign_staff}</td>
-                  <td class="px-4 py-3 text-gray-700 dark:text-gray-100">${ date !== '0000-00-00' ? formattedDate : "N/A" }</td>
+                  <td class="px-4 py-3 text-gray-700 dark:text-gray-100">${ date !== '0000-00-00' ? formattedDate : "--" }</td>
                   <td class="px-4 py-3">
                         <button class="room-action-btn text-sm ${btn_color} text-white py-2 px-3 rounded-md cursor-pointer" id="${action_name === 'View Info' ? 'view-info' : action_name === 'Mark Ready' ? 'mark-ready' : 'assign-staff'}">${icon}</button>
                   </td>
@@ -140,22 +140,19 @@ function render_openViewInfoRoomDetails(btn) {
       document.querySelector('#viewRoomInfoPortal').innerHTML += modal;
 }
 
-function renderAssignStaffModal(){
+async function renderAssignStaffModal(area_name, room_no){
+      const staffs = await allStaffs();
       const modal = `
             <div id="assign-staff-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[50] flex items-center justify-center z-[50]">
                   <div class="bg-card-bg dark:bg-gray-900 w-full max-w-[800px] rounded-lg shadow-2xl p-6 relative fade-in-up">
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2"><i class="fas fa-user-tag text-primary-blue"></i> Assign Staff </h3>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2"><i class="fas fa-user-tag text-primary-blue"></i> Assign Cleaners </h3>
                         <form id="assignStaffForm">
                               <div class="w-full mb-6 flex flex-col gap-2">
-                                    <input type="hidden" name="area_name">
-                                    <input type="hidden" name="room_no">
+                                    <input type="hidden" name="area_name" value="${area_name}">
+                                    <input type="hidden" name="room_no" value="${room_no}">
                                     <select  name="name"class="w-full appearance-none border border-gray-300 rounded-lg px-3 py-4 pr-8 text-gray-700 dark:text-gray-100 dark:bg-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                                           <option value="">Select Staff</option>
-                                          <option value="maria">Maria Gonzales</option>
-                                          <option value="john">John Dela Cruz</option>
-                                          <option value="ana">Ana Santos</option>
-                                          <option value="mark">Mark Villanueva</option>
-                                          <option value="lisa">Lisa Ramos</option>
+                                          ${staffs}
                                     </select>
                                     <label class="mt-2 text-[15px] text-gray-700 dark:text-gray-400">Date Assigned:</label>
                                     <input type="date" name="date" class="p-4 border border-gray-400 dark:border-gray-200 dark:text-gray-100 text-gray-800 rounded-sm" required>
@@ -183,9 +180,7 @@ function openStaffDetails(btn) {
       const room_name = document.getElementById('modalRoomTitle').textContent.split(' ');
       const roomNo = cells[0].textContent.trim();
 
-      renderAssignStaffModal();
-      document.querySelector('input[name="area_name"]').value = room_name[0];
-      document.querySelector('input[name="room_no"]').value = roomNo;
+      renderAssignStaffModal(room_name[0], roomNo);
 }
 
 // -------------------- DATA ------------------------- //
@@ -198,6 +193,27 @@ async function accomodationData(){
             result.data.forEach(data => {
                   createRowData(data.name, data.total_room, data.need_clean, data.on_clean, data.ready, data.occupied, data.maintenance);
             });
+      }else{
+            failedMessageCard('Error fecthing data');
+      }
+}
+
+async function allStaffs(){
+      const response = await fetch('/staff-cleaners');
+      const result = await response.json();
+      console.log(result);
+      if (result.success){
+            let staff_list = [];
+
+            result.data.forEach(staff => {
+                  const opt = `
+                        <option value="${staff.staff_name}">${staff.staff_name}</option>
+                  `;
+
+                  staff_list.push(opt);
+            });
+
+            return staff_list.join('\n');
       }else{
             failedMessageCard('Error fecthing data');
       }
@@ -247,10 +263,12 @@ async function markReady(btn){
       const result = await response.json();
 
       if(result.success){
+            notifications();
             successMessageCard(result.message);
             openRoomDetails(row.dataset.room);
             getSummarryCardData();
             accomodationData();
+            document.querySelector('#roomDetailsModal').remove();
       }else{
             failedMessageCard(result.message);
       }
@@ -297,7 +315,6 @@ document.addEventListener('click', (e) => {
 document.addEventListener('submit', (e) => {
       if (e.target.matches('#assignStaffForm')) submitAssignStaff(e);
 });
-
 
 export function initPageHousekeeping(){
       getSummarryCardData();

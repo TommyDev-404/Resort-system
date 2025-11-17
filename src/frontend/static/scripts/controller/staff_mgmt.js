@@ -3,6 +3,33 @@ let isAttendanceNotEmpty = false;
 const tbody = document.getElementById('staffList');
 
 // ------------ HELPER FUNCTIONS ------------
+function successMessageCard(message, redirect=null){
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                  </div>
+            </div>
+      `;
+      document.getElementById('messagePortal').innerHTML += msg;
+}
+
+function failedMessageCard(message){
+      const msg = `
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                        <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('messagePortal').innerHTML += msg;
+}
+
 function renderAddStaffModal(){
       const modal = `
             <div id="addStaffModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
@@ -18,12 +45,12 @@ function renderAddStaffModal(){
                               <input type="hidden" name="status" value="Active">
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-                                    <input type="text" id="addName" name="staff_name" placeholder="Enter full name" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="text" id="addName" name="staff_name" placeholder="Enter full name" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
-                                    <select id="addPosition" name="position" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <select id="addPosition" name="position" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                           <option value="">Select position</option>
                                           <option value="Front Desk">Front Desk</option>
                                           <option value="Janitor">Janitor</option>
@@ -36,17 +63,17 @@ function renderAddStaffModal(){
                               <div class="grid grid-cols-2 gap-4">
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Daily Salary (₱)</label>
-                                          <input type="number" id="addDailySalary" name="daily_salary" min="0" placeholder="e.g., 500" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <input type="number" id="addDailySalary" name="daily_salary" min="0" placeholder="e.g., 500" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                     </div>
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Leave Days</label>
-                                          <input type="number" id="addMaxLeave" name="avl_leave" min="0" readonly value="5" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <input type="number" id="addMaxLeave" name="avl_leave" min="0" readonly value="5" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                     </div>
                               </div>
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
-                                    <input type="date" id="addDateStarted" name="date_started" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="date" id="addDateStarted" name="date_started" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                               
                               <button type="submit" class="mt-3 px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">Add Staff</button>
@@ -98,15 +125,15 @@ async function renderAddStaffAttendanceModal(){
                                     <!-- Attendance Table -->
                                     <div class="overflow-x-auto max-h-[350px] border border-gray-200 dark:border-gray-700 rounded-xl">
                                           <table class="w-full text-sm border-collapse">
-                                                <thead class="bg-gray-200 dark:bg-gray-700">
-                                                <tr>
-                                                      <th class="p-2 text-center text-gray-700 dark:text-gray-300">Select Here </th>
-                                                <th class="p-2 text-center text-gray-700 dark:text-gray-300">Staff Name</th>
-                                                <th class="p-2 text-center text-gray-700 dark:text-gray-300">Position</th>
-                                                </tr>
+                                                <thead class="bg-gray-900 dark:bg-gray-700">
+                                                      <tr>
+                                                            <th class="p-2 text-center text-white dark:text-gray-300">Select Here </th>
+                                                            <th class="p-2 text-center text-white dark:text-gray-300">Staff Name</th>
+                                                            <th class="p-2 text-center text-white dark:text-gray-300">Position</th>
+                                                      </tr>
                                                 </thead>
                                                 <tbody id="bulkAttendanceTable" class="text-gray-700 dark:text-gray-300">
-                                                ${generated_row}
+                                                      ${generated_row}
                                                 </tbody>
                                           </table>
                                     </div>
@@ -179,7 +206,7 @@ async function renderViewStaffInfo(id, staff_name, date_started, position, daily
 
       const modal = `
             <div id="viewStaffModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
-                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-3xl p-6 relative fade-in-up">
+                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-4xl p-6 relative fade-in-up">
                   
                         <button id="closeViewStaff" class="absolute top-4 right-4 text-gray-600 dark:text-gray-300 text-2xl hover:text-red-500">&times;</button>
                         
@@ -244,12 +271,12 @@ async function renderViewStaffInfo(id, staff_name, date_started, position, daily
                               <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Attendance History</h3>
                               <div class="overflow-y-auto max-h-[250px]">
                                     <table class="w-full text-sm border-collapse">
-                                          <thead class="bg-gray-200 dark:bg-gray-700">
+                                          <thead class="bg-gray-900 dark:bg-gray-700">
                                                 <tr class="text-center">
-                                                      <th class="p-2 text-gray-700 dark:text-gray-300">Date</th>
-                                                      <th class="p-2 text-gray-700 dark:text-gray-300">Time In</th>
-                                                      <th class="p-2 text-gray-700 dark:text-gray-300">Time Out</th>
-                                                      <th class="p-2 text-gray-700 dark:text-gray-300">Status</th>
+                                                      <th class="p-2 text-white dark:text-gray-300 w-50">Date</th>
+                                                      <th class="p-2 text-white dark:text-gray-300 w-45">Time In</th>
+                                                      <th class="p-2 text-white dark:text-gray-300 w-45">Time Out</th>
+                                                      <th class="p-2 text-white dark:text-gray-300 w-60">Status</th>
                                                 </tr>
                                           </thead>
                                           <tbody id="attendanceTableIndividual" class="text-gray-700 dark:text-gray-300">
@@ -408,11 +435,11 @@ function createStaffListRow(id, staff_name, position, status){
 function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date, status, type=null){
       if (type) {  
             const row = `
-                  <tr data-id="${staff_id}" class="text-[12px] bg-gray-50 dark:bg-white/3 hover:bg-black/10 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]">
-                        <td class="py-3 px-10 text-center">${date}</td>
-                        <td class="py-3 px-10 text-center">${time_in}</td> 
-                        <td class="py-3 px-10 text-center">${time_out}</td> 
-                        <td class="py-3 px-6 text-center">
+                  <tr data-id="${staff_id}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/10 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]">
+                        <td class="py-3 px-10 text-center text-sm">${date}</td>
+                        <td class="py-3 px-10 text-center text-sm">${time_in}</td> 
+                        <td class="py-3 px-10 text-center text-sm">${time_out}</td> 
+                        <td class="py-3 px-6 text-center" text-sm>
                               <label class="text-[12px] font-semibold py-1 px-3 rounded-2xl ${status === "Absent"  ? 'text-green-600 bg-red-100 dark:text-white dark:bg-red-500' : 'text-green-600 bg-green-100 dark:text-white dark:bg-green-500'}">${status}</label>
                         </td>
                   </tr>
@@ -421,11 +448,11 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
             return row;
       }else{
             const row = `
-                  <tr data-id="${staff_id}" class="text-[12px] bg-gray-50 dark:bg-white/3 hover:bg-black/10 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]">
-                        <td class="py-3 px-10 text-center">${staff_name}</td> 
-                        <td class="py-3 px-10 text-center">${time_in}</td> 
-                        <td class="py-3 px-10 text-center">${time_out}</td> 
-                        <td class="py-3 px-10 text-center">${date}</td>
+                  <tr data-id="${staff_id}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/10 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px] overflow-x-auto">
+                        <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${staff_name}</td> 
+                        <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_in}</td> 
+                        <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_out}</td> 
+                        <td class="py-3 px-10 text-center text-sm">${date}</td>
                         <td class="py-3 px-6 text-center">
                               <label class="text-[12px] font-semibold py-1 px-3 rounded-2xl 
                                     ${status === "Absent"  ? 'text-green-600 bg-red-100 dark:text-white dark:bg-red-500' :
@@ -498,7 +525,7 @@ function resetAll(){
 
 function enableTimeOutBtn(){
       const btn = document.getElementById('updateStaffAttendance');
-      console.log(isAttendanceNotEmpty);
+      
       if (isAttendanceNotEmpty){
             btn.style.opacity = '0.4';
             btn.style.pointerEvents = 'none';
@@ -540,12 +567,12 @@ async function addStaff(e){
             const result = await response.json();
 
             if (result.success){
-                  alert(result.message);
+                  successMessageCard(result.message);
                   document.querySelector('#addStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
             }else{
-                  alert(result.message);
+                  failedMessageCard(result.message);
             }
       }catch(err){
             console.error(err);
@@ -614,7 +641,7 @@ async function getAllStaff(){
 
                   result.data.forEach(staff => {
                         const row = `
-                              <tr data-set="${staff.id}" class="border-b border-gray-200 dark:border-gray-700">  
+                              <tr data-set="${staff.id}" class="border-b border-gray-200 dark:border-gray-700 dark:border-gray-700 hover:bg-black/3 dark:bg-white/3">  
                                     <td class="py-3 px-1 text-center">
                                           <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
                                                 <input type="checkbox" name="select_staff" class="timeout-checkbox hidden peer">
@@ -659,7 +686,7 @@ async function getAllPresentStaff(){
 
                   result.data.forEach(staff => {
                         const row = `
-                              <tr data-set="${staff.staff_id}" class="border-b border-gray-200 dark:border-gray-700">
+                              <tr data-set="${staff.staff_id}" class="border-b border-gray-200 dark:border-gray-700 hover:bg-black/3 dark:bg-white/3">
                                     <td class="py-3 px-1 text-center">
                                           <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
                                                 <input type="checkbox" name="select_staff" class="timeout-checkbox hidden peer">
@@ -761,7 +788,7 @@ async function addStaffAttendance(e){
       });
 
       if (!allValid) {
-            alert("Please mark attendance for all staff before submitting.");
+            failedMessageCard("Please mark attendance for all staff before submitting.");
             return; // stop submission
       }
       
@@ -774,13 +801,13 @@ async function addStaffAttendance(e){
             const result = await response.json();
 
             if (result.success){
-                  alert(result.message);
+                  successMessageCard(result.message);
                   document.querySelector('#bulkAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
                   showAllStaff();
             }else{
-                  alert(result.message);
+                  failedMessageCard(result.message);
             }
       }catch(err){
             console.error(err);
@@ -813,14 +840,14 @@ async function updateStaffAttendance(e){
                   body: JSON.stringify(data)
             });
             const result = await response.json();
-            console.log(result);
+
             if (result.success){
-                  alert(result.message);
+                  successMessageCard(result.message);
                   document.querySelector('#updateAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
             }else{
-                  alert(result.message);
+                  failedMessageCard(result.message);
             }
       }catch(err){
             console.error(err);
@@ -840,12 +867,12 @@ async function updateStaffInfo(e){
             const result = await response.json();
 
             if (result.success){
-                  alert(result.message);
+                  successMessageCard(result.message);
                   document.querySelector('#updateStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
             }else{
-                  alert(result.message);
+                  failedMessageCard(result.message);
             }
       }catch(err){
             console.error(err);
@@ -1010,11 +1037,11 @@ async function removeStaff(id){
             const result = await response.json();
 
             if (result.success){
-                  alert(result.message);
+                  success(result.message);
                   showAllStaff();
                   sumarryCards();
             }else{
-                  alert(result.message);
+                  failedMessageCard(result.message);
             }
 
       }catch(err){
@@ -1036,12 +1063,12 @@ async function removeStaffAttendance(e){
             const result = await response.json();
 
             if (result.success){
-                  alert(result.message);
+                  successMessageCard(result.message);
                   allStaffAttendance();
                   sumarryCards();
                   showAllStaff();
             }else{
-                  alert(result.message);
+                  failedMessageCard(result.message);
             }
 
       }catch(err){

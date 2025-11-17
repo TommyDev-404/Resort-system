@@ -1,26 +1,25 @@
-
+import { notifications } from "./home-dashboard.js";
 
 // ---------------------- HELPERS ---------------------
-function successMessageCard(message){
+function successMessageCard(message, redirect=null){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
       `;
-
       document.getElementById('messagePortal').innerHTML += msg;
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
             </div>
@@ -44,7 +43,7 @@ function createRow(id, date, promo_name, discount, area, end, status){
       const formatted_area_name = area.split(',').map(a => all_area[a]);
 
       const row = `
-            <tr class="hover:bg-blue-50 text-gray-700 dark:text-gray-100 dark:hover:bg-white/3 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]" data-id=${id}>
+            <tr class="hover:bg-black/3 text-gray-700 dark:text-gray-100 dark:hover:bg-white/3 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]" data-id=${id}>
                   <td class="py-3 px-4">${date}</td>
                   <td class="py-3 px-4">${end}</td>
                   <td class="py-3 px-4 font-medium">${promo_name}</td>
@@ -127,11 +126,11 @@ function renderAddPromoModal(){
                               <div class="space-y-4">
                                     <div>
                                           <label for="promo_name" class="block text-sm font-medium dark:text-gray-400 text-gray-700">Promotion Name</label>
-                                          <input type="text" id="promo_name" name="promo_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
+                                          <input type="text" id="promo_name" required name="promo_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
                                     </div>
                                     <div>
                                           <label for="promo_rate" class="block text-sm font-medium dark:text-gray-400 text-gray-700">Discount Rate (%)</label>
-                                          <input type="number" id="promo_rate" name="promo_rate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
+                                          <input type="number" required id="promo_rate" name="promo_rate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
                                     </div>
                                     <div class="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-400 rounded-sm p-4">
                                           <h2 class="font-semibold text-[19px] mb-4 dark:text-gray-200 text-gray-900">Area's to apply promotion: </h2>
@@ -183,11 +182,11 @@ async function applyPromo(e) {
             e.target.reset();
             document.querySelector('#promo-overlay').remove();
             getAllPromo();
+            notifications();
       }else{
             failedMessageCard(res.message);
       }
 }
-
 
 async function updatePromo(e) {
       e.preventDefault();
@@ -229,8 +228,8 @@ async function getAllPromo() {
             });
       }else{
             const empty_row = `
-                  <tr id="no-promo-row" class="dark:hover:bg-white/3 hover:bg-gray-50">
-                        <td colspan="6" class="text-center text-gray-500 py-4">No promotions yet.</td>
+                  <tr id="no-promo-row" class="dark:hover:bg-white/3 dark:bg-white/5 bg-gray-50 hover:bg-black/6">
+                        <td colspan="7" class="text-center text-gray-500 dark:text-white py-4">No promotions yet.</td>
                   </tr>
             `;
             
@@ -268,6 +267,7 @@ async function removePromo(e){
       if (result.success){
             successMessageCard(result.message);
             getAllPromo();
+            notifications();
       }else{
             failedMessageCard(result.message);
       }      

@@ -1,27 +1,28 @@
+import { notifications} from "./home-dashboard.js";
+
 const tbody = document.getElementById('tbody');
 let savedAccomodations = [];
 
 // ---------------- RENDER HELPERS ------------------
-function successMessageCard(message){
+function successMessageCard(message, redirect=null){
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up" id="success-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
       `;
-
       document.getElementById('messagePortal').innerHTML += msg;
 }
 
 function failedMessageCard(message){
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up" id="failed-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
             </div>
@@ -381,7 +382,7 @@ function retrieveCheckboxId(){
 async function addBooking(e){
       e.preventDefault();      
       const form = new FormData(e.target);
-      console.log(form);
+
       try{
             const response = await fetch('/add-booking', {
                   method: 'POST', 
@@ -420,6 +421,7 @@ async function markAsCheckout(){
       const result = await response.json();
 
       if (result.success){
+            notifications();
             successMessageCard(result.message);
             recentBookings();
             todayCheckouts();
@@ -712,7 +714,7 @@ async function getTotalsCountData() {
 
       const response = await fetch(`/totals?month=${month}&year=${year}`);
       const result = await response.json();
-      console.log(result);
+
       if (result.success){
             document.getElementById('all-data').querySelector('span').textContent = `+${result.all}`;
             document.getElementById('reserved-data').querySelector('span').textContent = `+${result.reserved}`;

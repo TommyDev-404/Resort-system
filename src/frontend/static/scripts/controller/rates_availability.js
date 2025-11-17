@@ -1,25 +1,25 @@
 
 // ----------------- HELPERS ----------------- //
-function successMessageCard(message){
+
+function successMessageCard(message, redirect=null){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
       `;
-
       document.getElementById('messagePortal').innerHTML += msg;
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
             </div>
@@ -29,15 +29,26 @@ function failedMessageCard(message){
 }
 
 function openUpdateAreaModal(e) {
-      console.log(e);
       const row = e.target.closest('tr'); // get the row
       const cells = row.querySelectorAll('td'); // get all td in that row
+
+      const modal2 = `
+            <div id="update-area-modal" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+                  <div class="bg-card-bg dark:bg-gray-900 w-full max-w-[500px] rounded-lg shadow-2xl px-6 py-6 relative fade-in-up">
+                        <span id="close-area-update-modal" class="absolute top-3 right-4 text-gray-500 dark:text-gray-200 text-[25px] cursor-pointer">&times;</span>
+                        <div class="flex flex-col gap-1 items-center justify-center relative mt-2">
+                              <i data-lucide="circle-x" class="w-15 h-15 text-red-500"></i>
+                              <p class="text-md font-md text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2 mt-4">Cannot update. This area is currently under a promotion.</p>
+                        </div>
+                  </div>
+            </div>
+      `;
 
       const modal = `
             <div id="update-area-modal" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
                   <div class="bg-card-bg dark:bg-gray-900 w-full max-w-[500px] rounded-lg shadow-2xl px-6 py-2 relative fade-in-up">
                         <span id="close-area-update-modal" class="absolute top-3 right-4 text-gray-500 dark:text-gray-200 text-[25px] cursor-pointer">&times;</span>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2 mt-4"><i class="fas fa-user-tag text-primary-blue"></i>Update Price</h3>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2 mt-4">Update Price</h3>
                         <form id="updateAreaForm">
                               <div class="w-full mb-6 flex flex-col gap-2">
                                     <input type="hidden" name="area-name-update" value="${cells[0].textContent}">
@@ -49,7 +60,8 @@ function openUpdateAreaModal(e) {
             </div>
       `;
 
-      document.getElementById('ratesAvailabilityPortal').innerHTML += modal;
+      document.getElementById('ratesAvailabilityPortal').innerHTML += cells[3].textContent.split('-').length > 1 ? modal2 : modal;
+      lucide.createIcons();
 }
 
 async function renderTable() {
@@ -64,9 +76,9 @@ async function renderTable() {
       } catch (err) {
             console.error("Failed to fetch data:", err);
       }
-
+      
       // Columns for the table
-      let columns = ["Area Type", "Area Count", "Max Occ.", "Rate ($)", "Today's Avail.", "Tomorrow's Avail.", "Action"];
+      let columns = ["Area Type", "Area Count", "Max Occ.", "Rate (₱)", "Today's Avail.", "Tomorrow's Avail.", "Action"];
 
       // Render header
       const headerHtml = columns.map(col => `<th class="px-3 py-3 text-center font-bold uppercase">${col}</th>`).join('');
@@ -77,10 +89,10 @@ async function renderTable() {
             const { name, capacity } = areaTypeInfo(row.room_type);
             return `
                   <tr class="fade-in-up text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700">
-                        <td class="px-6 py-4 text-center font-semibold flex items-center gap-2">${name}<span class="text-[13px] font-light">(Under promotions)</span></td>
+                        <td class="px-6 py-4 text-center font-semibold flex items-center gap-2">${name} ${row.area_condition ? `<span class="text-[13px] font-light">(${row.promo_name})</span>` : ''}</td>
                         <td class="px-3 py-4 text-center">${row.total_rooms}</td>
                         <td class="px-3 py-4 text-center font-bold text-lg text-primary-blue">${capacity}</td>
-                        <td class="px-3 py-4 text-center text-green-600">₱${row.rate}</td>
+                        <td class="px-3 py-4 text-center text-green-600 dark:text-green-500 flex items-center justify-center gap-1 font-semibold">${row.area_condition ? `<label class="line-through text-red-500 font-light">₱${row.orig_rate}</label> <p class="text-gray-500 dark:text-gray-200">-</p> <span class="text-green-600 dark:text-green-500">₱${row.rate} </span>` : `₱${row.rate}`}</td> 
                         <td class="px-3 py-4 text-center"><span class="font-bold text-lg text-red-500">${row.today_avail}</span></td>
                         <td class="px-3 py-4 text-center"><span class="font-bold text-lg text-green-500">${row.tomorrow_avail}</span></td>
                         <td class="px-3 py-4 flex gap-2 justify-center"><button class="update-btn text-sm text-white bg-teal-500 py-2 px-4 rounded-sm  flex gap-2" id="${row.room_type}"><i class="ti ti-edit text-lg"></i>Update</button></td>
@@ -142,17 +154,17 @@ document.addEventListener('click', (e) => {
       const btn = e.target.closest('.update-btn'); // ensures we get the button even if child is clicked
       
       if (btn) {
-          const areaId = btn.id;
-          openUpdateAreaModal(e); // pass the ID to the modal
+            const areaId = btn.id;
+            openUpdateAreaModal(e); // pass the ID to the modal
       }
-  
+
       // Close modal
       if (e.target.matches('#close-area-update-modal')) {
-          document.getElementById('update-area-modal').remove();
+            document.getElementById('update-area-modal').remove();
       }
-  });
+      
+});
 
-  
 document.addEventListener('submit', (e) =>{
       if (e.target.matches('#updateAreaForm')) updatePrice(e);
 });      

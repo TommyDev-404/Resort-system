@@ -14,13 +14,18 @@ class RatesAndAvailability:
                                     LOWER(s.name) AS room_type,
                                     s.total_rooms,
                                     s.rate,
+                                    s.orig_rate,
                                     a.today_avail,
-                                    a.tomorrow_avail
+                                    a.tomorrow_avail,
+                                    p.name as promo_name,
+                                    CASE 
+                                          WHEN p.area IS NOT NULL THEN 'under promotion'
+                                    END AS area_condition
                               FROM (
                               SELECT 'premium' AS room_type,
                                     4 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN premium ELSE 0 END) AS today_avail,
                                     4 - SUM(CASE WHEN check_out >= CURRENT_DATE() + INTERVAL 1 DAY THEN premium ELSE 0 END) AS tomorrow_avail
-                              FROM accomodation_data
+                              FROM accomodation_data 
                               UNION ALL
                               SELECT 'standard',
                                     3 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN standard ELSE 0 END),
@@ -62,15 +67,22 @@ class RatesAndAvailability:
                                     8 - SUM(CASE WHEN check_out >= CURRENT_DATE() + INTERVAL 1 DAY THEN big ELSE 0 END)
                               FROM accomodation_data
                               ) AS a
+                              
                               JOIN (
-                              SELECT 
-                                    LOWER(name) AS name,
-                                    COUNT(*) AS total_rooms,
-                                    MAX(rate) AS rate
-                              FROM accomodation_spaces
-                              GROUP BY LOWER(name)
+                                    SELECT 
+                                          LOWER(name) AS name,
+                                          COUNT(*) AS total_rooms,
+                                          MAX(rate) AS rate,
+                                          MAX(orig_rate) AS orig_rate
+                                    FROM accomodation_spaces
+						GROUP BY name
                               ) AS s
-                              ON a.room_type = s.name
+                              On a.room_type = s.name
+                              
+                              LEFT JOIN promos p
+                                    ON FIND_IN_SET(s.name, p.area) > 0
+                                    AND p.date <= CURRENT_DATE()
+                                    AND p.end_date >= CURRENT_DATE()
                               ORDER BY a.room_type;
                         ''')
 

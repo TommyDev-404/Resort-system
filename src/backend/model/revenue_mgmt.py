@@ -13,7 +13,7 @@ class RevenueMgmt:
                         promotions = f"{promo_name} - {promo_rate}%"
                         discount = int(promo_rate)/100
 
-                        cursor.execute(''' INSERT INTO promos(date, name, discount, area, end_date, status) VALUES(%s, %s, %s, %s, %s, %s)''', (date, promotions, discount, areas_promo, duration, 'Active'))
+                        cursor.execute(''' INSERT INTO promos(date, name, discount, area, end_date, status) VALUES(%s, %s, %s, %s, %s, %s)''', (date, promotions, promo_rate, areas_promo, duration, 'Active'))
 
                         for area in areas:
                               cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = rate * (1 - %s) WHERE name = %s ''', 

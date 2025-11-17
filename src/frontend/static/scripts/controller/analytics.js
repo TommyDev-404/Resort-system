@@ -56,22 +56,24 @@ async function drawCheckinForecastChart(type=null) {
                               label: 'Historical Check-in (%)',
                               data: historicalValues,
                               borderColor: '#0bda0bff',
-                              backgroundColor: '#18e411ff',
+                              backgroundColor: '#18e411a8',
                               borderWidth: 2,
                               tension: 0.4,
                               pointRadius: 0,
                               spanGaps: true,
+                              fill: true
                         },
                         {
                               label: 'Forecasted Check-in (%)',
                               data: forecastValues,
                               borderColor: '#0a33ebff',
-                              backgroundColor: '#0e24ebff',
+                              backgroundColor: '#0e24eb8e',
                               borderDash: [8, 5],
                               borderWidth: 2,
                               tension: 0.4,
                               pointRadius: 0,
                               spanGaps: true,
+                              fill: true
                         }
                   ]
             },
@@ -81,7 +83,7 @@ async function drawCheckinForecastChart(type=null) {
                   scales: {
                         y: {
                               min: 0,
-                              max: 100,
+                              max: 50,
                               title: { 
                                     display: true, 
                                     text: 'Occupancy %', 
@@ -267,7 +269,7 @@ async function targetRevenue(){
       const response = await fetch('/target-revenue');
       const res = await response.json();
       
-      document.getElementById('target').textContent = `₱${res.target}`;
+      document.getElementById('target').textContent =  Number(res.target).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
 }
 
 function loadAccomodationType(accomodation_type=null){

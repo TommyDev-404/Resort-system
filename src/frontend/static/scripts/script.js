@@ -45,7 +45,7 @@ function toggleSidebar() {
 /*---------------- SWITCH CONTENT ----------------*/
 function switchContent(sectionId) {
       if (!sectionId) return;
-      
+
       // Hide all sections
       contentSections.forEach(section => section.classList.add('hidden'));
 
@@ -175,6 +175,8 @@ document.addEventListener('click', (e) => {
       }
 
       if (e.target.closest('#profile-shortcut')) switchContent('admin-profile');
+      if (e.target.closest('#housekeeping-notif')) (switchContent('housekeeping'), document.querySelector('#notification-modal').classList.add('hidden'), document.querySelector('#notificationsModal').remove());
+      if (e.target.closest('#redirect-promo')) (switchContent('revenue-management'), document.querySelector('#notification-modal').classList.add('hidden'), document.querySelector('#notificationsModal').remove());
       if (e.target.closest('#logoutButton')) logout();
 });
 
@@ -209,9 +211,9 @@ function logoutCard(){
 function successMessageCard(message, redirect=null){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
@@ -227,9 +229,9 @@ function successMessageCard(message, redirect=null){
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
                         <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
-                        <h2 class="text-lg text-gray-600" id="message">${message}</h2>
+                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
             </div>

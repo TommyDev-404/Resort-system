@@ -109,3 +109,15 @@ class Housekeeping:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
+            
+      def staff_cleaners(self):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(''' SELECT * FROM staff_details WHERE position NOT IN ('Front Desk', 'Security Guard') ''')
+                        data = cursor.fetchall()
+
+                        return {'success': bool(data), 'data': data}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}

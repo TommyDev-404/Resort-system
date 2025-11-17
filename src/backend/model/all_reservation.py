@@ -75,7 +75,6 @@ class Reservation:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-      
 
       def get_avl_room_all(self):
             try:

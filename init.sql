@@ -1,3 +1,8 @@
+-- new 
+update accomodation_spaces set staff_assign = '--' where status = 'avl' and date = '0000-00-00'
+insert into notifications(name, date, room_name, room_no) VALUES ('temporary', CURRENT_DATE(), 'occupancy', 0)
+
+
 -- CREATE DATABASE
 CREATE DATABASE resort_db2;
 

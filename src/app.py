@@ -314,6 +314,10 @@ def reassign_cleaner():
 def update_area_condition():
       return jsonify(house.update_room_condition(request.args.get('room_no'), request.args.get('area_name')))
 
+@app.route('/staff-cleaners', methods=['GET'])
+def staff_cleaners():
+      return jsonify(house.staff_cleaners())
+
 
 #--------------- RATES AND AVAILABILITY ------------------#
 @app.route('/availables', methods=['GET'])

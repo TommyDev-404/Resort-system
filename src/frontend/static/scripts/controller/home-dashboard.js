@@ -3,6 +3,7 @@ let occupancyChart = null;
 let heavyMonthChart = null;
 let mostBookedAreaChart = null;
 let occupancyChartPercentage = null;
+let allNotifications = [];
 
 const observer = new MutationObserver(() => {
       // Safely destroy each chart if it exists
@@ -126,22 +127,24 @@ async function drawOccupancyForecastChart() {
                               label: 'Historical Occupancy (%)',
                               data: historicalValues,
                               borderColor: '#3B82F6',
-                              backgroundColor: '#3B82F6',
+                              backgroundColor: '#508ae9b7',
                               borderWidth: 2,
                               tension: 0.4,
                               pointRadius: 0,
                               spanGaps: true,
+                              fill: true
                         },
                         {
                               label: 'Forecasted Occupancy (%)',
                               data: forecastValues,
                               borderColor: '#FBBF24',
-                              backgroundColor: '#FBBF24',
+                              backgroundColor: '#e0f006af',
                               borderDash: [8, 5],
                               borderWidth: 2,
                               tension: 0.4,
                               pointRadius: 0,
                               spanGaps: true,
+                              fill: true
                         }
                   ]
             },
@@ -218,49 +221,41 @@ function timeAgo(inputTime) {
       const diffSec = Math.floor((now - date) / 1000);
       const absSec = Math.abs(diffSec); // convert into seconds
 
-      if (Math.round(absSec / 60) < 60) return `${absSec} seconds ago`;
+      if (Math.round(absSec / 60) < 60) return `${Math.round(absSec / 60)} seconds ago`;
       if (absSec < 3600) return `${Math.floor(absSec / 60)} minutes ago`;
       if (absSec < 86400) return `${Math.floor(absSec / 3600)} hours ago`;
       return `${Math.floor(absSec / 86400)} days ago`;
 }
 
 function viewAllNotifications(){
+      document.querySelectorAll('#notificationsList div').forEach(row => row.remove());
+      const generated_row = allNotifications.join('\n');
       const modal = `
-            <div id="notificationsModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50] hidden">
+            <div id="notificationsModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                   <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-md p-6 relative fade-in-up">
-                  
-                  <!-- Close Button -->
-                  <button id="closeNotifications" class="absolute top-4 right-4 text-2xl text-gray-600 dark:text-gray-300 hover:text-red-500">&times;</button>
-                  
-                  <!-- Modal Title -->
-                  <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Notifications</h2>
-                  
-                  <!-- Notifications List -->
-                  <div class="max-h-80 overflow-y-auto border-t border-b border-gray-200 dark:border-gray-700 py-2">
-                        <ul id="notificationsList" class="space-y-2 text-gray-700 dark:text-gray-300">
-                        <!-- Example Notification -->
-                        <li class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-sm">
-                        <p class="text-sm font-medium">New staff added: John Doe</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Nov 15, 2025 10:00 AM</p>
-                        </li>
-                        <li class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-sm">
-                        <p class="text-sm font-medium">Payroll updated</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Nov 14, 2025 05:30 PM</p>
-                        </li>
-                        <!-- More notifications dynamically injected here -->
-                        </ul>
-                  </div>
-                  
-                  <!-- Footer -->
-                  <div class="mt-4 flex justify-end">
-                        <button id="clearNotifications" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition">Clear All</button>
-                  </div>
-                  
+                        <button id="closeNotifications" class="absolute top-4 right-4 text-2xl text-gray-600 dark:text-gray-300 hover:text-red-500">&times;</button>
+            
+                        <div class="flex gap-2 items-center justify-center mb-4">
+                              <button id="notification" class="hover:bg-black/7 dark:hover:bg-white/10 rounded-lg transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-900 dark:text-white transition-colors duration-500" viewBox="0 0 20 20" fill="currentColor">
+                                          <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a2 2 0 002-2H8a2 2 0 002 2z"/>
+                                    </svg>
+                              </button>
+                              <h2 class="text-xl font-bold text-gray-800 dark:text-white">Notifications</h2>
+                        </div>
+
+                        <!-- Notifications List -->
+                        <div class="max-h-80 overflow-y-auto border-t border-b border-gray-200 dark:border-gray-700 py-2">
+                              <ul id="notificationsList" class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    ${generated_row}
+                              </ul>
+                        </div>
                   </div>
             </div>
       `;
 
       document.getElementById('notificationPortal').innerHTML += modal;
+      lucide.createIcons(); 
 }
 
 async function drawHeavyMonthChart() {
@@ -452,63 +447,92 @@ async function todayProjectedRevenue(){
       // revenue
       const response = await fetch('/revenue', {method: "GET"});
       const res = await response.json();
-      
-      document.getElementById('total-revenue').textContent = `₱${res.current_revenue}`;
+
+      document.getElementById('total-revenue').textContent = Number(res.current_revenue).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
       document.getElementById('target-revenue').textContent = Number(res.change) > 0 ? `+${res.change}%` : `${res.change}%`;
 }
 
-async function notificationCount() {
+export async function notifications() {
+      document.querySelectorAll('.notif-item').forEach(item => item.remove());
+      document.querySelector('.view-notif-btn').classList.remove('hidden');
+
+      // notif count
       const response = await fetch('/notification-count', {method: "GET"});
       const res = await response.json();
-
-      document.getElementById('notification-count').textContent = `${res.count}+`;
-}
-
-async function alertOccupancy() {
-      document.querySelectorAll('.notif-item').forEach(item => item.remove());
-      const response = await fetch('/occupancy-alert', {method: "GET"});
-      const res = await response.json();
       
-      let time = timeAgo(res.time);
-      let notification = res.message;
+      if (Number(res.count) != 0){
+            document.getElementById('notification-count').classList.add('px-1.5', 'py-0.5');
+            document.getElementById('notification-count').textContent = `${res.count}+` ;
+      }else{
+            document.getElementById('notification-count').classList.remove('px-1.5', 'py-0.5');
+            document.getElementById('notification-count').textContent = '';
+      }
 
-      const occupancy_notif = `
-            <div class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
-                  <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-400 mt-0.5"></i>
-                  <div class="flex flex-col">
-                        <p class="text-sm text-gray-800 dark:text-gray-100">${notification}</p>
-                        <span class="text-xs text-gray-400 mt-1">${time}</span>
+      let have_notifications = [];
+
+      // occupancy alert
+      const response1 = await fetch('/occupancy-alert', {method: "GET"});
+      const res1 = await response1.json();
+      
+      // housekeeping alert
+      const response2 = await fetch('/housekeeping-alert', {method: "GET"});
+      const res2 = await response2.json();
+      console.log(res2);
+
+      if (res1.success){
+            have_notifications.push(true);
+            const data = res1.data;
+            let time = timeAgo(data.date);
+            let notification = data.name;
+
+            const occupancy_notif = `
+                  <div id="redirect-promo" class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-400 mt-0.5"></i>
+                        <div class="flex flex-col flex-1"">
+                              <p class="text-sm text-gray-800 dark:text-gray-100">${notification}</p>
+                              <span class="text-xs text-gray-400 mt-1">${time}</span>
+                        </div>
                   </div>
-            </div>
-      `;
-      
-      document.getElementById('notif-modal').insertAdjacentHTML('beforeend', occupancy_notif);
-      lucide.createIcons(); 
-}
+            `;
 
-async function alertHousekeeping() {
-      document.querySelectorAll('.notif-item').forEach(item => item.remove());
-      const response = await fetch('/housekeeping-alert', {method: "GET"});
-      const res = await response.json();
-      
-      if (res.success){
-            res.data.forEach(data => {
+            allNotifications.push(occupancy_notif);
+            document.getElementById('notif-modal').innerHTML += occupancy_notif;
+            lucide.createIcons(); 
+      }
+
+      if (res2.success){
+            have_notifications.push(true);
+            res2.data.forEach(data => {
                   let time = timeAgo(data.date);
                   let notification = data.name;
 
                   const housekeeping_notif = `
-                        <div class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
+                        <div id="housekeeping-notif" class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
                               <i data-lucide="house" class="w-5 h-5 text-blue-400 mt-0.5"></i>
-                              <div class="flex flex-col">
-                              <p class="text-sm text-gray-800 dark:text-gray-100">${notification}</p>
-                              <span class="text-xs  text-gray-800 dark:text-gray-400 mt-1">${time}</span>
+                              <div class="flex flex-col flex-1"">
+                                    <p class="text-sm text-gray-800 dark:text-gray-100">${notification+'. Clean now!'}</p>
+                                    <span class="text-xs  text-gray-800 dark:text-gray-400 mt-1">${time}</span>
                               </div>
                         </div>
                   `;
                   
-                  document.getElementById('notif-modal').insertAdjacentHTML('beforeend', housekeeping_notif);
+                  allNotifications.push(housekeeping_notif);
+                  document.getElementById('notif-modal').innerHTML += housekeeping_notif;
                   lucide.createIcons(); 
             });
+      }
+      
+      if (have_notifications.length == 0){
+            const empty_row = `
+                  <div id="empty-notif" class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
+                        <div class="flex flex-col flex-1"">
+                              <p class="text-sm text-gray-800 dark:text-gray-400 text-center">No notifications.</p>
+                        </div>
+                  </div>
+            `;
+            
+            document.querySelector('.view-notif-btn').classList.add('hidden');
+            document.getElementById('notif-modal').innerHTML += empty_row;
       }
 }
 
@@ -573,7 +597,7 @@ async function mostBookedArea() {
 document.addEventListener('click', (e) => {
       if (e.target.matches('#closeAlert')) document.getElementById('alertToast').classList.add('hidden');
       if (e.target.matches('#closeAlertHousekeeping')) document.getElementById('alertHousekeeping').classList.add('hidden');
-      if (e.target.closest('#viewAllNotifications')) viewAllNotifications();
+      if (e.target.closest('#viewAllNotifications')) (viewAllNotifications(),  document.querySelector('#notification-modal').classList.add('hidden'));
       if (e.target.matches('#closeNotifications')) document.getElementById('notificationsModal').remove();
 });
 
@@ -593,10 +617,9 @@ setTimeout(() => {
 
 // Initial load: ensure the default content is shown and charts are drawn
 export function initPageDashboard() {
+      allNotifications.length = 0;
       mostBookedArea();
-      alertOccupancy();
-      notificationCount();
-      alertHousekeeping();
+      notifications();
       todayGuest();
       todayCheckin();
       totalGuestInHouse();

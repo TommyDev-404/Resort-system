@@ -140,11 +140,11 @@ class Dashboard:
                         GROUP BY YEAR(check_in), MONTH(check_in)
                         ),
                         target AS (
-                        SELECT ROUND(COALESCE(AVG(monthly_revenue), 0), 2) AS target_revenue
+                        SELECT ROUND(COALESCE(AVG(monthly_revenue), 0)) AS target_revenue
                         FROM monthly_data
                         ),
                         current_month AS (
-                        SELECT ROUND(COALESCE(SUM(total_amount), 0), 2) AS current_revenue
+                        SELECT ROUND(COALESCE(SUM(total_amount), 0)) AS current_revenue
                         FROM bookings
                         WHERE status NOT IN ('Cancelled')
                               AND YEAR(check_in) = YEAR(CURDATE())
