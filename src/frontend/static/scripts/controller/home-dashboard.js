@@ -477,7 +477,6 @@ export async function notifications() {
       // housekeeping alert
       const response2 = await fetch('/housekeeping-alert', {method: "GET"});
       const res2 = await response2.json();
-      console.log(res2);
 
       if (res1.success){
             have_notifications.push(true);

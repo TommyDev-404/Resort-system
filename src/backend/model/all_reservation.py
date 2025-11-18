@@ -68,7 +68,6 @@ class Reservation:
 
                         list = []
                         for d in data:
-                              print(d)
                               list.append(d.get('avl_room'))
 
                         return {'rooms' : list}

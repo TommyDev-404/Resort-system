@@ -938,7 +938,7 @@ async function individualStaffAttendance(id){
       try{
             const response = await fetch(`/individual-staff-attendance?id=${id}`,);
             const result = await response.json();
-            console.log(result);
+            
             if (result.success){ 
                   let all_row = [];
 

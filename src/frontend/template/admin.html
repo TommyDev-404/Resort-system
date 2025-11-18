@@ -62,7 +62,7 @@
 				<img src="{{ url_for('static', filename='assets/logo2.png') }}" alt="logo" class="w-8 h-8 rounded-md flex-shrink-0">
 				<span class="text-blue-600 dark:text-gray-200 font-semibold text-[20px]">Resort<span class="text-yellow-500 font-bold">-HUB</span></span>
 			</div>
-			<button id="toggleSidebar" class="dark:bg-white/10 bg-black/3 hover:bg-black/7 dark:hover:bg-white/20 p-2 rounded-lg transition-all duration-300 ease-in-out flex-shrink-0">
+			<button id="toggleSidebar" class="dark:bg-white/10 bg-black/3 hover:bg-black/7 dark:hover:bg-white/20 p-2 rounded-lg transition-all duration-300 ease-in-out flex-shrink-0 cursor-pointer">
 				<i id="hamburgerIcon" data-lucide="menu" class="w-6 h-6 text-gray-900 dark:text-white"></i>
 				<i id="closeSidebar" data-lucide="chevron-left" class="w-6 h-6 text-gray-900 dark:text-white hidden"></i>
 			</button>
@@ -134,13 +134,13 @@
 			<h1 class="font-semibold text-lg text-gray-900 dark:text-white">Welcome back, <span class="text-blue-500">Admin!</span></h1>
 
 			<div class="flex items-center gap-4">
-				<button id="darkModeToggle" class="hover:bg-black/7  bg-black/5 dark:bg-white/10 p-2 rounded-4xl dark:hover:bg-white/20">
+				<button id="darkModeToggle" class="hover:bg-black/7  bg-black/5 dark:bg-white/10 p-2 rounded-4xl dark:hover:bg-white/20 cursor-pointer">
 					<i data-lucide="moon" class="w-5 h-5 text-gray-900 ease-in-out hidden" id="darkIcon"></i>
 					<i data-lucide="sun" class="w-5 h-5 dark:text-white ease-in-out hidden" id="lightIcon"></i>
 				</button>
 
 				<div class="relative">
-					<button id="notification" class="hover:bg-black/7 bg-black/5 dark:bg-white/10 p-2 rounded-4xl dark:hover:bg-white/20 p-2 transition">
+					<button id="notification" class="hover:bg-black/7 bg-black/5 dark:bg-white/10 p-2 rounded-4xl dark:hover:bg-white/20 p-2 transition cursor-pointer">
 						<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-900 dark:text-white transition-colors duration-500" viewBox="0 0 20 20" fill="currentColor">
 							<path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a2 2 0 002-2H8a2 2 0 002 2z"/>
 						</svg>
@@ -519,7 +519,7 @@
                                     </script>
                               </div>
                               
-                              <button id="add-booking-btn" type="button" class="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                              <button id="add-booking-btn" type="button" class="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer">
                                     <i data-lucide="plus-circle" class="w-5 h-5"></i>Add Booking
                               </button>
                         </div>
@@ -997,7 +997,6 @@
 		</main>
 	</div>
       
-
       <!-- MODAL INSERTION -->
       <div id="notificationPortal"></div>
       <div id="reservationPortal"></div>
