@@ -2,7 +2,7 @@
 const adminNum = document.getElementById('admin-num');
 const adminName = document.getElementById('admin-name');
 const adminEmail = document.getElementById('admin-email');
-const datePasswordChange = document.getElementById('date-pass-change');
+const datePasswordChange = document.getElementById('last-pass-changed');
 
 // ------------- HELPERS ---------------- //
 function successMessageCard(message, redirect=null){
@@ -16,11 +16,6 @@ function successMessageCard(message, redirect=null){
             </div>
       `;
       document.getElementById('messagePortal').innerHTML += msg;
-
-      document.querySelector('#close-message').addEventListener('click', (e) => {
-            if (redirect) window.location.href = redirect;
-            document.querySelector('#logoutModal').remove();
-      });
 }
 
 function failedMessageCard(message){
@@ -58,8 +53,8 @@ function renderChangePassword(email){
                               </div>
                               <label class="flex justify-end gap-2 text-sm mb-6 text-gray-900 dark:text-gray-100"><input type="checkbox" id="show">Show Password</label>
                               <div class="flex justify-end gap-2">
-                                    <button id="cancel-change-pass" type="button" class="px-4 py-2 bg-gray-400 text-white dark:bg-white/10 hover:bg-white/3 rounded hover:bg-gray-500">Cancel</button>
-                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white dark:bg-green-500 dark:hover:bg-green-600 rounded hover:bg-green-700">Change</button>
+                                    <button id="cancel-change-pass" type="button" class="px-4 py-2 bg-gray-600 text-white dark:bg-white/10 hover:bg-gray-500 rounded dark:hover:bg-white/8 cursor-pointer">Cancel</button>
+                                    <button type="submit" class="px-4 py-2 bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-700 rounded hover:bg-green-700  cursor-pointer">Change</button>
                               </div>
                         </form>
                   </div>
@@ -86,8 +81,8 @@ function renderEditModal(type, value){
                         <h3 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">Edit ${type}</h3>
                               <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="text" name="${type ==+ "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border border-gray-400 rounded text-gray-900 dark:text-gray-100" placeholder="Enter ${type}" value="${value}">
                               <div class="flex justify-end gap-2">
-                                    <button id="cancel" type="button" class="px-4 py-2 bg-gray-400 dark:bg-white/10 dark:hover:bg-white/3 text-white rounded hover:bg-gray-500">Cancel</button>
-                                    <button id="change${type === "Contact Number" ? "ContactNumber" : type}" type="button" class="px-4 py-2 bg-blue-600 text-white dark:bg-blue-500 hover:bg-blue-600 rounded hover:bg-blue-700">Change</button>
+                                    <button id="cancel" type="button" class="px-4 py-2 bg-gray-600 dark:bg-white/15 dark:hover:bg-white/10 text-white rounded hover:bg-gray-500">Cancel</button>
+                                    <button id="change${type === "Contact Number" ? "ContactNumber" : type}" type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Change</button>
                               </div>
                   </div>
             </div>
@@ -99,19 +94,19 @@ function renderEditModal(type, value){
 function renderCodeModal(){
       const modal = `
             <div id="codeModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in-up">
-                  <div class="bg-white rounded-2xl shadow-lg p-6 w-90 max-w-full">
-                        <h2 class="text-xl font-bold mb-4 text-center">Enter 6-Digit Code</h2>
+                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 w-90 max-w-full">
+                        <h2 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-white">Enter 6-Digit Code</h2>
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-2 mt-2 mb-4">
-                              <input id="codeInput1" type="text" maxlength="1" class="w-full p-2 border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput2" type="text" maxlength="1" class="w-full p-2 border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput3" type="text" maxlength="1" class="w-full p-2 border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput4" type="text" maxlength="1" class="w-full p-2 border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput5" type="text" maxlength="1" class="w-full p-2 border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput6" type="text" maxlength="1" class="w-full p-2 border border-gray-300 rounded-md text-center text-lg tracking-widest" />
+                              <input id="codeInput1" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
+                              <input id="codeInput2" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
+                              <input id="codeInput3" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
+                              <input id="codeInput4" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
+                              <input id="codeInput5" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border border-gray-300 rounded-md text-center text-lg tracking-widest" />
+                              <input id="codeInput6" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
                         </div>
                         <div class="mt-4 flex justify-end gap-2 ">
-                              <button id="closeCode" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Cancel</button>
-                              <button id="submitCode" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Submit</button>
+                              <button id="closeCode" class="px-4 py-2 bg-gray-600 dark:bg-white/15 dark:hover:bg-white/10 rounded-lg hover:bg-gray-500">Cancel</button>
+                              <button id="submitCode" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Submit</button>
                         </div>
                   </div>
             </div>
@@ -164,18 +159,17 @@ async function changePass(e) {
       if (confirm_pass !== new_pass) return alert('Password unmatched!');
 
       const form = new FormData(e.target);
-
+      console.log(form);
       try {
             loadingAnimation();
 
-            const response = await fetch('/change-password', {
+            const response = await fetch('/change-passwordv2', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify(Object.fromEntries(form.entries()))
             });
-
             const result = await response.json();
-
+            console.log(result);
             if (result.success) {
                   successMessageCard(result.message);
                   e.target.reset();
@@ -216,7 +210,7 @@ async function adminProfile() {
 
       if (result.success){
             const formatDate = new Date(result.data.date_pass_change).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
-
+            console.log(formatDate);
             adminName.textContent = result.data.username;
             adminEmail.textContent = result.data.email;
             adminNum.textContent = result.data.contact;

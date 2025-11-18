@@ -457,8 +457,8 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
                         <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_in}</td> 
                         <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_out}</td> 
                         <td class="py-3 px-10 text-center text-sm">${date}</td>
-                        <td class="py-3 px-6 text-center">
-                              <label class="text-[12px] font-semibold py-1 px-3 rounded-2xl 
+                        <td class="py-3 px-6 text-center w-[200px]">
+                              <label class="text-[12px] font-semibold py-1 px-3 rounded-2xl w-full overflow-x-auto scroll-hide whitespace-nowrap
                                     ${status === "Absent"  ? 'text-green-600 bg-red-100 dark:text-white dark:bg-red-500' :
                                     status === '--' ? 'text-gray-900 dark:text-white ' :
                                     'text-green-600 bg-green-100 dark:text-white dark:bg-green-500' 

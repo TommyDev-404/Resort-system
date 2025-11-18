@@ -440,7 +440,7 @@ def sort_attendance():
 
 
 #--------------- ADMIN PROFILE ------------------#
-@app.route('/change-password', methods=['POST'])
+@app.route('/change-passwordv2', methods=['POST'])
 def change_pass():
       return jsonify(admin.changePass(**request.get_json()))
 

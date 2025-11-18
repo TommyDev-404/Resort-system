@@ -14,13 +14,12 @@ class Admin:
             self.code = None
 
       def changePass(self, email, current_password, new_password, confirm_password):
+            print(email, current_password, new_password, confirm_password)
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        print(email)
                         # validate email format
                         email_validation = self.is_valid_email(email)
-                        print(email_validation)
                         if not email_validation: return {'message': 'Invalid email!'}
 
                         cursor.execute(''' SELECT password FROM admin WHERE email = %s ''', (email))

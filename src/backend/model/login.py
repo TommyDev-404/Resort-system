@@ -44,7 +44,6 @@ class Login:
 
 
       def forgot_pass(self, email):
-            print(email)
             # validate email format
             email_validation = self.is_valid_email(email.get('email'))
             if not email_validation: return {'message': 'Invalid email!'}
