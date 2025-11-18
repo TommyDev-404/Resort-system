@@ -71,17 +71,16 @@ class RevenueMgmt:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        areas = areas_promo.split(',')
-
+                        areas = areas_promo.split(', ')
+                        
                         cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
-
                         for area in areas:
                               cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = orig_rate WHERE name = %s ''', 
                               ('None', area.split(' ')[0]))
 
                         con.commit()
 
-                        return {'success': bool(cursor.rowcount > 0), 'message': "Promotions remove successfully" if bool(cursor.rowcount > 0) else "Failed to remove promotions."}
+                        return {'success': bool(cursor.rowcount != 0), 'message': "Promotions remove successfully" if bool(cursor.rowcount != 0) else "Failed to remove promotions."}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}

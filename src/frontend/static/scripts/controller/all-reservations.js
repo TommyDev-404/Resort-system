@@ -39,7 +39,7 @@ function createTable(id, guest_name, checkin, checkout, stay_count, accomodation
                               <input type="checkbox" name="select" class="timeout-checkbox hidden peer">
                               <span
                                     class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition">
-                                    <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                    <i data-lucide="check" class="check-icon w-4 h-4 text-transparent"></i>
                               </span>
                         </label>
                   </td>
@@ -791,24 +791,36 @@ document.addEventListener('click', (e) => {
             if (e.target.closest('#close-accomodation-avl')) closeAccomodationRoom();
             if (e.target.closest('#close-reservation-overlay')) document.querySelector('#update-reservation-overlay').remove();
             if (e.target.closest('.remove-btn')) removeAccomodation(e);
-            
       }
+      
 });
 
-document.querySelectorAll('input[name="select"]:checked').forEach(cb => {
-
-      console.log(icon);
-      const icon = this.parentElement.querySelector('i, svg'); 
-      if (!icon) return;
-          if (this.checked) {
-              icon.classList.remove('text-transparent');
-              icon.classList.add('text-white');
-          } else {
-              icon.classList.remove('text-white');
-              icon.classList.add('text-transparent');
-          }
-  });
-  
+document.addEventListener('change', (e) => {
+      if (e.target.matches('input[name="select"]')) {
+            const checkbox = e.target;
+            document.querySelectorAll('input[name="select"]').forEach(cb => {
+                  if (cb !== checkbox) {
+                        cb.checked = false;
+      
+                        const otherSpan = cb.nextElementSibling;
+                        const otherIcon = otherSpan.querySelector('svg, i');
+                        otherIcon?.classList.add('text-transparent');
+                        otherIcon?.classList.remove('text-white');
+                  }
+            });
+      
+            const span = checkbox.nextElementSibling;
+            const icon = span.querySelector('svg, i');
+      
+            if (checkbox.checked) {
+                  icon.classList.remove('text-transparent');
+                  icon.classList.add('text-white');
+            } else {
+                  icon.classList.add('text-transparent');
+                  icon.classList.remove('text-white');
+            }
+      }
+});
 
 // submit
 document.addEventListener('submit', async(e) => {

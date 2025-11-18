@@ -44,23 +44,23 @@ function createRow(id, date, promo_name, discount, area, end, status){
 
       const row = `
             <tr class="hover:bg-black/3 text-gray-700 dark:text-gray-100 dark:hover:bg-white/3 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]" data-id=${id}>
-                  <td class="py-3 px-1  w-[150px]">${date}</td>
-                  <td class="py-3 px-1  w-[150px]">${end}</td>
+                  <td class="py-3 px-1 ">${date}</td>
+                  <td class="py-3 px-1  ">${end}</td>
                   <td class="py-3 px-1 font-medium  w-[250px]">
                         <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
                               ${promo_name}
                         </div>
                   </td>
-                  <td class="py-3 px-1  w-[100px]">${discount}</td>
-                  <td class="py-3 px-1 w-[600px]">
+                  <td class="py-3 px-1 ">${discount}</td>
+                  <td class="py-3 px-1">
                         <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
                               ${formatted_area_name.join(', ')}
                         </div>
                   </td>
                   <td class="text-white rounded-lg text-sm font-bold py-3 px-1  w-[100px]"><span class="${status === 'Active' ? 'bg-green-500' : 'bg-orange-500 '} py-2 px-4 rounded-lg">${status}</span></td>
-                  <td class="flex gap-2 items-center justify-center py-3 px-1  w-[200px]">
-                        <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i class="ti ti-edit text-white text-lg"></i>Update</button>
-                        <button id="remove-promo" class="bg-red-500 hover:bg-red-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i class="ti ti-trash text-white text-lg"></i>Remove</button>
+                  <td class="flex gap-2 items-center justify-center py-3 px-1 ">
+                        <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i class="ti ti-edit text-white text-lg"></i></button>
+                        <button id="remove-promo" class="bg-red-500 hover:bg-red-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i class="ti ti-trash text-white text-lg"></i></button>
                   </td>
             </tr>
       `;
@@ -114,7 +114,7 @@ function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_
                                           End PromotionDate:
                                           <input type="date" name="end_date" value="${end_date}" required class="border border-gray-400 text-gray-900 dark:text-gray-100 rounded-sm p-4">
                                     </div>
-                                    <button type="submit" class="w-full bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-2 px-4 mt-4 rounded-lg shadow-md hover:bg-blue-700 transition" id="save-promo">Save Promotion</button>
+                                    <button type="submit" class="w-full bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-2 px-4 mt-4 rounded-lg shadow-md hover:bg-blue-700 transition" id="save-promo">Update Promotion</button>
                               </div>
                         </form>
                   </div>
@@ -134,11 +134,11 @@ function renderAddPromoModal(){
                               <div class="space-y-4">
                                     <div>
                                           <label for="promo_name" class="block text-sm font-medium dark:text-gray-400 text-gray-700">Promotion Name</label>
-                                          <input type="text" id="promo_name" required name="promo_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
+                                          <input type="text" id="promo_name" required name="promo_name" class="mt-1 block text-gray-900 dark:text-gray-100 w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
                                     </div>
                                     <div>
                                           <label for="promo_rate" class="block text-sm font-medium dark:text-gray-400 text-gray-700">Discount Rate (%)</label>
-                                          <input type="number" required id="promo_rate" name="promo_rate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
+                                          <input type="number" required id="promo_rate" name="promo_rate" class="mt-1 block  text-gray-900 dark:text-gray-100 w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
                                     </div>
                                     <div class="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-400 rounded-sm p-4">
                                           <h2 class="font-semibold text-[19px] mb-4 dark:text-gray-200 text-gray-900">Area's to apply promotion: </h2>
@@ -156,9 +156,9 @@ function renderAddPromoModal(){
                                     </div>
                                     <div class="flex flex-col text-sm dark:text-gray-400 text-gray-700">
                                           Start Promotion Date:
-                                          <input type="date" name="date" required class="border border-gray-200 rounded-sm p-4 mb-4">
+                                          <input type="date" name="date" required class="border border-gray-200  text-gray-900 dark:text-gray-100 rounded-sm p-4 mb-4">
                                           End PromotionDate:
-                                          <input type="date" name="end_date" required class="border border-gray-200 rounded-sm p-4">
+                                          <input type="date" name="end_date" required class="border border-gray-200  text-gray-900 dark:text-gray-100 rounded-sm p-4">
                                     </div>
                                     <button type="submit" class="w-full bg-primary-blue text-white font-bold py-2 px-4 mt-4 rounded-lg shadow-md hover:bg-blue-700 transition" id="save-promo">Save Promotion</button>
                               </div>
@@ -253,11 +253,22 @@ function renderDataToUpdatePromo(e){
        // Extract values from td cells
       const promo_name = td[2].textContent.trim();
       const discount = td[3].textContent.trim().replace('%', '');
-      const start_date = new Date(td[0].textContent.trim()).toISOString().split('T')[0];
-      const end_date = new Date(td[1].textContent.trim()).toISOString().split('T')[0];
+      const startDate = new Date(td[0].textContent.trim());
+      const endDate = new Date(td[1].textContent.trim());
       const area_affected = td[4].textContent.trim();
       
-      renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_affected);
+      const new_start = formatDate(startDate);
+      const new_end = formatDate(endDate);
+      
+      renderUpdatePromo(id, promo_name, discount, new_start, new_end, area_affected);
+}
+
+// Format back to YYYY-MM-DD
+function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
 }
 
 async function removePromo(e){
@@ -266,7 +277,7 @@ async function removePromo(e){
       const td = tr.querySelectorAll('td');
       
       const area_affected = td[4].textContent.trim();
-
+      console.log(area_affected);
       const response = await fetch(`/remove-promo?id=${id}&area_promos=${area_affected}`, {
             method: 'DELETE'
       });
@@ -291,8 +302,8 @@ document.addEventListener('submit', (e) => {
 
 // click
 document.addEventListener('click', (e) => {     
-      if(e.target.matches('#update-promo')) renderDataToUpdatePromo(e);
-      if(e.target.matches('#remove-promo')) removePromo(e);
+      if(e.target.closest('#update-promo')) renderDataToUpdatePromo(e);
+      if(e.target.closest('#remove-promo')) removePromo(e);
       if(e.target.matches('#add-promo')) renderAddPromoModal();
       if(e.target.matches('#close-promo-modal')) document.querySelector('#promo-overlay').remove();
       if(e.target.matches('#close-updatepromo-modal')) document.querySelector('#updatepromo-overlay').remove();

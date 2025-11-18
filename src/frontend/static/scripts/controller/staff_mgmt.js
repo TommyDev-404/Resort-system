@@ -557,6 +557,21 @@ function changeAttendanceType(type){
       wrapper.style.opacity = type ==="Absent" ? '0.4' : '1';
 }
 
+function markCheckIcon(e){
+      const checkbox = e.target;
+      const span = checkbox.nextElementSibling;
+      const icon = span.querySelector('svg, i');
+
+      if (checkbox.checked) {
+            icon.classList.remove('text-transparent');
+            icon.classList.add('text-white');
+      } else {
+            icon.classList.add('text-transparent');
+            icon.classList.remove('text-white');
+      }
+
+}
+
 // --------- DATA FETCHING FUNCTIONS -----------------
 async function addStaff(e){
       e.preventDefault();
@@ -650,7 +665,8 @@ async function getAllStaff(){
                                           <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
                                                 <input type="checkbox" name="select_staff" class="timeout-checkbox hidden peer">
                                                 <span
-                                                      class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition"><i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                                      class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition">
+                                                      <i data-lucide="check" class="w-4 h-4 text-transparent"></i>
                                                 </span>
                                           </label>
                                     </td>
@@ -695,7 +711,8 @@ async function getAllPresentStaff(){
                                           <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
                                                 <input type="checkbox" name="select_staff" class="timeout-checkbox hidden peer">
                                                 <span
-                                                      class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition"><i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                                      class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition">
+                                                      <i data-lucide="check" class="w-4 h-4 text-transparent"></i>
                                                 </span>
                                           </label>
                                     </td>
@@ -1135,7 +1152,9 @@ document.addEventListener('change', (e) => {
       if (e.target.closest('#monthSelect2')) sortAttendanceData();
       if (e.target.closest('#daySelect')) sortAttendanceData();
       if (e.target.closest('#attendanceType')) changeAttendanceType(e.target.value);
+      if (e.target.matches('input[name="select_staff"]')) markCheckIcon(e);
 });
+
 
 document.addEventListener('submit', (e) => {
       if (e.target.matches('#addStaffForm')) addStaff(e);
