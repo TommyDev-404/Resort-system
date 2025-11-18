@@ -53,7 +53,7 @@
 		<div class="w-[50%] px-8 py-10 relative flex flex-col justify-center items-center">
 			<!-- FIXED LOGO (stays when switching modals) -->
 			<div class="absolute top-8 left-1/2 -translate-x-1/2 text-center">
-				<img src="{{ url_for('static', filename='assets/resort.avif') }}" width="40" class="mx-auto rounded-full shadow-sm mb-1">
+				<img src="{{ url_for('static', filename='assets/logo2.png') }}" width="40" class="mx-auto rounded-full shadow-sm mb-1">
 				<h1 class="text-lg font-semibold text-primary-blue tracking-wide">Resto-<span class="text-secondary-gold font-bold">Hub</span></h1>
 			</div>
 
@@ -64,13 +64,13 @@
 				<form class="loginForm w-full">
 					<div class="flex flex-col relative mt-6">  
 						<img src="{{ url_for('static', filename='assets/uname.png') }}" width="38px" class="absolute top-4 right-4">
-						<input type="text" placeholder="" name="username" required class="peer border border-gray-300 p-4 rounded-lg outline-none transition-all duration-300 ease-in-out focus:border-1 focus:border-blue-700 focus:shadow-md valid:border-blue-700"/>
+						<input type="text" placeholder="" name="username" required class="peer border border-gray-400 p-4 rounded-lg outline-none transition-all duration-300 ease-in-out focus:border-1 focus:border-blue-700 focus:shadow-md valid:border-blue-700"/>
 						<span class="absolute top-4 left-[4%] px-2 peer-focus:-top-2 peer-valid:-top-2 peer-focus:text-sm peer-valid:text-sm peer-focus:text-blue-700 text-gray-400 peer-valid:text-blue-700 transiton-all duration-300 ease-in-out bg-white">Username</span>
 					</div>	
 
 					<div class="flex flex-col relative mt-4 passField">  
 						<img src="{{ url_for('static', filename='assets/pass.png') }}" width="24px" id="ps-icon" class="absolute top-4 right-5">
-						<input type="password" name="password" placeholder="" required class="peer border border-gray-300 p-4 rounded-lg outline-none transition-all duration-300 ease-in-out focus:border-1 focus:border-blue-700 focus:shadow-md valid:border-blue-700"/>
+						<input type="password" name="password" placeholder="" required class="peer border border-gray-400 p-4 rounded-lg outline-none transition-all duration-300 ease-in-out focus:border-1 focus:border-blue-700 focus:shadow-md valid:border-blue-700"/>
 						<span class="absolute top-4 left-[4%] px-2 peer-focus:-top-2 peer-valid:-top-2 peer-focus:text-sm peer-valid:text-sm  peer-focus:text-blue-700 text-gray-400 peer-valid:text-blue-700 transiton-all duration-300 ease-in-out bg-white" id="ps-icon">Password</span>
 					</div>
 					<a id="forgotLink"class="text-gray-500 text-sm flex justify-end w-full underline hover:text-blue-600 cursor-pointer transition-colors mt-2">Forgot password?</a>
@@ -87,10 +87,10 @@
 				<p class="text-gray-500 text-sm text-center px-6 mb-6">Enter your email and we’ll send a verification code to reset your password.</p>
 
 				<div class="flex items-center gap-2 w-full">
-					<input type="email" placeholder="Enter your email" name="email" class="flex-1 border border-gray-300 px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300" required />
+					<input type="email" placeholder="Enter your email" name="email" class="flex-1 border border-gray-400 px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300" required />
 					<button type="button" id="get_code" class="bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-lg text-sm font-medium transition-all duration-200">Get Code</button>
 				</div>
-				<input type="text" name="code" maxlength="6" placeholder="Enter 6-digit code" class="w-full border border-gray-300 px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300 " required />
+				<input type="text" name="code" maxlength="6" placeholder="Enter 6-digit code" class="w-full border border-gray-400 px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300 " required />
 				<button type="button" id="link-change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold mt-6 w-full transition-all duration-300">Continue</button>
 				<p class="text-center text-sm text-gray-500 mt-4"> Remember your password?<span id="backToLogin" class="text-blue-600 hover:underline font-medium cursor-pointer">Login</span></p>
 			</div>
@@ -101,7 +101,7 @@
 				<h2 class="text-2xl font-bold text-gray-800 tracking-wide mb-4 text-center">Change Password</h2>
 				<p class="text-gray-500 text-sm text-center px-6 mb-6">Update your account password securely below.</p>
 
-				<input type="password" name="new_password" required class="w-full border border-gray-300 px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300" placeholder="Enter new password" />
+				<input type="password" name="new_password" required class="w-full border border-gray-400 px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300" placeholder="Enter new password" />
 				<label class="text-sm text-gray-500 flex gap-2 mt-3"><input type="checkbox" name="show_change_pass" id="showPassword">Show Password</label>
 				<button type="submit" id="change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold mt-6 w-full transition-all duration-300">Continue</button>
 				<p class="text-center text-sm text-gray-500 mt-4"> Remember your password?<span id="backToLogin2" class="text-blue-600 hover:underline font-medium cursor-pointer">Login</span></p>

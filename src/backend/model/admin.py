@@ -72,7 +72,6 @@ class Admin:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
-
       def edit_info(self, info, type, id):
             try:
                   with self.db.connect() as con:
@@ -97,8 +96,7 @@ class Admin:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
-            
+
       def is_valid_email(self, email):
             pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
             return re.match(pattern, email) is not None

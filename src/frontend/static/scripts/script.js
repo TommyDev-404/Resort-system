@@ -171,7 +171,7 @@ document.addEventListener('click', (e) => {
 
             document.querySelector('#darkIcon').classList.toggle('hidden'); 
             document.querySelector('#lightIcon').classList.toggle('hidden');
-            lucide.replace();
+            lucide.createIcons();
       }
 
       if (e.target.closest('#profile-shortcut')) switchContent('admin-profile');

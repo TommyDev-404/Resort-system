@@ -38,7 +38,8 @@ function createTable(id, guest_name, checkin, checkout, stay_count, accomodation
                         <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
                               <input type="checkbox" name="select" class="timeout-checkbox hidden peer">
                               <span
-                                    class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition"><i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                    class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition">
+                                    <i data-lucide="check" class="w-4 h-4 text-white"></i>
                               </span>
                         </label>
                   </td>
@@ -51,6 +52,7 @@ function createTable(id, guest_name, checkin, checkout, stay_count, accomodation
                         <button  id="view-full-info" class="text-[14px] bg-purple-700 dark:bg-purple-500 hover:bg-purple-600 p-2 rounded-lg text-white flex items-center gap-1 cursor-pointer"><i class="ti ti-eye text-lg text-white"></i>View Details</button>
                   </td>
             </tr>
+            
       `;
 
       tbody.innerHTML += row;
@@ -792,6 +794,21 @@ document.addEventListener('click', (e) => {
             
       }
 });
+
+document.querySelectorAll('input[name="select"]:checked').forEach(cb => {
+
+      console.log(icon);
+      const icon = this.parentElement.querySelector('i, svg'); 
+      if (!icon) return;
+          if (this.checked) {
+              icon.classList.remove('text-transparent');
+              icon.classList.add('text-white');
+          } else {
+              icon.classList.remove('text-white');
+              icon.classList.add('text-transparent');
+          }
+  });
+  
 
 // submit
 document.addEventListener('submit', async(e) => {

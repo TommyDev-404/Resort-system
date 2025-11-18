@@ -53,7 +53,7 @@ def system_page():
             # Expire outdated promos
             cursor.execute(""" UPDATE promos SET status = 'Expired' WHERE end_date < CURDATE() AND status = 'Active' """)
 
-            # Restore room rates
+            # Restore room rates after promo expired
             cursor.execute(""" 
                   UPDATE accomodation_spaces AS a
                   LEFT JOIN promos AS p
@@ -63,7 +63,7 @@ def system_page():
                   AND LOWER(TRIM(a.promo)) != 'None';
             """)
 
-            #reset salary data 
+            #reset salary data every new week
             cursor.execute(''' 
                   UPDATE staff_details
                   SET 

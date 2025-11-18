@@ -388,7 +388,7 @@ async function drawMostBookedArea() {
                   maintainAspectRatio: false,
                   plugins: {
                         legend: {
-                              position: 'bottom', // move legend below chart
+                              position: 'right', // move legend below chart
                               align: 'center',   // center legend
                               labels: {
                                     color: isDarkMode ? '#F9FAFB' : '#374151', // white in dark mode
