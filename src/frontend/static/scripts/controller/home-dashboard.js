@@ -485,11 +485,11 @@ export async function notifications() {
             let notification = data.name;
 
             const occupancy_notif = `
-                  <div id="redirect-promo" class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
+                  <div id="redirect-promo" class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
                         <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-400 mt-0.5"></i>
                         <div class="flex flex-col flex-1"">
                               <p class="text-sm text-gray-800 dark:text-gray-100">${notification}</p>
-                              <span class="text-xs text-gray-400 mt-1">${time}</span>
+                              <span class="text-xs text-gray-500 mt-1">${time}</span>
                         </div>
                   </div>
             `;
@@ -506,11 +506,11 @@ export async function notifications() {
                   let notification = data.name;
 
                   const housekeeping_notif = `
-                        <div id="housekeeping-notif" class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
+                        <div id="housekeeping-notif" class="notif-item px-4 py-3 flex items-start bg-gray-50 dark:bg-gray-800 gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
                               <i data-lucide="house" class="w-5 h-5 text-blue-400 mt-0.5"></i>
                               <div class="flex flex-col flex-1"">
                                     <p class="text-sm text-gray-800 dark:text-gray-100">${notification+'. Clean now!'}</p>
-                                    <span class="text-xs  text-gray-800 dark:text-gray-400 mt-1">${time}</span>
+                                    <span class="text-xs  text-gray-800 dark:text-gray-500 mt-1">${time}</span>
                               </div>
                         </div>
                   `;

@@ -156,9 +156,9 @@ function renderAddPromoModal(){
                                     </div>
                                     <div class="flex flex-col text-sm dark:text-gray-400 text-gray-700">
                                           Start Promotion Date:
-                                          <input type="date" name="date" required class="border border-gray-200  text-gray-900 dark:text-gray-100 rounded-sm p-4 mb-4">
+                                          <input type="date" name="date" required class="border border-gray-400  text-gray-900 dark:text-gray-100 rounded-sm p-4 mb-4">
                                           End PromotionDate:
-                                          <input type="date" name="end_date" required class="border border-gray-200  text-gray-900 dark:text-gray-100 rounded-sm p-4">
+                                          <input type="date" name="end_date" required class="border border-gray-400  text-gray-900 dark:text-gray-100 rounded-sm p-4">
                                     </div>
                                     <button type="submit" class="w-full bg-primary-blue text-white font-bold py-2 px-4 mt-4 rounded-lg shadow-md hover:bg-blue-700 transition" id="save-promo">Save Promotion</button>
                               </div>

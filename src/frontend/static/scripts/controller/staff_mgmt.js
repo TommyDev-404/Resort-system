@@ -176,11 +176,11 @@ async function renderUpdateAttendanceModal(e){
                               <!-- Attendance Table -->
                               <div class="overflow-x-auto max-h-[350px] border border-gray-200 dark:border-gray-700 rounded-xl">
                                     <table class="w-full text-sm border-collapse">
-                                          <thead class="bg-gray-200 dark:bg-gray-700">
+                                          <thead class="bg-gray-900 dark:bg-gray-700">
                                                 <tr>
-                                                      <th class="p-2 text-center text-gray-700 dark:text-gray-300">Select Here</th>
-                                                      <th class="p-2 text-center text-gray-700 dark:text-gray-300">Staff Name</th>
-                                                      <th class="p-2 text-center text-gray-700 dark:text-gray-300">Time In</th>
+                                                      <th class="p-2 text-center text-white dark:text-gray-300">Select Here</th>
+                                                      <th class="p-2 text-center text-white dark:text-gray-300">Staff Name</th>
+                                                      <th class="p-2 text-center text-white dark:text-gray-300">Time In</th>
                                                 </tr>
                                           </thead>
                                           <tbody id="updateAttendanceTable" class="text-gray-700 dark:text-gray-300">
