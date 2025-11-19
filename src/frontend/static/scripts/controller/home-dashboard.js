@@ -604,6 +604,7 @@ loadingAnimation();
 setTimeout(() => {
       mostBookedArea();
       todayGuest();
+      notifications();
       todayCheckin();
       totalGuestInHouse();
       todayProjectedRevenue();
