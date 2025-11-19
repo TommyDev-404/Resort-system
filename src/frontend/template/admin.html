@@ -201,9 +201,9 @@
 									<span data-lucide="user-check" class="w-6 h-6 dark:text-white text-purple-500 bg-gray-100 dark:bg-purple-500 p-1 rounded-full"></span>
 								</div>
 								<p class="text-4xl font-extrabold mt-3 dark:text-white text-purple-600" id="today-guest">188</p>
-								<div class="text-xs mt-3 flex items-center text-purple-500 font-medium">
-									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
-									<span><label id="change-rate-today-guest">+0</label>% vs Yesterday</span>
+								<div class="text-xs mt-3 flex items-center  text-gray-400 font-medium">
+									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1" id="change-rate-today-guest-icon"></span>
+									<span><label id="change-rate-today-guest" class="text-green-500 text-sm mt-2">+0</label> vs Yesterday</span>
 								</div>
 							</div>
 
@@ -214,9 +214,9 @@
 									<span data-lucide="calendar-plus" class="w-6 h-6 dark:text-white text-blue-500 bg-gray-100 dark:bg-blue-500 p-1 rounded-full"></span>
 								</div>
 								<p class="text-4xl font-extrabold mt-3 dark:text-white text-blue-500" id="check-ins-data">22</p>
-								<div class="text-xs mt-3 flex items-center text-blue-500 font-medium">
-									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
-									<span><label id="change-rate-checkin">+0</label>% vs Yesterday</span>
+								<div class="text-xs mt-3 flex items-center  text-gray-400 font-medium">
+									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1" id="change-rate-checkin-icon"></span>
+									<span><label id="change-rate-checkin" class="text-green-500 text-sm mt-2">+0</label> vs Yesterday</span>
 								</div>
 							</div>
 
@@ -227,9 +227,9 @@
 									<span data-lucide="user-check" class="w-6 h-6 dark:text-white text-teal-500 dark:bg-teal-500 bg-gray-100 p-1 rounded-full"></span>
 								</div>
 								<p class="text-4xl font-extrabold mt-3 dark:text-white text-teal-500" id="total-guest-in-house">188</p>
-								<div class="text-xs mt-3 flex items-center text-teal-500 font-medium">
-									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
-									<span><label id="change-rate-guest">+0</label>% vs Last Week</span>
+								<div class="text-xs mt-3 flex items-center text-gray-400 font-medium">
+									<span data-lucide="arrow-up-right" class="w-4 h-4 mr-1" id="change-rate-guest-icon"></span>
+									<span><label id="change-rate-guest" class="text-green-500 text-sm mt-2">+0</label> vs Last Week</span>
 								</div>
 							</div>
 				
@@ -240,9 +240,9 @@
 									<span data-lucide="dollar-sign" class="w-6 h-6 dark:text-white text-green-500 dark:bg-green-500 bg-gray-100 p-1 rounded-full"></span>
 								</div>
 								<p class="text-4xl font-extrabold mt-3 dark:text-white text-green-500" id="total-revenue">$45,900</p>
-								<div class="text-xs mt-3 flex items-center text-green-500 font-medium">
-									<span id="revenue-this-month" data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
-									<span><label id="target-revenue">-2%</label> vs Target</span>
+								<div class="text-xs mt-3 flex items-center  text-gray-400 font-medium">
+									<span id="target-revenue-icon" data-lucide="arrow-up-right" class="w-4 h-4 mr-1"></span>
+									<span><label id="target-revenue" class="text-green-500 text-sm mt-2">-2%</label> vs Target</span>
 								</div>
 							</div>
 						</div>
@@ -442,7 +442,7 @@
                                           <div>
                                                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Check-Ins <span class="text-[13px] text-gray-400">( This Week )</span> </p>
                                                 <p class="text-4xl font-bold mt-3 text-blue-600 dark:text-white" id="total_checkin">45</p>
-                                                <span class="text-xs text-gray-400"><span id="change_checkins" class="text-green-500 font-semibold">+12%</span> from last week</span>
+                                                <label class="text-xs text-gray-400"><span id="change_checkins_percentage" class="text-green-500 font-semibold">+12%</span> from last week</label>
                                           </div>
                                           <div class="bg-blue-100 dark:bg-blue-500 p-3 rounded-xl"><i data-lucide="log-in" class="w-6 h-6 text-blue-600 dark:text-white"></i></div>
                                     </div>

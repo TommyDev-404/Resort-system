@@ -245,6 +245,14 @@ async function occupancyData(type=null) {
 
       document.getElementById('occupancy-percentage').textContent = `${res.current}%`;
       document.getElementById('occupancy-change').textContent = res.change < 0 ? `${res.change}%` : `+${res.change}%`;
+
+      if (res.change < 0){
+            document.getElementById('occupancy-change').classList.remove('text-green-500');
+            document.getElementById('occupancy-change').classList.add('text-red-500');
+      }else{
+            document.getElementById('occupancy-change').classList.remove('text-red-500');
+            document.getElementById('occupancy-change').classList.add('text-green-500');
+      }
 }
 
 async function adrData(type=null){  
@@ -254,6 +262,14 @@ async function adrData(type=null){
 
       document.getElementById('adr').textContent = Number(res.current).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
       document.getElementById('adr-change').textContent = res.change < 0? `${res.change}%` : `+${res.change}%`;
+
+      if (res.change < 0){
+            document.getElementById('adr-change').classList.remove('text-green-500');
+            document.getElementById('adr-change').classList.add('text-red-500');
+      }else{
+            document.getElementById('adr-change').classList.remove('text-red-500');
+            document.getElementById('adr-change').classList.add('text-green-500');
+      }
 }
 
 async function revparData(type=null){
@@ -263,6 +279,14 @@ async function revparData(type=null){
 
       document.getElementById('revpar').textContent = Number(res.revpar).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
       document.getElementById('revpar-change').textContent = res.change < 0 ? `${res.change}%` : `+${res.change}%`;    
+
+      if (res.change < 0){
+            document.getElementById('revpar-change').classList.remove('text-green-500');
+            document.getElementById('revpar-change').classList.add('text-red-500');
+      }else{
+            document.getElementById('revpar-change').classList.remove('text-red-500');
+            document.getElementById('revpar-change').classList.add('text-green-500');
+      }
 }
 
 async function targetRevenue(){

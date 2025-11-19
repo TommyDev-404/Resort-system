@@ -423,7 +423,23 @@ async function totalGuestInHouse() {
       const res = await response.json();
 
       document.getElementById('total-guest-in-house').textContent = res.today;
-      document.getElementById('change-rate-guest').textContent = res.change > 0 ? `+${res.change}` : `${res.change}`;
+      document.getElementById('change-rate-guest').textContent = res.change > 0 ? `+${res.change}%` : `${res.change}%`;
+
+      if (res.change < 0){
+            document.getElementById('change-rate-guest').classList.remove('text-green-500');
+            document.getElementById('change-rate-guest').classList.add('text-red-500');
+            document.getElementById('change-rate-guest-icon').setAttribute("data-lucide", "arrow-down-left");
+            document.getElementById('change-rate-guest-icon').classList.remove("text-green-500");
+            document.getElementById('change-rate-guest-icon').classList.add("text-red-500");
+      }else{
+            document.getElementById('change-rate-guest').classList.remove('text-red-500');
+            document.getElementById('change-rate-guest').classList.add('text-green-500');
+            document.getElementById('change-rate-guest-icon').setAttribute("data-lucide", "arrow-up-right");
+            document.getElementById('change-rate-guest-icon').classList.remove("text-red-500");
+            document.getElementById('change-rate-guest-icon').classList.add("text-green-500");
+      }
+
+      lucide.createIcons();
 }
 
 async function todayGuest() {
@@ -432,7 +448,23 @@ async function todayGuest() {
       const res = await response.json();
 
       document.getElementById('today-guest').textContent = res.today_guest;
-      document.getElementById('change-rate-today-guest').textContent = res.change > 0 ? `+${res.change}` : `${res.change}`;
+      document.getElementById('change-rate-today-guest').textContent = res.change > 0 ? `+${res.change}%` : `${res.change}%`;
+
+      if (res.change < 0){
+            document.getElementById('change-rate-today-guest').classList.remove('text-green-500');
+            document.getElementById('change-rate-today-guest').classList.add('text-red-500');
+            document.getElementById('change-rate-today-guest-icon').setAttribute("data-lucide", "arrow-down-left");
+            document.getElementById('change-rate-today-guest-icon').classList.remove("text-green-500");
+            document.getElementById('change-rate-today-guest-icon').classList.add("text-red-500");
+      }else{
+            document.getElementById('change-rate-today-guest').classList.remove('text-red-500');
+            document.getElementById('change-rate-today-guest').classList.add('text-green-500');
+            document.getElementById('change-rate-today-guest-icon').setAttribute("data-lucide", "arrow-up-right");
+            document.getElementById('change-rate-today-guest-icon').classList.remove("text-red-500");
+            document.getElementById('change-rate-today-guest-icon').classList.add("text-green-500");
+      }
+
+      lucide.createIcons();
 }
 
 async function todayCheckin() {
@@ -440,7 +472,23 @@ async function todayCheckin() {
       const response = await fetch('/today-checkin', {method: "GET"});
       const res = await response.json();
       document.getElementById('check-ins-data').textContent = res.check_in;
-      document.getElementById('change-rate-checkin').textContent = Number(res.change) < 0  || Number(res.change) == 0 ? `${res.change}` : `+${res.change}`;
+      document.getElementById('change-rate-checkin').textContent = Number(res.change) < 0  || Number(res.change) == 0 ? `${res.change}%` : `+${res.change}%`;
+
+      if (res.change < 0){
+            document.getElementById('change-rate-checkin').classList.remove('text-green-500');
+            document.getElementById('change-rate-checkin').classList.add('text-red-500');
+            document.getElementById('change-rate-checkin-icon').setAttribute("data-lucide", "arrow-down-left");
+            document.getElementById('change-rate-checkin-icon').classList.remove("text-green-500");
+            document.getElementById('change-rate-checkin-icon').classList.add("text-red-500");
+      }else{
+            document.getElementById('change-rate-checkin').classList.remove('text-red-500');
+            document.getElementById('change-rate-checkin').classList.add('text-green-500');
+            document.getElementById('change-rate-checkin-icon').setAttribute("data-lucide", "arrow-up-right");
+            document.getElementById('change-rate-checkin-icon').classList.remove("text-red-500");
+            document.getElementById('change-rate-checkin-icon').classList.add("text-green-500");
+      }
+
+      lucide.createIcons();
 }
 
 async function todayProjectedRevenue(){
@@ -450,6 +498,22 @@ async function todayProjectedRevenue(){
 
       document.getElementById('total-revenue').textContent = Number(res.current_revenue).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
       document.getElementById('target-revenue').textContent = Number(res.change) > 0 ? `+${res.change}%` : `${res.change}%`;
+
+      if (res.change < 0){
+            document.getElementById('target-revenue').classList.remove('text-green-500');
+            document.getElementById('target-revenue').classList.add('text-red-500');
+            document.getElementById('target-revenue-icon').setAttribute("data-lucide", "arrow-down-left");
+            document.getElementById('target-revenue-icon').classList.remove("text-green-500");
+            document.getElementById('target-revenue-icon').classList.add("text-red-500");
+      }else{
+            document.getElementById('target-revenue').classList.remove('text-red-500');
+            document.getElementById('target-revenue').classList.add('text-green-500');
+            document.getElementById('target-revenue-icon').setAttribute("data-lucide", "arrow-up-right");
+            document.getElementById('target-revenue-icon').classList.remove("text-red-500");
+            document.getElementById('target-revenue-icon').classList.add("text-green-500");
+      }
+      
+      lucide.createIcons(); // re-render icons
 }
 
 export async function notifications() {

@@ -350,6 +350,11 @@ function enableActionBtns(e){
                         }
                   }
             });
+      }else{
+            allBtns.forEach(btn => {
+                  btn.style.opacity = '0.4';
+                  btn.style.pointerEvents = 'none';
+            });
       }
 }
 
@@ -700,7 +705,15 @@ async function totalCheckin(){
       const response = await fetch('/total-checkins');
       const result = await response.json();
       document.getElementById('total_checkin').textContent = result.total_checkins;
-      document.getElementById('change_checkins').textContent = result.change >= 0 ? `+${result.change}` : `${result.change}`;
+      document.getElementById('change_checkins_percentage').textContent = result.change >= 0 ? `+${result.change}%` : `${result.change}%`;
+      
+      if (result.change < 0){
+            document.getElementById('change_checkins_percentage').classList.remove('text-green-500');
+            document.getElementById('change_checkins_percentage').classList.add('text-red-500');
+      }else{
+            document.getElementById('change_checkins_percentage').classList.remove('text-red-500');
+            document.getElementById('change_checkins_percentage').classList.add('text-green-500');
+      }
 }
 
 async function upcomingArrivals(){
@@ -729,7 +742,14 @@ async function getTotalsCountData() {
       }
 }
 
-async function bookingsCategories(e){
+async function bookingsCategories(e){ 
+      // disable btns when navigating 
+      const allBtns = document.querySelectorAll('.btn');
+      allBtns.forEach(btn => {
+            btn.style.opacity = '0.4';
+            btn.style.pointerEvents = 'none';
+      });
+
       const tabItem = e.target.closest('.tab-item'); // ensures we get the button
       if (!tabItem) return; // safety check
 
@@ -792,10 +812,20 @@ document.addEventListener('click', (e) => {
             if (e.target.closest('#close-reservation-overlay')) document.querySelector('#update-reservation-overlay').remove();
             if (e.target.closest('.remove-btn')) removeAccomodation(e);
       }
-      
 });
 
+// submit
+document.addEventListener('submit', async(e) => {
+      if (e.target.matches('#markpaid-form')) submitPayment(e);
+      if (e.target.matches('#addBookingForm')) addBooking(e);
+      if (e.target.matches('#update-reserved-form')) updateReservationDate(e);
+});
+
+// select tags  
 document.addEventListener('change', (e) => {
+      if (e.target.matches('#yearSelect')) recentBookings();
+      if (e.target.matches('#monthSelect')) recentBookings();
+      if (e.target.matches('input[name="select"]')) enableActionBtns(e);
       if (e.target.matches('input[name="select"]')) {
             const checkbox = e.target;
             document.querySelectorAll('input[name="select"]').forEach(cb => {
@@ -820,20 +850,6 @@ document.addEventListener('change', (e) => {
                   icon.classList.remove('text-white');
             }
       }
-});
-
-// submit
-document.addEventListener('submit', async(e) => {
-      if (e.target.matches('#markpaid-form')) submitPayment(e);
-      if (e.target.matches('#addBookingForm')) addBooking(e);
-      if (e.target.matches('#update-reserved-form')) updateReservationDate(e);
-});
-
-// select tags  
-document.addEventListener('change', (e) => {
-      if (e.target.matches('#yearSelect')) recentBookings();
-      if (e.target.matches('#monthSelect')) recentBookings();
-      if (e.target.matches('input[name="select"]')) enableActionBtns(e);
 });
 
 
