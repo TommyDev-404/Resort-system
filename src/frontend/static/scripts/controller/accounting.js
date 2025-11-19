@@ -1,11 +1,14 @@
 
 
 function createRow(date, direct, online){
+      const online_payment =  Number(online).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })
+      const direct_payment =  Number(direct).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })
+      
       const row = `
             <tr class="fade-in-up z-10 text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700">
                   <td class="px-6 py-4 text-center whitespace-nowrap">${date}</td>
-                  <td class="px-6 py-4 text-center  whitespace-nowrap">₱${online}</td>
-                  <td class="px-6 py-4 text-center  whitespace-nowrap">₱${direct}</td>
+                  <td class="px-6 py-4 text-center  whitespace-nowrap">${online_payment}</td>
+                  <td class="px-6 py-4 text-center  whitespace-nowrap">${direct_payment}</td>
             </tr>
       `;
 
@@ -35,9 +38,9 @@ async function getSummaryData() {
       const response = await fetch('/accounting-data');
       const result = await response.json();
 
-      document.getElementById('direct-payment').textContent = `₱${result.direct}`;
-      document.getElementById('online-payment').textContent = `₱${result.online}`;
-      document.getElementById('booking-revenue').textContent = `₱${result.total_revenue}`;
+      document.getElementById('direct-payment').textContent = Number(result.direct).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+      document.getElementById('online-payment').textContent = Number(result.online).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+      document.getElementById('booking-revenue').textContent = Number(result.total_revenue).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
 }
 
 async function loadBookingRevenue(year) {
