@@ -150,7 +150,7 @@ document.addEventListener('click', (e) => {
       
       // toggle sidebar
       if (e.target.closest('#toggleSidebar')){
-            header.classList.toggle("left-62");
+            header.classList.toggle("left-70");
             logoText.classList.toggle('max-w-[160px]');
             logoText.classList.toggle('opacity-100');
             sidebar.classList.toggle('w-[280px]');

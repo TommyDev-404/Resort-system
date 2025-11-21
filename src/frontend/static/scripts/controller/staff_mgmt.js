@@ -623,12 +623,12 @@ async function viewStaffInfo(id){
 }
 
 async function showAllStaff(){
+      document.querySelectorAll('ul li').forEach(row => row.remove());      
       try{
             const response = await fetch('/all-staff', {});
             const result = await response.json();
 
             if (result.success){
-                  document.querySelectorAll('ul li').forEach(row => row.remove());      
                   result.data.forEach(staff => {
                         createStaffListRow(staff.id, staff.staff_name, staff.position, staff.status);
                   });
@@ -829,6 +829,10 @@ async function addStaffAttendance(e){
                   showAllStaff();
             }else{
                   failedMessageCard(result.message);
+                  document.querySelector('#bulkAttendanceModal').remove();
+                  allStaffAttendance();
+                  sumarryCards();
+                  showAllStaff();
             }
       }catch(err){
             console.error(err);
@@ -869,6 +873,9 @@ async function updateStaffAttendance(e){
                   sumarryCards();
             }else{
                   failedMessageCard(result.message);
+                  document.querySelector('#updateAttendanceModal').remove();
+                  allStaffAttendance();
+                  sumarryCards();
             }
       }catch(err){
             console.error(err);
@@ -894,6 +901,9 @@ async function updateStaffInfo(e){
                   sumarryCards();
             }else{
                   failedMessageCard(result.message);
+                  document.querySelector('#updateStaffModal').remove();
+                  showAllStaff();
+                  sumarryCards();
             }
       }catch(err){
             console.error(err);
@@ -1058,7 +1068,7 @@ async function removeStaff(id){
             const result = await response.json();
 
             if (result.success){
-                  success(result.message);
+                  successMessageCard(result.message);
                   showAllStaff();
                   sumarryCards();
             }else{

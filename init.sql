@@ -1,5 +1,5 @@
 -- new 
-insert into notifications(name, date, room_name, room_no) VALUES ('temporary', CURRENT_DATE(), 'occupancy', 0)
+insert into notifications(name, date, room_name, room_no) VALUES ('temporary', CURRENT_DATE() - INTERVAL 1 DAY, 'occupancy', 0)
 
 -- CREATE DATABASE
 CREATE DATABASE resort_db;
@@ -32,7 +32,7 @@ CREATE TABLE bookings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- accomodation data table
-CREATE TABLE full_texts (
+CREATE TABLE accomodation_data (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     booking_id INT(11) NOT NULL,
     check_in DATE NOT NULL,

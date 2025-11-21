@@ -37,7 +37,7 @@ class Staff_Management:
                         
                         con.commit()
 
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if bool(cursor.rowcount != 0) else 'Failed'}
+                        return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if bool(cursor.rowcount != 0) else 'Failed! Either data not changed or something went wrong.'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}

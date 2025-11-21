@@ -31,7 +31,7 @@ db = pymysql.connect( host="localhost", user="root", password="", database="reso
 cursor = db.cursor() # Use the connection directly
 
 # 4️⃣ Loop through dataframe and insert
-count = 0
+count = 1
 for index, row in df.iterrows():
     cursor.execute("""
         INSERT INTO bookings (name, check_in, check_out, accomodations,  total_guest, payment, status, booking_type, total_amount)
@@ -39,9 +39,9 @@ for index, row in df.iterrows():
     """, (row['name'], row['check'], row['checkout'], row.acc, row['totalguest'], row['payment'], 'Checked-out', 'Walk-in', row['am']) )
 
     cursor.execute("""
-        INSERT INTO accomodation_data (check_in, check_out, premium, standard, garden, barkada, family, cabana, small, big, hall, total)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """, (row['check'], row['checkout'], row['pr'], row['st'], row['gar'], row['bd'], row['fm'], row['cb'], row['sm'], row['bg'], row['h'], row['total'] ))
+        INSERT INTO accomodation_data (booking_id, check_in, check_out, premium, standard, garden, barkada, family, cabana, small, big, hall, total)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (count, row['check'], row['checkout'], row['pr'], row['st'], row['gar'], row['bd'], row['fm'], row['cb'], row['sm'], row['bg'], row['h'], row['total'] ))
     
     count+=1
 # 5️⃣ Commit and close

@@ -17,8 +17,8 @@ class Accounting:
                                     COALESCE(SUM(CASE WHEN payment = 'ZUZU (Online Payment)' THEN total_amount ELSE 0 END), 0) AS online
                               FROM bookings
                               WHERE YEAR(check_in) = %s
-                              GROUP BY YEAR(check_in), MONTH(check_in), MONTHNAME(check_in)
-                              ORDER BY YEAR(check_in), MONTH(check_in);
+                              GROUP BY month_year
+                              ORDER BY MIN(check_in);
                         ''', (year))
                         data = cursor.fetchall()
 
