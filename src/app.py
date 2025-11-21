@@ -467,20 +467,3 @@ def logout():
 
 if __name__ == '__main__':
       app.run(debug=True)
-
-
-"""
-CREATE TABLE bookings (
-      booking_id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100) NOT NULL,
-      total_guest INT NOT NULL,
-      booking_type ENUM('Reservation', 'Walk-in', 'Day Guest') NOT NULL,
-      status ENUM('Reserved', 'Checked-in', 'Checked-out', 'Completed', 'Cancelled', 'No-show') DEFAULT 'Reserved',
-      payment_type ENUM('Direct', 'Online') NOT NULL,
-      payment_status ENUM('Pending', 'Paid', 'Refunded') DEFAULT 'Pending',
-      accomodations JSON,  -- store selected room types or IDs
-      check_in DATE NOT NULL,
-      check_out DATE NOT NULL,
-      total_amount DECIMAL(10,2) DEFAULT 0.00
-);
-"""

@@ -68,8 +68,8 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
             <tr data-room="${room_name}">
                   <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">${room_no}</td>
                   <td class="px-4 py-3"><span class="px-2 py-1 rounded-full ${bg_color} text-xs font-semibold">${new_status}</td>
-                  <td class="px-4 py-3 text-gray-700 dark:text-gray-100">${assign_staff}</td>
-                  <td class="px-4 py-3 text-gray-700 dark:text-gray-100">${ date !== '0000-00-00' ? formattedDate : "--" }</td>
+                  <td class="px-4 py-3 text-gray-700 dark:text-gray-100">${assign_staff !== null ? assign_staff : "--" }</td>
+                  <td class="px-4 py-3 text-gray-700 dark:text-gray-100">${ date !== null ? formattedDate : "--" }</td>
                   <td class="px-4 py-3">
                         <button class="room-action-btn text-sm ${btn_color} text-white py-2 px-3 rounded-md cursor-pointer" id="${action_name === 'View Info' ? 'view-info' : action_name === 'Mark Ready' ? 'mark-ready' : 'assign-staff'}">${icon}</button>
                   </td>

@@ -228,7 +228,7 @@ class Analytics:
                         cursor.execute('''
                               SELECT 
                                     check_in AS ds,
-                                    total AS y
+                                    sum(total) AS y
                               FROM accomodation_data
                               GROUP BY check_in
                               ORDER BY check_in

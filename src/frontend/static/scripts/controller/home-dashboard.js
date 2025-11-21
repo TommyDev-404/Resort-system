@@ -643,6 +643,7 @@ function createMostBookedArea(area_name, percentage){
 async function mostBookedArea() {
       const area = document.getElementById('top-booked-area');
       area.querySelectorAll('div').forEach(row => row.remove());
+      
       try{
             const response = await fetch('/top-booked-area');
             const res = await response.json();

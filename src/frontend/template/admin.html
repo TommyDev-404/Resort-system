@@ -52,10 +52,10 @@
 	</style>
 </head>
 
-<body class="flex bg-gray-200 dark:bg-gray-800 text-gray-100 max-h-screen font-[Inter]">
+<body class="flex bg-gray-200 fixed w-full dark:bg-gray-800 text-gray-100 max-h-screen font-[Inter]">
 
 	<!-- SIDEBAR -->
-	<aside id="sidebar" class="dark:bg-gray-900 bg-white flex flex-col relative transition-all duration-500 ease-in-out shadow-lg w-17 relative z-50">
+	<aside id="sidebar" class="dark:bg-gray-900 bg-white flex flex-col transition-all duration-500 ease-in-out shadow-lg w-17 relative z-50 h-screen">
 		<!-- HEADER / LOGO AREA -->
 		<div class="absolute top-3 left-0 w-full border-b border-gray-300 dark:border-gray-700 pb-6 flex items-center justify-between px-4 transition-all duration-300 ease-in-out">
 			<div id="logoText" class="flex items-center gap-2 whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0">
@@ -69,58 +69,59 @@
 		</div>
 
 		<!-- NAV LINKS -->
-		<nav class="relative flex flex-col mt-24 gap-2 w-full text-[16px] ">
-			<span class="text-[12px] dark:text-gray-500 text-gray-900 font-semibold whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 ml-6">MENU</span>
-
-			<div id="nav-home-dashboard" data-section="home-dashboard"  class="sidebar-item flex items-center gap-3 cursor-pointer text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10  transition-all rounded-sm px-3 py-4 duration-300 ease-in-out">
-				<i data-lucide="home" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Dashboard<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-			
-			<div id="nav-analytics" data-section="analytics" class="sidebar-item flex items-center gap-3 cursor-pointer text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4 transition-all duration-300 ease-in-out">
-				<i data-lucide="bar-chart-3" class="w-5 h-5 ml-3"></i>
-				<span class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Analytics & Reports<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-			
-			<div id="nav-all-reservations" data-section="all-reservations"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10  rounded-sm px-3 py-4  duration-300 ease-in-out">
-				<i data-lucide="calendar-check" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Manage Bookings<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-
-			<div id="nav-housekeeping" data-section="housekeeping"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
-				<i data-lucide="sparkles" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Housekeeping<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-
-			<div  id="nav-rates-availability" data-section="rates-availability" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
-				<i data-lucide="calendar" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Rates & Availability<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-
-                  <div id="nav-accounting" data-section="accounting" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
-				<i data-lucide="wallet" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Accounting<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-			
-			<div  id="nav-revenue-management" data-section="revenue-management" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
-				<i data-lucide="trending-up" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText"class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Revenue Management<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-
-			<div id="nav-staff-management" data-section="staff-management" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
-				<i data-lucide="users" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Staff Management<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-
-			<div id="nav-admin-profile" data-section="admin-profile"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
-				<i data-lucide="user" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Admin Profile<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
-
-			<!-- Divider -->
-			<div class="border-t border-white/10 mt-25"></div>
-				
-			<div id="nav-logout" data-section="logout"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4 duration-300 ease-in-out">
+		<nav class="relative flex flex-col mt-24 w-full text-[16px] justify-between h-full">
+                  <div class="flex flex-col gap-2">
+                        <span class="text-[12px] dark:text-gray-500 text-gray-900 font-semibold whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 ml-6">MENU</span>
+                        <div id="nav-home-dashboard" data-section="home-dashboard"  class="sidebar-item flex items-center gap-3 cursor-pointer text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10  transition-all rounded-sm px-3 py-4 duration-300 ease-in-out">
+                              <i data-lucide="home" class="w-5 h-5 ml-3"></i>
+                              <span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Dashboard<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+                        
+                        <div id="nav-analytics" data-section="analytics" class="sidebar-item flex items-center gap-3 cursor-pointer text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4 transition-all duration-300 ease-in-out">
+                              <i data-lucide="bar-chart-3" class="w-5 h-5 ml-3"></i>
+                              <span class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Analytics & Reports<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+                        
+                        <div id="nav-all-reservations" data-section="all-reservations"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10  rounded-sm px-3 py-4  duration-300 ease-in-out">
+                              <i data-lucide="calendar-check" class="w-5 h-5 ml-3"></i>
+                              <span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Manage Bookings<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+      
+                        <div id="nav-housekeeping" data-section="housekeeping"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+                              <i data-lucide="sparkles" class="w-5 h-5 ml-3"></i>
+                              <span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Housekeeping<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+      
+                        <div  id="nav-rates-availability" data-section="rates-availability" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+                              <i data-lucide="calendar" class="w-5 h-5 ml-3"></i>
+                              <span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Rates & Availability<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+      
+                        <div id="nav-accounting" data-section="accounting" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+                              <i data-lucide="wallet" class="w-5 h-5 ml-3"></i>
+                              <span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Accounting<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+                        
+                        <div  id="nav-revenue-management" data-section="revenue-management" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+                              <i data-lucide="trending-up" class="w-5 h-5 ml-3"></i>
+                              <span id="dashboardText"class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Revenue Management<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+      
+                        <div id="nav-staff-management" data-section="staff-management" class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+                              <i data-lucide="users" class="w-5 h-5 ml-3"></i>
+                              <span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Staff Management<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+      
+                        <div id="nav-admin-profile" data-section="admin-profile"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4  duration-300 ease-in-out">
+                              <i data-lucide="user" class="w-5 h-5 ml-3"></i>
+                              <span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Admin Profile<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+                        </div>
+      
+                        <!-- Divider -->
+                        <div class="border-t border-black/10 dark:border-white/10"></div>
+                  </div>			
+                  
+			<div id="nav-logout" data-section="logout"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4 duration-300 ease-in-out mb-4">
 				<i data-lucide="log-out" class="w-5 h-5 ml-3"></i>
 				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Log Out<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
 			</div>
