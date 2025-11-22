@@ -39,9 +39,9 @@ for index, row in df.iterrows():
     """, (row['name'], row['check'], row['checkout'], row.acc, row['totalguest'], row['payment'], 'Checked-out', 'Walk-in', row['am']) )
 
     cursor.execute("""
-        INSERT INTO accomodation_data (booking_id, check_in, check_out, premium, standard, garden, barkada, family, cabana, small, big, hall, total)
+        INSERT INTO accomodation_data (check_in, check_out, premium, standard, garden, barkada, family, cabana, small, big, hall, total)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """, (count, row['check'], row['checkout'], row['pr'], row['st'], row['gar'], row['bd'], row['fm'], row['cb'], row['sm'], row['bg'], row['h'], row['total'] ))
+    """, (row['check'], row['checkout'], row['pr'], row['st'], row['gar'], row['bd'], row['fm'], row['cb'], row['sm'], row['bg'], row['h'], row['total'] ))
     
     count+=1
 # 5️⃣ Commit and close

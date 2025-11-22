@@ -33,8 +33,7 @@ CREATE TABLE bookings (
 
 -- accomodation data table
 CREATE TABLE accomodation_data (
-    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    booking_id INT(11) NOT NULL,
+    booking_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     check_in DATE NOT NULL,
     check_out DATE NOT NULL,
     premium INT(11) DEFAULT 0,

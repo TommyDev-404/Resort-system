@@ -260,6 +260,19 @@ function switchTabs(){
       });
 }
 
+function resetToDefaultTabItem(){
+      const tabs = document.querySelectorAll(".tab-item");
+      const tab_all_data = document.getElementById("all-data");
+
+      tabs.forEach(t => {
+            t.classList.remove("text-blue-500", "border-blue-500", "bg-black/10", "dark:bg-white/10", "rounded-t-sm");
+            t.classList.add("text-gray-600", "border-gray-300");
+      });\
+      // Activate the clicked tab
+      tab_all_data.classList.add("text-blue-500", "border-blue-500", "bg-black/10", "dark:bg-white/10", "rounded-t-sm");
+      tab_all_data.classList.remove("text-gray-600", "border-gray-300");
+}
+
 function resetButtonAndCheckBox(){
       const checkboxes = document.querySelectorAll('input[name="select"]');
       const allBtns = document.querySelectorAll('.btn');
@@ -635,14 +648,15 @@ async function recentBookings(){
 
       const response = await fetch(`/recent-bookings?year=${year}&month=${month}`);
       const result = await response.json();
+      
+      document.querySelectorAll('tbody tr').forEach(row => row.remove());      
+      resetToDefaultTabItem();
 
       if (result.success){
-            document.querySelectorAll('tbody tr').forEach(row => row.remove());      
             result.data.forEach(row => {
                   createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['status'], row['payment']);
             });
       }else {
-            document.querySelectorAll('tbody tr').forEach(row => row.remove());
             const empty_row = `
                   <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="7" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
