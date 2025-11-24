@@ -1,3 +1,4 @@
+lucide.createIcons() 
 
 const input = document.querySelector('input[name="password"]');
 const loginForm = document.getElementById('loginForm');

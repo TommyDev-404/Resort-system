@@ -267,7 +267,7 @@ function resetToDefaultTabItem(){
       tabs.forEach(t => {
             t.classList.remove("text-blue-500", "border-blue-500", "bg-black/10", "dark:bg-white/10", "rounded-t-sm");
             t.classList.add("text-gray-600", "border-gray-300");
-      });\
+      });
       // Activate the clicked tab
       tab_all_data.classList.add("text-blue-500", "border-blue-500", "bg-black/10", "dark:bg-white/10", "rounded-t-sm");
       tab_all_data.classList.remove("text-gray-600", "border-gray-300");

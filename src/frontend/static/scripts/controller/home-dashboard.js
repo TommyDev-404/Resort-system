@@ -526,7 +526,7 @@ export async function notifications() {
       
       if (Number(res.count) != 0){
             document.getElementById('notification-count').classList.add('px-1.5', 'py-0.5');
-            document.getElementById('notification-count').textContent = `${res.count}+` ;
+            document.getElementById('notification-count').textContent = `${res.count} +` ;
       }else{
             document.getElementById('notification-count').classList.remove('px-1.5', 'py-0.5');
             document.getElementById('notification-count').textContent = '';
