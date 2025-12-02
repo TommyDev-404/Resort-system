@@ -241,10 +241,14 @@ class Staff_Management:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' DELETE FROM staff_details WHERE id = %s''', (id,))
-                        cursor.execute(''' DELETE FROM staff_attendance WHERE staff_id = %s''', (id,))
-                        con.commit()
+                        del_staff = cursor.rowcount
 
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Removed successfully!' if bool(cursor.rowcount != 0) else 'Failed'}
+                        cursor.execute(''' DELETE FROM staff_attendance WHERE staff_id = %s''', (id,))
+                        del_staff_attendance = cursor.rowcount
+                        con.commit()
+                        success = (del_staff + del_staff_attendance) > 0
+
+                        return {'success': True if success > 0 else False, 'message': 'Removed successfully!' if success > 0 else 'Failed'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
@@ -333,7 +337,7 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
-      def staff_summary_cards(self):
+      def staff_summary_cards(self, month, day):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -352,14 +356,14 @@ class Staff_Management:
 
                                     (SELECT COUNT(*) 
                                     FROM staff_attendance 
-                                    WHERE status <> 'Absent' 
-                                    AND date = CURRENT_DATE()
+                                    WHERE status IN ('Present (Whole Day)', 'Present (Half Day)', 'Present (Overtime)')
+                                    AND MONTH(date) = %s AND DAY(date) = %s  AND YEAR(date) = YEAR(CURRENT_DATE())
                                     ) AS today_duty,
 
                                     (SELECT COUNT(*) 
                                     FROM staff_attendance 
                                     WHERE status = 'Absent'
-                                    AND date = CURRENT_DATE()
+                                    AND MONTH(date) = %s AND DAY(date) = %s AND YEAR(date) = YEAR(CURRENT_DATE())
                                     ) AS today_absent,
 
                                     (SELECT COUNT(*) 
@@ -367,7 +371,7 @@ class Staff_Management:
                                     WHERE date >= (SELECT sunday_date FROM last_week_sunday)
                                     AND date < (SELECT sunday_date FROM this_week_sunday)
                                     ) AS total_leave;
-                        ''')
+                        ''', (month, day, month, day))
                         stats = cursor.fetchone()
 
 

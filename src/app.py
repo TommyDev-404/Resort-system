@@ -132,9 +132,13 @@ def today_guest():
 def occupancy_all():
       return jsonify(dashboard.forecast_occupancy())
 
-@app.route('/today-checkin', methods=['GET'])
+@app.route('/bookings-overview-data', methods=['GET'])
 def checkin():
-      return jsonify(dashboard.todays_checkin())
+      return jsonify(dashboard.bookings_overview_cards_data())
+
+@app.route('/today-bookings', methods=['GET'])
+def bookings():
+      return jsonify(dashboard.today_bookings())
 
 @app.route('/occupancy', methods=['GET'])
 def occupancy():
@@ -156,6 +160,30 @@ def most_booked_area():
 def top_booked_area():
       return jsonify(dashboard.top_most_booked_area())
 
+@app.route('/upcoming-checkout', methods=['GET'])
+def upcoming_checkout():
+      return jsonify(dashboard.upcoming_checkouts())
+
+@app.route('/upcoming-arrival', methods=['GET'])
+def upcoming_arrival():
+      return jsonify(dashboard.upcoming_arrival())
+
+@app.route('/occupied-room', methods=['GET'])
+def occupied_room():
+      return jsonify(dashboard.occupied_room())
+
+@app.route('/monthly-bookings', methods=['GET'])
+def monthly_bookings():
+      return jsonify(dashboard.monthly_bookings_data())
+
+@app.route('/booking-type-ditribution', methods=['GET'])
+def booking_type_distro():
+      return jsonify(dashboard.booking_type_distro())
+
+@app.route('/revenue-guest-trend', methods=['GET'])
+def revenue_guest_trend():
+      return jsonify(dashboard.revenue_guest_trend_data())
+
 
 #----------------- ANALYTICS ------------------#
 @app.route('/mtd-occupancy-all', methods=['GET'])
@@ -166,21 +194,21 @@ def mtd_occupancy_all():
 def mtd_occupancy_type():
       return jsonify(analytics.get_occupancy(request.args.get('accomodation_type')))
 
-@app.route('/mtd-adr-all', methods=['GET'])
-def mtd_adr_all():
-      return jsonify(analytics.get_adr())
+@app.route('/daily-revenue-all', methods=['GET'])
+def daily_revenue_all():
+      return jsonify(analytics.daily_revenue())
 
-@app.route('/mtd-adr-type', methods=['GET'])
-def mtd_adr_type():
-      return jsonify(analytics.get_adr(request.args.get('accomodation_type')))
+@app.route('/daily-revenue-type', methods=['GET'])
+def daily_revenue_type():
+      return jsonify(analytics.daily_revenue(request.args.get('accomodation_type')))
 
-@app.route('/mtd-revpar-all', methods=['GET'])
-def mtd_revpar_all():
-      return jsonify(analytics.get_revpar())
+@app.route('/monthly-revenue-all', methods=['GET'])
+def monthly_all():
+      return jsonify(analytics.monthly_revenue())
 
-@app.route('/mtd-revpar-type', methods=['GET'])
-def mtd_revpar_type():
-      return jsonify(analytics.get_revpar(request.args.get('accomodation_type')))
+@app.route('/monthly-revenue-type', methods=['GET'])
+def monthly_revenuetype():
+      return jsonify(analytics.monthly_revenue(request.args.get('accomodation_type')))
 
 @app.route('/checkin-forecast-all', methods=['GET'])
 def occupancy_forecast():
@@ -207,6 +235,10 @@ def target_revenue():
 @app.route('/avl-spaces', methods=['GET'])
 def avl_spaces():
       return jsonify(reserve.get_avl_spaces())
+
+@app.route('/summary-cards-data', methods=['GET'])
+def summary_cards_data():
+      return jsonify(reserve.summaryCardsData())
 
 @app.route('/avl-rooms', methods=['GET'])
 def avl_rooms():
@@ -236,18 +268,6 @@ def category_bookings():
 def current_bookings():
       return jsonify(reserve.current_bookings())
 
-@app.route('/today-checkouts', methods=['GET'])
-def today_checkouts():
-      return jsonify(reserve.todays_checkout())
-
-@app.route('/total-checkins', methods=['GET'])
-def total_checkin():
-      return jsonify(reserve.total_checkin())
-
-@app.route('/upcoming-arrivals', methods=['GET'])
-def upcoming_arrivals():
-      return jsonify(reserve.arrivals())
-
 @app.route('/get-years', methods=['GET'])
 def get_years():
       return jsonify(reserve.get_year_data())
@@ -272,10 +292,6 @@ def cancel_booking():
 def view_details(id):
       return jsonify(reserve.view_details(id))
 
-@app.route('/cancelled-bookings', methods=['GET'])
-def cancelled():
-      return jsonify(reserve.total_cancelled())
-
 @app.route('/get-reservation-date', methods=['GET'])
 def reservation_date():
       return jsonify(reserve.get_reservation_date(request.args.get('id')))
@@ -287,6 +303,10 @@ def update_reservation_date():
 @app.route('/get-data-to-update', methods=['GET'])
 def get_data_to_update():
       return jsonify(reserve.get_data_to_update(request.args.get('id')))
+
+@app.route('/search-guest', methods=['GET'])
+def search_guest():
+      return jsonify(reserve.search_guest(request.args.get('name'), request.args.get('year'), request.args.get('month'), request.args.get('category')))
 
 
 #--------------- HOUSEKEEPING ------------------#
@@ -426,9 +446,9 @@ def add_staff_attendance():
 def update_staff_attendance():
       return jsonify(staff.update_staff_attendance(request.get_json()))
 
-@app.route('/summary-cards-data', methods=['GET'])
+@app.route('/summary-cards', methods=['GET'])
 def summary_cards():
-      return jsonify(staff.staff_summary_cards())
+      return jsonify(staff.staff_summary_cards(request.args.get('month'), request.args.get('day')))
 
 @app.route('/thisweek-onleave-data', methods=['GET'])
 def on_leave():

@@ -43,8 +43,8 @@ class RatesAndAvailability:
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'garden',
-                                    7 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN garden ELSE 0 END),
-                                    7 - SUM(CASE WHEN check_out >= CURRENT_DATE() + INTERVAL 1 DAY THEN garden ELSE 0 END)
+                                    12 - SUM(CASE WHEN check_in = CURRENT_DATE() THEN garden ELSE 0 END),
+                                    12 - SUM(CASE WHEN check_out >= CURRENT_DATE() + INTERVAL 1 DAY THEN garden ELSE 0 END)
                               FROM accomodation_data
                               UNION ALL
                               SELECT 'cabana',
@@ -92,12 +92,11 @@ class RatesAndAvailability:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
-
       def update_price(self, price, name):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' UPDATE  accomodation_spaces SET rate = %s WHERE name = %s ''', (price, name))
+                        cursor.execute(''' UPDATE  accomodation_spaces SET rate = %s, orig_rate = %s WHERE name = %s ''', (price, price, name))
                         con.commit()
 
                         return {'success' : bool(cursor.rowcount != 0), 'message': 'Price updated successfully!' if bool(cursor.rowcount != 0) else 'Failed to update.'}

@@ -33,7 +33,7 @@ function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupie
             <tr data-room="${acc_name}" class="fade-in-up border-b border-gray-200 dark:border-gray-700">
                   <td class="px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">${acc_name}</td>
                   <td class="px-6 py-4 text-gray-800 dark:text-gray-100">${acc_count}</td>
-                  <td class="px-6 py-4 text-blue-600 dark:text-gray-blue-500 font-bold">${need_clean}</td>
+                  <td class="px-6 py-4 ${Number(need_clean) > 0 ? 'text-red-600' : 'text-blue-600'} dark:text-gray-blue-500 font-bold">${need_clean}</td>
                   <td class="px-6 py-4 text-yellow-600 dark:text-gray-yellow-500 font-bold">${on_clean}</td>
                   <td class="px-6 py-4 text-green-600  dark:text-green-blue-500 font-bold">${ready}</td>
                   <td class="px-6 py-4 text-purple-600 dark:text-purple-blue-500 font-bold">${occupied}</td>

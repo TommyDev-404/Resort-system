@@ -1,4 +1,3 @@
-lucide.createIcons() 
 
 const input = document.querySelector('input[name="password"]');
 const loginForm = document.getElementById('loginForm');
@@ -10,6 +9,7 @@ const backToLogin2 = document.getElementById('backToLogin2');
 const linkChangePass = document.getElementById('link-change-pass');
 const loginOverlay = document.querySelector('.login-overlay');
 
+lucide.createIcons() 
 
 /*---------------- LOGIN EVENT LISTENER ----------------*/
 forgotLink.addEventListener('click', () => {
@@ -33,7 +33,7 @@ backToLogin.addEventListener('click', () => {
 // remove password icon & show eye icon
 input.addEventListener('input', (e) => {
       const img = document.querySelector('.passField img');
-      console.log(e.target.value);
+      
       if (e.target.value != ''){
             img.src = 'static/assets/eye.png';
             img.setAttribute('id', 'show');

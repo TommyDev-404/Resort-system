@@ -79,11 +79,11 @@ function renderEditModal(type, value){
             <div id="editModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                   <div class="bg-white dark:bg-gray-900 p-6 rounded-xl w-96 relative  fade-in-up">
                         <h3 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">Edit ${type}</h3>
-                              <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="text" name="${type ==+ "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border border-gray-400 rounded text-gray-900 dark:text-gray-100" placeholder="Enter ${type}" value="${value}">
-                              <div class="flex justify-end gap-2">
-                                    <button id="cancel" type="button" class="px-4 py-2 bg-gray-600 dark:bg-white/15 dark:hover:bg-white/10 text-white rounded hover:bg-gray-500">Cancel</button>
-                                    <button id="change${type === "Contact Number" ? "ContactNumber" : type}" type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Change</button>
-                              </div>
+                        <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="text" name="${type === "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border border-gray-400 rounded text-gray-900 dark:text-gray-100" placeholder="Enter ${type}" value="${value}">
+                        <div class="flex justify-end gap-2">
+                              <button id="cancel" type="button" class="px-4 py-2 bg-gray-600 dark:bg-white/15 dark:hover:bg-white/10 text-white rounded hover:bg-gray-500">Cancel</button>
+                              <button id="change${type === "Contact Number" ? "ContactNumber" : type}" type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Change</button>
+                        </div>
                   </div>
             </div>
       `;
@@ -187,9 +187,9 @@ async function changePass(e) {
 }
 
 async function editInfo(type) {
-      const value = document.getElementById(`input${type === "Contact" ? "ContactNumber" : type}`).value;
+      const value = document.getElementById(`input${type === "Contact Number" ? "ContactNumber" : type}`).value;
 
-      const response = await fetch(`/edit-info?info=${value}&type=${type}&id=${1}`, {
+      const response = await fetch(`/edit-info?info=${value}&type=${type === 'Contact Number' ? 'contact' : type.toLowerCase()}&id=${1}`, {
             method: 'POST', 
             headers: {'Content-Type': 'application/json'}
       });
@@ -210,7 +210,7 @@ async function adminProfile() {
 
       if (result.success){
             const formatDate = new Date(result.data.date_pass_change).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
-            console.log(formatDate);
+            
             adminName.textContent = result.data.username;
             adminEmail.textContent = result.data.email;
             adminNum.textContent = result.data.contact;
@@ -226,7 +226,7 @@ adminProfile();
 document.addEventListener('click', (e) => {
       // open modals
       if (e.target.matches('#change-pass')) renderChangePassword(adminEmail.textContent);
-      if (e.target.matches('#change-name')) renderEditModal('Name', adminName.textContent);
+      if (e.target.matches('#change-name')) renderEditModal('Username', adminName.textContent);
       if (e.target.matches('#change-num')) renderEditModal('Contact Number', adminNum.textContent);
       if (e.target.matches('#change-email')) renderEditModal('Email', adminEmail.textContent);
 
@@ -246,8 +246,8 @@ document.addEventListener('click', (e) => {
       
       // submit / change info
       if(e.target.matches('#changeEmail')) editInfo("Email");
-      if(e.target.matches('#changeName')) editInfo("Name");
-      if(e.target.matches('#changeContactNumber')) editInfo("Contact");
+      if(e.target.matches('#changeUsername')) editInfo("Username");
+      if(e.target.matches('#changeContactNumber')) editInfo("Contact Number");
 
       // submit 6-digit code
       if(e.target.matches('#submitCode')) changePassv2(e);

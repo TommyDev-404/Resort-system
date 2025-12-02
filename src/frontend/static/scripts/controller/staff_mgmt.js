@@ -439,8 +439,8 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
                         <td class="py-3 px-10 text-center text-sm">${date}</td>
                         <td class="py-3 px-10 text-center text-sm">${time_in}</td> 
                         <td class="py-3 px-10 text-center text-sm">${time_out}</td> 
-                        <td class="py-3 px-6 text-center" text-sm>
-                              <label class="text-[12px] font-semibold py-1 px-3 rounded-2xl ${status === "Absent"  ? 'text-green-600 bg-red-100 dark:text-white dark:bg-red-500' : 'text-green-600 bg-green-100 dark:text-white dark:bg-green-500'}">${status}</label>
+                        <td class="py-3 px-6 text-center" >
+                              <label class="text-xs font-semibold py-1 px-3 rounded-2xl ${status === "Absent"  ? 'text-green-600 bg-red-100 dark:text-white dark:bg-red-500' : 'text-green-600 bg-green-100 dark:text-white dark:bg-green-500'}">${status}</label>
                         </td>
                   </tr>
             `;
@@ -456,9 +456,13 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
                         </td> 
                         <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_in}</td> 
                         <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_out}</td> 
-                        <td class="py-3 px-10 text-center text-sm">${date}</td>
+                        <td class="py-3 px-10 text-center text-sm">
+                              <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                                    ${date}
+                              </div>
+                        </td>
                         <td class="py-3 px-6 text-center w-[200px]">
-                              <label class="text-[12px] font-semibold py-1 px-3 rounded-2xl w-full overflow-x-auto scroll-hide whitespace-nowrap
+                              <label class="text-xs font-semibold py-1 px-3 rounded-2xl w-full overflow-x-auto scroll-hide whitespace-nowrap
                                     ${status === "Absent"  ? 'text-green-600 bg-red-100 dark:text-white dark:bg-red-500' :
                                     status === '--' ? 'text-gray-900 dark:text-white ' :
                                     'text-green-600 bg-green-100 dark:text-white dark:bg-green-500' 
@@ -476,55 +480,26 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
       lucide.createIcons();
 }
 
-function markAllAsPresent(){
-      const radios = document.querySelectorAll('.attendance-radio');
-      const groups = {};
-
-      radios.forEach(r => {
-            const name = r.name;
-            groups[name] = groups[name] || [];
-            groups[name].push(r);
-      });
-
-      Object.values(groups).forEach(group => {
-            const present = group.find(r => r.value === "Present");
-            if (present) present.checked = true;
-      });
-}
-
 function selectAllCheckboxes() {
-      const checkboxes = document.querySelectorAll('.timeout-checkbox');
-      checkboxes.forEach(cb => cb.checked = true);
+      const checkboxes = document.querySelectorAll('input[name="select_staff"]');
+
+      checkboxes.forEach(cb => {
+            cb.checked = true;          // check the checkbox
+            markCheckIcon(cb);          // update icon
+      });
 
       lucide.createIcons();
 }
 
 function unselectAllCheckboxes() {
-      const checkboxes = document.querySelectorAll('.timeout-checkbox');
-      checkboxes.forEach(cb => cb.checked = false);
+      const checkboxes = document.querySelectorAll('input[name="select_staff"]');
+
+      checkboxes.forEach(cb => {
+            cb.checked = false;          // check the checkbox
+            markCheckIcon(cb);          // update icon
+      });
 
       lucide.createIcons();
-}
-
-function markAllAsAbsent(){
-      const radios = document.querySelectorAll('.attendance-radio');
-      const groups = {};
-
-      radios.forEach(r => {
-            const name = r.name;
-            groups[name] = groups[name] || [];
-            groups[name].push(r);
-      });
-
-      Object.values(groups).forEach(group => {
-            const absent = group.find(r => r.value === "Absent");
-            if (absent) absent.checked = true;
-      });
-}
-
-function resetAll(){
-      const radios = document.querySelectorAll('.attendance-radio');
-      radios.forEach(r => r.checked = false);
 }
 
 function enableTimeOutBtn(){
@@ -557,8 +532,7 @@ function changeAttendanceType(type){
       wrapper.style.opacity = type ==="Absent" ? '0.4' : '1';
 }
 
-function markCheckIcon(e){
-      const checkbox = e.target;
+function markCheckIcon(checkbox){
       const span = checkbox.nextElementSibling;
       const icon = span.querySelector('svg, i');
 
@@ -569,7 +543,6 @@ function markCheckIcon(e){
             icon.classList.add('text-transparent');
             icon.classList.remove('text-white');
       }
-
 }
 
 // --------- DATA FETCHING FUNCTIONS -----------------
@@ -1005,7 +978,7 @@ async function searchStaff(name){
             if (result.success){
                   document.querySelectorAll('ul li').forEach(row => row.remove());      
                   result.data.forEach(staff => {
-                        createStaffListRow(staff.id, staff.staff_name, staff.position);
+                        createStaffListRow(staff.id, staff.staff_name, staff.position, staff.status);
                   });
             }else{
                   document.querySelectorAll('ul li').forEach(row => row.remove());      
@@ -1045,6 +1018,7 @@ async function sortAttendanceData(){
 
                         createStaffAttendanceRow(staff.staff_id, staff.name, staff.time_in, staff.time_out, formattedDate, staff.status);
                   });
+
             }else{
                   isAttendanceNotEmpty = true;
                   const empty_row = `
@@ -1055,6 +1029,8 @@ async function sortAttendanceData(){
                   
                   document.getElementById('attendanceTable').innerHTML += empty_row; 
             }
+            
+            sumarryCards();
       }catch(err){
             console.error(err);
       }
@@ -1107,11 +1083,14 @@ async function removeStaffAttendance(e){
       }
 }
 
-async function sumarryCards(id){
+async function sumarryCards(){
+      const month = document.getElementById('monthSelect2').value;
+      const day = document.getElementById('daySelect').value;
+      
       try{
-            const response = await fetch(`/summary-cards-data`);
+            const response = await fetch(`/summary-cards?month=${month}&day=${day}`);
             const result = await response.json();
-
+            console.log(result);
             if (result.success){
                   const data = result.data;
                   
@@ -1139,9 +1118,6 @@ document.addEventListener('click', (e) => {
       if (e.target.closest('#removeStaffAttendance')) removeStaffAttendance(e);
       if (e.target.closest('#viewOnLeave')) showAllOnLeave();
 
-      if (e.target.closest('#markAllPresent')) markAllAsPresent();
-      if (e.target.closest('#markAllAbsent')) markAllAsAbsent();
-      if (e.target.closest('#resetAll')) resetAll();
       if (e.target.closest('#selectAll')) selectAllCheckboxes();
       if (e.target.closest('#resetAllSelected')) unselectAllCheckboxes();
 
@@ -1162,9 +1138,8 @@ document.addEventListener('change', (e) => {
       if (e.target.closest('#monthSelect2')) sortAttendanceData();
       if (e.target.closest('#daySelect')) sortAttendanceData();
       if (e.target.closest('#attendanceType')) changeAttendanceType(e.target.value);
-      if (e.target.matches('input[name="select_staff"]')) markCheckIcon(e);
+      if (e.target.matches('input[name="select_staff"]')) markCheckIcon(e.target);
 });
-
 
 document.addEventListener('submit', (e) => {
       if (e.target.matches('#addStaffForm')) addStaff(e);

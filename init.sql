@@ -11,7 +11,7 @@ CREATE TABLE bookings (
     booking_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     total_guest INT(11) NOT NULL,
-    booking_type ENUM('Reservation', 'Walk-in', 'Day Guest')NOT NULL,
+    booking_type ENUM('Reservation', 'Check-in', 'Day Guest')NOT NULL,
     payment ENUM(
         'Direct Payment',
         'ZUZU (Online Payment)',
@@ -105,10 +105,11 @@ CREATE TABLE notifications (
 -- staff attendance table
 CREATE TABLE staff_attendance (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    staff_id INT(11) NOT NULL,
     time_in VARCHAR(20) NOT NULL,
     time_out VARCHAR(20) NOT NULL,
     date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('Present (Whole Day)', 'Present (Half Day)', 'Absent', '--', 'Present (Overtime)') NOT NULL,
+    status ENUM('Present (Whole Day)', 'Present (Half Day)', 'Absent', '--', 'Present (Overtime)') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- staff details
@@ -236,3 +237,48 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- auto checkout guest event
+DELIMITER $$
+
+CREATE EVENT IF NOT EXISTS auto_checkout_guests
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_DATE
+DO
+BEGIN
+    -- 1. Update booking status
+    UPDATE bookings
+    SET status = 'Checked-out'
+    WHERE check_out <= CURRENT_DATE AND MONTH(check_out) = MONTH(CURRENT_DATE) AND YEAR(check_out) = YEAR(CURRENT_DATE)
+    AND status = 'Checked-in';
+
+    -- 2. Update accomodation_spaces for rooms that just checked out
+    UPDATE accomodation_spaces a
+    JOIN bookings b
+      ON a.name = TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1))
+     AND a.room = CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED)
+    SET a.status = 'need-clean'
+    WHERE check_out <= CURRENT_DATE AND MONTH(check_out) = MONTH(CURRENT_DATE) AND YEAR(check_out) = YEAR(CURRENT_DATE)
+      AND b.status = 'Checked-out';
+
+    -- 3. Insert notifications for housekeeping
+    INSERT INTO notifications(name, date, room_name, room_no)
+    SELECT CONCAT('(System check-out): Housekeeping requested for ', b.accomodations),
+           NOW(),
+           TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1)) ,
+           CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED)
+    FROM bookings b
+    WHERE check_out <= CURRENT_DATE AND MONTH(check_out) = MONTH(CURRENT_DATE) AND YEAR(check_out) = YEAR(CURRENT_DATE)
+      AND b.status = 'Checked-out';
+END$$
+
+DELIMITER ;
+
+
+-- check event if its turn on
+SHOW VARIABLES LIKE 'event_scheduler';
+
+-- turned on the event
+SET GLOBAL event_scheduler = ON;
+
+

@@ -78,9 +78,9 @@ function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_
 
       const modal = `
             <div class="absolute top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="updatepromo-overlay">
-                  <div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card-bg dark:bg-gray-900 py-2 pb-4 px-[20px] max-w-[800px] rounded-lg shadow-lg fade-in-up">
-                        <span id="close-updatepromo-modal" class="text-[26px] flex justify-end text-gray-900 dark:text-gray-200 cursor-pointer">&times;</span>
-                        <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100 text-center">Update Promotions</h3>
+                  <div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card-bg dark:bg-gray-900 py-3 pb-4 px-[20px] max-w-[900px] rounded-lg shadow-lg fade-in-up">
+                        <span id="close-updatepromo-modal" class="text-[26px] absolute right-4 text-gray-900 dark:text-gray-200 cursor-pointer">&times;</span>
+                        <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100 text-center mt-2">Update Promotions</h3>
                         <form id="updatePromosForm">
                               <div class="space-y-4">
                                     <input type="hidden" name="id" value="${id}">
@@ -95,8 +95,8 @@ function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_
                                           <input type="number" id="promo_rate" name="promo_rate" value="${Number(discount)}" class="mt-1 block w-full rounded-md border-gray-400 shadow-sm text-gray-900 dark:text-gray-100 p-2 border focus:border-primary-blue focus:ring-primary-blue">
                                     </div>
                                     <div class="bg-gray-50 dark:bg-gray-800 border border-gray-400 rounded-sm p-4">
-                                          <h2 class="font-semibold text-[19px] text-gray-900 dark:text-gray-200 mb-4">Area's to apply promotion: </h2>
-                                          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                          <h2 class="font-semibold text-[19px] text-gray-900 dark:text-gray-200 mb-2 text-center">Area's to apply promotion: </h2>
+                                          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full text-sm">
                                                 <label class="border bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-gray-400 p-2 rounded-lg flex gap-2 dark:hover:bg-white/3 hover:bg-green-200"><input type="checkbox" name="areas_promo" value="Premium" ${isChecked('Premium')}>Premium Villa Room</label>
                                                 <label class="border bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-gray-400 p-2 rounded-lg flex gap-2 dark:hover:bg-white/3 hover:bg-green-200"><input type="checkbox" name="areas_promo" value="Standard" ${isChecked('Standard')}>Standard Villa Room</label>
                                                 <label class="border bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-gray-400 p-2 rounded-lg flex gap-2 dark:hover:bg-white/3 hover:bg-green-200"><input type="checkbox" name="areas_promo" value="Garden" ${isChecked('Garden')}>Garden View Room</label>
@@ -127,9 +127,9 @@ function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_
 function renderAddPromoModal(){
       const modal = `
             <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-50" id="promo-overlay">
-                  <div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card-bg dark:bg-gray-900 py-2 pb-4 px-[20px] max-w-[800px] rounded-xl shadow-lg fade-in-up">
-                        <span id="close-promo-modal" class="text-[26px] flex justify-end cursor-pointer dark:text-white text-gray-900">&times;</span>
-                        <h3 class="text-xl font-semibold mb-4 text-center dark:text-white text-gray-900">Add Promotions</h3>
+                  <div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card-bg dark:bg-gray-900 py-2 pb-4 px-[20px] max-w-[900px] rounded-xl shadow-lg fade-in-up">
+                        <span id="close-promo-modal" class="text-[26px] absolute right-4 cursor-pointer dark:text-white text-gray-900">&times;</span>
+                        <h3 class="text-xl font-semibold mb-4 mt-2 text-center dark:text-white text-gray-900">Add Promotions</h3>
                         <form id="promosForm">
                               <div class="space-y-4">
                                     <div>
@@ -141,8 +141,8 @@ function renderAddPromoModal(){
                                           <input type="number" required id="promo_rate" name="promo_rate" class="mt-1 block  text-gray-900 dark:text-gray-100 w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-primary-blue focus:ring-primary-blue">
                                     </div>
                                     <div class="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-400 rounded-sm p-4">
-                                          <h2 class="font-semibold text-[19px] mb-4 dark:text-gray-200 text-gray-900">Area's to apply promotion: </h2>
-                                          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                          <h2 class="font-semibold text-[19px] mb-4 dark:text-gray-200 text-gray-900 text-center">Area's to apply promotion: </h2>
+                                          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full text-sm">
                                                 <label class="border bg-white dark:bg-gray-900 border-gray-400 p-2 rounded-lg flex gap-2 dark:hover:bg-white/3 hover:bg-green-200 dark:text-gray-400 text-gray-700"><input type="checkbox" name="areas_promo" value="Premium">Premium Villa Room</label>
                                                 <label class="border bg-white dark:bg-gray-900 border-gray-400 p-2 rounded-lg flex gap-2 dark:hover:bg-white/3 hover:bg-green-200 dark:text-gray-400 text-gray-700"><input type="checkbox" name="areas_promo" value="Standard">Standard Villa Room</label>
                                                 <label class="border bg-white dark:bg-gray-900 border-gray-400 p-2 rounded-lg flex gap-2 dark:hover:bg-white/3 hover:bg-green-200 dark:text-gray-400 text-gray-700"><input type="checkbox" name="areas_promo" value="Garden">Garden View Room</label>
@@ -216,6 +216,7 @@ async function updatePromo(e) {
             e.target.reset();
             document.querySelector('#updatepromo-overlay').remove();
             getAllPromo();
+            notifications();
       }else{
             failedMessageCard(res.message);
       }

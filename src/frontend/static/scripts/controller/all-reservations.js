@@ -2,6 +2,7 @@ import { notifications} from "./home-dashboard.js";
 
 const tbody = document.getElementById('tbody');
 let savedAccomodations = [];
+let category_data = 'all-data';
 
 // ---------------- RENDER HELPERS ------------------
 function successMessageCard(message, redirect=null){
@@ -31,7 +32,7 @@ function failedMessageCard(message){
       document.getElementById('messagePortal').innerHTML += msg;
 }
 
-function createTable(id, guest_name, checkin, checkout, stay_count, accomodations, status, payment_status){
+function createTable(id, guest_name, checkin, checkout, stay_count, accomodations, booking_type, status, payment_status){
       const row = `
             <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up" id="${id}" data-set="${accomodations}">
                   <td class="px-3 py-4">
@@ -43,13 +44,32 @@ function createTable(id, guest_name, checkin, checkout, stay_count, accomodation
                               </span>
                         </label>
                   </td>
-                  <td class="px-4 py-4"><span class="font-medium">${guest_name}</span></td>
-                  <td class="px-4 py-4"><span>${checkin} - ${checkout} <label class="text-gray-400 text-sm">(${stay_count} Nights)</label></span></td>
-                  <td class="px-6 py-4"><span>${accomodations}</span></td>
-                  <td class="px-5 py-4 text-blue-600 font-semibold text-[14px]"><span class="px-3 py-1 text-xs rounded-full ${status === 'Reserved' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500' : status === 'Cancelled' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500' : status === 'Checked-out' ? 'text-secondary-gold bg-yellow-100  dark:text-white dark:bg-yellow-500' : 'text-blue-700 bg-blue-100 dark:text-white dark:bg-blue-500'}">${status}</span></td>
-                  <td class="px-5 py-4 text-yellow-600 font-semibold text-[14px]"><span class="px-3 py-1 text-xs rounded-full ${payment_status === 'ZUZU (Online Payment)' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500' : payment_status === 'Refunded' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500' : payment_status === 'Direct Payment' ? 'text-blue-700 bg-blue-100  dark:text-white dark:bg-blue-500' : 'text-yellow-700 bg-yellow-100 dark:text-white dark:bg-yellow-500'}">${payment_status}</span></td>
+                  <td class="px-4 py-4">
+                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">      
+                              <span class="font-medium">${guest_name}</span></td>
+                        </div>
+                  <td class="px-4 py-4">
+                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                              <span>${checkin} - ${checkout} <label class="text-gray-400 text-sm">${stay_count > 0 ? `(${stay_count} Nights)` : '' }</label></span></td>
+                        </div>
+                  <td class="px-6 py-4">
+                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">      
+                              <span>${accomodations}</span></td>
+                        </div>
+                  <td class="px-6 py-4">
+                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                              <span>${booking_type}</span></td>
+                        </div>
+                  <td class="px-5 py-4 text-blue-600 font-semibold text-[14px]">
+                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                              <span class="px-3 py-1 text-xs rounded-full ${status === 'Day Guest' ? 'text-teal-700 bg-teal-100 dark:text-white dark:bg-teal-500' : status === 'Reserved' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500' : status === 'Cancelled' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500' : status === 'Checked-out' ? 'text-secondary-gold bg-yellow-100  dark:text-white dark:bg-yellow-500' : 'text-blue-700 bg-blue-100 dark:text-white dark:bg-blue-500'}">${status}</span></td>
+                        </div>
+                  <td class="px-5 py-4 text-yellow-600 font-semibold text-[14px]">
+                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                              <span class="px-3 py-1 text-xs rounded-full ${payment_status === 'ZUZU (Online Payment)' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500' : payment_status === 'Refunded' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500' : payment_status === 'Direct Payment' ? 'text-orange-700 bg-orange-100  dark:text-white dark:bg-orange-500' : 'text-yellow-700 bg-yellow-100 dark:text-white dark:bg-yellow-500'}">${payment_status}</span></td>
+                        </div>
                   <td class="px-4 py-4 flex justify-center gap-2">
-                        <button  id="view-full-info" class="text-[14px] bg-purple-700 dark:bg-purple-500 hover:bg-purple-600 p-2 rounded-lg text-white flex items-center gap-1 cursor-pointer"><i class="ti ti-eye text-lg text-white"></i>View Details</button>
+                        <button  id="view-full-info" class="text-[14px] bg-purple-700 dark:bg-purple-500 hover:bg-purple-600 p-2 rounded-lg text-white flex items-center gap-1 cursor-pointer"><i data-lucide="eye" class="w-5 h-5"></i></button>
                   </td>
             </tr>
             
@@ -63,7 +83,7 @@ function renderAddBookingModal(){
       avl_spaces();
       const form  = `
             <div id="booking-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
-                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-3xl relative p-8 fade-in-up">
+                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-3xl relative px-8 py-4 fade-in-up">
                         <span id="close-add-booking" class="absolute top-4 right-4 text-gray-500 dark:text-gray-200 dark:hover:text-gray-400 hover:text-gray-700 text-3xl font-light cursor-pointer">&times;</span>
                         <div class="text-center mb-6">
                               <h2 class="text-xl font-bold text-gray-700 dark:text-white">Add Booking</h2>
@@ -79,18 +99,18 @@ function renderAddBookingModal(){
             
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                          <select id="booking_type" name="inquiry_type" class="border border-gray-300 text-gray-800 dark:text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
-                                                <option value="" selected disabled>Select Inquiry Type</option>
-                                                <option value="Reservation">Reservation (Booked in advance)</option>
-                                                <option value="Walk-in">Walk-in (No prior booking)</option>
-                                                <option value="Day Guest">Day Guest (Swim or Tour only)</option>
+                                          <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-600 dark:text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                                <option class="text-gray-600 " value="" selected disabled>Select Booking Category</option>
+                                                <option class="text-gray-600 " value="Reservation">Reservation (Advance Booking)</option>
+                                                <option class="text-gray-600" value="Check-in">Check-in (Walk-in Booking)</option>
+                                                <option class="text-gray-600" value="Day Guest">Day Guest (Amenities Only)</option>
                                           </select>
-            
-                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
-                                                <option value="" selected disabled>Select Payment Method</option>
-                                                <option value="Direct Payment">Direct Payment</option>
-                                                <option value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
-                                                <option value="Pending">Pending</option>
+
+                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-600 dark:text-gray-100 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
+                                                <option class="text-gray-600 "  value="" selected disabled>Select Payment Method</option>
+                                                <option class="text-gray-600 "  value="Direct Payment">Direct Payment</option>
+                                                <option class="text-gray-600 "  value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
+                                                <option class="text-gray-600 "  value="Pending">Pending</option>
                                           </select>
                                     </div>
                               </section>
@@ -108,10 +128,10 @@ function renderAddBookingModal(){
                                           <label class="btn-acc bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-center cursor-pointer transition-all" data-section="Big Cottage">Big Cottage (<span id="count-b"></span>)</label>
                                           <label class="btn-acc bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-center cursor-pointer transition-all" data-section="Hall">Halls (<span id="count-h"></span>)</label>
                                     </div>
-            
+                        
                                     <div class="mt-4 text-sm">
                                           <label class="text-gray-600 dark:text-gray-100 block mb-1 font-medium">Selected Accommodations:</label>
-                                          <div id="selected-accomodations" class="grid grid-cols-4 gap-2 border border-gray-200 rounded-md p-3 bg-gray-50 dark:bg-gray-800 h-30 overflow-y-auto"></div>
+                                          <div id="selected-accomodations" class="grid grid-cols-4 gap-2 border border-gray-200 rounded-md p-3 bg-gray-50 dark:bg-gray-800 h-17 overflow-y-auto"></div>
                                           <input type="hidden" name="accomodations_selected">
                                     </div>
                               </section>
@@ -213,22 +233,14 @@ function saveAccomodationRoom(){
       checked.forEach(cb => {
             if (!savedAccomodations.includes(cb.value)) savedAccomodations.push(cb.value);
 
-            const tag = `<label class="h-10 bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg inline-flex justify-between items-center gap-2 text-white text-sm font-medium shadow-sm transition" id="${cb.value.split(' ')[0]}"> ${cb.value} <span class="remove-btn text-lg font-bold cursor-pointer" data-acc="${cb.value}">&times;</span></label>`;
+            const tag = `<label class="h-10 bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg inline-flex justify-between items-center gap-2 text-white text-sm font-medium shadow-sm transition" id="${cb.value.split(' ').join('-')}"> ${cb.value} <span class="remove-btn text-lg font-bold cursor-pointer"  data-acc="${cb.value}">&times;</span></label>`;
             document.querySelector("#selected-accomodations").innerHTML += tag;
       });
 
       document.querySelector('input[name="accomodations_selected"]').value = savedAccomodations;
-      closeAccomodationRoom();
-}
-
-function resetCheckedAccomodation(){
-      const checked = document.querySelectorAll('input[name="avl"]:checked');
-      checked.forEach(cb => {
-            cb.checked = false;
-            savedAccomodations = savedAccomodations.filter(item => item !== cb.value);
-      });
       
-      document.querySelector('input[name="accomodations_selected"]').value = savedAccomodations;
+      console.log(savedAccomodations);
+      closeAccomodationRoom();
 }
 
 function closeAccomodationRoom(){
@@ -302,8 +314,8 @@ function enableActionBtns(e){
       if (anyChecked.length > 0) {
             const tr = e.target.closest('tr');
             const id = tr.getAttribute('id');
-            const status = tr.querySelectorAll('td')[4].textContent.trim();
-            const payment = tr.querySelectorAll('td')[5].textContent.trim();
+            const status = tr.querySelectorAll('td')[5].textContent.trim();
+            const payment = tr.querySelectorAll('td')[6].textContent.trim();
 
             // --- Apply your conditions
             allBtns.forEach(btn => {
@@ -312,9 +324,9 @@ function enableActionBtns(e){
                   const reservationDate = new Date(`${date[0]}${year}`);
                   const checkoutDate = new Date(`${date[1]}${year}`);
                   const todayDate = new Date();
-
                   // Paid
                   if (payment !== 'Pending') {
+                        console.log(payment);
                         // enable check-out btn only
                         if (status === 'Checked-in' && checkoutDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid') {
                               btn.style.opacity = '1';
@@ -374,11 +386,12 @@ function enableActionBtns(e){
 function removeAccomodation(e){
       const acc = e.target.dataset.acc;
       const index = savedAccomodations.indexOf(acc);
-      
+      console.log(acc, index);
       if (index > -1) savedAccomodations.splice(index, 1);
 
-      document.querySelector(`#${acc.split(' ')[0]}`).remove();
+      document.querySelector(`#${acc.split(' ').join('-')}`).remove();
       document.querySelector('input[name="accomodations_selected"]').value = savedAccomodations;
+      console.log(savedAccomodations);
 }
 
 function retrieveCheckboxId(){
@@ -416,8 +429,7 @@ async function addBooking(e){
                   successMessageCard(result.message);
                   document.querySelector('#booking-overlay').remove();
                   recentBookings();
-                  totalCheckin();
-                  upcomingArrivals();
+                  summaryCards();
                   savedAccomodations.length =  0; // empty the array
             }else{
                   successMessageCard(result.message);
@@ -444,7 +456,7 @@ async function markAsCheckout(){
             notifications();
             successMessageCard(result.message);
             recentBookings();
-            todayCheckouts();
+            summaryCards();
             resetButtonAndCheckBox();
       }else{
             failedMessageCard(result.message);
@@ -465,9 +477,8 @@ async function markAsCheckin(){
 
       if (result.success){
             successMessageCard(result.message);
-            totalCheckin();
+            summaryCards();
             recentBookings();
-            upcomingArrivals();
             resetButtonAndCheckBox();
       }else{
             failedMessageCard(result.message);
@@ -489,9 +500,7 @@ async function cancelBooking(){
       if (result.success){
             successMessageCard(result.message);
             recentBookings();
-            totalCancelled();
-            totalCheckin();
-            upcomingArrivals();
+            summaryCards
             resetButtonAndCheckBox();
       }else{
             failedMessageCard(result.message);
@@ -654,12 +663,12 @@ async function recentBookings(){
 
       if (result.success){
             result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['status'], row['payment']);
+                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             const empty_row = `
                   <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="7" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
+                        <td colspan="8" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
                   </tr>
             `;
             
@@ -674,13 +683,13 @@ async function currentBookings(){
       if (result.success){
             document.querySelectorAll('tbody tr').forEach(row => row.remove());      
             result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['status'], row['payment']);
+                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
             const empty_row = `
                   <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="7" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
+                        <td colspan="8" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
                   </tr>
             `;
             
@@ -703,37 +712,30 @@ async function getYears(){
       });
 }
 
-async function todayCheckouts(){
-      const response = await fetch('/today-checkouts');
+async function summaryCards(){
+      const response = await fetch('/summary-cards-data');
       const result = await response.json();
-      document.getElementById('today_checkouts').textContent = result.today_checkouts;
-}
-
-async function totalCancelled(){
-      const response = await fetch('/cancelled-bookings');
-      const result = await response.json();
-      document.getElementById('cancelled').textContent = result.cancelled;
-}
-
-async function totalCheckin(){
-      const response = await fetch('/total-checkins');
-      const result = await response.json();
-      document.getElementById('total_checkin').textContent = result.total_checkins;
-      document.getElementById('change_checkins_percentage').textContent = result.change >= 0 ? `+${result.change}%` : `${result.change}%`;
       
-      if (result.change < 0){
-            document.getElementById('change_checkins_percentage').classList.remove('text-green-500');
-            document.getElementById('change_checkins_percentage').classList.add('text-red-500');
-      }else{
-            document.getElementById('change_checkins_percentage').classList.remove('text-red-500');
-            document.getElementById('change_checkins_percentage').classList.add('text-green-500');
-      }
-}
+      if (result.success){
+            const data = result.data;
 
-async function upcomingArrivals(){
-      const response = await fetch('/upcoming-arrivals');
-      const result = await response.json();
-      document.getElementById('upcoming_arrivals').textContent = result.upcoming_checkin;
+            document.getElementById('total_guest_today').textContent = data.total_guests;
+
+            document.getElementById('guest-checkin').textContent = Number(data.guests_checkin) !== 0 ? `(${data.guests_checkin} guests)` : `(No guests)`;
+            document.getElementById('total_checkin').textContent = data.bookings_checkin;
+            
+            document.getElementById('guest-checkout').textContent = Number(data.guests_checkout) !== 0 ? `(${data.guests_checkout} guests)` : `(No guests)`;
+            document.getElementById('total_checkout').textContent = data.bookings_checkout;
+
+            document.getElementById('guest-day-guest').textContent = Number(data.guests_day) !== 0 ? `(${data.guests_day} guests)` : `(No guests)`;
+            document.getElementById('day_guests_today').textContent = data.bookings_day; 
+
+            document.getElementById('guest-upcoming').textContent = Number(data.guests_upcoming) !== 0 ? `(${data.guests_upcoming} guests)` : `(No guests)`;
+            document.getElementById('upcoming_arrivals').textContent = data.bookings_upcoming; 
+
+            document.getElementById('guest-cancel').textContent = Number(data.guests_cancelled) !== 0 ? `(${data.guests_cancelled} guests)` : `(No guests)`;
+            document.getElementById('cancelled').textContent = data.bookings_cancelled;
+      }
 }
 
 async function getTotalsCountData() {
@@ -746,6 +748,7 @@ async function getTotalsCountData() {
       if (result.success){
             document.getElementById('all-data').querySelector('span').textContent = `+${result.all}`;
             document.getElementById('reserved-data').querySelector('span').textContent = `+${result.reserved}`;
+            document.getElementById('day-guest').querySelector('span').textContent = `+${result.day_guest}`;
             document.getElementById('check_out-data').querySelector('span').textContent = `+${result.checkout}`;
             document.getElementById('check_in-data').querySelector('span').textContent = `+${result.checkin}`;
             document.getElementById('cancelled-reservation-data').querySelector('span').textContent = `+${result.cancelled}`;
@@ -770,17 +773,42 @@ async function bookingsCategories(e){
       const category = tabItem.getAttribute('id'); // now this always works
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
-      
+      category_data = category;
+
       const response = await fetch(`/category-bookings?year=${year}&month=${month}&category=${category}`);
       const result = await response.json();
 
       if (result.success){
             document.querySelectorAll('tbody tr').forEach(row => row.remove());      
             result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['status'], row['payment']);
+                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
+            const empty_row = `
+                  <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="8" class="text-center bg-gray-50 dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
+                  </tr>
+            `;
+            
+            tbody.innerHTML += empty_row;
+      }
+}
+
+async function searchGuest(e){ 
+      const name = e.target.value;
+      const year = document.getElementById('yearSelect').value;
+      const month = document.getElementById('monthSelect').value;
+
+      const response = await fetch(`/search-guest?name=${name}&year=${year}&month=${month}&category=${category_data}`);
+      const result = await response.json();
+      console.log(result);
+      document.querySelectorAll('tbody tr').forEach(row => row.remove());      
+      if (result.success){
+            result.data.forEach(row => {
+                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['status'], row['payment']);
+            });
+      }else {
             const empty_row = `
                   <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="7" class="text-center bg-gray-50 dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
@@ -814,7 +842,7 @@ document.addEventListener('click', (e) => {
       if (e.target.matches('label')){
             if (e.target.closest('.btn-acc')) showAccomodationAvlForm(e);
             if (e.target.closest('#select-accomodation-avl')) saveAccomodationRoom();
-            if (e.target.closest('#reset-accomodation-avl')) resetCheckedAccomodation();
+            //if (e.target.closest('#reset-accomodation-avl')) resetCheckedAccomodation();
       }
 
       // span click
@@ -866,6 +894,9 @@ document.addEventListener('change', (e) => {
       }
 });
 
+document.addEventListener('input', (e) => {
+      if (e.target.matches('input[name="guest-name"]')) searchGuest(e);
+});
 
 // -------------- Initialiaze when loaded -----------
 getYears();
@@ -875,10 +906,7 @@ getTotalsCountData();
 export function initPageReservation(){
       getTotalsCountData();
       resetDropDown();
-      todayCheckouts();
       currentBookings();
-      totalCheckin();
-      totalCancelled();
-      upcomingArrivals();
+      summaryCards();
 }
 
