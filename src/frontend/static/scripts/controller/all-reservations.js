@@ -203,11 +203,11 @@ function renderMarkPaidModal(){
                         <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Payment</h2>
                         <form id="markpaid-form">
                               <div class="flex flex-col gap-6 mt-2">
-                                    <select id="mark-payment" class="border border-gray-300 p-4 rounded-sm" required>
+                                    <select id="mark-payment" class="border border-gray-300 p-4 rounded-sm text-gray-800 dark:text-white" required>
                                           <option value=""  selected disabled>Select Payment</option>
-                                          <option value="Direct Payment">Direct Payment</option>
-                                          <option value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
-                                          <option value="Pending">Pending</option>
+                                          <option class="text-gray-900" value="Direct Payment">Direct Payment</option>
+                                          <option class="text-gray-900" value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
+                                          <option class="text-gray-900" value="Pending">Pending</option>
                                     </select> 
                                     <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Done</button>      
                               </div>

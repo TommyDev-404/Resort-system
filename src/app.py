@@ -128,10 +128,6 @@ def total_guest_in_house():
 def today_guest():
       return jsonify(dashboard.today_guest())
 
-@app.route('/occupancy-forecast', methods=['GET'])
-def occupancy_all():
-      return jsonify(dashboard.forecast_occupancy())
-
 @app.route('/bookings-overview-data', methods=['GET'])
 def checkin():
       return jsonify(dashboard.bookings_overview_cards_data())
@@ -186,6 +182,10 @@ def revenue_guest_trend():
 
 
 #----------------- ANALYTICS ------------------#
+@app.route('/occupancy-forecast', methods=['GET'])
+def occupancy_all():
+      return jsonify(analytics.forecast_occupancy())
+
 @app.route('/mtd-occupancy-all', methods=['GET'])
 def mtd_occupancy_all():
       return jsonify(analytics.get_occupancy())

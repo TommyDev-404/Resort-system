@@ -9,10 +9,11 @@ class Dashboard:
       #---------------- HELPERS ----------------#
       def _response(self, success, message=None, data=None, **kwargs):
             return {'success': success, 'message': message, 'data': data, **kwargs}
-
+      
       def get_total_guest_house(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
+
                   cursor.execute('''
                         WITH 
                         today_total AS (
@@ -48,7 +49,7 @@ class Dashboard:
                   data = cursor.fetchone()
 
                   return {'today': data.get('latest_total_guest') , 'change': data.get('change_rate_percent')}
-            
+
       def today_guest(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -157,24 +158,6 @@ class Dashboard:
 
                   return {'current_revenue': data.get('today_revenue'), 'change': data.get('achievement_percent')}
 
-      def forecast_occupancy(self):
-            with self.db.connect() as con:
-                  cursor = con.cursor()
-                  cursor.execute('''
-                        SELECT
-                              check_in as ds,
-                              ROUND((SUM(total) / 54) * 100, 2) AS y
-                        FROM accomodation_data
-                        GROUP BY check_in
-                        ORDER BY check_in;
-                  ''')
-            data = cursor.fetchall()
-
-            dates = [row.get('ds') for row in data]
-            values = [row.get('y') for row in data]
-
-            return self.revenue_forecast.forecast_occupancy(dates, values)
-      
       def heavy_guest_month(self):
             with self.db.connect() as con:
                   cursor = con.cursor()

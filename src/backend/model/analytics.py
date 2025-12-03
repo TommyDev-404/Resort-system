@@ -291,6 +291,24 @@ class Analytics:
 
             return self.revenue_forecast.forecast_revenue(dates, values)
       
+      def forecast_occupancy(self):
+            with self.db.connect() as con:
+                  cursor = con.cursor()
+                  cursor.execute('''
+                        SELECT
+                              check_in as ds,
+                              ROUND((SUM(total) / 54) * 100, 2) AS y
+                        FROM accomodation_data
+                        GROUP BY check_in
+                        ORDER BY check_in;
+                  ''')
+            data = cursor.fetchall()
+
+            dates = [row.get('ds') for row in data]
+            values = [row.get('y') for row in data]
+
+            return self.revenue_forecast.forecast_occupancy(dates, values)
+      
       def  get_target_revenue(self):
             with self.db.connect() as con:
                   cursor = con.cursor()

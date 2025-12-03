@@ -162,43 +162,43 @@ async function todaysBookings() {
       document.getElementById('change-rate-bookings').textContent = Number(res.change) < 0  || Number(res.change) == 0 ? `${res.change}%` : `+${res.change}%`;
 
       if (res.change < 0){
-            document.getElementById('change-rate-bookings').classList.remove('text-green-500');
-            document.getElementById('change-rate-bookings').classList.add('text-red-500');
+            document.getElementById('change-rate-bookings').classList.remove('text-green-600', 'bg-green-50',  'dark:bg-green-600');
+            document.getElementById('change-rate-bookings').classList.add('text-red-600', 'bg-red-50',  'dark:bg-red-600');
             document.getElementById('change-rate-bookings-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('change-rate-bookings-icon').classList.remove("text-green-500");
-            document.getElementById('change-rate-bookings-icon').classList.add("text-red-500");
+            document.getElementById('change-rate-bookings-icon').classList.remove("text-green-600");
+            document.getElementById('change-rate-bookings-icon').classList.add("text-red-600");
       }else{
-            document.getElementById('change-rate-bookings').classList.remove('text-red-500');
-            document.getElementById('change-rate-bookings').classList.add('text-green-500');
+            document.getElementById('change-rate-bookings').classList.remove('text-red-600', 'bg-red-50',  'dark:bg-red-600');
+            document.getElementById('change-rate-bookings').classList.add('text-green-600', 'bg-green-50',  'dark:bg-green-600');
             document.getElementById('change-rate-bookings-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('change-rate-bookings-icon').classList.remove("text-red-500");
-            document.getElementById('change-rate-bookings-icon').classList.add("text-green-500");
+            document.getElementById('change-rate-bookings-icon').classList.remove("text-red-600");
+            document.getElementById('change-rate-bookings-icon').classList.add("text-green-600");
       }
 
       lucide.createIcons();
 }
 
 // Metric Card
-async function totalGuestInHouse() {
+async function totalGuestInHouse(label) {
       // total guest in house
-      const response = await fetch('/total-guest-in-house', {method: "GET"});
+      const response = await fetch(`/total-guest-in-house?label=${label}`, {method: "GET"});
       const res = await response.json();
-
+      
       document.getElementById('total-guest-in-house').textContent = res.today;
       document.getElementById('change-rate-guest').textContent = res.change > 0 ? `+${res.change}%` : `${res.change}%`;
 
       if (res.change < 0){
-            document.getElementById('change-rate-guest').classList.remove('text-green-500');
-            document.getElementById('change-rate-guest').classList.add('text-red-500');
+            document.getElementById('change-rate-guest').classList.remove('text-green-600', 'bg-green-50',  'dark:bg-green-600');
+            document.getElementById('change-rate-guest').classList.add('text-red-600', 'bg-red-50',  'dark:bg-red-600');
             document.getElementById('change-rate-guest-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('change-rate-guest-icon').classList.remove("text-green-500");
-            document.getElementById('change-rate-guest-icon').classList.add("text-red-500");
+            document.getElementById('change-rate-guest-icon').classList.remove("text-green-600");
+            document.getElementById('change-rate-guest-icon').classList.add("text-red-600");
       }else{
-            document.getElementById('change-rate-guest').classList.remove('text-red-500');
-            document.getElementById('change-rate-guest').classList.add('text-green-500');
+            document.getElementById('change-rate-guest').classList.remove('text-red-600', 'bg-red-50',  'dark:bg-red-600');
+            document.getElementById('change-rate-guest').classList.add('text-green-600', 'bg-green-50',  'dark:bg-green-600');
             document.getElementById('change-rate-guest-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('change-rate-guest-icon').classList.remove("text-red-500");
-            document.getElementById('change-rate-guest-icon').classList.add("text-green-500");
+            document.getElementById('change-rate-guest-icon').classList.remove("text-red-600");
+            document.getElementById('change-rate-guest-icon').classList.add("text-green-600");
       }
 
       lucide.createIcons();
@@ -213,17 +213,17 @@ async function todayGuest() {
       document.getElementById('change-rate-today-guest').textContent = res.change > 0 ? `+${res.change}%` : `${res.change}%`;
 
       if (res.change < 0){
-            document.getElementById('change-rate-today-guest').classList.remove('text-green-500');
-            document.getElementById('change-rate-today-guest').classList.add('text-red-500');
+            document.getElementById('change-rate-today-guest').classList.remove('text-green-600', 'bg-green-50',  'dark:bg-green-600');
+            document.getElementById('change-rate-today-guest').classList.add('text-red-600', 'bg-red-50',  'dark:bg-red-600');
             document.getElementById('change-rate-today-guest-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('change-rate-today-guest-icon').classList.remove("text-green-500");
-            document.getElementById('change-rate-today-guest-icon').classList.add("text-red-500");
+            document.getElementById('change-rate-today-guest-icon').classList.remove("text-green-600");
+            document.getElementById('change-rate-today-guest-icon').classList.add("text-red-600");
       }else{
-            document.getElementById('change-rate-today-guest').classList.remove('text-red-500');
-            document.getElementById('change-rate-today-guest').classList.add('text-green-500');
+            document.getElementById('change-rate-today-guest').classList.remove('text-red-600', 'bg-red-50',  'dark:bg-red-600');
+            document.getElementById('change-rate-today-guest').classList.add('text-green-600', 'bg-green-50',  'dark:bg-green-600');
             document.getElementById('change-rate-today-guest-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('change-rate-today-guest-icon').classList.remove("text-red-500");
-            document.getElementById('change-rate-today-guest-icon').classList.add("text-green-500");
+            document.getElementById('change-rate-today-guest-icon').classList.remove("text-red-600");
+            document.getElementById('change-rate-today-guest-icon').classList.add("text-green-600");
       }
 
       lucide.createIcons();
@@ -238,17 +238,17 @@ async function todayProjectedRevenue(){
       document.getElementById('target-revenue').textContent = Number(res.change) > 0 ? `+${res.change}%` : `${res.change}%`;
 
       if (res.change < 0){
-            document.getElementById('target-revenue').classList.remove('text-green-500');
-            document.getElementById('target-revenue').classList.add('text-red-500');
+            document.getElementById('target-revenue').classList.remove('text-green-600', 'bg-green-50',  'dark:bg-green-600');
+            document.getElementById('target-revenue').classList.add('text-red-600', 'bg-red-50',  'dark:bg-red-600');
             document.getElementById('target-revenue-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('target-revenue-icon').classList.remove("text-green-500");
-            document.getElementById('target-revenue-icon').classList.add("text-red-500");
+            document.getElementById('target-revenue-icon').classList.remove("text-green-600");
+            document.getElementById('target-revenue-icon').classList.add("text-red-600");
       }else{
-            document.getElementById('target-revenue').classList.remove('text-red-500');
-            document.getElementById('target-revenue').classList.add('text-green-500');
+            document.getElementById('target-revenue').classList.remove('text-red-600', 'bg-red-50',  'dark:bg-red-600');
+            document.getElementById('target-revenue').classList.add('text-green-600', 'bg-green-50',  'dark:bg-green-600');
             document.getElementById('target-revenue-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('target-revenue-icon').classList.remove("text-red-500");
-            document.getElementById('target-revenue-icon').classList.add("text-green-500");
+            document.getElementById('target-revenue-icon').classList.remove("text-red-600");
+            document.getElementById('target-revenue-icon').classList.add("text-green-600");
       }
       
       lucide.createIcons(); // re-render icons
@@ -526,7 +526,7 @@ async function roomsData() {
       const res = await response.json();
 
       const rooms = `
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-blue-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Premium Villa</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[6].total_rooms - Number(res.data[6].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[6].today_avail}</span></p>
@@ -535,7 +535,7 @@ async function roomsData() {
                   </div>
             </div>
 
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-violet-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Standard Villa</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[8].total_rooms - Number(res.data[8].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[8].today_avail}</span></p>
@@ -544,7 +544,7 @@ async function roomsData() {
                   </div>
             </div>
 
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-teal-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Cabana Cottage</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[2].total_rooms - Number(res.data[2].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[2].today_avail}</span></p>
@@ -553,7 +553,7 @@ async function roomsData() {
                   </div>
             </div>
 
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-yellow-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Family Room</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[3].total_rooms - Number(res.data[3].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[3].today_avail}</span></p>
@@ -562,7 +562,7 @@ async function roomsData() {
                   </div>
             </div>
 
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-green-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Garden View Room</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[4].total_rooms - Number(res.data[4].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[4].today_avail}</span></p>
@@ -571,7 +571,7 @@ async function roomsData() {
                   </div>
             </div>
 
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-red-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Barkada Room</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[0].total_rooms - Number(res.data[0].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[0].today_avail}</span></p>
@@ -580,7 +580,7 @@ async function roomsData() {
                   </div>
             </div>
 
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-indigo-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Small Cottage</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[7].total_rooms - Number(res.data[7].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[7].today_avail}</span></p>
@@ -589,7 +589,7 @@ async function roomsData() {
                   </div>
             </div>
 
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-pink-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Big Cottage</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[1].total_rooms - Number(res.data[1].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[1].today_avail}</span></p>
@@ -598,7 +598,7 @@ async function roomsData() {
                   </div>
             </div>
             
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-pink-50 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">Hall</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[5].total_rooms - Number(res.data[5].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Available: <span class="font-semibold">${res.data[5].today_avail}</span></p>
@@ -898,11 +898,20 @@ async function drawRevenueTrend() {
       });
 }  
 
+async function  filteredDashboard(label) {
+      totalGuestInHouse(label);
+}
+
 document.addEventListener('click', (e) => {
       if (e.target.matches('#closeAlert')) document.getElementById('alertToast').classList.add('hidden');
       if (e.target.matches('#closeAlertHousekeeping')) document.getElementById('alertHousekeeping').classList.add('hidden');
       if (e.target.closest('#viewAllNotifications')) (viewAllNotifications(),  document.querySelector('#notification-modal').classList.add('hidden'));
       if (e.target.matches('#closeNotifications')) document.getElementById('notificationsModal').remove();
+
+      if (e.target.matches('#today')) filteredDashboard('today');
+      if (e.target.matches('#yesterday')) filteredDashboard('yesterday');
+      if (e.target.matches('#last_week')) filteredDashboard('last_week');
+      if (e.target.matches('#last_month')) filteredDashboard('last_month');
 });
 
 loadingAnimation();
@@ -914,7 +923,7 @@ setTimeout(() => {
       upcomingArrivals();
       drawMonthlyBookings();
       upcomingCheckouts();
-      totalGuestInHouse();
+      totalGuestInHouse('today');
       todayProjectedRevenue();
       bookingOverviewCardsData();
       drawOccupancyPercentage();
@@ -931,7 +940,7 @@ export function initPageDashboard() {
       mostBookedArea();
       notifications();
       todayGuest();
-      totalGuestInHouse();
+      totalGuestInHouse('today');
       totalOccupied();
       roomsData();
       upcomingArrivals();
