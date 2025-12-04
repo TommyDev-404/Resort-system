@@ -1,6 +1,3 @@
--- new 
-insert into notifications(name, date, room_name, room_no) VALUES ('temporary', CURRENT_DATE() - INTERVAL 1 DAY, 'occupancy', 0)
-
 -- CREATE DATABASE
 CREATE DATABASE resort_db;
 
@@ -81,7 +78,7 @@ CREATE TABLE area_table (
     rate INT(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---admin table
+-- admin table
 CREATE TABLE admin (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL,
@@ -106,6 +103,7 @@ CREATE TABLE notifications (
 CREATE TABLE staff_attendance (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     staff_id INT(11) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     time_in VARCHAR(20) NOT NULL,
     time_out VARCHAR(20) NOT NULL,
     date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -144,6 +142,9 @@ CREATE TABLE staff_leaves_data (
 INSERT INTO admin (username, password, email, contact, code, hash_pass, date_pass_change)
 VALUES
 ('admin', 'plainpass123', 'admin@example.com', '09123456789', 123456, '$2y$10$9H0p1KdEQ1gEoH9s2lO0gOVYBWqs0ioY1hGQfgF4FklajfHsyAqLC','2025-01-01');
+
+-- new 
+insert into notifications(name, date, room_name, room_no) VALUES ('temporary', CURRENT_DATE() - INTERVAL 1 DAY, 'occupancy', 0)
 
 -- accommodation_spaces
 INSERT INTO accomodation_spaces (name, room, status, date, rate, orig_rate, promo, staff_assign)
@@ -207,7 +208,6 @@ VALUES
 ('Big', 108, 'avl', NULL, 1000, 1000, 'None', NULL),
 ('Hall', 101, 'avl', NULL, 1000, 1000, 'None', NULL);
 
-
 INSERT INTO area_table (name, count, max, rate)
 VALUES
 ('Premium Villa Room', 4, 12, 10000),
@@ -219,6 +219,7 @@ VALUES
 ('Small Cottage', 8, 20, 500),
 ('Hall', 1, 100, 3000),
 ('Big Cottage', 8, 50, 1000);
+
 
 
 -- trigger for updating data on bookings then affect the accomodation data

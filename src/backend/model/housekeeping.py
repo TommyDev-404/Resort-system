@@ -70,11 +70,12 @@ class Housekeeping:
                         cursor.execute('''
                               UPDATE accomodation_spaces SET status = 'on-clean', staff_assign = %s, date = %s WHERE name = %s AND room = %s
                         ''', (name, date, area_name, room_no))
-                        con.commit()
-
+                        
                         cursor.execute('''
                               DELETE FROM notifications WHERE room_name = %s AND room_no = %s
-                        ''', (area_name, room_no))
+                        ''', (area_name.lower(), room_no))
+                        
+                        con.commit()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Assigned successfully!' if bool(cursor.rowcount ) else 'Failed inserting data!'}
             except Exception as e:

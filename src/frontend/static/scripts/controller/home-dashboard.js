@@ -424,7 +424,7 @@ async function upcomingCheckouts() {
       document.getElementById('upcoming-checkout-table').querySelectorAll('tbody tr').forEach(row => row.remove());
       if (res.success){
             res.data.forEach(guest => {
-                  const date = new Date(guest.check_in).toISOString().split('T')[0];
+                  const date = new Date(guest.check_out).toISOString().split('T')[0];
                   const formattedDate = new Date(date).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
@@ -914,7 +914,6 @@ document.addEventListener('click', (e) => {
 
 loadingAnimation();
 setTimeout(() => {
-      initPageDashboard();
       document.querySelector('#loading').remove();
 }, 1000);
 

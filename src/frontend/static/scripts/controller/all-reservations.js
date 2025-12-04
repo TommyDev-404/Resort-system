@@ -154,14 +154,14 @@ function renderAddBookingModal(){
             
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                          <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-600 dark:text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                          <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-900 dark:text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                                 <option class="text-gray-600 " value="" selected disabled>Select Booking Category</option>
                                                 <option class="text-gray-600 " value="Reservation">Reservation (Advance Booking)</option>
                                                 <option class="text-gray-600" value="Check-in">Check-in (Walk-in Booking)</option>
                                                 <option class="text-gray-600" value="Day Guest">Day Guest (Amenities Only)</option>
                                           </select>
 
-                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-600 dark:text-gray-100 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
+                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
                                                 <option class="text-gray-600 "  value="" selected disabled>Select Payment Method</option>
                                                 <option class="text-gray-600 "  value="Direct Payment">Direct Payment</option>
                                                 <option class="text-gray-600 "  value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
@@ -286,10 +286,12 @@ function saveAccomodationRoom(){
       const checked = document.querySelectorAll('input[type="checkbox"]:checked');
 
       checked.forEach(cb => {
-            if (!savedAccomodations.includes(cb.value)) savedAccomodations.push(cb.value);
-
-            const tag = `<label class="h-10 bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg inline-flex justify-between items-center gap-2 text-white text-sm font-medium shadow-sm transition" id="${cb.value.split(' ').join('-')}"> ${cb.value} <span class="remove-btn text-lg font-bold cursor-pointer"  data-acc="${cb.value}">&times;</span></label>`;
-            document.querySelector("#selected-accomodations").innerHTML += tag;
+            if (!savedAccomodations.includes(cb.value)){
+                  savedAccomodations.push(cb.value);
+                  
+                  const tag = `<label class="h-10 bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg inline-flex justify-between items-center gap-2 text-white text-sm font-medium shadow-sm transition" id="${cb.value.split(' ').join('-')}"> ${cb.value} <span class="remove-btn text-lg font-bold cursor-pointer"  data-acc="${cb.value}">&times;</span></label>`;
+                  document.querySelector("#selected-accomodations").innerHTML += tag;
+            }
       });
 
       document.querySelector('input[name="accomodations_selected"]').value = savedAccomodations;

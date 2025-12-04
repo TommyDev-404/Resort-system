@@ -21,8 +21,7 @@ class Analytics:
                                     FROM accomodation_data a 
                                     JOIN bookings b 
                                     ON a.booking_id = b.booking_id
-                                    WHERE MONTH(a.check_in) = MONTH(CURDATE()) 
-                                    AND YEAR(a.check_in) = YEAR(CURDATE()) AND b.status IN ('Checked-in', 'Day Guest')
+                                    WHERE a.check_in =CURDATE() AND b.status IN ('Checked-in', 'Day Guest')
                               ),
                               previous_mtd AS (
                                     SELECT 
@@ -30,8 +29,7 @@ class Analytics:
                                     FROM accomodation_data a
                                     JOIN bookings b 
                                     ON a.booking_id = b.booking_id
-                                    WHERE MONTH(a.check_in) = MONTH(CURDATE()) - 1
-                                    AND YEAR(a.check_in) = YEAR(CURDATE()) AND b.status IN ('Checked-in', 'Day Guest')
+                                    WHERE a.check_in =CURDATE() - INTERVAL 1 DAY AND b.status IN ('Checked-in', 'Day Guest')
                               )
                               SELECT
                                     current_mtd.occupancy AS current_mtd_occupancy,

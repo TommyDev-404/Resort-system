@@ -232,7 +232,7 @@ async function allStaffs(){
 
             return staff_list.join('\n');
       }else{
-            failedMessageCard('Error fecthing data');
+            failedMessageCard('No staffs yet.');
       }
 }
 
