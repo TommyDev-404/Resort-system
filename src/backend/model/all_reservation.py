@@ -241,7 +241,7 @@ class Reservation:
                                           DATE(check_out) - DATE(check_in) AS stay_gap
                                     FROM bookings
                                     WHERE YEAR(check_in) = %s
-                                    AND MONTH(check_in) = %s AND status = "Reserved"]
+                                    AND MONTH(check_in) = %s AND status = "Reserved"
                                     ORDER BY check_in DESC;
                               ''', (year, month))
                         
@@ -675,10 +675,10 @@ class Reservation:
 
                         # Base query
                         sql = """
-                        SELECT * FROM bookings 
-                        WHERE name LIKE %s COLLATE utf8mb4_general_ci
-                        AND YEAR(check_in) = %s 
-                        AND MONTH(check_in) = %s
+                              SELECT * FROM bookings 
+                              WHERE name LIKE %s COLLATE utf8mb4_general_ci
+                              AND YEAR(check_in) = %s 
+                              AND MONTH(check_in) = %s
                         """
 
                         params = [guest_name + "%", year, month]
@@ -709,7 +709,7 @@ class Reservation:
                               formatted_checkin  = d.get('check_in').strftime("%b %d").lstrip("0")  
                               formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0")    
 
-                              new_data.append({'id': d.get('booking_id'), 'name': d.get('name'), 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
+                              new_data.append({'id': d.get('booking_id'), 'name': d.get('name'), 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'),'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
                               
                         return {'success': bool(new_data), 'data': new_data}
 

@@ -5,20 +5,21 @@ function successMessageCard(message, redirect=null){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
       `;
       document.getElementById('messagePortal').innerHTML += msg;
+      lucide.createIcons();
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
+                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
@@ -26,6 +27,7 @@ function failedMessageCard(message){
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
+      lucide.createIcons();
 }
 
 function createRow(id, date, promo_name, discount, area, end, status){
@@ -53,19 +55,20 @@ function createRow(id, date, promo_name, discount, area, end, status){
                   </td>
                   <td class="py-3 px-1 ">${discount}</td>
                   <td class="py-3 px-1">
-                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
+                        <div class="w-full overflow-x-auto thin-scroll whitespace-nowrap">
                               ${formatted_area_name.join(', ')}
                         </div>
                   </td>
                   <td class="text-white rounded-lg text-sm font-bold py-3 px-1  w-[100px]"><span class="${status === 'Active' ? 'bg-green-500' : 'bg-orange-500 '} py-2 px-4 rounded-lg">${status}</span></td>
                   <td class="flex gap-2 items-center justify-center py-3 px-1 ">
-                        <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i class="ti ti-edit text-white text-lg"></i></button>
-                        <button id="remove-promo" class="bg-red-500 hover:bg-red-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i class="ti ti-trash text-white text-lg"></i></button>
+                        <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i  data-lucide="eye" class="text-white text-lg"></i></button>
+                        <button id="remove-promo" class="bg-red-500 hover:bg-red-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i data-lucide="trash"  class="text-white text-lg"></i></button>
                   </td>
             </tr>
       `;
 
       document.getElementById('promo-tbody').innerHTML += row;
+      lucide.createIcons();
 }
 
 function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_affected){

@@ -1,3 +1,4 @@
+import '../chart.umd.js';
 
 let occupancyChartPercentage = null;
 let allNotifications = [];
@@ -423,7 +424,7 @@ async function upcomingCheckouts() {
       document.getElementById('upcoming-checkout-table').querySelectorAll('tbody tr').forEach(row => row.remove());
       if (res.success){
             res.data.forEach(guest => {
-                  const date = new Date(guest.check_out).toISOString().split('T')[0];
+                  const date = new Date(guest.check_in).toISOString().split('T')[0];
                   const formattedDate = new Date(date).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
@@ -433,21 +434,21 @@ async function upcomingCheckouts() {
                   const row = `
                         <tr class="border-b border-gray-200 dark:border-gray-500 bg-gray-50 dark:bg-white/4 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
                               <td class="px-3 py-2 text-center">
-                                    <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">    
+                                    <div class="w-[150px] overflow-x-auto thin-scroll whitespace-nowrap">    
                                           ${guest.name}
                                     </div>
                               </td>
                               <td class="px-3 py-2 text-center">
-                                    <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">    
-                                          ${guest.accomodations}
+                                    <div class="w-[340px] truncate whitespace-nowrap">    
+                                          ${guest.accomodations.split(',').map(accs => accs.trim()).join(', ')}
                                     </div>
                               </td>
-                              <td class="px-3 py-2 text-center">
-                                    <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">    
+                              <td class="px-3 py-2 text-center ">
+                                    <div class="w-[100px] whitespace-nowrap">    
                                           ${formattedDate}
                                     </div>
                               </td>
-                              <td class="px-3 py-2 text-center">2</td>
+                              <td class="px-3 py-2 text-center">${guest.total_guest}</td>
                         </tr>
                   `;
 
@@ -456,7 +457,7 @@ async function upcomingCheckouts() {
       }else{
             const empty_row = `
                   <tr class="border-b border-gray-200 dark:border-gray-500 bg-gray-100 dark:bg-white/4 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
-                        <td colspan="4" class="text-center bg-gray-50 dark:bg-gray-800 dark:text-white text-gray-600 py-2">No data yet.</td>
+                        <td colspan="4" class="text-center dark:bg-gray-800 dark:text-white text-gray-600 py-2 bg-gray-50">No data yet.</td>
                   </tr>
             `;
                   
@@ -481,20 +482,21 @@ async function upcomingArrivals() {
                   const row = `
                         <tr class="border-b border-gray-200 dark:border-gray-500 bg-gray-50 dark:bg-white/4 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
                               <td class="px-3 py-2 text-center">
-                                    <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">    
+                                    <div class="w-[150px] overflow-x-auto thin-scroll whitespace-nowrap">    
                                           ${guest.name}
                                     </div>
                               </td>
                               <td class="px-3 py-2 text-center">
-                                    <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">    
-                                          ${guest.accomodations}
+                                    <div class="w-[340px] truncate whitespace-nowrap">    
+                                          ${guest.accomodations.split(',').map(accs => accs.trim()).join(', ')}
                                     </div>
                               </td>
-                              <td class="px-3 py-2 text-center">
-                                    <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">    
+                              <td class="px-3 py-2 text-center ">
+                                    <div class="w-[100px] whitespace-nowrap">    
                                           ${formattedDate}
                                     </div>
                               </td>
+                              <td class="px-3 py-2 text-center">${guest.total_guest}</td>
                         </tr>
                   `;
 

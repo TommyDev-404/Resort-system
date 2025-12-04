@@ -5,20 +5,21 @@ function successMessageCard(message, redirect=null){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
       `;
       document.getElementById('messagePortal').innerHTML += msg;
+      lucide.createIcons();
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
+                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
@@ -26,6 +27,7 @@ function failedMessageCard(message){
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
+      lucide.createIcons();
 }
 
 function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied){
@@ -38,12 +40,13 @@ function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupie
                   <td class="px-6 py-4 text-green-600  dark:text-green-blue-500 font-bold">${ready}</td>
                   <td class="px-6 py-4 text-purple-600 dark:text-purple-blue-500 font-bold">${occupied}</td>
                   <td class="px-6 py-4 flex justify-center">
-                        <button class="px-4 py-2 text-sm bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex gap-2 items-center" id="view-room-details"><i class="ti ti-building text-lg"></i>View Rooms</button>
+                        <button class="px-4 py-2 text-sm bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex gap-2 items-center" id="view-room-details"><i data-lucide="building" class="text-lg"></i>View Rooms</button>
                   </td>
             </tr>
       `;
 
       document.getElementById('acc-tbody').innerHTML += row;
+      lucide.createIcons();
 }
 
 function removePrevTable(){
@@ -55,7 +58,7 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
       let bg_color = null;;
       let action_name = status === "need-clean" ? 'Assign' : status === "on-clean" ? 'Mark Ready' : 'View Info';
       let btn_color = status === "need-clean" ? 'bg-red-500 hover:bg-red-600' : status === "on-clean" ? 'bg-green-500 hover:bg-green-600 ' : 'bg-teal-500 hover:bg-teal-600';
-      let icon = action_name === 'View Info' ? '<i class="ti ti-eye text-lg"></i>' : action_name === 'Mark Ready' ? '<i class="ti ti-clipboard-check text-lg"></i>' : '<i class="ti ti-user-plus text-lg"></i>' 
+      let icon = action_name === 'View Info' ? '<i data-lucide="eye" class="text-lg"></i>' : action_name === 'Mark Ready' ? '<i data-lucide="clipboard-check" class="text-lg"></i>' : '<i data-lucide="user-plus" class="text-lg"></i>' 
       
       if (status === 'avl') (new_status = 'Ready/Available', bg_color = 'bg-green-100 text-green-700 dark:text-white dark:bg-green-500');
       if (status === 'occupied') (new_status = 'Occupied', bg_color = 'bg-purple-100 text-purple-700 dark:text-white dark:bg-purple-500');
@@ -77,16 +80,17 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
       `;
 
       document.querySelector('#room-details').innerHTML += row;
+      lucide.createIcons();
 }
 
 function renderViewDetailsModal(roomType){
       const modal = `
-            <div id="roomDetailsModal" class="absolute w-full h-full inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
+            <div id="roomDetailsModal" class="absolute w-full h-full inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50] ">
                   <div class="bg-white dark:bg-gray-900 w-full max-w-5xl rounded-lg shadow-xl p-6 relative fade-in-up">
                         <span class="absolute top-2 right-4 text-gray-500 dark:text-gray-100 dark:hover:text-gray-200 hover:text-gray-700 text-[25px] cursor-pointer" id="closeRoomDetails">&times;</span>
                         <h3 id="modalRoomTitle" class="text-2xl font-semibold text-primary-blue mb-4">${roomType} Room - Details</h3>
 
-                        <div class="overflow-y-auto max-h-[50vh]">
+                        <div class="overflow-y-auto max-h-[50vh] thin-scroll">
                               <table class="min-w-full divide-y divide-gray-200 text-center">
                                     <thead class="dark:bg-gray-700 bg-gray-900 text-white sticky top-0">
                                           <tr>

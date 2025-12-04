@@ -1,13 +1,6 @@
 # ------------- DEPENDENCIES INSTALLATION --------------- #
 
-# Python (Flask)
-pip install flask
-pip install pymysql
-pip install pandas
-pip install prophet
-pip install bcrypt
-pip install odfpy
-
+pip install -r requirements.txt
 
 # Tailwind css & Chart.js
 npm install

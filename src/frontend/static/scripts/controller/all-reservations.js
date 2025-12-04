@@ -9,20 +9,21 @@ function successMessageCard(message, redirect=null){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
       `;
       document.getElementById('messagePortal').innerHTML += msg;
+      lucide.createIcons();
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
+                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
@@ -30,49 +31,90 @@ function failedMessageCard(message){
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
+      lucide.createIcons();
 }
 
 function createTable(id, guest_name, checkin, checkout, stay_count, accomodations, booking_type, status, payment_status){
       const row = `
-            <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up" id="${id}" data-set="${accomodations}">
-                  <td class="px-3 py-4">
-                        <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
+            <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}">
+                  <!-- SELECT -->
+                  <td class="px-3 py-4 w-[70px] text-center">
+                        <label class="flex items-center justify-center gap-2 cursor-pointer select-none">
                               <input type="checkbox" name="select" class="timeout-checkbox hidden peer">
-                              <span
-                                    class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition">
-                                    <i data-lucide="check" class="check-icon w-4 h-4 text-transparent"></i>
+                              <span class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition">
+                              <i data-lucide="check" class="check-icon w-4 h-4 text-transparent"></i>
                               </span>
                         </label>
                   </td>
-                  <td class="px-4 py-4">
-                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">      
-                              <span class="font-medium">${guest_name}</span></td>
+
+                  <!-- TRAVELER -->
+                  <td class="px-3 py-4 text-center">
+                        <div class="block w-[230px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
+                              <span class="font-medium">${guest_name}</span>
                         </div>
-                  <td class="px-4 py-4">
-                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
-                              <span>${checkin} - ${checkout} <label class="text-gray-400 text-sm">${stay_count > 0 ? `(${stay_count} Nights)` : '' }</label></span></td>
+                  </td>
+
+                  <!-- BOOKING DATE -->
+                  <td class="px-3 py-4 text-center">
+                        <div class="block w-[200px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
+                              <span class="text-gray-700 dark:text-gray-100">
+                              ${checkin} - ${checkout}
+                              <label class="text-gray-500 dark:text-gray-200 text-xs">
+                                    ${stay_count > 0 ? `(${stay_count} Nights)` : ''}
+                              </label>
+                              </span>
                         </div>
-                  <td class="px-6 py-4">
-                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">      
-                              <span>${accomodations}</span></td>
+                  </td>
+
+                  <!-- ACCOMMODATIONS -->
+                  <td class="px-3 py-4 text-center">
+                        <div class="block w-[390px] truncate">
+                              <span>${accomodations.split(',').map(accs => accs.trim()).join(', ')}</span>
                         </div>
-                  <td class="px-6 py-4">
-                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
-                              <span>${booking_type}</span></td>
+                  </td>
+
+                  <!-- BOOKING TYPE -->
+                  <td class="px-3 py-4 text-center">
+                        <div class="block w-[150px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
+                              <span>${booking_type}</span>
                         </div>
-                  <td class="px-5 py-4 text-blue-600 font-semibold text-[14px]">
-                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
-                              <span class="px-3 py-1 text-xs rounded-full ${status === 'Day Guest' ? 'text-teal-700 bg-teal-100 dark:text-white dark:bg-teal-500' : status === 'Reserved' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500' : status === 'Cancelled' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500' : status === 'Checked-out' ? 'text-secondary-gold bg-yellow-100  dark:text-white dark:bg-yellow-500' : 'text-blue-700 bg-blue-100 dark:text-white dark:bg-blue-500'}">${status}</span></td>
+                  </td>
+
+                  <!-- STATUS -->
+                  <td class="px-3 py-4 text-center">
+                        <div class="block w-[140px]">
+                              <span class="px-3 py-1 text-xs rounded-full
+                              ${status === 'Day Guest' ? 'text-teal-700 bg-teal-100 dark:text-white dark:bg-teal-500'
+                              : status === 'Reserved' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
+                              : status === 'Cancelled' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500'
+                              : status === 'Checked-out' ? 'text-secondary-gold bg-yellow-100 dark:text-white dark:bg-yellow-500'
+                              : 'text-blue-700 bg-blue-100 dark:text-white dark:bg-blue-500'}">
+                              ${status}
+                              </span>
                         </div>
-                  <td class="px-5 py-4 text-yellow-600 font-semibold text-[14px]">
-                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
-                              <span class="px-3 py-1 text-xs rounded-full ${payment_status === 'ZUZU (Online Payment)' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500' : payment_status === 'Refunded' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500' : payment_status === 'Direct Payment' ? 'text-orange-700 bg-orange-100  dark:text-white dark:bg-orange-500' : 'text-yellow-700 bg-yellow-100 dark:text-white dark:bg-yellow-500'}">${payment_status}</span></td>
+                  </td>
+
+                  <!-- PAYMENT -->
+                  <td class="px-3 py-4 text-center">
+                        <div class="w-[220px] mx-auto">
+                              <span class=" px-3 py-1 text-xs rounded-full
+                              ${payment_status === 'ZUZU (Online Payment)' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
+                              : payment_status === 'Refunded' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500'
+                              : payment_status === 'Direct Payment' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
+                              : 'text-yellow-700 bg-yellow-100 dark:text-white dark:bg-yellow-500'}">
+                              ${payment_status}
+                              </span>
                         </div>
-                  <td class="px-4 py-4 flex justify-center gap-2">
-                        <button  id="view-full-info" class="text-[14px] bg-purple-700 dark:bg-purple-500 hover:bg-purple-600 p-2 rounded-lg text-white flex items-center gap-1 cursor-pointer"><i data-lucide="eye" class="w-5 h-5"></i></button>
+                  </td>
+
+                  <!-- ACTION -->
+                  <td class="px-3 py-4 w-full flex items-center justify-center">
+                        <button id="view-full-info" 
+                              class="text-[14px] bg-purple-700 dark:bg-purple-500 hover:bg-purple-600 p-2 rounded-lg text-white flex items-center justify-center gap-1 cursor-pointer">
+                              <i data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
                   </td>
             </tr>
-            
       `;
 
       tbody.innerHTML += row;
@@ -410,6 +452,17 @@ function retrieveCheckboxId(){
       return {'id': id, 'accomodations': accommodations};
 }
 
+function updateBadge(id, value) {
+      const badge = document.getElementById(id).querySelector("span");
+
+      if (value > 0) {
+            badge.textContent = `+${value}`;
+            badge.classList.remove("hidden");
+      } else {
+            badge.textContent = "";
+            badge.classList.add("hidden");
+      }
+}
 
 // --------------- POST DATA Fetching -------------- //
 async function addBooking(e){
@@ -746,14 +799,14 @@ async function getTotalsCountData() {
       const result = await response.json();
 
       if (result.success){
-            document.getElementById('all-data').querySelector('span').textContent = `+${result.all}`;
-            document.getElementById('reserved-data').querySelector('span').textContent = `+${result.reserved}`;
-            document.getElementById('day-guest').querySelector('span').textContent = `+${result.day_guest}`;
-            document.getElementById('check_out-data').querySelector('span').textContent = `+${result.checkout}`;
-            document.getElementById('check_in-data').querySelector('span').textContent = `+${result.checkin}`;
-            document.getElementById('cancelled-reservation-data').querySelector('span').textContent = `+${result.cancelled}`;
-            document.getElementById('paid-data').querySelector('span').textContent = `+${result.paid}`;
-            document.getElementById('not_paid-data').querySelector('span').textContent = `+${result.not_paid}`;
+            updateBadge('all-data', result.all);
+            updateBadge('reserved-data', result.reserved);
+            updateBadge('day-guest', result.day_guest);
+            updateBadge('check_out-data', result.checkout);
+            updateBadge('check_in-data', result.checkin);
+            updateBadge('paid-data', result.paid);
+            updateBadge('not_paid-data', result.not_paid);
+            updateBadge('cancelled-reservation-data', result.cancelled);
       }else{
             ('Failed');
       }
@@ -802,16 +855,16 @@ async function searchGuest(e){
 
       const response = await fetch(`/search-guest?name=${name}&year=${year}&month=${month}&category=${category_data}`);
       const result = await response.json();
-      console.log(result);
+
       document.querySelectorAll('tbody tr').forEach(row => row.remove());      
       if (result.success){
             result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['status'], row['payment']);
+                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             const empty_row = `
                   <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="7" class="text-center bg-gray-50 dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
+                        <td colspan="8" class="text-center bg-gray-50 dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
                   </tr>
             `;
             

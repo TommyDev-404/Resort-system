@@ -1,3 +1,4 @@
+import '../chart.umd.js';
 
 let checkinChart = null;
 let revenueChart = null;

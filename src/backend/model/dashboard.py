@@ -20,7 +20,7 @@ class Dashboard:
                               SELECT COALESCE(SUM(total_guest), 0) AS total_guest_in_house
                               FROM bookings 
                               WHERE check_in <= CURRENT_DATE()
-                              AND check_out > CURRENT_DATE() And status = 'Checked-in'
+                              AND check_out >= CURRENT_DATE() And status = 'Checked-in'
                         ),
                         last_week_sunday AS (
                               SELECT DATE_SUB(CURRENT_DATE(), INTERVAL (WEEKDAY(CURRENT_DATE()) + 1) DAY) AS sunday_date
@@ -56,22 +56,24 @@ class Dashboard:
                   cursor.execute('''
                         WITH 
                         today AS (
-                        SELECT COALESCE(SUM(total_guest), 0) AS guests
-                        FROM bookings
-                        WHERE DATE(check_in) = CURDATE()
+                              SELECT COALESCE(SUM(total_guest), 0) AS guests
+                              FROM bookings
+                              WHERE DATE(check_in) = CURDATE()
                         ),
                         yesterday AS (
-                        SELECT COALESCE(SUM(total_guest), 0) AS guests
-                        FROM bookings
-                        WHERE DATE(check_in) = CURDATE() - INTERVAL 1 DAY
+                              SELECT COALESCE(SUM(total_guest), 0) AS guests
+                              FROM bookings
+                              WHERE DATE(check_in) = CURDATE() - INTERVAL 1 DAY
                         )
                         SELECT 
-                        today.guests AS today_guest,
-                        CASE 
-                              WHEN yesterday.guests = 0 THEN 100
-                              ELSE ROUND(((today.guests - yesterday.guests) / yesterday.guests) * 100, 2)
-                        END AS change_rate
-                        FROM today, yesterday;      
+                              today.guests AS today_guest,
+                              yesterday.guests AS y_guest,
+                              CASE 
+                                    WHEN yesterday.guests = 0 AND today.guests = 0 THEN 0
+                                    WHEN yesterday.guests = 0 AND today.guests > 0 THEN 100
+                                    ELSE ROUND(((today.guests - yesterday.guests) / yesterday.guests) * 100, 2)
+                              END AS change_rate
+                        FROM today, yesterday;
                   ''')                                            
                   data = cursor.fetchone()
 

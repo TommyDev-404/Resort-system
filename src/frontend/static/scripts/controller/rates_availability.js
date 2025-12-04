@@ -1,24 +1,24 @@
 
 // ----------------- HELPERS ----------------- //
-
 function successMessageCard(message, redirect=null){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i class="ti ti-circle-check text-6xl font-light text-green-500"></i>
+                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
                   </div>
             </div>
       `;
       document.getElementById('messagePortal').innerHTML += msg;
+      lucide.createIcons();
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i class="ti ti-circle-x text-6xl font-light text-red-500"></i>
+                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
                   </div>
@@ -26,6 +26,7 @@ function failedMessageCard(message){
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
+      lucide.createIcons();
 }
 
 function openUpdateAreaModal(e) {
@@ -95,11 +96,12 @@ async function renderTable() {
                         <td class="px-3 py-4 text-center text-green-600 dark:text-green-500 flex items-center justify-center gap-1 font-semibold">${row.area_condition ? `<label class="line-through text-red-500 font-light">₱${row.orig_rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</label> <p class="text-gray-500 dark:text-gray-200">-</p> <span class="text-green-600 dark:text-green-500">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} </span>` : `₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</td> 
                         <td class="px-3 py-4 text-center"><span class="font-bold text-lg text-red-500">${row.today_avail}</span></td>
                         <td class="px-3 py-4 text-center"><span class="font-bold text-lg text-green-500">${row.tomorrow_avail}</span></td>
-                        <td class="px-3 py-4 flex gap-2 justify-center"><button class="update-btn text-sm text-white bg-teal-500 py-2 px-4 rounded-sm  flex gap-2" id="${row.room_type}"><i class="ti ti-edit text-lg"></i>Update</button></td>
+                        <td class="px-3 py-4 flex gap-2 justify-center"><button class="update-btn text-sm text-white bg-teal-500 py-2 px-4 rounded-sm  flex gap-2" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update</button></td>
                   </tr>`;
       }).join('');
 
       document.getElementById('table2-body').innerHTML = bodyHtml;
+      lucide.createIcons();
 }
 
 function areaTypeInfo(area){
