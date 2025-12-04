@@ -5,33 +5,46 @@ let savedAccomodations = [];
 let category_data = 'all-data';
 
 // ---------------- RENDER HELPERS ------------------
-function successMessageCard(message, redirect=null){
+function successMessageCard(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
                   </div>
             </div>
       `;
+
+      // Append message popup
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+
+      document.getElementById("close-message").addEventListener("click", () =>  {
+            const box = document.getElementById("success-message");
+            box.remove();
+
+            if (redirect)  window.location.href = redirect;
+      });
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
                   </div>
             </div>
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+      document.getElementById("close-failed-message").addEventListener("click", () =>  {
+            const box = document.getElementById("failed-message");
+            box.remove();
+      });
 }
 
 function createTable(id, guest_name, checkin, checkout, stay_count, accomodations, booking_type, status, payment_status){
@@ -194,11 +207,11 @@ function renderAddBookingModal(){
                         </form>
                   </div>
 
-                  <div class="accomodation-avl-overlay fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
-                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 w-[500px] relative fade-in-up">
+                  <div class="accomodation-avl-overlay absolute w-full h-full inset-0 bg-black/40  top z-50 hidden">
+                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 w-[500px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fade-in-up">
                               <span class="absolute right-3 top-1 text-[25px] text-gray-900 dark:text-gray-100 hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer" id="close-accomodation-avl">&times;</span>
                               <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 text-center" id="accomodation_label">Premium Villa Rooms</h2>
-                              <div class="flex flex-col gap-2 mt-4 h-[200px] overflow-y-auto" id="avl-accomodations"></div>
+                              <div class="flex flex-col gap-2 mt-4 h-[200px] overflow-y-auto thin-scroll" id="avl-accomodations"></div>
                               <div class="flex gap-6 justify-between mt-6">
                                     <label class="bg-primary-blue dark:bg-blue-600 dark:hover:bg-blue-500 hover:bg-blue-500 rounded-sm text-white py-2 px-[50px] w-full text-center" id="select-accomodation-avl">Select</label>
                               </div>
@@ -609,7 +622,6 @@ async function updateReservationDate(e){
       getTotalsCountData();
 }
 
-
 // --------------- GET DATA Fetching -------------- //
 async function renderViewReservationDetails(id){
       console.log('view');
@@ -708,7 +720,7 @@ async function recentBookings(){
       const month = document.getElementById('monthSelect').value;
       getTotalsCountData();
 
-      const response = await fetch(`/recent-bookings?year=${year}&month=${month}`);
+      const response = await fetch(`/recent-bookings?year=${year ? year : new Date().getFullYear()}&month=${month}`);
       const result = await response.json();
       
       document.querySelectorAll('tbody tr').forEach(row => row.remove());      
@@ -719,27 +731,6 @@ async function recentBookings(){
                   createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
-            const empty_row = `
-                  <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="8" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
-                  </tr>
-            `;
-            
-            tbody.innerHTML += empty_row;
-      }
-}
-
-async function currentBookings(){
-      const response = await fetch(`/current-bookings`);
-      const result = await response.json();
-      
-      if (result.success){
-            document.querySelectorAll('tbody tr').forEach(row => row.remove());      
-            result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
-            });
-      }else {
-            document.querySelectorAll('tbody tr').forEach(row => row.remove());
             const empty_row = `
                   <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="8" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
@@ -795,7 +786,7 @@ async function getTotalsCountData() {
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
 
-      const response = await fetch(`/totals?month=${month}&year=${year}`);
+      const response = await fetch(`/totals?month=${month}&year=${year ? year : new Date().getFullYear()}`);
       const result = await response.json();
 
       if (result.success){
@@ -840,7 +831,7 @@ async function bookingsCategories(e){
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
             const empty_row = `
                   <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="8" class="text-center bg-gray-50 dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
+                        <td colspan="8" class="text-cente dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
                   </tr>
             `;
             
@@ -864,7 +855,7 @@ async function searchGuest(e){
       }else {
             const empty_row = `
                   <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="8" class="text-center bg-gray-50 dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
+                        <td colspan="8" class="text-center dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
                   </tr>
             `;
             
@@ -952,14 +943,13 @@ document.addEventListener('input', (e) => {
 });
 
 // -------------- Initialiaze when loaded -----------
-getYears();
 switchTabs();
-getTotalsCountData();
+getYears();
 
 export function initPageReservation(){
       getTotalsCountData();
       resetDropDown();
-      currentBookings();
+      recentBookings();
       summaryCards();
 }
 

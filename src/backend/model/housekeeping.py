@@ -72,6 +72,10 @@ class Housekeeping:
                         ''', (name, date, area_name, room_no))
                         con.commit()
 
+                        cursor.execute('''
+                              DELETE FROM notifications WHERE room_name = %s AND room_no = %s
+                        ''', (area_name, room_no))
+
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Assigned successfully!' if bool(cursor.rowcount ) else 'Failed inserting data!'}
             except Exception as e:
                   con.rollback()
@@ -97,10 +101,6 @@ class Housekeeping:
                         cursor = con.cursor()
                         cursor.execute('''
                               UPDATE accomodation_spaces SET status = 'avl' WHERE name = %s AND room = %s
-                        ''', (area_name, room_no))
-
-                        cursor.execute('''
-                              DELETE FROM notifications WHERE room_name = %s AND room_no = %s
                         ''', (area_name, room_no))
 
                         con.commit()

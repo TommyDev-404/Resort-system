@@ -627,7 +627,6 @@ function resetDropdown(){
       document.getElementById('roomTypeFilter').value = 'all';
 }
 
-
 // Initial load: ensure the default content is shown and charts are drawn
 export function initPageAnalytics() {
       resetDropdown();
@@ -642,5 +641,3 @@ export function initPageAnalytics() {
       drawMostBookedArea();
       drawOccupancyForecastChart();
 };
-
-initPageAnalytics();

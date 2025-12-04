@@ -1,15 +1,4 @@
 
-// Import page initialization functions
-import { initPageDashboard } from "./controller/home-dashboard.js";
-import { initPageAnalytics } from "./controller/analytics.js";
-import { initPageReservation } from "./controller/all-reservations.js";
-import { initPageHousekeeping } from "./controller/housekeeping.js";
-import { initPageRatesAndAvailability } from "./controller/rates_availability.js";
-import { initPageAccounting } from "./controller/accounting.js";
-import { initPageAdmin } from "./controller/admin.js";
-import { initPageRevenueMgmt } from "./controller/revenue_mgmt.js";
-import { initPageStaffMgmt } from "./controller/staff_mgmt.js";
-
 lucide.createIcons()
 
 // DOM Elements
@@ -17,17 +6,16 @@ const sidebarItems = document.querySelectorAll('.sidebar-item');
 const contentSections = document.querySelectorAll('.content-section');
 const sidebar = document.getElementById('sidebar');
 
-// Map section IDs to their respective initialization functions
-const sectionInitMap = {
-      'home-dashboard': initPageDashboard,
-      'analytics': initPageAnalytics,
-      'all-reservations': initPageReservation,
-      'housekeeping': initPageHousekeeping,
-      'rates-availability': initPageRatesAndAvailability,
-      'accounting': initPageAccounting,
-      'revenue-management':  initPageRevenueMgmt,
-      'staff-management':  initPageStaffMgmt,
-      'admin-profile': initPageAdmin
+const sectionControllerMap = {
+      'home-dashboard': () => import('./controller/home-dashboard.js'),
+      'analytics': () => import('./controller/analytics.js'),
+      'all-reservations': () => import('./controller/all-reservations.js'),
+      'housekeeping': () => import('./controller/housekeeping.js'),
+      'rates-availability': () => import('./controller/rates_availability.js'),
+      'accounting': () => import('./controller/accounting.js'),
+      'revenue-management': () => import('./controller/revenue_mgmt.js'),
+      'staff-management': () => import('./controller/staff_mgmt.js'),
+      'admin-profile': () => import('./controller/admin.js')
 };
 
 /*---------------- SIDEBAR TOGGLE ----------------*/
@@ -41,7 +29,8 @@ function toggleSidebar() {
 }
 
 /*---------------- SWITCH CONTENT ----------------*/
-function switchContent(sectionId) {
+
+async function switchContent(sectionId) {
       if (!sectionId) return;
 
       // Hide all sections
@@ -52,16 +41,19 @@ function switchContent(sectionId) {
       if (targetSection) {
             targetSection.classList.remove('hidden');
 
-            // Initialize section if a function exists
-            if (sectionInitMap[sectionId]) sectionInitMap[sectionId]();
+          // Dynamically import and initialize
+            if (sectionControllerMap[sectionId]) {
+                  const module = await sectionControllerMap[sectionId]();
+                  // Assuming each module exports `initPageX`
+                  const initFunc = Object.values(module)[0];
+                  if (initFunc) initFunc();
+            }
       }
 
       // Update sidebar active state
       sidebarItems.forEach(item => {
             const isActive = item.dataset.section === sectionId;
-            
-            if (item.getAttribute('data-section') !== 'logout'){
-                  // Change color for the icon
+            if (item.getAttribute('data-section') !== 'logout') {
                   item.classList.toggle('active', isActive);
                   item.classList.toggle('text-white', isActive);
                   item.classList.toggle('text-gray-900', !isActive);
@@ -194,7 +186,7 @@ function logoutCard(){
                   <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Confirm Logout</h2>
                   <p class="text-gray-600 mb-6 dark:text-gray-400">Are you sure you want to log out?</p>
                   <div class="flex justify-between">
-                        <button id="cancelLogout" class="bg-gray-700 dark:bg-white/5 px-4 py-2 rounded hover:bg-gray-400 dark:bg-white/2">Cancel</button>
+                        <button id="cancelLogout" class="bg-gray-700 dark:bg-white/5 px-4 py-2 rounded hover:bg-gray-400 ">Cancel</button>
                         <button id="confirmLogout" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">Logout</button>
                   </div>
                   </div>
@@ -204,31 +196,44 @@ function logoutCard(){
       document.getElementById('logoutPortal').innerHTML += modal;
 }
 
-function successMessageCard(message, redirect=null){
+function successMessageCard(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
                   </div>
             </div>
       `;
+
+      // Append message popup
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+
+      document.getElementById("close-message").addEventListener("click", () =>  {
+            const box = document.getElementById("success-message");
+            box.remove();
+
+            if (redirect)  window.location.href = redirect;
+      });
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
                   </div>
             </div>
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+      document.getElementById("close-failed-message").addEventListener("click", () =>  {
+            const box = document.getElementById("failed-message");
+            box.remove();
+      });
 }

@@ -25,7 +25,6 @@ class RevenueMgmt:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-      
 
       def get_promo_data(self):
             try:

@@ -264,10 +264,6 @@ def recent_bookings():
 def category_bookings():
       return jsonify(reserve.booking_category(request.args.get('year'), request.args.get('month'), request.args.get('category')))
 
-@app.route('/current-bookings', methods=['GET'])
-def current_bookings():
-      return jsonify(reserve.current_bookings())
-
 @app.route('/get-years', methods=['GET'])
 def get_years():
       return jsonify(reserve.get_year_data())

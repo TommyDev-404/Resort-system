@@ -168,7 +168,7 @@ class Reservation:
                                     booking_type,
                                     status, 
                                     payment,
-                                    DATE(check_out) - DATE(check_in) AS stay_gap
+                                    DATEDIFF(check_out, check_in) AS stay_gap
                               FROM bookings
                               WHERE YEAR(check_in) = %s
                               AND MONTH(check_in) = %s ORDER BY check_in DESC;
@@ -507,29 +507,6 @@ class Reservation:
                         con.commit()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
-            except Exception as e:
-                  con.rollback()
-                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
-
-      def cancel_booking(self, id, accomodation):
-            try:
-                  with self.db.connect() as con:
-                        cursor = con.cursor()
-
-                        parts = accomodation.split(',')
-                        rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
-                        room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
-                        
-                        for room, number in set(zip(rooms, room_no)):
-                              cursor.execute('''UPDATE accomodation_spaces SET status = "avl" WHERE name=%s AND room=%s''', (room.capitalize(), number))
-
-                        cursor.execute(''' UPDATE bookings SET payment = 'Refunded', status = 'Cancelled' where booking_id = %s ''', (id,))
-                        cursor.execute(''' DELETE FROM accomodation_data WHERE booking_id = %s ''', (id,))
-
-                        con.commit()
-
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Cancelled successfully!' if cursor.rowcount != 0 else 'Failed!'}
-
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}

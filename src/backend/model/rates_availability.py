@@ -81,8 +81,7 @@ class RatesAndAvailability:
                               
                               LEFT JOIN promos p
                                     ON FIND_IN_SET(s.name, p.area) > 0
-                                    AND p.date <= CURRENT_DATE()
-                                    AND p.end_date >= CURRENT_DATE()
+                                    AND p.status = 'Active'
                               ORDER BY a.room_type;
                         ''')
 

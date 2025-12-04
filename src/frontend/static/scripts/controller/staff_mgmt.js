@@ -3,35 +3,47 @@ let isAttendanceNotEmpty = false;
 const tbody = document.getElementById('staffList');
 
 // ------------ HELPER FUNCTIONS ------------
-function successMessageCard(message, redirect=null){
+function successMessageCard(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
                   </div>
             </div>
       `;
+
+      // Append message popup
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+
+      document.getElementById("close-message").addEventListener("click", () =>  {
+            const box = document.getElementById("success-message");
+            box.remove();
+
+            if (redirect)  window.location.href = redirect;
+      });
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
                   </div>
             </div>
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+      document.getElementById("close-failed-message").addEventListener("click", () =>  {
+            const box = document.getElementById("failed-message");
+            box.remove();
+      });
 }
-
 
 function renderAddStaffModal(){
       const modal = `
@@ -48,12 +60,12 @@ function renderAddStaffModal(){
                               <input type="hidden" name="status" value="Active">
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-                                    <input type="text" id="addName" name="staff_name" placeholder="Enter full name" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="text" id="addName" name="staff_name" placeholder="Enter full name" class="text-gray-900 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
-                                    <select id="addPosition" name="position" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <select id="addPosition" name="position" class="text-gray-900 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                           <option value="">Select position</option>
                                           <option value="Front Desk">Front Desk</option>
                                           <option value="Janitor">Janitor</option>
@@ -66,17 +78,17 @@ function renderAddStaffModal(){
                               <div class="grid grid-cols-2 gap-4">
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Daily Salary (₱)</label>
-                                          <input type="number" id="addDailySalary" name="daily_salary" min="0" placeholder="e.g., 500" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <input type="number" id="addDailySalary" name="daily_salary" min="0" placeholder="e.g., 500" class="text-gray-900  w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                     </div>
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Leave Days</label>
-                                          <input type="number" id="addMaxLeave" name="avl_leave" min="0" readonly value="5" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <input type="number" id="addMaxLeave" name="avl_leave" min="0" readonly value="5" class="text-gray-900  w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                     </div>
                               </div>
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
-                                    <input type="date" id="addDateStarted" name="date_started" class="text-gray-900 dark:text-gray-400 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="date" id="addDateStarted" name="date_started" class="text-gray-900  w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                               
                               <button type="submit" class="mt-3 px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">Add Staff</button>
@@ -309,12 +321,12 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
                               <input type="hidden" name="staff_id" value="${staff_id}">
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-                                    <input type="text" id="updateName" name="staff_name" value="${staff_name}" placeholder="Enter full name" class="w-full p-3 text-gray-800 dark:text-gray-100 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="text" id="updateName" name="staff_name" value="${staff_name}" placeholder="Enter full name" class="w-full p-3 text-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
-                                    <select id="updatePosition" name="position" class="w-full p-3 rounded-lg border border-gray-300 text-gray-800 dark:text-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <select id="updatePosition" name="position" class="w-full p-3 rounded-lg border border-gray-300 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                           <option value="">Select position</option>
                                           <option value="Front Desk" ${position === 'Front Desk' ? 'selected' : ''}>Front Desk</option>
                                           <option value="Janitor" ${position === 'Janitor' ? 'selected' : ''}>Janitor</option>
@@ -327,17 +339,17 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
                               <div class="grid grid-cols-2 gap-4">
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Daily Salary (₱)</label>
-                                          <input type="number" id="updateDailySalary" value="${daily_salary}" name="daily_salary" min="0" placeholder="e.g., 500" class="w-full p-3 text-gray-800 dark:text-gray-100 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <input type="number" id="updateDailySalary" value="${daily_salary}" name="daily_salary" min="0" placeholder="e.g., 500" class="w-full p-3 text-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                     </div>
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remaining Leave Days</label>
-                                          <input type="number" id="updateMaxLeave" value="${avl_leave}" name="avl_leave" min="0" placeholder="e.g., 5" class="w-full p-3 rounded-lg text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <input type="number" id="updateMaxLeave" value="${avl_leave}" name="avl_leave" min="0" placeholder="e.g., 5" class="w-full p-3 rounded-lg text-gray-800 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                                     </div>
                               </div>
                         
                               <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
-                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>dark:text-gray-100
+                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800  dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
@@ -393,7 +405,7 @@ async function showAllOnLeave(){
 
 function createStaffListRow(id, staff_name, position, status){
       const row = `
-            <li data-id="${id}" class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 shadow-md flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:-translate-y-1">
+            <li data-id="${id}" class="p-4 rounded-xl bg-gray-50 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-md flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:-translate-y-1">
                   <div>
                         <div class="flex items-center gap-2">
                               <span class="font-semibold text-lg text-gray-900 dark:text-gray-100">${staff_name}</span>
@@ -636,7 +648,7 @@ async function getAllStaff(){
 
                   result.data.forEach(staff => {
                         const row = `
-                              <tr data-set="${staff.id}" class="border-b border-gray-200 dark:border-gray-700 dark:border-gray-700 hover:bg-black/3 dark:bg-white/3">  
+                              <tr data-set="${staff.id}" class="border-b border-gray-200  dark:border-gray-700 hover:bg-black/3 dark:bg-white/3">  
                                     <td class="py-3 px-1 text-center">
                                           <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
                                                 <input type="checkbox" name="select_staff" class="timeout-checkbox hidden peer">
@@ -908,7 +920,7 @@ async function allStaffAttendance(){
                   isAttendanceNotEmpty = true;
                   const empty_row = `
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-200 ease-in-out">
-                              <td colspan="6" class="text-center bg-gray-50 dark:bg-gray-800 dark:text-white text-gray-600 py-3 bg-gray-50">No data.</td>
+                              <td colspan="6" class="text-center  dark:bg-gray-800 dark:text-white text-gray-600 py-3 bg-gray-50">No data.</td>
                         </tr>
                   `;
                   
@@ -943,7 +955,7 @@ async function individualStaffAttendance(id){
             }else{
                   const empty_row = `
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-200 ease-in-out">
-                              <td colspan="6" class="text-center bg-gray-50 dark:bg-gray-800 dark:text-white text-gray-600 py-3 bg-gray-50">No data.</td>
+                              <td colspan="6" class="text-center  dark:bg-gray-800 dark:text-white text-gray-600 py-3 bg-gray-50">No data.</td>
                         </tr>
                   `;
                   
@@ -1026,7 +1038,7 @@ async function sortAttendanceData(){
                   isAttendanceNotEmpty = true;
                   const empty_row = `
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-200 ease-in-out">
-                              <td colspan="6" class="text-center bg-gray-50 dark:bg-gray-800 dark:text-white text-gray-600 py-3 bg-gray-50">No data.</td>
+                              <td colspan="6" class="text-center  dark:bg-gray-800 dark:text-white text-gray-600 py-3 bg-gray-50">No data.</td>
                         </tr>
                   `;
                   

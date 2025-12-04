@@ -1,33 +1,46 @@
 import { notifications } from "./home-dashboard.js";
 
 // -------------------- HELPERS ------------------------- //
-function successMessageCard(message, redirect=null){
+function successMessageCard(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
                   </div>
             </div>
       `;
+
+      // Append message popup
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+
+      document.getElementById("close-message").addEventListener("click", () =>  {
+            const box = document.getElementById("success-message");
+            box.remove();
+
+            if (redirect)  window.location.href = redirect;
+      });
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
                   </div>
             </div>
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+      document.getElementById("close-failed-message").addEventListener("click", () =>  {
+            const box = document.getElementById("failed-message");
+            box.remove();
+      });
 }
 
 function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied){
@@ -88,7 +101,7 @@ function renderViewDetailsModal(roomType){
             <div id="roomDetailsModal" class="absolute w-full h-full inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50] ">
                   <div class="bg-white dark:bg-gray-900 w-full max-w-5xl rounded-lg shadow-xl p-6 relative fade-in-up">
                         <span class="absolute top-2 right-4 text-gray-500 dark:text-gray-100 dark:hover:text-gray-200 hover:text-gray-700 text-[25px] cursor-pointer" id="closeRoomDetails">&times;</span>
-                        <h3 id="modalRoomTitle" class="text-2xl font-semibold text-primary-blue mb-4">${roomType} Room - Details</h3>
+                        <h3 id="modalRoomTitle" class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">${roomType} Room - Details</h3>
 
                         <div class="overflow-y-auto max-h-[50vh] thin-scroll">
                               <table class="min-w-full divide-y divide-gray-200 text-center">
@@ -147,14 +160,14 @@ function render_openViewInfoRoomDetails(btn) {
 async function renderAssignStaffModal(area_name, room_no){
       const staffs = await allStaffs();
       const modal = `
-            <div id="assign-staff-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[50] flex items-center justify-center z-[50]">
+            <div id="assign-staff-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                   <div class="bg-card-bg dark:bg-gray-900 w-full max-w-[800px] rounded-lg shadow-2xl p-6 relative fade-in-up">
                         <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2"><i class="fas fa-user-tag text-primary-blue"></i> Assign Cleaners </h3>
                         <form id="assignStaffForm">
                               <div class="w-full mb-6 flex flex-col gap-2">
                                     <input type="hidden" name="area_name" value="${area_name}">
                                     <input type="hidden" name="room_no" value="${room_no}">
-                                    <select  name="name"class="w-full appearance-none border border-gray-300 rounded-lg px-3 py-4 pr-8 text-gray-700 dark:text-gray-100 dark:bg-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                    <select  name="name"class="w-full  border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-4 pr-8 text-gray-700 dark:text-gray-100 dark:bg-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                                           <option value="">Select Staff</option>
                                           ${staffs}
                                     </select>

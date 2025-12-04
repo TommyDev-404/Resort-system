@@ -1,32 +1,45 @@
 
 // ----------------- HELPERS ----------------- //
-function successMessageCard(message, redirect=null){
+function successMessageCard(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-check" class="text-6xl font-light text-green-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
                   </div>
             </div>
       `;
+
+      // Append message popup
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+
+      document.getElementById("close-message").addEventListener("click", () =>  {
+            const box = document.getElementById("success-message");
+            box.remove();
+
+            if (redirect)  window.location.href = redirect;
+      });
 }
 
 function failedMessageCard(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col p-6 text-center gap-4">
-                        <i data-lucide="circle-x" class="text-6xl font-light text-red-500"></i>
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600" id="close-failed-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
                   </div>
             </div>
       `;
 
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
+      document.getElementById("close-failed-message").addEventListener("click", () =>  {
+            const box = document.getElementById("failed-message");
+            box.remove();
+      });
 }
 
 function openUpdateAreaModal(e) {
@@ -71,6 +84,8 @@ async function renderTable() {
       try {
             const response = await fetch('/availables');
             const res = await response.json();
+            console.log(res);
+
             res.data.forEach(data => {
                   rows.push(data);
             });
