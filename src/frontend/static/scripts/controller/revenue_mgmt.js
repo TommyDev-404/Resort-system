@@ -58,7 +58,7 @@ function createRow(id, date, promo_name, discount, area, end, status){
       const formatted_area_name = area.split(',').map(a => all_area[a]);
 
       const row = `
-            <tr class="text-center hover:bg-black/3 text-gray-700 dark:text-gray-100 dark:hover:bg-white/3 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]" data-id=${id}>
+            <tr class="text-center bg-gray-50 dark:bg-gray-white/2 hover:bg-black/5 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-sm" data-id=${id}>
                   <td class="py-3 px-2">${date}</td>
                   <td class="py-3 px-2">${end}</td>
                   <td class="py-3 px-2 font-medium"><div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">${promo_name}</div></td>
@@ -249,8 +249,8 @@ async function getAllPromo() {
             });
       }else{
             const empty_row = `
-                  <tr id="no-promo-row" class="dark:hover:bg-white/3 dark:bg-white/5 bg-gray-50 hover:bg-black/6">
-                        <td colspan="7" class="text-center text-gray-500 dark:text-white py-4">No promotions yet.</td>
+                  <tr id="no-promo-row" class="dark:hover:bg-white/3 dark:bg-white/5 bg-gray-50 hover:bg-black/6 text-sm">
+                        <td colspan="7" class="text-center text-gray-800 dark:text-white py-4">No promotions yet.</td>
                   </tr>
             `;
             

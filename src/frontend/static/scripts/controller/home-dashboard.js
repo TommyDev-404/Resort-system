@@ -432,7 +432,7 @@ async function upcomingCheckouts() {
                   });
 
                   const row = `
-                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-black/10 transition">
+                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
                               <td class="px-3 py-2 text-center">
                                     <div class="w-[150px] overflow-x-auto thin-scroll whitespace-nowrap">    
                                           ${guest.name}
@@ -456,8 +456,8 @@ async function upcomingCheckouts() {
             });
       }else{
             const empty_row = `
-                  <tr class="border-b border-gray-300 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-black/10">
-                        <td colspan="4" class="text-center py-2">No data yet.</td>
+                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="8" class="text-center text-gray-800 py-2 dark:text-white">No data.</td>
                   </tr>
             `;
                   
@@ -480,7 +480,7 @@ async function upcomingArrivals() {
                   });
 
                   const row = `
-                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-black/10 transition">
+                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
                               <td class="px-3 py-2 text-center">
                                     <div class="w-[150px] overflow-x-auto thin-scroll whitespace-nowrap">    
                                           ${guest.name}
@@ -504,8 +504,8 @@ async function upcomingArrivals() {
             });
       }else{
             const empty_row = `
-                  <tr class="border-b border-gray-200 dark:border-gray-500 bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-black/10 transition">
-                        <td colspan="4" class="text-center py-2">No data yet.</td>
+                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="8" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
                   </tr>
             `;
                   

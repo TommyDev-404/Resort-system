@@ -376,25 +376,19 @@ async function showAllOnLeave(){
       const modal = `
             <div id="onLeaveModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                   <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-3xl p-6 relative fade-in-up">
-                  
                         <button id="closeOnLeaveStaff" class="absolute top-2 right-4 text-gray-600 dark:text-gray-300 text-2xl hover:text-red-500">&times;</button>
-                        
-                        <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-800 shadow-sm mt-4">
-                              <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Staff On Leave History</h3>
-                              <div class="overflow-y-auto max-h-[250px]">
-                                    <table class="w-full text-sm border-collapse">
-                                          <thead class="bg-gray-200 dark:bg-gray-700">
-                                                <tr class="text-center">
-                                                      <th class="p-2 text-gray-700 dark:text-gray-300">Staff Name</th>
-                                                      <th class="p-2 text-gray-700 dark:text-gray-300">Position</th>
-                                                      <th class="p-2 text-gray-700 dark:text-gray-300">Date</th>
-                                                </tr>
-                                          </thead>
-                                          <tbody id="attendanceTableIndividual" class="text-gray-700 dark:text-gray-300">
-                                                ${generated_row}
-                                          </tbody>
-                                    </table>
-                              </div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Staff On Leave History</h3>
+                        <div class="overflow-y-auto max-h-[250px]">
+                              <table class="w-full text-sm border-collapse">
+                                    <thead class="bg-gray-800 text-white">
+                                          <tr class="text-center">
+                                                <th class="p-2 ">Staff Name</th>
+                                                <th class="p-2 ">Position</th>
+                                                <th class="p-2 ">Date</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody id="attendanceTableIndividual" class="text-gray-700 dark:text-gray-300">${generated_row}</tbody>
+                              </table>
                         </div>
                   </div>
             </div>
@@ -450,7 +444,7 @@ function createStaffListRow(id, staff_name, position, status){
 function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date, status, type=null){
       if (type) {  
             const row = `
-                  <tr data-id="${staff_id}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/10 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]">
+                  <tr data-id="${staff_id}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/5 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]">
                         <td class="py-3 px-10 text-center text-sm">${date}</td>
                         <td class="py-3 px-10 text-center text-sm">${time_in}</td> 
                         <td class="py-3 px-10 text-center text-sm">${time_out}</td> 
@@ -463,7 +457,7 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
             return row;
       }else{
             const row = `
-                  <tr data-id="${staff_id}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/10 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px] overflow-x-auto">
+                  <tr data-id="${staff_id}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/5 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px] overflow-x-auto">
                         <td class="py-3 px-10 text-center text-sm truncate">
                               <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
                                     ${staff_name}
@@ -747,7 +741,7 @@ async function thisWeekOnLeave(){
                         });
 
                         const row = `
-                              <tr data-set="${staff.staff_id}" class="border-b border-gray-200 dark:border-gray-700">
+                              <tr data-set="${staff.staff_id}" class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 hover:bg-black/5 dark:bg-white/2 dark:hover:bg-white/5">
                                     <td class="p-3 text-center">${staff.name}</td>
                                     <td class="p-3 text-center">${staff.position}</td>
                                     <td class="p-3 text-center">${formattedDate}</td>
@@ -919,8 +913,8 @@ async function allStaffAttendance(){
             }else{
                   isAttendanceNotEmpty = true;
                   const empty_row = `
-                        <tr class="hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-200 ease-in-out">
-                              <td colspan="6" class="text-center  dark:bg-gray-800 dark:text-white text-gray-600 py-3 bg-gray-50">No data.</td>
+                        <tr class="bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 ease-in-out">
+                              <td colspan="6" class="text-center  dark:text-white text-gray-600 py-3">No data.</td>
                         </tr>
                   `;
                   

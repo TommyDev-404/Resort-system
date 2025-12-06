@@ -51,7 +51,7 @@ class Alerts:
 
                         db_date = data.get('date')
                         now = datetime.now(timezone.utc)
-
+                        
                         if (db_date.date() != now.date() or data.get('name') == 'temporary'):
                               cursor.execute('''
                                     UPDATE notifications SET name = %s, date =%s WHERE room_name = 'occupancy'

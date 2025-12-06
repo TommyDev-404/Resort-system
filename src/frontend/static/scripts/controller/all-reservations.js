@@ -49,7 +49,7 @@ function failedMessageCard(message){
 
 function createTable(id, guest_name, checkin, checkout, stay_count, accomodations, booking_type, status, payment_status){
       const row = `
-            <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}">
+            <tr class="text-[16px] hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}">
                   <!-- SELECT -->
                   <td class="px-3 py-4 w-[70px] text-center">
                         <label class="flex items-center justify-center gap-2 cursor-pointer select-none">
@@ -765,8 +765,8 @@ async function recentBookings(){
             });
       }else {
             const empty_row = `
-                  <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="8" class="text-center dark:text-gray-100 text-gray-600 py-6 dark:bg-white/3 bg-gray-50">No data.</td>
+                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="8" class="text-center text-gray-800 py-6 dark:text-white">No data.</td>
                   </tr>
             `;
             
@@ -863,8 +863,8 @@ async function bookingsCategories(e){
       }else {
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
             const empty_row = `
-                  <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="8" class="text-cente dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
+                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="8" class="text-center text-gray-800 py-6 dark:text-white">No data.</td>
                   </tr>
             `;
             

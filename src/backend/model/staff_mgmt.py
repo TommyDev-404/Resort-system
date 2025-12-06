@@ -13,7 +13,7 @@ class Staff_Management:
                         monthly = int(daily_salary) * 25
 
                         cursor.execute(''' 
-                              INSERT INTO staff_details(staff_name, date_started, daily_salary, weekly_salary, monthly_salary, estimate_weekly, estimate_month, position, avl_leave, status, workdays, absent, reset_date)
+                              INSERT INTO staff_details(staff_name, date_started, daily_salary, weekly_salary, monthly_salary, estimate_weekly, estimate_month, job_position, avl_leave, status, workdays, absent, reset_date)
                               VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ''', 
                         (staff_name, date_started, daily_salary, 0, 0,  weekly, monthly, position, avl_leave, status, 0, 0, date.today()))
                         
@@ -29,7 +29,7 @@ class Staff_Management:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute('''
-                              UPDATE staff_details set staff_name = %s, date_started = %s, daily_salary = %s, estimate_weekly = daily_salary * 7, estimate_month = daily_salary * 25, position = %s, avl_leave = %s, status = %s WHERE id = %s
+                              UPDATE staff_details set staff_name = %s, date_started = %s, daily_salary = %s, estimate_weekly = daily_salary * 7, estimate_month = daily_salary * 25, job_position = %s, avl_leave = %s, status = %s WHERE id = %s
                         ''', (staff_name, date_started, daily_salary, position, avl_leave, status, staff_id))
 
                         if status == 'On Leave':

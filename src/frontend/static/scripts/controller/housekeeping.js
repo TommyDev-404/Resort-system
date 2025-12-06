@@ -45,7 +45,7 @@ function failedMessageCard(message){
 
 function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied){
       const row = `
-            <tr data-room="${acc_name}" class="fade-in-up border-b border-gray-200 dark:border-gray-700">
+            <tr data-room="${acc_name}" class="fade-in-up border-b border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5">
                   <td class="px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">${acc_name}</td>
                   <td class="px-6 py-4 text-gray-800 dark:text-gray-100">${acc_count}</td>
                   <td class="px-6 py-4 ${Number(need_clean) > 0 ? 'text-red-600' : 'text-blue-600'} dark:text-gray-blue-500 font-bold">${need_clean}</td>
@@ -81,7 +81,7 @@ function createRowForRoomDetails(room_name, room_no, status, assign_staff, date)
       const formattedDate = new Date(date).toLocaleString("en-US", { month: "short", day: "numeric" });
 
       const row = `
-            <tr data-room="${room_name}">
+            <tr data-room="${room_name}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700">
                   <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">${room_no}</td>
                   <td class="px-4 py-3"><span class="px-2 py-1 rounded-full ${bg_color} text-xs font-semibold">${new_status}</td>
                   <td class="px-4 py-3 text-gray-700 dark:text-gray-100">${assign_staff !== null ? assign_staff : "--" }</td>
@@ -109,8 +109,8 @@ function renderViewDetailsModal(roomType){
                                           <tr>
                                           <th class="px-4 py-3 text-xs font-semibold uppercase">Room No.</th>
                                           <th class="px-4 py-3 text-xs font-semibold uppercase">Status</th>
-                                          <th class="px-4 py-3 text-xs font-semibold uppercase">Assigned To</th>
-                                          <th class="px-4 py-3 text-xs font-semibold uppercase">Date Assigned</th>
+                                          <th class="px-4 py-3 text-xs font-semibold uppercase">Last Assigned To</th>
+                                          <th class="px-4 py-3 text-xs font-semibold uppercase">Last Date Assigned</th>
                                           <th class="px-4 py-3 text-xs font-semibold uppercase">Action</th>
                                           </tr>
                                     </thead>
@@ -127,28 +127,59 @@ function renderViewDetailsModal(roomType){
       document.getElementById('housekeepingPortal').innerHTML += modal;
 }
 
-function render_openViewInfoRoomDetails(btn) {
+async function render_openViewInfoRoomDetails(btn) {
       const row = btn.closest('tr'); 
       const cells = row.querySelectorAll('td');
-
       const room_name = document.getElementById('modalRoomTitle').textContent.split(' ');
       const roomNo = cells[0].textContent.trim();
-      const status = cells[1].textContent.trim();
-      const staff = cells[2].textContent.trim();
-      const lastCleaned = cells[3].textContent.trim();
+
+      const response = await fetch(`/room-cleaning-history?room_name=${room_name[0]} ${roomNo}`);
+      const result = await response.json();
+
+      const rows = [];
+      if (result.success){
+            result.data.forEach(data => {
+                  const date = new Date(data.date).toISOString().split('T')[0];
+                  const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                  });
+
+                  const tr = `
+                        <tr class="text-sm bg-gray-50 dark:bg-white/2 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                              <td class="px-6 py-4 font-normal text-gray-800 dark:text-gray-100">${data.name}</td>
+                              <td class="px-6 py-4 text-gray-800 dark:text-gray-100">${formattedDate}</td>
+                        </tr>
+                  `;
+                  rows.push(tr);
+            });
+      }else{
+            const empty_row = `
+                  <tr class="text-sm bg-gray-50 dark:bg-white/2 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="2" class="text-center dark:text-white text-gray-800 py-4">No data.</td>
+                  </tr>
+            `;
+
+            rows.push(empty_row);
+      }
 
       const modal = `
-            <div id="view-info-modal" class="fixed inset-0 w-full h-full bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                  <div class="bg-card-bg dark:bg-gray-900 w-full max-w-[500px] rounded-lg shadow-2xl px-6 py-4 relative fade-in-up">
+            <div id="view-info-modal" class="absolute w-full h-full inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                  <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-lg shadow-xl p-6 relative fade-in-up">
                         <span class="absolute top-3 right-4 text-gray-500 dark:text-gray-200 text-[25px]  cursor-pointer transition" id="close-view-info-modal">&times;</span>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2" id="view-info-title"><i class="fas fa-user-tag text-primary-blue"></i>${room_name[0]} Room ${roomNo} - Info</h3>
-                        <div class="flex flex-col gap-2 mt-4 text-gray-900 dark:text-gray-400">
-                              Status:
-                              <label id="status" class="font-semibold text-[17px] text-gray-800 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-400 bg-gray-50 border border-gray-200 rounded-sm p-4">${status}</label>
-                              Date cleaned:
-                              <label id="date" class="font-medium text-[17px] text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-400 bg-blue-50 border border-blue-100 rounded-sm p-4">${lastCleaned}</label>
-                              Assigned to:
-                              <label id="assigned" class="font-medium text-[17px] text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-400 bg-blue-50 border border-blue-100 rounded-sm p-4">${staff}</label>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2" id="view-info-title"><i class="fas fa-user-tag text-primary-blue"></i>${room_name[0]} Room ${roomNo} - Cleaning History</h3>
+
+                        <div class="overflow-y-auto max-h-[40vh] thin-scroll">
+                              <table class="min-w-full divide-y divide-gray-200 text-center">
+                                    <thead class="dark:bg-gray-700 bg-gray-900 text-white sticky top-0 z-50">
+                                          <tr>
+                                                <th class="px-4 py-3 text-xs font-semibold uppercase">Staff Name</th>
+                                                <th class="px-4 py-3 text-xs font-semibold uppercase">Date Assigned</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200" id="cleaning-details">${rows.join('\n')}</tbody>
+                              </table>
                         </div>
                   </div>
             </div>
@@ -218,7 +249,7 @@ async function accomodationData(){
 async function allStaffs(){
       const response = await fetch('/staff-cleaners');
       const result = await response.json();
-      console.log(result);
+
       if (result.success){
             let staff_list = [];
 
@@ -323,7 +354,7 @@ document.addEventListener('click', (e) => {
             }
       }
       if (e.target.matches('#view-room-details')) (renderViewDetailsModal(e.target.closest('tr').dataset.room), openRoomDetails(e.target.closest('tr').dataset.room));
-    
+
       // spans
       if (e.target.matches('#closeRoomDetails')) document.getElementById('roomDetailsModal').remove();
       if (e.target.matches('#close-assign-staff-modal')) document.getElementById('assign-staff-modal').remove();

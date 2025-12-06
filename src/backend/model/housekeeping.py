@@ -71,31 +71,22 @@ class Housekeeping:
                               UPDATE accomodation_spaces SET status = 'on-clean', staff_assign = %s, date = %s WHERE name = %s AND room = %s
                         ''', (name, date, area_name, room_no))
                         
+                        room = f'''{area_name} {room_no}'''
+                        cursor.execute('''
+                              INSERT INTO room_assign_history(name, date, room) VALUES(%s, %s, %s)
+                        ''', (name, date, room))
+
                         cursor.execute('''
                               DELETE FROM notifications WHERE room_name = %s AND room_no = %s
                         ''', (area_name.lower(), room_no))
                         
                         con.commit()
 
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Assigned successfully!' if bool(cursor.rowcount ) else 'Failed inserting data!'}
+                        return {'success': bool(cursor.rowcount > 0), 'message': 'Assigned successfully!' if bool(cursor.rowcount > 0) else 'Failed inserting data!'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
-      def reassign_cleaner(self, name, role, date, room_no, area_name):
-            try:
-                  with self.db.connect() as con:
-                        cursor = con.cursor()
-                        cursor.execute('''
-                              UPDATE accomodation_spaces SET staff_assign = %s, date = %s WHERE name = %s AND room = %s
-                        ''', (name, role, date, area_name, room_no))
-                        con.commit()
-
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Re-assigned successfully!' if bool(cursor.rowcount ) else 'Failed inserting data!'}
-            except Exception as e:
-                  con.rollback()
-                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
       def update_room_condition(self, room_no, area_name):
             try:
                   with self.db.connect() as con:
@@ -116,6 +107,18 @@ class Housekeeping:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' SELECT * FROM staff_details WHERE position NOT IN ('Front Desk', 'Security Guard') ''')
+                        data = cursor.fetchall()
+
+                        return {'success': bool(data), 'data': data}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+            
+      def room_assigned_history(self, room):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(''' SELECT * FROM room_assign_history WHERE room = %s ''', (room,))
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}

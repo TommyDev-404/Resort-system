@@ -97,7 +97,7 @@ async function renderTable() {
       const bodyHtml = rows.map(row => {
             const { name, capacity } = areaTypeInfo(row.room_type);
             return `
-                  <tr class="fade-in-up text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+                  <tr class="fade-in-up text-gray-900 bg-gray-50 dark:bg-white/3 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 hover:bg-black/5 dark:hover:bg-white/5 transition-all">
                         <td class="px-6 py-4 text-center font-semibold flex flex-col justify-center items-center gap-1 min-w-[450px] whitespace-nowrap">
                               ${row.area_condition ? `<span class="text-[12px] font-medium text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-800 px-2 py-0.5 rounded-full">${row.promo_name}</span>` : ''}
                               ${name}

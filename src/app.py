@@ -47,6 +47,7 @@ def system_page():
       if  not session.get('admin'):
             return redirect(url_for('login_page'))
       
+      alert.occupancy_alert()
       with db.connect() as conn:
             cursor = conn.cursor()
 
@@ -333,6 +334,10 @@ def update_area_condition():
 @app.route('/staff-cleaners', methods=['GET'])
 def staff_cleaners():
       return jsonify(house.staff_cleaners())
+
+@app.route('/room-cleaning-history', methods=['GET'])
+def room_cleaning_history():
+      return jsonify(house.room_assigned_history(request.args.get('room_name')))
 
 
 #--------------- RATES AND AVAILABILITY ------------------#

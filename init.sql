@@ -129,11 +129,18 @@ CREATE TABLE staff_leaves_data (
     date DATE NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- room staff assigned history
+CREATE TABLE room_assign_history (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    date DATE NOT NULL,
+    room VARCHAR(50)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 -- default admin credentials
-INSERT INTO admin (username, password, email, contact, code, hash_pass, date_pass_change);
-VALUES
-('admin', 'plainpass123', 'admin@example.com', '09123456789', 123456, '$2y$10$9H0p1KdEQ1gEoH9s2lO0gOVYBWqs0ioY1hGQfgF4FklajfHsyAqLC','2025-01-01');
+INSERT INTO admin (username, password, email, contact, code, hash_pass, date_pass_change)
+VALUES ('admin', 'plainpass123', 'admin@example.com', '09123456789', 123456, '$2y$10$9H0p1KdEQ1gEoH9s2lO0gOVYBWqs0ioY1hGQfgF4FklajfHsyAqLC','2025-01-01');
 
 -- new 
 insert into notifications(name, date, room_name, room_no) VALUES ('temporary', CURRENT_DATE() - INTERVAL 1 DAY, 'occupancy', 0)
@@ -200,19 +207,6 @@ VALUES
 ('Big', 108, 'avl', NULL, 1000, 1000, 'None', NULL),
 ('Hall', 101, 'avl', NULL, 1000, 1000, 'None', NULL);
 
-INSERT INTO area_table (name, count, max, rate)
-VALUES
-('Premium Villa Room', 4, 12, 10000),
-('Standard Villa Room', 3, 10, 8000),
-('Garden View Room', 12, 4, 3500),
-('Barkada Room', 7, 8, 6500),
-('Family Room', 7, 10, 3000),
-('Cabana Cottage', 8, 30, 1000),
-('Small Cottage', 8, 20, 500),
-('Hall', 1, 100, 3000),
-('Big Cottage', 8, 50, 1000);
-
-
 -- trigger for updating data on bookings then affect the accomodation data
 DELIMITER $$
 
@@ -230,18 +224,18 @@ END$$
 
 DELIMITER ;
 
--- auto checkout guest event
+
 DELIMITER $$
 
 CREATE EVENT IF NOT EXISTS auto_checkout_guests
 ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_DATE
+STARTS CURRENT_DATE()
 DO
 BEGIN
     -- 1. Update booking status
     UPDATE bookings
     SET status = 'Checked-out'
-    WHERE check_out <= CURRENT_DATE AND MONTH(check_out) = MONTH(CURRENT_DATE) AND YEAR(check_out) = YEAR(CURRENT_DATE)
+    WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE())
     AND status = 'Checked-in';
 
     -- 2. Update accomodation_spaces for rooms that just checked out
@@ -250,7 +244,7 @@ BEGIN
       ON a.name = TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1))
      AND a.room = CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED)
     SET a.status = 'need-clean'
-    WHERE check_out <= CURRENT_DATE AND MONTH(check_out) = MONTH(CURRENT_DATE) AND YEAR(check_out) = YEAR(CURRENT_DATE)
+    WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE())
       AND b.status = 'Checked-out';
 
     -- 3. Insert notifications for housekeeping
@@ -260,12 +254,11 @@ BEGIN
            TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1)) ,
            CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED)
     FROM bookings b
-    WHERE check_out <= CURRENT_DATE AND MONTH(check_out) = MONTH(CURRENT_DATE) AND YEAR(check_out) = YEAR(CURRENT_DATE)
+    WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE())
       AND b.status = 'Checked-out';
 END$$
 
 DELIMITER ;
-
 
 -- check event if its turn on
 SHOW VARIABLES LIKE 'event_scheduler';
