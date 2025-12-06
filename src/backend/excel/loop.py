@@ -28,12 +28,10 @@ df = df.rename(columns={
 })
 
 db = pymysql.connect( 
-    host="mysql-172efd11-rustomgalicia498-3247.c.aivencloud.com",
-    user="avnadmin",
-    password="AVNS_Q1xkKWniQn9lyznK3Qx",
-    port=20969,
+    host="localhost",
+    user="root",
+    password="2006",
     database="resort_db", 
-    ssl={'ca': './src/backend/ca.pem'}
 ) 
 
 cursor = db.cursor() # Use the connection directly
