@@ -34,11 +34,10 @@ function failedMessageCard(message){
       lucide.createIcons();
 }
 
-
 function renderChangePassword(email){
       const modal = `
             <div id="passwordModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                  <div class="bg-white dark:bg-gray-900 p-6 rounded-xl w-110 relative  fade-in-up">
+                  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-110 relative  fade-in-up">
                         <h3 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">Change Password</h3>
                         <form id="changePassForm">
                               <input type="hidden" name="email" value="${email}">
@@ -80,7 +79,7 @@ function showPassword() {
 function renderEditModal(type, value){
       const modal = `
             <div id="editModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                  <div class="bg-white dark:bg-gray-900 p-6 rounded-xl w-96 relative  fade-in-up">
+                  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-96 relative  fade-in-up">
                         <h3 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">Edit ${type}</h3>
                         <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="text" name="${type === "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border border-gray-400 rounded text-gray-900 dark:text-gray-100" placeholder="Enter ${type}" value="${value}">
                         <div class="flex justify-end gap-2">
@@ -97,14 +96,14 @@ function renderEditModal(type, value){
 function renderCodeModal(){
       const modal = `
             <div id="codeModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in-up">
-                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 w-90 max-w-full">
+                  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 w-90 max-w-full">
                         <h2 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-white">Enter 6-Digit Code</h2>
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-2 mt-2 mb-4">
                               <input id="codeInput1" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
                               <input id="codeInput2" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
                               <input id="codeInput3" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
                               <input id="codeInput4" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput5" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border border-gray-300 rounded-md text-center text-lg tracking-widest" />
+                              <input id="codeInput5" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
                               <input id="codeInput6" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
                         </div>
                         <div class="mt-4 flex justify-end gap-2 ">

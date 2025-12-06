@@ -16,6 +16,7 @@ CREATE TABLE bookings (
     ) NOT NULL,
     status ENUM(
         'Reserved',
+        'Day Guest',
         'Checked-in',
         'Checked-out',
         'Cancelled'
@@ -67,15 +68,6 @@ CREATE TABLE promos (
     area VARCHAR(100) NOT NULL,
     end_date DATE NOT NULL,
     status ENUM('Active', 'Expired') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- area_data table
-CREATE TABLE area_table (
-    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    count INT(11) NOT NULL,
-    max INT(11) NOT NULL,
-    rate INT(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- admin table
@@ -219,7 +211,6 @@ VALUES
 ('Small Cottage', 8, 20, 500),
 ('Hall', 1, 100, 3000),
 ('Big Cottage', 8, 50, 1000);
-
 
 
 -- trigger for updating data on bookings then affect the accomodation data

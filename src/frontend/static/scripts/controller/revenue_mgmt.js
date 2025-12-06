@@ -58,24 +58,20 @@ function createRow(id, date, promo_name, discount, area, end, status){
       const formatted_area_name = area.split(',').map(a => all_area[a]);
 
       const row = `
-            <tr class="hover:bg-black/3 text-gray-700 dark:text-gray-100 dark:hover:bg-white/3 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]" data-id=${id}>
-                  <td class="py-3 px-1 ">${date}</td>
-                  <td class="py-3 px-1  ">${end}</td>
-                  <td class="py-3 px-1 font-medium  w-[250px]">
-                        <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
-                              ${promo_name}
-                        </div>
-                  </td>
-                  <td class="py-3 px-1 ">${discount}</td>
-                  <td class="py-3 px-1">
-                        <div class="w-full overflow-x-auto thin-scroll whitespace-nowrap">
-                              ${formatted_area_name.join(', ')}
-                        </div>
-                  </td>
-                  <td class="text-white rounded-lg text-sm font-bold py-3 px-1  w-[100px]"><span class="${status === 'Active' ? 'bg-green-500' : 'bg-orange-500 '} py-2 px-4 rounded-lg">${status}</span></td>
-                  <td class="flex gap-2 items-center justify-center py-3 px-1 ">
-                        <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i  data-lucide="eye" class="text-white text-lg"></i></button>
-                        <button id="remove-promo" class="bg-red-500 hover:bg-red-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 cursor-pointer"><i data-lucide="trash"  class="text-white text-lg"></i></button>
+            <tr class="text-center hover:bg-black/3 text-gray-700 dark:text-gray-100 dark:hover:bg-white/3 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px]" data-id=${id}>
+                  <td class="py-3 px-2">${date}</td>
+                  <td class="py-3 px-2">${end}</td>
+                  <td class="py-3 px-2 font-medium"><div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">${promo_name}</div></td>
+                  <td class="py-3 px-2 text-center">${discount}</td>
+                  <td class="py-3 px-2"><div class="w-full overflow-x-auto thin-scroll whitespace-nowrap">${formatted_area_name.join(', ')}</div></td>
+                  <td class="py-3 px-2 text-center"><span class="inline-block text-white font-semibold text-sm px-3 py-1 rounded-full ${status === 'Active' ? 'bg-green-500' : 'bg-orange-500'} shadow-md">${status}</span></td>
+                  <td class="flex gap-2 items-center justify-center py-3 px-2">
+                        <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 items-center justify-center cursor-pointer">
+                              <i data-lucide="eye" class="text-white text-lg"></i>
+                        </button>
+                        <button id="remove-promo" class="bg-red-500 hover:bg-red-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 items-center justify-center cursor-pointer">
+                              <i data-lucide="trash" class="text-white text-lg"></i>
+                        </button>
                   </td>
             </tr>
       `;
@@ -245,8 +241,8 @@ async function getAllPromo() {
       document.querySelectorAll('#promo-tbody tr').forEach(row => row.remove());
       if (res.success){
             res.data.forEach(row => {
-                  const start = new Date(row.date).toLocaleDateString("en-US", {year: "numeric", month: "long", day: "numeric"});
-                  const end = new Date(row.end_date).toLocaleDateString("en-US", {year: "numeric", month: "long", day: "numeric"});
+                  const start = new Date(row.date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+                  const end = new Date(row.end_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
                   let discount = row.name.split('-');
 
                   createRow(row.id, start, discount[0], discount[1], row.area, end, row.status)

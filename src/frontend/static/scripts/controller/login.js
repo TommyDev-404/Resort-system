@@ -1,3 +1,4 @@
+lucide.createIcons();
 
 const input = document.querySelector('input[name="password"]');
 const loginForm = document.getElementById('loginForm');
@@ -8,8 +9,6 @@ const backToLogin = document.getElementById('backToLogin');
 const backToLogin2 = document.getElementById('backToLogin2');
 const linkChangePass = document.getElementById('link-change-pass');
 const loginOverlay = document.querySelector('.login-overlay');
-
-lucide.createIcons() 
 
 /*---------------- LOGIN EVENT LISTENER ----------------*/
 forgotLink.addEventListener('click', () => {
@@ -139,7 +138,6 @@ async function loginAdmin(e) {
             });
             const result = await response.json();
       
-            console.log(result);
             if (result.success){
                   successMessageCard(result.message, result.redirect);
             }else{
@@ -167,7 +165,6 @@ async function forgotPassword() {
             });
             const result = await response.json();
       
-            console.log(result);
             if (result.success){
                   successMessageCard(result.message);
             }else{

@@ -37,7 +37,7 @@ class Accounting:
                                     COALESCE(SUM(CASE WHEN payment = 'Online Payment' THEN total_amount ELSE 0 END), 0) AS online,
                                     COALESCE(SUM(total_amount), 0) AS total_revenue
                               FROM bookings
-                              WHERE DATE(check_in) = CURDATE();
+                              WHERE DATE(check_in) = CURDATE() and status IN ('Checked-in', 'Day Guest');
                         ''')
                         data = cursor.fetchone()
 

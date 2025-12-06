@@ -147,25 +147,25 @@ function renderAddBookingModal(){
                         <form id="addBookingForm" class="flex flex-col gap-6">
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                          <input type="text" name="name" placeholder="Guest Name" class="border border-gray-300 dark:text-gray-100 text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
-                                          <input type="number" name="total_guest" placeholder="Total Guests" min="1" class="border dark:text-gray-100 text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                          <input type="text" name="name" placeholder="Guest Name" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                          <input type="number" name="total_guest" placeholder="Total Guests" min="1" class="border dark:text-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                     </div>
                               </section>
             
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                          <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-900 dark:text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
-                                                <option class="text-gray-600 " value="" selected disabled>Select Booking Category</option>
-                                                <option class="text-gray-600 " value="Reservation">Reservation (Advance Booking)</option>
-                                                <option class="text-gray-600" value="Check-in">Check-in (Walk-in Booking)</option>
-                                                <option class="text-gray-600" value="Day Guest">Day Guest (Amenities Only)</option>
+                                          <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                                <option class="text-black " value="" selected disabled>Select Booking Category</option>
+                                                <option class="text-black " value="Reservation">Reservation (Advance Booking)</option>
+                                                <option class="text-black" value="Check-in">Check-in (Walk-in Booking)</option>
+                                                <option class="text-black" value="Day Guest">Day Guest (Amenities Only)</option>
                                           </select>
 
-                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
-                                                <option class="text-gray-600 "  value="" selected disabled>Select Payment Method</option>
-                                                <option class="text-gray-600 "  value="Direct Payment">Direct Payment</option>
-                                                <option class="text-gray-600 "  value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
-                                                <option class="text-gray-600 "  value="Pending">Pending</option>
+                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
+                                                <option class="text-black "  value="" selected disabled>Select Payment Method</option>
+                                                <option class="text-black "  value="Direct Payment">Direct Payment</option>
+                                                <option class="text-black "  value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
+                                                <option class="text-black "  value="Pending">Pending</option>
                                           </select>
                                     </div>
                               </section>
@@ -626,7 +626,6 @@ async function updateReservationDate(e){
 
 // --------------- GET DATA Fetching -------------- //
 async function renderViewReservationDetails(id){
-      console.log('view');
       const response = await fetch(`/view-details/${id}`);
       const result = await response.json();
 
@@ -635,30 +634,62 @@ async function renderViewReservationDetails(id){
             const check_out = new Date(result.data.check_out).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'});
 
             const modal = `
-                  <div class="fixed top-0 left-0 w-full h-full bg-black/30 backdrop-blur-sm z-50" id="details-overlay">
-                        <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-2xl max-w-[680px] px-[50px] py-6">
-                              <span id="close-details" class="font-semibold text-[25px] cursor-pointer fixed top-[1%] left-[94.5%] text-gray-400 dark:text-gray-100 dark:hover:text-gray-200 hover:text-gray-600 transition">&times;</span>
-                              <div class="max-h-auto">
-                                    <h2 class="text-gray-700 dark:text-gray-100 text-center font-bold text-[20px] mb-4">Guest Details</h2>
-                                    <div class="flex flex-col gap-1 mt-4 text-gray-900 dark:text-gray-200">
-                                          Name:
-                                          <label id="name" class="font-semibold text-[17px] text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-gray-200 rounded-sm p-2">${result.data.name}</label>
-                                          Check-in:
-                                          <label id="check-in" class="font-medium text-[17px] text-blue-700 bg-blue-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-blue-100 rounded-sm p-2">${check_in}</label>
-                                          Check-out:
-                                          <label id="check-out" class="font-medium text-[17px] text-blue-700 bg-blue-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-blue-100 rounded-sm p-2">${check_out}</label>
-                                          Accomodations:
-                                          <label id="accomodations" class="font-medium text-[17px] text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-gray-200 rounded-sm p-2">${result.data.accomodations}</label>
-                                          Total Guest:
-                                          <label id="total" class="font-medium text-[17px] text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-gray-200 rounded-sm p-2">${result.data.total_guest}</label>
-                                          Booking Type:
-                                          <label id="booking" class="font-medium text-[17px] text-indigo-700 bg-indigo-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-indigo-100 rounded-sm p-2">${result.data.booking_type}</label>
-                                          Status:
-                                          <label id="status" class="font-medium text-[17px] text-emerald-700 bg-emerald-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500  border border-emerald-100 rounded-sm p-2">${result.data.status}</label>
-                                          Payment:
-                                          <label id="payment_t" class="font-medium text-[17px] text-yellow-700 bg-yellow-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-yellow-100 rounded-sm p-2">${result.data.payment}</label>
-                                          Total Paid:
-                                          <label id="paid-amount" class="font-medium text-[17px] text-teal-700 bg-teal-50 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-500 border border-teal-100 rounded-sm p-2">${result.data.total_amount}</label>
+                  <div id="details-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                        <div class="relative w-full max-w-xl bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-8 overflow-hidden">
+                              <!-- Close button -->
+                              <span id="close-details" class="absolute top-4 right-4 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 text-2xl font-bold transition cursor-pointer">&times;</span>
+
+                              <!-- Header -->
+                              <h2 class="text-center text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Guest Details</h2>
+
+                              <!-- Details grid -->
+                              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-900 dark:text-gray-200">
+                                    <div>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Name</p>
+                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.name}</div>
+                                    </div>
+                                    
+                                    <div>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Check-in</p>
+                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${check_in}</div>
+                                    </div>
+                                    
+                                    <div>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Check-out</p>
+                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${check_out}</div>
+                                    </div>
+                                    
+                                    <div>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Total Guest</p>
+                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.total_guest}</div>
+                                    </div>
+                                    
+                                    <div>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Booking Type</p>
+                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.booking_type}</div>
+                                    </div>
+                                    
+                                    <div>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Status</p>
+                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.status}</div>
+                                    </div>
+                                    
+                                    <div>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Payment</p>
+                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.payment}</div>
+                                    </div>
+                                    
+                                    <div>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Total Paid</p>
+                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.total_amount}</div>
+                                    </div>
+                                    
+                                    <!-- Accommodations with scrollable content -->
+                                          <div class="md:col-span-2">
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Accommodations</p>
+                                          <div class="max-h-32 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-gray-900 dark:text-gray-200">
+                                                ${result.data.accomodations.split(',').map(accs => accs.trim()).join(', ')}
+                                          </div>
                                     </div>
                               </div>
                         </div>

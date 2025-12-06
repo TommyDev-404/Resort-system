@@ -261,9 +261,7 @@ class Staff_Management:
                         cursor.execute(''' DELETE FROM staff_attendance WHERE staff_id = %s  AND date = %s''', (id, new_date))
                         
                         if status != 'Absent':
-                              print('not absent here')
                               if status == 'Present (Whole Day)':
-                                    print('wholle here')
                                     cursor.execute('''
                                           UPDATE staff_details
                                           SET 
@@ -284,7 +282,6 @@ class Staff_Management:
                                           WHERE id = %s
                                     ''', (id,))
                               else:
-                                    print('halfay here')
                                     cursor.execute('''
                                           UPDATE staff_details
                                           SET 
@@ -306,26 +303,12 @@ class Staff_Management:
                                     ''', (id,))
 
                         else:
-                              print('absent here')
                               cursor.execute('''
-                                    UPDATE staff_details
-                                    SET 
-                                    absent = CASE 
-                                                      WHEN absent - 1 < 0 THEN 0
-                                                      ELSE absent - 1
-                                                END,
-
-                                    weekly_salary = CASE
-                                                      WHEN weekly_salary - (daily_salary * 1) < 0 THEN 0
-                                                      ELSE weekly_salary - (daily_salary * 1)
-                                                      END,
-
-                                    monthly_salary = CASE
-                                                      WHEN monthly_salary - (daily_salary * 1) < 0 THEN 0
-                                                      ELSE monthly_salary - (daily_salary * 1)
-                                                      END
+                                    UPDATE staff_details SET 
+                                    absent = CASE WHEN absent - 1 < 0 THEN 0 ELSE absent - 1 END,
+                                    weekly_salary = CASE WHEN weekly_salary - (daily_salary * 1) < 0 THEN 0 ELSE weekly_salary - (daily_salary * 1) END,
+                                    monthly_salary = CASE WHEN monthly_salary - (daily_salary * 1) < 0 THEN 0 ELSE monthly_salary - (daily_salary * 1) END
                                     WHERE id = %s;
-
                               ''', (id,))
 
                               cursor.execute(''' UPDATE staff_details SET status = %s WHERE id = %s ''', ('Active', id))

@@ -522,17 +522,18 @@ async function occupancyData(type=null) {
 
       document.getElementById('occupancy-percentage').textContent = `${res.current}%`;
       document.getElementById('occupancy-change').textContent = res.change < 0 ? `${res.change}%` : `+${res.change}%`;
+      document.getElementById('current-occupancy-data').textContent = `${Math.round(res.current)}%`;
 
       if (res.change < 0){
             document.getElementById('occupancy-change').classList.remove('text-green-500');
             document.getElementById('occupancy-change').classList.add('text-red-500');
-            document.getElementById('change-occupancy-icon').setAttribute("data-lucide", "arrow-down-left");
+            document.getElementById('change-occupancy-icon').setAttribute("data-lucide", "arrow-down");
             document.getElementById('change-occupancy-icon').classList.remove("text-green-500");
             document.getElementById('change-occupancyt-icon').classList.add("text-red-500");
       }else{
             document.getElementById('occupancy-change').classList.remove('text-red-500');
             document.getElementById('occupancy-change').classList.add('text-green-500');
-            document.getElementById('change-occupancy-icon').setAttribute("data-lucide", "arrow-up-right");
+            document.getElementById('change-occupancy-icon').setAttribute("data-lucide", "arrow-up");
             document.getElementById('change-occupancy-icon').classList.remove("text-red-500");
             document.getElementById('change-occupancy-icon').classList.add("text-green-500");
       }
@@ -545,19 +546,19 @@ async function dailyRevenue(type=null){
       const response = await fetch(url);
       const res = await response.json();
 
-      document.getElementById('today-revenue-analytics').textContent = Number(res.current).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+      document.getElementById('today-revenue-analytics').textContent = formatPesoShort(Number(res.current));
       document.getElementById('today-revenue-change').textContent = res.change < 0? `${res.change}%` : `+${res.change}%`;
 
       if (res.change < 0){
             document.getElementById('today-revenue-change').classList.remove('text-green-500');
             document.getElementById('today-revenue-change').classList.add('text-red-500');
-            document.getElementById('change-today-icon').setAttribute("data-lucide", "arrow-down-left");
+            document.getElementById('change-today-icon').setAttribute("data-lucide", "arrow-down");
             document.getElementById('change-today-icon').classList.remove("text-green-500");
             document.getElementById('change-today-icon').classList.add("text-red-500");
       }else{
             document.getElementById('today-revenue-change').classList.remove('text-red-500');
             document.getElementById('today-revenue-change').classList.add('text-green-500');
-            document.getElementById('change-today-icon').setAttribute("data-lucide", "arrow-up-right");
+            document.getElementById('change-today-icon').setAttribute("data-lucide", "arrow-up");
             document.getElementById('change-today-icon').classList.remove("text-red-500");
             document.getElementById('change-today-icon').classList.add("text-green-500");
       }
@@ -570,22 +571,26 @@ async function monthlyRevenue(type=null){
       const response = await fetch(url);
       const res = await response.json();
 
-      document.getElementById('monthly-revenue-analytics').textContent = Number(res.monthly).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+      document.getElementById('monthly-revenue-analytics').textContent = formatPesoShort(Number(res.monthly));
       document.getElementById('monthly-revenue-change').textContent = res.change < 0 ? `${res.change}%` : `+${res.change}%`;    
-
-      if (res.change < 0){
-            console.log(res.change);
-            document.getElementById('monthly-revenue-change').classList.remove('text-green-500');
-            document.getElementById('monthly-revenue-change').classList.add('text-red-500');
-            document.getElementById('change-monthly-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('change-monthly-icon').classList.remove("text-green-500");
-            document.getElementById('change-monthly-icon').classList.add("text-red-500");
-      }else{
-            document.getElementById('monthly-revenue-change').classList.remove('text-red-500');
-            document.getElementById('monthly-revenue-change').classList.add('text-green-500');
-            document.getElementById('change-monthly-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('change-monthly-icon').classList.remove("text-red-500");
-            document.getElementById('change-monthly-icon').classList.add("text-green-500");
+      
+      const changeEl = document.getElementById('monthly-revenue-change');
+      const iconEl = document.getElementById('change-monthly-icon');
+      
+      if (res.change < 0) {
+            changeEl.classList.remove('dark:text-green-400');
+            changeEl.classList.add('dark:text-red-400');
+            
+            iconEl.setAttribute("data-lucide", "arrow-down");
+            iconEl.classList.remove("dark:text-green-400");
+            iconEl.classList.add("dark:text-red-400");
+      } else {
+            changeEl.classList.remove('dark:text-red-400');
+            changeEl.classList.add('dark:text-green-400');
+            
+            iconEl.setAttribute("data-lucide", "arrow-up");
+            iconEl.classList.remove("dark:text-red-400");
+            iconEl.classList.add("dark:text-green-400");
       }
       
       lucide.createIcons();
@@ -595,12 +600,19 @@ async function targetRevenue(){
       const response = await fetch('/target-revenue');
       const res = await response.json();
       
-      document.getElementById('target').textContent =  Number(res.target).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+      document.getElementById('target').textContent =  formatPesoShort(Number(res.target));
+}
+
+function formatPesoShort(num) {
+      if (num >= 1_000_000_000) return "₱" + (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B";  
+      if (num >= 1_000_000)     return "₱" + (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";  
+      if (num >= 1_000)         return "₱" + (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";  
+      return "₱" + num.toLocaleString("en-PH");
 }
 
 function loadAccomodationType(accomodation_type=null){
       document.querySelectorAll('#accomodation_type').forEach(year => {
-            year.textContent = accomodation_type ? accomodation_type : 'All Resort Area';
+            year.textContent = accomodation_type ? `(${accomodation_type})` : '(All Resort Area)';
       });
 }
 

@@ -348,7 +348,7 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
                               </div>
                         
                               <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>dark:text-gray-100
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
                                     <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800  dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
@@ -455,7 +455,7 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
                         <td class="py-3 px-10 text-center text-sm">${time_in}</td> 
                         <td class="py-3 px-10 text-center text-sm">${time_out}</td> 
                         <td class="py-3 px-6 text-center" >
-                              <label class="text-xs font-semibold py-1 px-3 rounded-2xl ${status === "Absent"  ? 'text-green-600 bg-red-100 dark:text-white dark:bg-red-500' : 'text-green-600 bg-green-100 dark:text-white dark:bg-green-500'}">${status}</label>
+                              <label class="text-xs font-semibold py-1 px-3 rounded-2xl ${status === "Absent"  ? 'text-red-600 bg-red-100 dark:text-white dark:bg-red-500' : 'text-green-600 bg-green-100 dark:text-white dark:bg-green-500'}">${status}</label>
                         </td>
                   </tr>
             `;
@@ -464,21 +464,21 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
       }else{
             const row = `
                   <tr data-id="${staff_id}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/10 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-[17px] overflow-x-auto">
-                        <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">
+                        <td class="py-3 px-10 text-center text-sm truncate">
                               <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
                                     ${staff_name}
                               </div>
                         </td> 
-                        <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_in}</td> 
-                        <td class="py-3 px-10 text-center text-sm truncate max-w-[180px]">${time_out}</td> 
+                        <td class="py-3 px-10 text-center text-sm truncate">${time_in}</td> 
+                        <td class="py-3 px-10 text-center text-sm truncate">${time_out}</td> 
                         <td class="py-3 px-10 text-center text-sm">
                               <div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">
                                     ${date}
                               </div>
                         </td>
-                        <td class="py-3 px-6 text-center w-[200px]">
+                        <td class="py-3 px-6 text-center">
                               <label class="text-xs font-semibold py-1 px-3 rounded-2xl w-full overflow-x-auto scroll-hide whitespace-nowrap
-                                    ${status === "Absent"  ? 'text-green-600 bg-red-100 dark:text-white dark:bg-red-500' :
+                                    ${status === "Absent"  ? 'text-red-600 bg-red-100 dark:text-white dark:bg-red-500' :
                                     status === '--' ? 'text-gray-900 dark:text-white ' :
                                     'text-green-600 bg-green-100 dark:text-white dark:bg-green-500' 
                               }">${status}</label>

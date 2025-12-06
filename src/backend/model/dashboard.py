@@ -58,12 +58,12 @@ class Dashboard:
                         today AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS guests
                               FROM bookings
-                              WHERE DATE(check_in) = CURDATE()
+                              WHERE DATE(check_in) = CURDATE() AND status IN ('Checked-in', 'Day Guest')
                         ),
                         yesterday AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS guests
                               FROM bookings
-                              WHERE DATE(check_in) = CURDATE() - INTERVAL 1 DAY
+                              WHERE DATE(check_in) = CURDATE() - INTERVAL 1 DAY AND status IN ('Checked-in', 'Day Guest', 'Checked-out')
                         )
                         SELECT 
                               today.guests AS today_guest,
@@ -121,8 +121,10 @@ class Dashboard:
                               CURRENT_DATE() AS ds,
                               COALESCE(ROUND(SUM(total) / 54 * 100, 2), 0) AS y,
                               COALESCE(SUM(total), 0) AS total_room
-                        FROM accomodation_data
-                        WHERE check_in = CURRENT_DATE();
+                        FROM accomodation_data a
+                        JOIN bookings b
+                        ON a.booking_id = b.booking_id
+                        WHERE a.check_in <= CURRENT_DATE() AND a.check_out >= CURRENT_DATE()  and b.status IN ('Checked-in', 'Day Guest');
                   ''')
             data = cursor.fetchone()
 
@@ -135,24 +137,24 @@ class Dashboard:
                         WITH 
                         today AS (
                               SELECT 
-                                    COALESCE(SUM(total_amount), 0) AS daily_revenue
+                                    COALESCE(SUM(total_amount), 0) AS today_revenue
                               FROM bookings
-                              WHERE status NOT IN ('Cancelled')
-                              AND check_in = CURDATE()
+                              WHERE check_in = CURDATE() and status IN ('Checked-in', 'Day Guest')
                         ),
                         yesterday AS (
                               SELECT
-                                    ROUND(COALESCE(SUM(total_amount), 0)) AS yesterday_revenue
+                                    COALESCE(SUM(total_amount), 0) AS yesterday_revenue
                               FROM bookings
-                              WHERE status NOT IN ('Cancelled')
-                              AND check_in = CURDATE() - INTERVAL 1 DAY
+                              WHERE status NOT IN ('Cancelled', 'Reservation')
+                              AND check_in = CURDATE() - INTERVAL 1 DAY 
                         )
                         SELECT 
-                              COALESCE(today.daily_revenue, 0) AS today_revenue,
-                              COALESCE(yesterday.yesterday_revenue, 0) AS yesterday_revenue,
+                              today.today_revenue,
+                              yesterday.yesterday_revenue,
                               CASE 
-                                    WHEN yesterday.yesterday_revenue = 0 THEN 0
-                                    ELSE ROUND((today.daily_revenue - yesterday.yesterday_revenue) / yesterday.yesterday_revenue * 100, 2)
+                                    WHEN yesterday.yesterday_revenue = 0 THEN 100
+                                    WHEN today.today_revenue = 0 AND yesterday.yesterday_revenue > 0 THEN -100
+                                    ELSE ROUND((today.today_revenue - yesterday.yesterday_revenue) / yesterday.yesterday_revenue * 100, 2)
                               END AS achievement_percent
                         FROM today, yesterday;
                   ''')
@@ -323,7 +325,7 @@ class Dashboard:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' 
-                              SELECT * FROM bookings WHERE check_out = CURRENT_DATE() + INTERVAL 1 DAY AND status NOT IN ('Cancelled', 'Reservation');
+                              SELECT * FROM bookings WHERE check_out = CURRENT_DATE() + INTERVAL 1 DAY AND status NOT IN ('Cancelled', 'Reserved');
                         ''')
                         data = cursor.fetchall()
 
@@ -353,8 +355,10 @@ class Dashboard:
                   cursor.execute(''' 
                         SELECT
                               COALESCE(SUM(total), 0) AS total_occupied
-                        FROM accomodation_data
-                        WHERE check_in = CURRENT_DATE();
+                        FROM accomodation_data a
+                        JOIN bookings b 
+                        ON a.booking_id = b.booking_id
+                        WHERE a.check_in <= CURRENT_DATE() AND a.check_out >= CURRENT_DATE() AND b.status = 'Checked-in';
                   ''')
             data = cursor.fetchone()
 
@@ -417,19 +421,18 @@ class Dashboard:
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute(''' 
-                              
                         WITH RECURSIVE week_dates AS (
-                        SELECT DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) + 5) % 7 DAY) AS day_date
-                        UNION ALL
-                        SELECT DATE_ADD(day_date, INTERVAL 1 DAY)
+                              SELECT DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) + 5) % 7 DAY) AS day_date
+                              UNION ALL
+                              SELECT DATE_ADD(day_date, INTERVAL 1 DAY)
                         FROM week_dates
                         WHERE day_date < DATE_ADD(DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) + 5) % 7 DAY), INTERVAL 6 DAY)
                         )
                         SELECT 
-                        wd.day_date,
-                        COALESCE(SUM(CASE WHEN b.status IN ('Checked-in', 'Day Guest') THEN 1 ELSE 0 END), 0) AS checkin_count,
-                        COALESCE(SUM(CASE WHEN b.status IN ('Checked-in', 'Day Guest') THEN b.total_guest ELSE 0 END), 0) AS guest_count,
-                        COALESCE(SUM(CASE WHEN b.status IN ('Checked-in', 'Day Guest') THEN b.total_amount ELSE 0 END), 0) AS revenue
+                              wd.day_date,
+                              COALESCE(SUM(CASE WHEN b.status IN ('Checked-in', 'Day Guest', 'Checked-out') THEN 1 ELSE 0 END), 0) AS checkin_count,
+                              COALESCE(SUM(CASE WHEN b.status IN ('Checked-in', 'Day Guest', 'Checked-out') THEN b.total_guest ELSE 0 END), 0) AS guest_count,
+                              COALESCE(SUM(CASE WHEN b.status IN ('Checked-in', 'Day Guest', 'Checked-out') THEN b.total_amount ELSE 0 END), 0) AS revenue
                         FROM week_dates wd
                         LEFT JOIN bookings b
                         ON DATE(b.check_in) = wd.day_date

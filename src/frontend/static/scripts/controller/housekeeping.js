@@ -51,7 +51,7 @@ function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupie
                   <td class="px-6 py-4 ${Number(need_clean) > 0 ? 'text-red-600' : 'text-blue-600'} dark:text-gray-blue-500 font-bold">${need_clean}</td>
                   <td class="px-6 py-4 text-yellow-600 dark:text-gray-yellow-500 font-bold">${on_clean}</td>
                   <td class="px-6 py-4 text-green-600  dark:text-green-blue-500 font-bold">${ready}</td>
-                  <td class="px-6 py-4 text-purple-600 dark:text-purple-blue-500 font-bold">${occupied}</td>
+                  <td class="px-6 py-4 text-rose-600 dark:text-rose-500 font-bold">${occupied}</td>
                   <td class="px-6 py-4 flex justify-center">
                         <button class="px-4 py-2 text-sm bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex gap-2 items-center" id="view-room-details"><i data-lucide="building" class="text-lg"></i>View Rooms</button>
                   </td>
@@ -249,6 +249,7 @@ async function submitAssignStaff(e){
 
       if(result.success){
             successMessageCard(result.message);
+            notifications();
             document.getElementById('assign-staff-modal').remove();
             openRoomDetails(form.get('area_name'));
             getSummarryCardData();

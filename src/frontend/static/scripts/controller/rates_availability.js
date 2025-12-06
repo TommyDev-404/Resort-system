@@ -93,26 +93,34 @@ async function renderTable() {
             console.error("Failed to fetch data:", err);
       }
       
-      // Columns for the table
-      let columns = ["Area Type", "Area Count", "Max Occ.", "Rate (₱)", "Today's Avail.", "Tomorrow's Avail.", "Action"];
-
-      // Render header
-      const headerHtml = columns.map(col => `<th class="px-3 py-3 text-center font-bold uppercase">${col}</th>`).join('');
-      document.getElementById('table-header').innerHTML = `<tr>${headerHtml}</tr>`;
-
       // Render body
       const bodyHtml = rows.map(row => {
             const { name, capacity } = areaTypeInfo(row.room_type);
             return `
-                  <tr class="fade-in-up text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700">
-                        <td class="px-6 py-4 text-center font-semibold flex items-center gap-2">${name} ${row.area_condition ? `<span class="text-[13px] font-medium text-yellow-600 dark:text-yellow-500">(${row.promo_name})</span>` : ''}</td>
-                        <td class="px-3 py-4 text-center">${row.total_rooms}</td>
-                        <td class="px-3 py-4 text-center font-bold text-lg text-primary-blue">${capacity}</td>
-                        <td class="px-3 py-4 text-center text-green-600 dark:text-green-500 flex items-center justify-center gap-1 font-semibold">${row.area_condition ? `<label class="line-through text-red-500 font-light">₱${row.orig_rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</label> <p class="text-gray-500 dark:text-gray-200">-</p> <span class="text-green-600 dark:text-green-500">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} </span>` : `₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</td> 
-                        <td class="px-3 py-4 text-center"><span class="font-bold text-lg text-red-500">${row.today_avail}</span></td>
-                        <td class="px-3 py-4 text-center"><span class="font-bold text-lg text-green-500">${row.tomorrow_avail}</span></td>
-                        <td class="px-3 py-4 flex gap-2 justify-center"><button class="update-btn text-sm text-white bg-teal-500 py-2 px-4 rounded-sm  flex gap-2" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update</button></td>
-                  </tr>`;
+                  <tr class="fade-in-up text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+                        <td class="px-6 py-4 text-center font-semibold flex flex-col justify-center items-center gap-1 min-w-[450px] whitespace-nowrap">
+                              ${row.area_condition ? `<span class="text-[12px] font-medium text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-800 px-2 py-0.5 rounded-full">${row.promo_name}</span>` : ''}
+                              ${name}
+                        </td>
+                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap">${row.total_rooms}</td>
+                        <td class="px-6 py-4 text-center font-bold text-lg text-primary-blue min-w-[80px] whitespace-nowrap">${capacity}</td>
+                        <td class="px-6 py-4 text-center flex flex-col items-center justify-center gap-1 min-w-[250px] whitespace-nowrap">
+                              ${row.area_condition 
+                                    ? `<div class="flex flex-col items-center gap-1">
+                                          <span class="line-through text-red-500 font-light text-sm">₱${row.orig_rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                          <span class="text-green-600 dark:text-green-500 font-semibold text-lg">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                          <span class="text-xs text-gray-500 dark:text-gray-400">Promo Applied</span>
+                                    </div>` 
+                                    : `<span class="text-gray-800 dark:text-gray-200">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
+                              }
+                        </td>
+                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-red-500">${row.today_avail}</span></td>
+                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-green-500">${row.tomorrow_avail}</span></td>
+                        <td class="px-6 py-4 min-w-[100px] whitespace-nowrap">
+                              <button class="update-btn text-sm text-white bg-teal-500 py-2 px-4 rounded-sm flex gap-2 items-center justify-center hover:bg-teal-600 transition-colors" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update</button>
+                        </td>
+            </tr>
+            `;
       }).join('');
 
       document.getElementById('table2-body').innerHTML = bodyHtml;

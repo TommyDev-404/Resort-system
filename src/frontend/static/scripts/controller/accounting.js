@@ -19,6 +19,13 @@ function removePrevRow(){
       document.querySelectorAll('#accounting-tbody tr').forEach(row => row.remove());
 }
 
+function formatPesoShort(num) {
+      if (num >= 1_000_000_000) return "₱" + (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B";  
+      if (num >= 1_000_000)     return "₱" + (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";  
+      if (num >= 1_000)         return "₱" + (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";  
+      return "₱" + num.toLocaleString("en-PH");
+}
+
 async function getYears(){
       const response = await fetch('/get-years');
       const result = await response.json();
@@ -38,9 +45,9 @@ async function getSummaryData() {
       const response = await fetch('/accounting-data');
       const result = await response.json();
 
-      document.getElementById('direct-payment').textContent = Number(result.direct).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-      document.getElementById('online-payment').textContent = Number(result.online).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-      document.getElementById('booking-revenue').textContent = Number(result.total_revenue).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+      document.getElementById('direct-payment').textContent = formatPesoShort(Number(result.direct));
+      document.getElementById('online-payment').textContent = formatPesoShort(Number(result.online));
+      document.getElementById('booking-revenue').textContent = formatPesoShort(Number(result.total_revenue));
 }
 
 async function loadBookingRevenue(year) {

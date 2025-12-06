@@ -109,11 +109,16 @@ class Reservation:
                         if booking_type == 'Check-in': status = 'Checked-in'
                         if booking_type == 'Day Guest': status = 'Day Guest'
                         
+
+                        new_checkin = datetime.strptime("2025-12-05", "%Y-%m-%d").date()
+                        new_checkout = datetime.strptime("2025-12-08", "%Y-%m-%d").date()
+                        night_stay = (new_checkout - new_checkin).days
+                        print(night_stay)
                         guest_revenue = int(total_guest) * 200
                         amount = guest_revenue
-
+                        
                         for room in rooms:
-                              amount += self.accomodation_data(room.capitalize())
+                              amount += self.accomodation_data(room.capitalize()) * night_stay
                         
                         cursor.execute(''' INSERT INTO bookings (name, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s) 
                         ''', (name, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, status, amount))
@@ -455,15 +460,13 @@ class Reservation:
                         cursor = con.cursor()
                         cursor.execute(''' UPDATE bookings SET status = 'Checked-in' where booking_id = %s ''', (id))
                         con.commit()
-                        print(accomodation)
+
                         parts = accomodation.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
                         
                         for room, number in set(zip(rooms, room_no)):
                               if room not in ['cabana', 'small', 'big', 'hall']:
-                                    print('updating...')
-                                    print(room, number)
                                     cursor.execute('''UPDATE accomodation_spaces SET status = "occupied",  date = NULL, staff_assign = NULL WHERE name=%s AND room=%s''', (room.capitalize(), number))
                                     
                         con.commit()

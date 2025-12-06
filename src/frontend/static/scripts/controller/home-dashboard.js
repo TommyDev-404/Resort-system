@@ -101,6 +101,13 @@ async function drawOccupancyPercentage(){
       });
 }
 
+function formatPesoShort(num) {
+      if (num >= 1_000_000_000) return "₱" + (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B";  
+      if (num >= 1_000_000)     return "₱" + (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";  
+      if (num >= 1_000)         return "₱" + (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";  
+      return "₱" + num.toLocaleString("en-PH");
+}
+
 function loadingAnimation(){
       const load = `
             <div id="loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2">
@@ -155,104 +162,97 @@ function viewAllNotifications(){
       lucide.createIcons(); 
 }
 
-// Metric Card
-async function todaysBookings() {
-      const response = await fetch('/today-bookings', {method: "GET"});
-      const res = await response.json();
+function updateMetric(valueId, rateId, iconId, value, change) {
+      document.getElementById(valueId).textContent = value;
+      document.getElementById(rateId).textContent = change > 0 ? `+${change}%` : `${change}%`;
 
-      document.getElementById('bookings-data').textContent = res.check_in;
-      document.getElementById('change-rate-bookings').textContent = Number(res.change) < 0  || Number(res.change) == 0 ? `${res.change}%` : `+${res.change}%`;
+      const rateEl = document.getElementById(rateId);
+      const iconEl = document.getElementById(iconId);
 
-      if (res.change < 0){
-            document.getElementById('change-rate-bookings').classList.remove('text-green-900', 'bg-green-200',  'dark:bg-green-500');
-            document.getElementById('change-rate-bookings').classList.add('text-red-900', 'bg-red-200',  'dark:bg-red-500');
-            document.getElementById('change-rate-bookings-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('change-rate-bookings-icon').classList.remove("text-green-600");
-            document.getElementById('change-rate-bookings-icon').classList.add("text-red-600");
-      }else{
-            document.getElementById('change-rate-bookings').classList.remove('text-red-900', 'bg-red-200',  'dark:bg-red-500');
-            document.getElementById('change-rate-bookings').classList.add('text-green-900', 'bg-green-200',  'dark:bg-green-500');
-            document.getElementById('change-rate-bookings-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('change-rate-bookings-icon').classList.remove("text-red-600");
-            document.getElementById('change-rate-bookings-icon').classList.add("text-green-600");
+      // Reset classes
+      rateEl.classList.remove('text-green-600', 'text-red-600','dark:text-green-500', 'dark:text-red-500');
+
+      iconEl.classList.remove(
+            'text-green-600', 'text-red-600',
+            'dark:text-green-400', 'dark:text-red-400'
+      );
+
+      if (change < 0) {
+            // LIGHT MODE
+            rateEl.classList.add('text-red-900');
+            iconEl.classList.add('text-red-600');
+
+            // DARK MODE
+            rateEl.classList.add('dark:text-red-500');
+            iconEl.classList.add('dark:text-red-400');
+
+            iconEl.setAttribute("data-lucide", "arrow-down");
+      } else {
+            // LIGHT MODE
+            rateEl.classList.add('text-green-600');
+            iconEl.classList.add('text-green-600');
+
+            // DARK MODE
+            rateEl.classList.add('dark:text-green-500');
+            iconEl.classList.add('dark:text-green-400');
+
+            iconEl.setAttribute("data-lucide", "arrow-up");
       }
 
       lucide.createIcons();
+}
+
+// Metric card
+async function todaysBookings() {
+      const response = await fetch('/today-bookings');
+      const res = await response.json();
+
+      updateMetric(
+            'bookings-data',
+            'change-rate-bookings',
+            'change-rate-bookings-icon',
+            res.check_in,
+            Number(res.change)
+      );
 }
 
 async function totalGuestInHouse(label) {
-      // total guest in house
-      const response = await fetch(`/total-guest-in-house?label=${label}`, {method: "GET"});
+      const response = await fetch(`/total-guest-in-house?label=${label}`);
       const res = await response.json();
-      
-      document.getElementById('total-guest-in-house').textContent = res.today;
-      document.getElementById('change-rate-guest').textContent = res.change > 0 ? `+${res.change}%` : `${res.change}%`;
 
-      if (res.change < 0){
-            document.getElementById('change-rate-guest').classList.remove('text-green-900', 'bg-green-200',  'dark:bg-green-500');
-            document.getElementById('change-rate-guest').classList.add('text-red-900', 'bg-red-200',  'dark:bg-red-500');
-            document.getElementById('change-rate-guest-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('change-rate-guest-icon').classList.remove("text-green-600");
-            document.getElementById('change-rate-guest-icon').classList.add("text-red-600");
-      }else{
-            document.getElementById('change-rate-guest').classList.remove('text-red-900', 'bg-red-200',  'dark:bg-red-500');
-            document.getElementById('change-rate-guest').classList.add('text-green-900', 'bg-green-200',  'dark:bg-green-500');
-            document.getElementById('change-rate-guest-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('change-rate-guest-icon').classList.remove("text-red-600");
-            document.getElementById('change-rate-guest-icon').classList.add("text-green-600");
-      }
-
-      lucide.createIcons();
+      updateMetric(
+            'total-guest-in-house',
+            'change-rate-guest',
+            'change-rate-guest-icon',
+            res.today,
+            Number(res.change)
+      );
 }
 
 async function todayGuest() {
-      // total guest in house
-      const response = await fetch('/today-guest', {method: "GET"});
+      const response = await fetch('/today-guest');
       const res = await response.json();
 
-      document.getElementById('today-guest').textContent = res.today_guest;
-      document.getElementById('change-rate-today-guest').textContent = res.change > 0 ? `+${res.change}%` : `${res.change}%`;
-
-      if (res.change < 0){
-            document.getElementById('change-rate-today-guest').classList.remove('text-green-900', 'bg-green-200',  'dark:bg-green-500');
-            document.getElementById('change-rate-today-guest').classList.add('text-red-900', 'bg-red-200',  'dark:bg-red-500');
-            document.getElementById('change-rate-today-guest-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('change-rate-today-guest-icon').classList.remove("text-green-600");
-            document.getElementById('change-rate-today-guest-icon').classList.add("text-red-600");
-      }else{
-            document.getElementById('change-rate-today-guest').classList.remove('text-red-900', 'bg-red-200',  'dark:bg-red-500');
-            document.getElementById('change-rate-today-guest').classList.add('text-green-900', 'bg-green-200',  'dark:bg-green-500');
-            document.getElementById('change-rate-today-guest-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('change-rate-today-guest-icon').classList.remove("text-red-600");
-            document.getElementById('change-rate-today-guest-icon').classList.add("text-green-600");
-      }
-
-      lucide.createIcons();
+      updateMetric(
+            'today-guest',
+            'change-rate-today-guest',
+            'change-rate-today-guest-icon',
+            res.today_guest,
+            Number(res.change)
+      );
 }
 
-async function todayProjectedRevenue(){
-      // revenue
-      const response = await fetch('/revenue', {method: "GET"});
+async function todayProjectedRevenue() {
+      const response = await fetch('/revenue');
       const res = await response.json();
 
-      document.getElementById('total-revenue').textContent = Number(res.current_revenue).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-      document.getElementById('target-revenue').textContent = Number(res.change) > 0 ? `+${res.change}%` : `${res.change}%`;
-
-      if (res.change < 0){
-            document.getElementById('target-revenue').classList.remove('text-green-900', 'bg-green-200',  'dark:bg-green-500');
-            document.getElementById('target-revenue').classList.add('text-red-900', 'bg-red-200',  'dark:bg-red-500');
-            document.getElementById('target-revenue-icon').setAttribute("data-lucide", "arrow-down-left");
-            document.getElementById('target-revenue-icon').classList.remove("text-green-600");
-            document.getElementById('target-revenue-icon').classList.add("text-red-600");
-      }else{
-            document.getElementById('target-revenue').classList.remove('text-red-900', 'bg-red-200',  'dark:bg-red-500');
-            document.getElementById('target-revenue').classList.add('text-green-900', 'bg-green-200',  'dark:bg-green-500');
-            document.getElementById('target-revenue-icon').setAttribute("data-lucide", "arrow-up-right");
-            document.getElementById('target-revenue-icon').classList.remove("text-red-600");
-            document.getElementById('target-revenue-icon').classList.add("text-green-600");
-      }
-      
-      lucide.createIcons(); // re-render icons
+      updateMetric(
+            'total-revenue',
+            'target-revenue',
+            'target-revenue-icon',
+            formatPesoShort(Number(res.current_revenue)),
+            Number(res.change)
+      );
 }
 
 export async function notifications() {
@@ -276,7 +276,7 @@ export async function notifications() {
       // occupancy alert
       const response1 = await fetch('/occupancy-alert', {method: "GET"});
       const res1 = await response1.json();
-      console.log(res1);
+      
       // housekeeping alert
       const response2 = await fetch('/housekeeping-alert', {method: "GET"});
       const res2 = await response2.json();
@@ -532,8 +532,8 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Premium Villa</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[6].total_rooms - Number(res.data[6].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[6].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-blue-500 h-2 rounded-full" style="width:${(res.data[6].today_avail / Number(res.data[6].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width:${(Number(res.data[6].today_avail) / Number(res.data[6].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
@@ -541,44 +541,44 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Standard Villa</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[8].total_rooms - Number(res.data[8].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[8].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-purple-500 h-2 rounded-full" style="width:${(res.data[8].today_avail / Number(res.data[8].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-purple-500 h-2 rounded-full" style="width:${(Number(res.data[8].today_avail) / Number(res.data[8].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-teal-100 dark:bg-gray-900 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-3 bg-teal-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Cabana Cottage</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[2].total_rooms - Number(res.data[2].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[2].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-teal-500 h-2 rounded-full" style="width:${(res.data[2].today_avail / Number(res.data[2].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-teal-500 h-2 rounded-full" style="width:${(Number(res.data[2].today_avail) / Number(res.data[2].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-yellow-100 dark:bg-gray-900 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-3 bg-yellow-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Family Room</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[3].total_rooms - Number(res.data[3].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[3].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-yellow-500 h-2 rounded-full" style="width:${(res.data[3].today_avail / Number(res.data[3].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-yellow-500 h-2 rounded-full" style="width:${(Number(res.data[3].today_avail) / Number(res.data[3].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-green-100 dark:bg-gray-900 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-3 bg-green-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Garden View Room</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[4].total_rooms - Number(res.data[4].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[4].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-green-500 h-2 rounded-full" style="width:${(res.data[4].today_avail / Number(res.data[4].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width:${(Number(res.data[4].today_avail) / Number(res.data[4].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-red-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-3 bg-orange-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Barkada Room</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[0].total_rooms - Number(res.data[0].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[0].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-red-500 h-2 rounded-full" style="width:${(res.data[0].today_avail / Number(res.data[0].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-red-500 h-2 rounded-full" style="width:${(Number(res.data[0].today_avail) / Number(res.data[0].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
@@ -586,8 +586,8 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Small Cottage</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[7].total_rooms - Number(res.data[7].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[7].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-indigo-500 h-2 rounded-full" style="width:${(res.data[7].today_avail / Number(res.data[7].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-indigo-500 h-2 rounded-full" style="width:${(Number(res.data[7].today_avail) / Number(res.data[7].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
@@ -595,8 +595,8 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Big Cottage</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[1].total_rooms - Number(res.data[1].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[1].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-orange-500 h-2 rounded-full" style="width:${(res.data[1].today_avail / Number(res.data[1].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-orange-500 h-2 rounded-full" style="width:${(Number(res.data[1].today_avail) / Number(res.data[1].total_rooms)*100)}%"></div>
                   </div>
             </div>
             
@@ -604,8 +604,8 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Hall</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[5].total_rooms - Number(res.data[5].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[5].today_avail}</span></p>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-pink-500 h-2 rounded-full" style="width:${(res.data[5].today_avail / Number(res.data[5].today_rooms)*100)}%"></div>
+                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-pink-500 h-2 rounded-full" style="width:${(Number(res.data[5].today_avail) / Number(res.data[5].total_rooms)*100)}%"></div>
                   </div>
             </div>
       `;
