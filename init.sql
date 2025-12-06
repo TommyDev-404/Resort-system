@@ -131,7 +131,7 @@ CREATE TABLE staff_leaves_data (
 
 
 -- default admin credentials
-INSERT INTO admin (username, password, email, contact, code, hash_pass, date_pass_change)
+INSERT INTO admin (username, password, email, contact, code, hash_pass, date_pass_change);
 VALUES
 ('admin', 'plainpass123', 'admin@example.com', '09123456789', 123456, '$2y$10$9H0p1KdEQ1gEoH9s2lO0gOVYBWqs0ioY1hGQfgF4FklajfHsyAqLC','2025-01-01');
 
