@@ -52,7 +52,7 @@ class Alerts:
                         db_date = data.get('date')
                         now = datetime.now(timezone.utc)
 
-                        if (db_date.date() != now.date()):
+                        if (db_date.date() != now.date() or data.get('name') == 'temporary'):
                               cursor.execute('''
                                     UPDATE notifications SET name = %s, date =%s WHERE room_name = 'occupancy'
                               ''', (f"Next week's forecasted occupancy is {round(avg_next_week, 2)}% (Target: 30%). Consider applying promotion!", now))
@@ -83,7 +83,7 @@ class Alerts:
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute('''   
-                        SELECT COUNT(*) as count FROM notifications 
+                        SELECT COUNT(*) as count FROM notifications WHERE name != 'temporary'
                   ''')
                   data = cursor.fetchone()
 
