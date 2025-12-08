@@ -1,4 +1,5 @@
 import pymysql
+from datetime import date
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
 from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
 
@@ -47,41 +48,11 @@ def system_page():
       if  not session.get('admin'):
             return redirect(url_for('login_page'))
       
+      # system automation functions
+      alert.auto_checkout_guest()
       alert.occupancy_alert()
-      with db.connect() as conn:
-            cursor = conn.cursor()
-
-            # Expire outdated promos
-            cursor.execute(""" UPDATE promos SET status = 'Expired' WHERE end_date < CURDATE() AND status = 'Active' """)
-
-            # Restore room rates after promo expired
-            cursor.execute(""" 
-                  UPDATE accomodation_spaces AS a
-                  LEFT JOIN promos AS p
-                  ON a.promo = p.name
-                  SET a.rate = a.orig_rate
-                  WHERE p.end_date < CURDATE()
-                  AND LOWER(TRIM(a.promo)) != 'None';
-            """)
-
-            #reset salary data every new week
-            cursor.execute(''' 
-                  UPDATE staff_details
-                  SET 
-                        weekly_salary = 0,
-                        monthly_salary = CASE
-                        WHEN MONTH(reset_date) != MONTH(CURRENT_DATE()) OR YEAR(reset_date) != YEAR(CURRENT_DATE())
-                        THEN 0
-                        ELSE monthly_salary
-                        END,
-                        reset_date = CURRENT_DATE()
-                  WHERE 
-                        WEEK(reset_date, 1) != WEEK(CURRENT_DATE(), 1)
-                        OR MONTH(reset_date) != MONTH(CURRENT_DATE())
-                        OR YEAR(reset_date) != YEAR(CURRENT_DATE());
-            ''')
-
-            conn.commit()
+      alert.generate_alerts()
+      alert.cron_jobs()
 
       return render_template('admin.html')
 
@@ -98,6 +69,10 @@ def housekeeping_alert():
 @app.route('/notification-count', methods=['GET'])
 def notif_count():
       return jsonify(alert.notification_count())
+
+@app.route('/bookings-alert', methods=['GET'])
+def bookings_alert():
+      return jsonify(alert.bookings_alert())
 
 
 #------------------ LOGIN API ------------------#
@@ -338,6 +313,10 @@ def staff_cleaners():
 @app.route('/room-cleaning-history', methods=['GET'])
 def room_cleaning_history():
       return jsonify(house.room_assigned_history(request.args.get('room_name')))
+
+@app.route('/cleaning-history', methods=['GET'])
+def cleaning_history():
+      return jsonify(house.cleaning_history(request.args.get('month'), request.args.get('day')))
 
 
 #--------------- RATES AND AVAILABILITY ------------------#

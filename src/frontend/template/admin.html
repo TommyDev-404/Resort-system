@@ -239,7 +239,7 @@
                                                 <span data-lucide="users" class="w-5 h-5 text-white dark:text-teal-400"></span>
                                                 Guests In-House
                                           </p>
-                                          <span class="text-xs text-white dark:text-gray-400 font-medium">(This Week)</span>
+                                          <span class="text-xs text-white dark:text-gray-400 font-medium">(Today)</span>
                                     </div>
                                     <p class="text-3xl font-bold text-white dark:text-emerald-400 mt-2" id="total-guest-in-house">188</p>
                                     <div class="text-xs flex items-center gap-1">
@@ -247,7 +247,7 @@
                                                 <span data-lucide="arrow-up-right" class="w-4 h-4 text-white dark:text-green-400" id="change-rate-guest-icon"></span>
                                                 <span class="font-semibold text-white dark:text-green-400" id="change-rate-guest">+0%</span>
                                           </div>
-                                          <span class="text-white dark:text-gray-400 font-medium">vs Last Week</span>
+                                          <span class="text-white dark:text-gray-400 font-medium">vs Yesterday</span>
                                     </div>
                               </div>
                               
@@ -256,7 +256,7 @@
                                     <div class="flex items-center justify-between">
                                           <p class="text-sm font-medium text-white dark:text-gray-100 flex items-center gap-2">
                                                 <span data-lucide="dollar-sign" class="w-5 h-5 text-white dark:text-emerald-400"></span>
-                                                Projected Revenue
+                                                Current Revenue
                                           </p>
                                           <span class="text-xs text-white dark:text-gray-400 font-medium">(Today)</span>
                                     </div>
@@ -311,7 +311,7 @@
                                                 <div class="p-4 rounded-sm bg-amber-500 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition duration-200 hover:-translate-y-1">
                                                       <p class="text-sm font-medium text-white dark:text-gray-100 flex items-center gap-1">
                                                       <span data-lucide="sun" class="w-4 h-4 text-white dark:text-amber-400"></span>
-                                                      Day Guests (Amenities Only)
+                                                      Day Guests
                                                       </p>
                                                       <p class="text-3xl font-bold text-white dark:text-amber-400 mt-1" id="total-dayguest">0</p>
                                                       <p class="text-xs text-white dark:text-amber-300 mt-2">Guests: <span id="total-dayguest-guests" class="font-semibold dark:text-amber-400">0</span></p>
@@ -759,17 +759,17 @@
                                           <p class="text-xs text-gray-100 dark:text-gray-400" id="guest-checkin">(10 guests)</p>
                                           <span class="text-2xl font-bold text-white dark:text-indigo-400 mt-2 block" id="total_checkin">3</span>
                                           </div>
-                                          <!-- Check-Outs -->
-                                          <div>
-                                          <span class="text-white dark:text-gray-200">Check-Outs</span>
-                                          <p class="text-xs text-gray-100 dark:text-gray-400" id="guest-checkout">(10 guests)</p>
-                                          <span class="text-2xl font-bold text-white dark:text-red-400 mt-2 block" id="total_checkout">3</span>
-                                          </div>
                                           <!-- Day Guests -->
                                           <div>
                                           <span class="text-white dark:text-gray-200">Day Guests</span>
                                           <p class="text-xs text-gray-100 dark:text-gray-400" id="guest-day-guest">(10 guests)</p>
                                           <span class="text-2xl font-bold text-white dark:text-amber-400 mt-2 block" id="day_guests_today">3</span>
+                                          </div>
+                                          <!-- Check-Outs -->
+                                          <div>
+                                          <span class="text-white dark:text-gray-200">Check-Outs</span>
+                                          <p class="text-xs text-gray-100 dark:text-gray-400" id="guest-checkout">(10 guests)</p>
+                                          <span class="text-2xl font-bold text-white dark:text-red-400 mt-2 block" id="total_checkout">3</span>
                                           </div>
                                     </div>
                               </div>
@@ -809,22 +809,6 @@
                                           <label for="monthSelect" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Month:</label>
                                           <select id="monthSelect" class="py-2.5 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 text-gray-700 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"></select>
                                     </div>
-                                    <script>
-                                          const monthSelect = document.getElementById("monthSelect");
-                                          const currentDate = new Date();
-                                          const currentYear = currentDate.getFullYear();
-                                          
-                                          for (let i = 0; i < 12; i++) {
-                                                const date = new Date(currentYear, i, 1);
-                                                const monthName = date.toLocaleString("default", { month: "long" });
-                                                const option = document.createElement("option");
-                                                option.value = i + 1;
-                                                option.textContent = monthName;
-                                                
-                                                if (i === currentDate.getMonth()) option.selected = true;
-                                                monthSelect.appendChild(option);
-                                          }
-                                    </script>
                               </div>
                               
                               <button id="add-booking-btn" type="button" class="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer">
@@ -939,34 +923,73 @@
                         <!-- Room Type Summary Table -->
                         <div class="bg-card-bg dark:bg-gray-900 p-6 rounded-sm shadow-lg border border-gray-300 dark:border-gray-700">
                               <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Room Summary by Type</h3>
+                                    <div class="flex gap-2">
+                                          <i data-lucide="bed-double" class="w-6 h-6 text-blue-500" id="title-icon"></i>
+                                          <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100" id="table-title">Room Status</h3>
+                                    </div>
+
+                                    <div class="dateBox flex gap-8 hidden fade-in-up">
+                                          <div class="flex items-center gap-2">
+                                                <label for="monthSelect3" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Month:</label>
+                                                <select id="monthSelect3" class="py-2 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 text-gray-700 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"></select>
+                                          </div>
+                                          <div class="flex items-center gap-2 relative overflow-visible">
+                                                <label for="daySelect2" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Day:</label>
+                                                <select id="daySelect2" class="py-2 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 dark:text-gray-100 text-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"> </select>
+                                          </div>
+                                    </div>
+                                    <button id="history-btn" class="switchBtn px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-semibold hover:bg-indigo-700 transition fade-in-up">Switch to Cleaning History</button>
                               </div>
-                              <div class="overflow-y-auto h-[45vh] thin-scroll">
-                                    <table class="min-w-full text-center">
-                                          <colgroup>
-                                                <col style="width: 300px;"> <!-- Date -->
-                                                <col style="width: 150px;"> <!-- End -->
-                                                <col style="width: 150px;"> <!-- Promo Name -->
-                                                <col style="width: 150px;"> <!-- Discount -->
-                                                <col style="width: 150px;"> <!-- Applied Rooms -->
-                                                <col style="width: 150px;"> <!-- Status -->
-                                                <col style="width: 200px;"> <!-- Action -->
-                                          </colgroup>
-                                          <thead class="text-white bg-gray-800 text-sm sticky top-0 z-50">
-                                                <tr>
-                                                      <th class="px-6 py-3 font-semibold uppercase ">Room Type</th>
-                                                      <th class="px-6 py-3 font-semibold uppercase ">Total Rooms</th>
-                                                      <th class="px-6 py-3 font-semibold uppercase ">To Be Cleaned</th>
-                                                      <th class="px-6 py-3 font-semibold uppercase ">Cleaning</th>
-                                                      <th class="px-6 py-3 font-semibold uppercase ">Ready</th>
-                                                      <th class="px-6 py-3 font-semibold uppercase ">Occupied</th>
-                                                      <th class="px-6 py-3 font-semibold uppercase ">Action</th>
-                                                </tr>
-                                          </thead>
-                                          <tbody id="acc-tbody"></tbody>
-                                    </table>
+                        
+                              <!-- Original Table (Room Status) -->
+                              <div id="room-status-table">
+                                    <div class="overflow-y-auto h-[45vh] thin-scroll" id="table-div">
+                                          <table class="min-w-full text-center">
+                                                <colgroup>
+                                                      <col style="width: 300px;">
+                                                      <col style="width: 150px;">
+                                                      <col style="width: 150px;">
+                                                      <col style="width: 150px;">
+                                                      <col style="width: 150px;">
+                                                      <col style="width: 150px;">
+                                                      <col style="width: 200px;">
+                                                </colgroup>
+                              
+                                                <thead class="text-white bg-gray-800 text-sm sticky top-0 z-50">
+                                                      <tr>
+                                                            <th class="px-6 py-3 font-semibold uppercase ">Room Type</th>
+                                                            <th class="px-6 py-3 font-semibold uppercase ">Total Rooms</th>
+                                                            <th class="px-6 py-3 font-semibold uppercase ">To Be Cleaned</th>
+                                                            <th class="px-6 py-3 font-semibold uppercase ">Cleaning</th>
+                                                            <th class="px-6 py-3 font-semibold uppercase ">Ready</th>
+                                                            <th class="px-6 py-3 font-semibold uppercase ">Occupied</th>
+                                                            <th class="px-6 py-3 font-semibold uppercase ">Action</th>
+                                                      </tr>
+                                                </thead>
+                              
+                                                <tbody id="room-status-tbody"></tbody>
+                                          </table>
+                                    </div>
+                              </div>
+                              
+                              <!-- Secondary Table (History Cleaning) -->
+                              <div id="clean-history-table" class="hidden">
+                                    <div class="overflow-y-auto h-[45vh] thin-scroll" >
+                                          <table class="min-w-full text-center">
+                                                <thead class="bg-gray-800 text-white sticky top-0 text-sm z-50">
+                                                      <tr>
+                                                            <th class="px-6 py-3">Room Name</th>
+                                                            <th class="px-6 py-3">Assigned Staff</th>
+                                                            <th class="px-6 py-3">Date Cleaned</th>
+                                                            <th class="px-6 py-3">Status</th>
+                                                      </tr>
+                                                </thead>
+                                                <tbody id="clean-history-tbody"></tbody>
+                                          </table>
+                                    </div>
                               </div>
                         </div>
+                        
                   </section>
 
 			<!-- RATES & AVAILABILITY -->
@@ -1060,9 +1083,7 @@
                                     <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2"><label data-lucide="receipt" class="w-5 h-5 mr-2 text-green-600 dark:text-green-400"></label>Booking Revenue Report<span class="text-[20px] text-gray-600 dark:text-gray-400">(This year)</span></h3>
                                     <div class="flex items-center gap-3">
                                           <label for="filter-payment" class="text-gray-700 dark:text-gray-100 font-medium text-[15px]">Year:</label>
-                                          <select id="filter-payment" class="border border-gray-300 rounded-sm py-2 px-3 dark:text-gray-100 dark:bg-gray-800 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
-                                                <option value="">Select Year</option>
-                                          </select>
+                                          <select id="filter-payment" class="border border-gray-300 rounded-sm py-2 px-3 dark:text-gray-100 dark:bg-gray-800 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"></select>
                                     </div>
                               </div>
                               <div class="overflow-y-auto max-h-[46vh]">
@@ -1209,53 +1230,14 @@
                                                       <label for="monthSelect2" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Month:</label>
                                                       <select id="monthSelect2" class="py-1 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 dark:text-gray-100 text-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"></select>
                                                 </div>
-                                                <script>
-                                                      const monthSelect2 = document.getElementById("monthSelect2");
-                                                      const currentDate2 = new Date();
-                                                      const currentYear2 = currentDate2.getFullYear();
-                                                      
-                                                      for (let i = 0; i < 12; i++) {
-                                                            const date = new Date(currentYear2, i, 1);
-                                                            const monthName = date.toLocaleString("default", { month: "long" });
-                                                            const option = document.createElement("option");
-                                                            option.value = i + 1;
-                                                            option.textContent = monthName;
-                                                            
-                                                            if (i === currentDate2.getMonth()) option.selected = true;
-                                                            monthSelect2.appendChild(option);
-                                                      }
-                                                </script>
                                                 <div class="flex items-center gap-2 relative overflow-visible">
                                                       <label for="daySelect" class="text-[15px] font-semibold text-gray-700 dark:text-gray-100">Day:</label>
                                                       <select id="daySelect" class="py-1 px-4 border border-gray-300 rounded-sm dark:bg-gray-800 bg-gray-50 dark:text-gray-100 text-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"> </select>
                                                 </div>
-                                                <script>
-                                                      const daySelect = document.getElementById("daySelect");
-                                                      const currentDate3 = new Date();
-                                                      const currentYear3 = currentDate3.getFullYear();
-                                                      const currentMonth3 = currentDate3.getMonth(); // 0-11
-                                                      const currentDay = currentDate3.getDate();    // 1-31
-                                                
-                                                      // Get number of days in the current month
-                                                      const monthDays = new Date(currentYear3, currentMonth3 + 1, 0).getDate();
-                                                
-                                                      for (let day = 1; day <= monthDays; day++) {
-                                                            const option = document.createElement("option");
-                                                            option.value = day;
-                                                            option.textContent = day;
-                                                      
-                                                            if (day === currentDay) option.selected = true;
-                                                      
-                                                            daySelect.appendChild(option);
-                                                      }
-                                                </script>
-                                                
                                           </div>
                                           
                                           <div class="flex items-center gap-2">
-                                                <button id="updateStaffAttendance" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2" style="pointer-events: none; opacity: 0.4;">
-                                                      <i data-lucide="edit" class="w-4 h-4"></i>Time Out
-                                                </button>
+                                                <button id="updateStaffAttendance" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2" style="pointer-events: none; opacity: 0.4;"><i data-lucide="edit" class="w-4 h-4"></i>Time Out</button>
                                                 <button id="addAttendanceBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Attendance</button>
                                           </div>
                                     </div>

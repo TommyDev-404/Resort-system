@@ -5,8 +5,8 @@ const tbody = document.getElementById('staffList');
 // ------------ HELPER FUNCTIONS ------------
 function successMessageCard(message, redirect = null) {
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
                         <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
@@ -19,7 +19,7 @@ function successMessageCard(message, redirect = null) {
       lucide.createIcons();
 
       document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.getElementById("success-message");
+            const box = document.querySelector("#success-message");
             box.remove();
 
             if (redirect)  window.location.href = redirect;
@@ -28,8 +28,8 @@ function successMessageCard(message, redirect = null) {
 
 function failedMessageCard(message){
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up ">
                         <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
@@ -40,7 +40,7 @@ function failedMessageCard(message){
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
       document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.getElementById("failed-message");
+            const box = document.querySelector("#failed-message");
             box.remove();
       });
 }
@@ -66,7 +66,6 @@ function renderAddStaffModal(){
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
                                     <select id="addPosition" name="position" class="text-gray-900 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
-                                          <option value="">Select position</option>
                                           <option value="Front Desk">Front Desk</option>
                                           <option value="Janitor">Janitor</option>
                                           <option value="Gardener">Gardener</option>
@@ -554,6 +553,45 @@ function markCheckIcon(checkbox){
       }
 }
 
+function getMonthsAndDays(){
+      document.querySelectorAll('#monthSelect2 option').forEach(opt => opt.remove());
+
+      const monthSelect = document.getElementById("monthSelect2");
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      
+      for (let i = 0; i < 12; i++) {
+            const date = new Date(currentYear, i, 1);
+            const monthName = date.toLocaleString("default", { month: "long" });
+            const option = document.createElement("option");
+            option.value = i + 1;
+            option.textContent = monthName;
+            
+            if (i === currentDate.getMonth()) option.selected = true;
+            monthSelect.appendChild(option);
+      }
+      
+      document.querySelectorAll('#daySelect option').forEach(opt => opt.remove());
+      const daySelect = document.getElementById("daySelect");
+      const currentDate3 = new Date();
+      const currentYear3 = currentDate3.getFullYear();
+      const currentMonth3 = currentDate3.getMonth(); // 0-11
+      const currentDay = currentDate3.getDate();    // 1-31
+
+      // Get number of days in the current month
+      const monthDays = new Date(currentYear3, currentMonth3 + 1, 0).getDate();
+
+      for (let day = 1; day <= monthDays; day++) {
+            const option = document.createElement("option");
+            option.value = day;
+            option.textContent = day;
+      
+            if (day === currentDay) option.selected = true;
+      
+            daySelect.appendChild(option);
+      }
+}
+
 // --------- DATA FETCHING FUNCTIONS -----------------
 async function addStaff(e){
       e.preventDefault();
@@ -594,7 +632,7 @@ async function viewStaffInfo(id){
                         day: 'numeric'
                   });
                   
-                  renderViewStaffInfo(data.id, data.staff_name, formattedDate, data.position, data.daily_salary, data.estimate_weekly, data.estimate_month, data.weekly_salary, data.monthly_salary, data.workdays, data.absent, data.avl_leave);
+                  renderViewStaffInfo(data.id, data.staff_name, formattedDate, data.job_position, data.daily_salary, data.estimate_weekly, data.estimate_month, data.weekly_salary, data.monthly_salary, data.workdays, data.absent, data.avl_leave);
             }else{
                   alert(result.message);
             }
@@ -612,7 +650,7 @@ async function showAllStaff(){
 
             if (result.success){
                   result.data.forEach(staff => {
-                        createStaffListRow(staff.id, staff.staff_name, staff.position, staff.status);
+                        createStaffListRow(staff.id, staff.staff_name, staff.job_position, staff.status);
                   });
             }else{
                   const empty_row = `
@@ -653,7 +691,7 @@ async function getAllStaff(){
                                           </label>
                                     </td>
                                     <td class="p-3 text-center">${staff.staff_name}</td>
-                                    <td class="p-3 text-center">${staff.position}</td>
+                                    <td class="p-3 text-center">${staff.job_position}</td>
                               </tr>
                         `;
 
@@ -711,7 +749,7 @@ async function getAllPresentStaff(){
             }else{
                   const empty_row = `
                         <tr class="border-b border-gray-200 dark:border-gray-700">
-                              <td colspan="4" class="p-3 text-center dark:text-gray-100 text-gray-800">All Staff has been updated.</td>
+                              <td colspan="4" class="p-3 text-center dark:text-gray-100 text-gray-800">All staff is updated.</td>
                         </tr>
                   `;
                   
@@ -743,7 +781,7 @@ async function thisWeekOnLeave(){
                         const row = `
                               <tr data-set="${staff.staff_id}" class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 hover:bg-black/5 dark:bg-white/2 dark:hover:bg-white/5">
                                     <td class="p-3 text-center">${staff.name}</td>
-                                    <td class="p-3 text-center">${staff.position}</td>
+                                    <td class="p-3 text-center">${staff.job_position}</td>
                                     <td class="p-3 text-center">${formattedDate}</td>
                               </tr>
                         `;
@@ -969,7 +1007,7 @@ async function getIndividualStaffInfo(id){
                   const staff = result.data;
                   const date = new Date(staff.date_started).toISOString().split('T')[0];
 
-                  renderUpdateStaffModal(staff.id, staff.staff_name, staff.position, staff.daily_salary, staff.avl_leave, date, staff.status);
+                  renderUpdateStaffModal(staff.id, staff.staff_name, staff.job_position, staff.daily_salary, staff.avl_leave, date, staff.status);
 
             }else{
                   alert('Empty data.')
@@ -987,7 +1025,7 @@ async function searchStaff(name){
             if (result.success){
                   document.querySelectorAll('ul li').forEach(row => row.remove());      
                   result.data.forEach(staff => {
-                        createStaffListRow(staff.id, staff.staff_name, staff.position, staff.status);
+                        createStaffListRow(staff.id, staff.staff_name, staff.job_position, staff.status);
                   });
             }else{
                   document.querySelectorAll('ul li').forEach(row => row.remove());      
@@ -1099,7 +1137,7 @@ async function sumarryCards(){
       try{
             const response = await fetch(`/summary-cards?month=${month}&day=${day}`);
             const result = await response.json();
-            console.log(result);
+
             if (result.success){
                   const data = result.data;
                   
@@ -1156,6 +1194,9 @@ document.addEventListener('submit', (e) => {
       if (e.target.matches('#updateStaffAttendanceForm')) updateStaffAttendance(e);
       if (e.target.matches('#updateStaffForm')) updateStaffInfo(e);
 });
+
+
+getMonthsAndDays();
 
 // ----------- EXPORT ON LOAD ------------
 export function initPageStaffMgmt(){

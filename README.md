@@ -5,7 +5,7 @@ pip install -r requirements.txt
 # Tailwind css & Chart.js
 npm install
 
-# SQL 
+# SQL  (local only)
 mysql -u username -p < init.sql
 
 # -------------  INSERT DATA IN DB -------------- #

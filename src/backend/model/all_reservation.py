@@ -1,10 +1,12 @@
 from collections import Counter
-from datetime import datetime, timezone
+from .alert import Alerts
+from datetime import datetime, timezone, timedelta, date
 
 
 class Reservation:
       def __init__(self, db):
             self.db = db
+            self.alert = Alerts(db)
       
       def get_avl_spaces(self, accomodation_type=None):
             try:
@@ -63,7 +65,8 @@ class Reservation:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT room as avl_room from accomodation_spaces where status = "avl" AND name = %s ''', (room_name, ))
+                        cursor.execute(''' 
+                              SELECT room as avl_room from accomodation_spaces where status = "avl" AND name = %s ''', (room_name, ))
                         data = cursor.fetchall()
 
                         list = []
@@ -84,7 +87,6 @@ class Reservation:
 
                         list = []
                         for d in data:
-                              print(d)
                               list.append(d.get('avl_room'))
 
                         return {'rooms' : list}
@@ -99,7 +101,7 @@ class Reservation:
                   
                         parts = accomodations_selected.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
-                        room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
+                        room_no = [parts[x].split(' ')[-1].lower() for x in range(len(parts))]
                         counts = Counter(rooms)
 
                         result_list = []
@@ -107,13 +109,12 @@ class Reservation:
                         status = None
                         if booking_type == 'Reservation': status = 'Reserved'
                         if booking_type == 'Check-in': status = 'Checked-in'
-                        if booking_type == 'Day Guest': status = 'Day Guest'
+                        if booking_type == 'Day Guest': status = 'Checked-in'
                         
-
-                        new_checkin = datetime.strptime("2025-12-05", "%Y-%m-%d").date()
-                        new_checkout = datetime.strptime("2025-12-08", "%Y-%m-%d").date()
+                        new_checkin = datetime.strptime(checkin, "%Y-%m-%d").date()
+                        new_checkout = datetime.strptime(checkout, "%Y-%m-%d").date()
                         night_stay = (new_checkout - new_checkin).days
-                        print(night_stay)
+
                         guest_revenue = int(total_guest) * 200
                         amount = guest_revenue
                         
@@ -122,7 +123,7 @@ class Reservation:
                         
                         cursor.execute(''' INSERT INTO bookings (name, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s) 
                         ''', (name, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, status, amount))
-                        
+
                         if cursor.rowcount != 0: result_list.append(True)
 
                         cursor.execute(''' INSERT INTO accomodation_data(check_in, check_out, premium, standard, garden, barkada, family, cabana, small, big, hall, total) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ''', 
@@ -145,9 +146,12 @@ class Reservation:
 
                         for room, number in set(zip(rooms, room_no)):
                               if booking_type == 'Check-in':
-                                    cursor.execute('''UPDATE accomodation_spaces SET status = "occupied",  date = NULL, staff_assign = NULL WHERE name=%s AND room=%s''', (room.capitalize(), number))
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = "occupied" WHERE name=%s AND room=%s''', (room.capitalize(), number))
 
                         con.commit()
+
+                        # show notifications
+                        self.alert.generate_alerts()
 
                         success = True
                         for result in range(len(result_list)):
@@ -300,7 +304,7 @@ class Reservation:
                                           DATE(check_out) - DATE(check_in) AS stay_gap
                                     FROM bookings
                                     WHERE YEAR(check_in) = %s
-                                    AND MONTH(check_in) = %s AND status = "Day Guest"
+                                    AND MONTH(check_in) = %s AND booking_type = "Day Guest"
                                     ORDER BY check_in DESC;
                               ''', (year, month))
 
@@ -353,40 +357,6 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def current_bookings(self):
-            try:
-                  with self.db.connect() as con:
-                        cursor = con.cursor()
-                        cursor.execute('''
-                              SELECT 
-                                    booking_id,
-                                    name, 
-                                    check_in, 
-                                    check_out, 
-                                    accomodations, 
-                                    booking_type,
-                                    status, 
-                                    payment,
-                                    DATE(check_out) - DATE(check_in) AS stay_gap
-                              FROM bookings
-                              WHERE YEAR(check_in) = YEAR(CURRENT_DATE())
-                              AND MONTH(check_in) = MONTH(CURRENT_DATE())
-                              ORDER BY check_in DESC;
-                        ''')
-                        data = cursor.fetchall()
-                        new_data = []
-
-                        for d in data:
-                              formatted_checkin = d.get('check_in').strftime("%b %d").lstrip("0")
-                              formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0")  
-
-                              new_data.append({'id': d.get('booking_id'), 'name': d.get('name'), 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
-                              
-                        return {'success': bool(data), 'data': new_data}
-            except Exception as e:
-                  con.rollback()
-                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
-
       def arrivals(self):
             try:
                   with self.db.connect() as con:
@@ -422,19 +392,19 @@ class Reservation:
                         cursor.execute('''
                               SELECT
                               -- Total Guests (all guests checked in today)
-                              SUM(CASE WHEN status IN ('Checked-in', 'Day Guest') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS total_guests,
+                              SUM(CASE WHEN status = 'Checked-in' AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS total_guests,
 
                               -- Check-Ins today
-                              COUNT(CASE WHEN status = 'Checked-in' AND check_in = CURRENT_DATE THEN 1 END) AS bookings_checkin,
-                              SUM(CASE WHEN status = 'Checked-in' AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkin,
+                              COUNT(CASE WHEN status = 'Checked-in' AND booking_type = 'Check-in' AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
+                              SUM(CASE WHEN status = 'Checked-in' AND booking_type = 'Check-in' AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkin,
 
                               -- Check-Outs today
                               COUNT(CASE WHEN status = 'Checked-out' AND check_out = CURRENT_DATE THEN 1 END) AS bookings_checkout,
                               SUM(CASE WHEN status = 'Checked-out' AND check_out = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkout,
 
                               -- Day Guests today
-                              COUNT(CASE WHEN status = 'Day Guest' AND check_in = CURRENT_DATE THEN 1 END) AS bookings_day,
-                              SUM(CASE WHEN status = 'Day Guest' AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_day,
+                              COUNT(CASE WHEN booking_type = 'Day Guest' AND status = 'Checked-in' AND check_in = CURRENT_DATE THEN 1 END) AS bookings_day,
+                              SUM(CASE WHEN booking_type = 'Day Guest' AND status = 'Checked-in' AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_day,
 
                               -- Upcoming Arrivals (future reservations)
                               COUNT(CASE WHEN status = 'Reserved' AND check_in > CURRENT_DATE THEN 1 END) AS bookings_upcoming,
@@ -467,10 +437,11 @@ class Reservation:
                         
                         for room, number in set(zip(rooms, room_no)):
                               if room not in ['cabana', 'small', 'big', 'hall']:
-                                    cursor.execute('''UPDATE accomodation_spaces SET status = "occupied",  date = NULL, staff_assign = NULL WHERE name=%s AND room=%s''', (room.capitalize(), number))
-                                    
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = "occupied" WHERE name=%s AND room=%s''', (room.capitalize(), number))
                         con.commit()
                         
+                        self.alert.generate_alerts()
+
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
                   con.rollback()
@@ -483,18 +454,25 @@ class Reservation:
                         cursor.execute(''' UPDATE bookings SET status = 'Checked-out' where booking_id = %s ''', (id))
                   
                         parts = accomodation.split(',')
-                        rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
+                        room_dict = {}
+
+                        for part in parts:
+                              tokens = part.split(' ')  # split by space
+                              room_type = tokens[0].lower()  # "Premium", "Garden", ...
+                              room_dict[room_type] = part
+                              
+                        rooms = [parts[x].split(' ')[0].strip().lower() for x in range(len(parts))]
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
                         now = datetime.now(timezone.utc)
 
-                        count = 0
                         for room, number in set(zip(rooms, room_no)):
-                              if room not in ['cabana', 'small', 'big', 'hall']:
+                              if room.strip() not in ['cabana', 'small', 'big', 'hall']:
                                     cursor.execute('''UPDATE accomodation_spaces SET status = "need-clean" WHERE name=%s AND room=%s''', (room.capitalize(), number))
-                                    cursor.execute(''' INSERT INTO notifications(name, date, room_name, room_no) VALUES(%s, %s, %s, %s) ''', (f'Housekeeping requested for {parts[count]}', now, room, number))
-                              count += 1
-
+                                    cursor.execute(''' INSERT INTO notifications(name, date, room_name, room_no, alert_type) VALUES(%s, %s, %s, %s, %s) ''', (f'Housekeeping requested for {room_dict.get(room)}', now, room, number, 'housekeeping'))
+                              
                         con.commit()
+
+                        self.alert.generate_alerts()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -514,6 +492,29 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      def cancel_booking(self, id, accomodation):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+
+                        parts = accomodation.split(',')
+                        rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
+                        room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
+
+                        for room, number in set(zip(rooms, room_no)):
+                              cursor.execute('''UPDATE accomodation_spaces SET status = "avl" WHERE name=%s AND room=%s''', (room.capitalize(), number))
+                        
+                        cursor.execute(''' UPDATE bookings SET payment = 'Refunded', status = 'Cancelled' where booking_id = %s ''', (id,))
+                        cursor.execute(''' DELETE FROM accomodation_data WHERE booking_id = %s ''', (id,))
+                        con.commit()
+
+                        self.alert.generate_alerts()
+                        return {'success': bool(cursor.rowcount != 0), 'message': 'Cancelled successfully!' if cursor.rowcount != 0 else 'Failed!'}
+
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+            
       def view_details(self, id):
             try:
                   with self.db.connect() as con:
@@ -530,20 +531,22 @@ class Reservation:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT check_in, check_out FROM bookings where booking_id = %s ''', (id,))
+                        cursor.execute(''' SELECT check_in, check_out, status FROM bookings where booking_id = %s ''', (id,))
                         data = cursor.fetchone()
 
-                        return {'check_in': data.get('check_in'), 'check_out': data.get('check_out')}
+                        return {'check_in': data.get('check_in'), 'check_out': data.get('check_out'), 'booking_type': data.get('status')}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def update_reservation_date(self, id, edit_checkin, edit_checkout):
+      def update_reservation_date(self, id, edit_checkin, edit_checkout, booking_type):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' UPDATE bookings SET check_in = %s, check_out = %s WHERE booking_id = %s ''', (edit_checkin, edit_checkout, id))
                         con.commit()
+
+                        self.alert.generate_alerts()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': "Updated successfully!" if cursor.rowcount != 0 else 'Failed to update.'}
             except Exception as e:
@@ -600,7 +603,7 @@ class Reservation:
                                     FROM bookings 
                                     WHERE MONTH(check_in) = %s
                                     AND YEAR(check_in) = %s
-                                    AND status = 'Day Guest'
+                                    AND booking_type = 'Day Guest'
                               ),
                               not_paid AS (
                                     SELECT COALESCE(COUNT(payment), 0) AS total_npaid 

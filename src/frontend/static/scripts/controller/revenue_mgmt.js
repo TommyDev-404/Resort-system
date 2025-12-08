@@ -3,8 +3,8 @@ import { notifications } from "./home-dashboard.js";
 // ---------------------- HELPERS ---------------------
 function successMessageCard(message, redirect = null) {
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
                         <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
@@ -17,7 +17,7 @@ function successMessageCard(message, redirect = null) {
       lucide.createIcons();
 
       document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.getElementById("success-message");
+            const box = document.querySelector("#success-message");
             box.remove();
 
             if (redirect)  window.location.href = redirect;
@@ -26,11 +26,11 @@ function successMessageCard(message, redirect = null) {
 
 function failedMessageCard(message){
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up ">
                         <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
+                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-failed-message">Okay</button>
                   </div>
             </div>
       `;
@@ -38,7 +38,7 @@ function failedMessageCard(message){
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
       document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.getElementById("failed-message");
+            const box = document.querySelector("#failed-message");
             box.remove();
       });
 }
@@ -58,13 +58,13 @@ function createRow(id, date, promo_name, discount, area, end, status){
       const formatted_area_name = area.split(',').map(a => all_area[a]);
 
       const row = `
-            <tr class="text-center bg-gray-50 dark:bg-gray-white/2 hover:bg-black/5 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-sm" data-id=${id}>
+            <tr class="text-center bg-gray-50 dark:bg-white/2 hover:bg-black/5 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-sm" data-id=${id}>
                   <td class="py-3 px-2">${date}</td>
                   <td class="py-3 px-2">${end}</td>
                   <td class="py-3 px-2 font-medium"><div class="w-full overflow-x-auto scroll-hide whitespace-nowrap">${promo_name}</div></td>
                   <td class="py-3 px-2 text-center">${discount}</td>
                   <td class="py-3 px-2"><div class="w-full overflow-x-auto thin-scroll whitespace-nowrap">${formatted_area_name.join(', ')}</div></td>
-                  <td class="py-3 px-2 text-center"><span class="inline-block text-white font-semibold text-sm px-3 py-1 rounded-full ${status === 'Active' ? 'bg-green-500' : 'bg-orange-500'} shadow-md">${status}</span></td>
+                  <td class="py-3 px-2 text-center"><span class="inline-block text-white font-semibold text-sm px-3 py-1 rounded-full ${status === 'Active' ? 'bg-green-500' : status == 'Upcoming' ? 'bg-blue-500' : 'bg-orange-500'} shadow-md">${status}</span></td>
                   <td class="flex gap-2 items-center justify-center py-3 px-2">
                         <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 items-center justify-center cursor-pointer">
                               <i data-lucide="eye" class="text-white text-lg"></i>
@@ -213,7 +213,7 @@ async function updatePromo(e) {
       const form = new FormData(e.target);
 
       let area_list = [];
-      document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value) });
+      document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value)});
       form.append('area_list', area_list);
 
       const response = await fetch('/update-promo', {
@@ -290,7 +290,7 @@ async function removePromo(e){
       const td = tr.querySelectorAll('td');
       
       const area_affected = td[4].textContent.trim();
-      console.log(area_affected);
+      
       const response = await fetch(`/remove-promo?id=${id}&area_promos=${area_affected}`, {
             method: 'DELETE'
       });

@@ -53,9 +53,11 @@ class Housekeeping:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
+                        area = accomodation.split(' ')[0]
+
                         cursor.execute('''
                               SELECT *  FROM accomodation_spaces WHERE name = %s
-                        ''', (accomodation))
+                        ''', (area))
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}
@@ -67,18 +69,19 @@ class Housekeeping:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute('''
-                              UPDATE accomodation_spaces SET status = 'on-clean', staff_assign = %s, date = %s WHERE name = %s AND room = %s
-                        ''', (name, date, area_name, room_no))
-                        
-                        room = f'''{area_name} {room_no}'''
-                        cursor.execute('''
-                              INSERT INTO room_assign_history(name, date, room) VALUES(%s, %s, %s)
-                        ''', (name, date, room))
 
                         cursor.execute('''
+                              UPDATE accomodation_spaces SET status = 'on-clean' WHERE name = %s AND room = %s
+                        ''', (area_name.split(' ')[0], room_no))
+      
+                        room = f'''{area_name}{room_no}'''
+                        cursor.execute('''
+                              INSERT INTO room_assign_history(name, date, room, status) VALUES(%s, %s, %s, %s)
+                        ''', (name, date, room, 'on-clean'))
+            
+                        cursor.execute('''
                               DELETE FROM notifications WHERE room_name = %s AND room_no = %s
-                        ''', (area_name.lower(), room_no))
+                        ''', (area_name.split(' ')[0].lower(), room_no))
                         
                         con.commit()
 
@@ -93,11 +96,14 @@ class Housekeeping:
                         cursor = con.cursor()
                         cursor.execute('''
                               UPDATE accomodation_spaces SET status = 'avl' WHERE name = %s AND room = %s
-                        ''', (area_name, room_no))
+                        ''', (area_name.split(' ')[0], room_no))
+                        
+                        room = f'''{area_name} {room_no}'''
+                        cursor.execute(''' UPDATE room_assign_history SET status = 'avl' WHERE room = %s ''', (room,))
 
                         con.commit()
 
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Marked ready successfully!' if bool(cursor.rowcount ) else 'Failed inserting data!'}
+                        return {'success': bool(cursor.rowcount > 0), 'message': 'Marked ready successfully!' if bool(cursor.rowcount > 0) else 'Failed inserting data!'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
@@ -106,7 +112,7 @@ class Housekeeping:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM staff_details WHERE position NOT IN ('Front Desk', 'Security Guard') ''')
+                        cursor.execute(''' SELECT * FROM staff_details WHERE job_position NOT IN ('Front Desk', 'Security Guard') ''')
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}
@@ -118,7 +124,20 @@ class Housekeeping:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM room_assign_history WHERE room = %s ''', (room,))
+                        print(room)
+                        cursor.execute(''' SELECT * FROM room_assign_history WHERE room = %s ORDER BY date DESC''', (room,))
+                        data = cursor.fetchall()
+
+                        return {'success': bool(data), 'data': data}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+            
+      def cleaning_history(self, month, day):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(''' SELECT * FROM room_assign_history WHERE MONTH(date) = %s AND DAY(date) = %s ''', (month, day))
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}

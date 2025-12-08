@@ -258,7 +258,7 @@ async function todayProjectedRevenue() {
 export async function notifications() {
       document.querySelectorAll('.notif-item').forEach(item => item.remove());
       document.querySelector('.view-notif-btn').classList.remove('hidden');
-
+      
       // notif count
       const response = await fetch('/notification-count', {method: "GET"});
       const res = await response.json();
@@ -281,6 +281,10 @@ export async function notifications() {
       const response2 = await fetch('/housekeeping-alert', {method: "GET"});
       const res2 = await response2.json();
 
+      // housekeeping alert
+      const response3 = await fetch('/bookings-alert', {method: "GET"});
+      const res3 = await response3.json();
+
       if (res1.success){
             have_notifications.push(true);
             const data = res1.data;
@@ -289,7 +293,7 @@ export async function notifications() {
 
             const occupancy_notif = `
                   <div id="redirect-promo" class="notif-item px-4 py-3 flex items-start gap-3 dark:hover:bg-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
-                        <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-400 mt-0.5"></i>
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-500 mt-0.5"></i>
                         <div class="flex flex-col flex-1"">
                               <p class="text-sm text-gray-800 dark:text-gray-100">${notification}</p>
                               <span class="text-xs text-gray-500 mt-1">${time}</span>
@@ -320,6 +324,41 @@ export async function notifications() {
                   
                   allNotifications.push(housekeeping_notif);
                   document.getElementById('notif-modal').innerHTML += housekeeping_notif;
+                  lucide.createIcons(); 
+            });
+      }
+
+      if (res3.success){
+            have_notifications.push(true);
+            res3.data.forEach(data => {
+                  let time = timeAgo(data.date);
+                  let notification = data.name;
+                  let icon = null;
+                  let icon_color = null;
+
+                  if (data.classification === 'reservation-tommorow' | data.classification === 'check-in-reservation-today'){
+                        icon = 'calendar';
+                        icon_color = 'text-green-500';
+                  }else if (data.classification == 'day-guest'){
+                        icon = 'user';
+                        icon_color = 'text-yellow-500'
+                  }else{
+                        icon = 'log-out';
+                        icon_color = 'text-red-500'
+                  }
+
+                  const bookings_notif = `
+                        <div id="bookings-notif" class="notif-item px-4 py-3 flex items-start bg-gray-50 dark:bg-gray-800 gap-3 dark:hover:bg-gray-700 hover:bg-black/7 transition border-b border-gray-100 dark:border-transparent">
+                              <i data-lucide="${icon}" class="w-5 h-5 ${icon_color} mt-0.5 font-bold"></i>
+                              <div class="flex flex-col flex-1"">
+                                    <p class="text-sm text-gray-800 dark:text-gray-100">${notification}</p>
+                                    <span class="text-xs  text-gray-800 dark:text-gray-500 mt-1">${time}</span>
+                              </div>
+                        </div>
+                  `;
+                  
+                  allNotifications.push(bookings_notif);
+                  document.getElementById('notif-modal').innerHTML += bookings_notif;
                   lucide.createIcons(); 
             });
       }
@@ -921,7 +960,6 @@ setTimeout(() => {
 export function initPageDashboard() {
       allNotifications.length = 0;
       mostBookedArea();
-      notifications();
       todayGuest();
       totalGuestInHouse('today');
       totalOccupied();

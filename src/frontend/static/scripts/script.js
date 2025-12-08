@@ -1,3 +1,4 @@
+import { notifications } from './controller/home-dashboard.js';
 
 lucide.createIcons();
 
@@ -40,10 +41,11 @@ async function switchContent(sectionId) {
       const targetSection = document.getElementById(sectionId);
       if (targetSection) {
             targetSection.classList.remove('hidden');
-
+            notifications();
           // Dynamically import and initialize
             if (sectionControllerMap[sectionId]) {
                   const module = await sectionControllerMap[sectionId]();
+                  
                   // Assuming each module exports `initPageX`
                   const initFunc = Object.values(module)[0];
                   if (initFunc) initFunc();
@@ -164,6 +166,7 @@ document.addEventListener('click', (e) => {
 
       if (e.target.closest('#profile-shortcut')) switchContent('admin-profile');
       if (e.target.closest('#housekeeping-notif')) (switchContent('housekeeping'), document.querySelector('#notification-modal').classList.add('hidden'), document.querySelector('#notificationsModal').remove());
+      if (e.target.closest('#bookings-notif')) (switchContent('all-reservations'), document.querySelector('#notification-modal').classList.add('hidden'), document.querySelector('#notificationsModal').remove());
       if (e.target.closest('#redirect-promo')) (switchContent('revenue-management'), document.querySelector('#notification-modal').classList.add('hidden'), document.querySelector('#notificationsModal').remove());
       if (e.target.closest('#logoutButton')) logout();
 });

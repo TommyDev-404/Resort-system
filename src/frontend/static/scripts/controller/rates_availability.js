@@ -2,8 +2,8 @@
 // ----------------- HELPERS ----------------- //
 function successMessageCard(message, redirect = null) {
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
                         <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
@@ -16,7 +16,7 @@ function successMessageCard(message, redirect = null) {
       lucide.createIcons();
 
       document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.getElementById("success-message");
+            const box = document.querySelector("#success-message");
             box.remove();
 
             if (redirect)  window.location.href = redirect;
@@ -25,8 +25,8 @@ function successMessageCard(message, redirect = null) {
 
 function failedMessageCard(message){
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up ">
                         <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
@@ -37,10 +37,11 @@ function failedMessageCard(message){
       document.getElementById('messagePortal').innerHTML += msg;
       lucide.createIcons();
       document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.getElementById("failed-message");
+            const box = document.querySelector("#failed-message");
             box.remove();
       });
 }
+
 
 function openUpdateAreaModal(e) {
       const row = e.target.closest('tr'); // get the row
@@ -65,8 +66,8 @@ function openUpdateAreaModal(e) {
                         <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2 mt-4">Update Price</h3>
                         <form id="updateAreaForm">
                               <div class="w-full mb-6 flex flex-col gap-2">
-                                    <input type="hidden" name="area-name-update" value="${cells[0].textContent}">
-                                    <input type="number" name="update-price" placeholder="Price (₱)" required class="w-full p-2 border rounded text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800" value="${cells[3].textContent.split('.')[0].slice(1).replace(/,/g, '')}">
+                                    <input type="hidden" name="area-name-update" value="${cells[0].textContent.trim()}">
+                                    <input type="number" name="update-price" placeholder="Price (₱)" required class="w-full p-2 border rounded text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800" value="${parseInt(cells[3].textContent.split('.')[0].replace(/[^0-9]/g, ""))}">
                                     <button type="submit" class="px-5 py-2 mt-8 bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"><i class="fas fa-paper-plane mr-1"></i> Update</button>
                               </div>
                         </form>
@@ -84,8 +85,7 @@ async function renderTable() {
       try {
             const response = await fetch('/availables');
             const res = await response.json();
-            console.log(res);
-
+            
             res.data.forEach(data => {
                   rows.push(data);
             });
@@ -159,9 +159,9 @@ async function updatePrice(e){
       e.preventDefault();
       const form = new FormData(e.target);
       const price = form.get('update-price');
-      const name = form.get('area-name-update').split(' ');
+      const name = form.get('area-name-update').split(' ')[0];
 
-      const response = await fetch(`/update-price?price=${price}&name=${name[0]}`, { method: 'POST', headers: {'Content-Type': 'application/json'}});
+      const response = await fetch(`/update-price?price=${price}&name=${name}`, { method: 'POST', headers: {'Content-Type': 'application/json'}});
       const result = await response.json();
 
       if (result.success){

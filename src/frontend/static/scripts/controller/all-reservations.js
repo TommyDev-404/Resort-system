@@ -7,8 +7,8 @@ let category_data = 'all-data';
 // ---------------- RENDER HELPERS ------------------
 function successMessageCard(message, redirect = null) {
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
                         <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
@@ -30,8 +30,8 @@ function successMessageCard(message, redirect = null) {
 
 function failedMessageCard(message){
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
                         <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
@@ -88,8 +88,13 @@ function createTable(id, guest_name, checkin, checkout, stay_count, accomodation
 
                   <!-- BOOKING TYPE -->
                   <td class="px-3 py-4 text-center">
-                        <div class="block w-[150px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
-                              <span>${booking_type}</span>
+                        <div class="block w-[130px]">
+                              <span class="px-3 py-1 text-xs rounded-full
+                              ${booking_type === 'Day Guest' ? 'text-yellow-700 bg-yellow-100 dark:text-white dark:bg-yellow-500'
+                              : booking_type === 'Reservation' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
+                              : 'text-purple-700 bg-purple-100 dark:text-white dark:bg-purple-500'}">
+                              ${booking_type}
+                              </span>
                         </div>
                   </td>
 
@@ -97,10 +102,9 @@ function createTable(id, guest_name, checkin, checkout, stay_count, accomodation
                   <td class="px-3 py-4 text-center">
                         <div class="block w-[140px]">
                               <span class="px-3 py-1 text-xs rounded-full
-                              ${status === 'Day Guest' ? 'text-teal-700 bg-teal-100 dark:text-white dark:bg-teal-500'
-                              : status === 'Reserved' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
+                              ${status === 'Reserved' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
                               : status === 'Cancelled' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500'
-                              : status === 'Checked-out' ? 'text-secondary-gold bg-yellow-100 dark:text-white dark:bg-yellow-500'
+                              : status === 'Checked-out' ? 'text-rose-600 bg-rose-100 dark:text-white dark:bg-rose-500'
                               : 'text-blue-700 bg-blue-100 dark:text-white dark:bg-blue-500'}">
                               ${status}
                               </span>
@@ -114,7 +118,7 @@ function createTable(id, guest_name, checkin, checkout, stay_count, accomodation
                               ${payment_status === 'ZUZU (Online Payment)' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
                               : payment_status === 'Refunded' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500'
                               : payment_status === 'Direct Payment' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
-                              : 'text-yellow-700 bg-yellow-100 dark:text-white dark:bg-yellow-500'}">
+                              : 'text-orange-700 bg-orange-100 dark:text-white dark:bg-orange-500'}">
                               ${payment_status}
                               </span>
                         </div>
@@ -154,19 +158,23 @@ function renderAddBookingModal(){
             
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                          <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
-                                                <option class="text-black " value="" selected disabled>Select Booking Category</option>
-                                                <option class="text-black " value="Reservation">Reservation (Advance Booking)</option>
-                                                <option class="text-black" value="Check-in">Check-in (Walk-in Booking)</option>
-                                                <option class="text-black" value="Day Guest">Day Guest (Amenities Only)</option>
-                                          </select>
-
-                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
-                                                <option class="text-black "  value="" selected disabled>Select Payment Method</option>
-                                                <option class="text-black "  value="Direct Payment">Direct Payment</option>
-                                                <option class="text-black "  value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
-                                                <option class="text-black "  value="Pending">Pending</option>
-                                          </select>
+                                          <div class="flex flex-col gap-0.5">
+                                                <label class="text-sm text-gray-600 dark:text-gray-200">Select Inquery Type</label>
+                                                <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                                      <option class="text-black " value="Reservation">Reservation (Advance Booking)</option>
+                                                      <option class="text-black" value="Check-in">Checked-in (Room Stay)</option>
+                                                      <option class="text-black" value="Day Guest">Day Guest (No Room Stay)</option>
+                                                </select>
+                                          </div>
+                                          
+                                          <div class="flex flex-col gap-0.5">
+                                                <label class="text-sm text-gray-600 dark:text-gray-200">Select Payment Type</label>
+                                                <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
+                                                      <option class="text-black "  value="Direct Payment">Direct Payment</option>
+                                                      <option class="text-black "  value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
+                                                      <option class="text-black "  value="Pending">Pending</option>
+                                                </select>
+                                          </div>
                                     </div>
                               </section>
             
@@ -223,7 +231,7 @@ function renderAddBookingModal(){
       document.getElementById('reservationPortal').innerHTML += form; 
 }
 
-function renderEditReservedModal(id, check_in, check_out){
+function renderEditReservedModal(id, check_in, check_out, booking_type){
       const modal = `
             <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
                   <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
@@ -232,6 +240,7 @@ function renderEditReservedModal(id, check_in, check_out){
                         <form id="update-reserved-form">
                               <div class="flex flex-col gap-6 mt-2">
                                     <input type="hidden" name="id" value="${id}">
+                                    <input type="hidden" name="booking_type" value="${booking_type}">
                                     <div class="flex flex-col gap1 text-gray-600 dark:text-gray-200">
                                           Edit Check-In:
                                           <input type="date" name="edit_checkin" class="border border-gray-300 text-gray-600 dark:text-gray-100 p-4 rounded-sm" value="${check_in}">
@@ -258,12 +267,14 @@ function renderMarkPaidModal(){
                         <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Payment</h2>
                         <form id="markpaid-form">
                               <div class="flex flex-col gap-6 mt-2">
-                                    <select id="mark-payment" class="border border-gray-300 p-4 rounded-sm text-gray-800 dark:text-white" required>
-                                          <option value=""  selected disabled>Select Payment</option>
-                                          <option class="text-gray-900" value="Direct Payment">Direct Payment</option>
-                                          <option class="text-gray-900" value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
-                                          <option class="text-gray-900" value="Pending">Pending</option>
-                                    </select> 
+                                    <div class="flex flex-col gap-0.5">
+                                          <label class="text-sm text-gray-600 dark:text-gray-200">Select Payment Type</label>
+                                          <select id="mark-payment" class="border border-gray-300 p-4 rounded-sm text-gray-800 dark:text-white" required>
+                                                <option class="text-gray-900" value="Direct Payment">Direct Payment</option>
+                                                <option class="text-gray-900" value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
+                                                <option class="text-gray-900" value="Pending">Pending</option>
+                                          </select> 
+                                    </div>
                                     <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Done</button>      
                               </div>
                         </form>
@@ -373,6 +384,7 @@ function enableActionBtns(e){
             const id = tr.getAttribute('id');
             const status = tr.querySelectorAll('td')[5].textContent.trim();
             const payment = tr.querySelectorAll('td')[6].textContent.trim();
+            const booking_type = tr.querySelectorAll('td')[4].textContent.trim();
 
             // --- Apply your conditions
             allBtns.forEach(btn => {
@@ -381,31 +393,38 @@ function enableActionBtns(e){
                   const reservationDate = new Date(`${date[0]}${year}`);
                   const checkoutDate = new Date(`${date[1]}${year}`);
                   const todayDate = new Date();
+
                   // Paid
                   if (payment !== 'Pending') {
-                        console.log(payment);
-                        // enable check-out btn only
-                        if (status === 'Checked-in' && checkoutDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid') {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
+                        if (booking_type === 'Day Guest'){
+                              if (status === 'Checked-in' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                        }else if (booking_type === 'Reservation'){
+                              // enable change date, checkin,  & cancel reservation btns
+                              if (status === 'Reserved' && reservationDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                              // enable change date & cancel reservation btns
+                              if (status === 'Reserved' && reservationDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                        }else{
+                              // enable check-out btn only
+                              if (status === 'Checked-in' && checkoutDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                              
+                              if (status === 'Checked-in' && checkoutDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
                         }
                         
-                        if (status === 'Checked-in' && checkoutDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout') {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
-                        }
-
-
-                        // enable change date, checkin,  & cancel reservation btns
-                        if (status === 'Reserved' && reservationDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
-                        }
-                        // enable change date & cancel reservation btns
-                        if (status === 'Reserved' && reservationDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
-                        }
                   } else { // Not Paid
                         if (status === 'Checked-in'  && checkoutDate.toDateString() === todayDate.toDateString() && (btn.getAttribute('id') === 'mark-checkout' || btn.getAttribute('id') === 'mark-paid')) {
                               btn.style.opacity = '1';
@@ -495,6 +514,7 @@ async function addBooking(e){
             if (result.success){
                   e.target.reset();
                   successMessageCard(result.message);
+                  notifications();
                   document.querySelector('#booking-overlay').remove();
                   recentBookings();
                   summaryCards();
@@ -545,6 +565,7 @@ async function markAsCheckin(){
 
       if (result.success){
             successMessageCard(result.message);
+            notifications();
             summaryCards();
             recentBookings();
             resetButtonAndCheckBox();
@@ -567,6 +588,7 @@ async function cancelBooking(){
 
       if (result.success){
             successMessageCard(result.message);
+            notifications();
             recentBookings();
             summaryCards
             resetButtonAndCheckBox();
@@ -613,6 +635,7 @@ async function updateReservationDate(e){
 
       if (result.success){
             successMessageCard(result.message);
+            notifications();
             document.querySelector('#update-reservation-overlay').remove();
             recentBookings();
             resetButtonAndCheckBox();
@@ -680,7 +703,7 @@ async function renderViewReservationDetails(id){
                                     </div>
                                     
                                     <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Total Paid</p>
+                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Total Paid (₱)</p>
                                           <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.total_amount}</div>
                                     </div>
                                     
@@ -711,7 +734,7 @@ async function getReservationDate(){
       const formatCheckin = new Date(result.check_in).toISOString().split('T')[0];
       const formatCheckout = new Date(result.check_out).toISOString().split('T')[0];
 
-      renderEditReservedModal(id, formatCheckin, formatCheckout); 
+      renderEditReservedModal(id, formatCheckin, formatCheckout, result.status); 
 }
 
 async function generateAvlAccomodation(accomodation){
@@ -787,6 +810,25 @@ async function getYears(){
       
             document.getElementById('yearSelect').appendChild(option);
       });
+}
+
+function getMonths(){
+      document.querySelectorAll('#monthSelect option').forEach(opt => opt.remove());
+
+      const monthSelect = document.getElementById("monthSelect");
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      
+      for (let i = 0; i < 12; i++) {
+            const date = new Date(currentYear, i, 1);
+            const monthName = date.toLocaleString("default", { month: "long" });
+            const option = document.createElement("option");
+            option.value = i + 1;
+            option.textContent = monthName;
+            
+            if (i === currentDate.getMonth()) option.selected = true;
+            monthSelect.appendChild(option);
+      }
 }
 
 async function summaryCards(){
@@ -887,8 +929,8 @@ async function searchGuest(e){
             });
       }else {
             const empty_row = `
-                  <tr class="text-[16px] hover:bg-blue-50 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="8" class="text-center dark:bg-white/3 dark:text-white text-gray-600 py-6 bg-gray-50">No data.</td>
+                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="8" class="text-center text-gray-800 py-6 dark:text-white">No data.</td>
                   </tr>
             `;
             
@@ -978,11 +1020,13 @@ document.addEventListener('input', (e) => {
 // -------------- Initialiaze when loaded -----------
 switchTabs();
 getYears();
+getMonths();
 
 export function initPageReservation(){
       getTotalsCountData();
       resetDropDown();
       recentBookings();
       summaryCards();
+      notifications();
 }
 

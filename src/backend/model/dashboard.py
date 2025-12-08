@@ -20,34 +20,35 @@ class Dashboard:
                               SELECT COALESCE(SUM(total_guest), 0) AS total_guest_in_house
                               FROM bookings 
                               WHERE check_in <= CURRENT_DATE()
-                              AND check_out >= CURRENT_DATE() And status = 'Checked-in'
+                              AND check_out >= CURRENT_DATE()
+                              AND status = 'Checked-in' AND booking_type = 'Check-in'
                         ),
-                        last_week_sunday AS (
-                              SELECT DATE_SUB(CURRENT_DATE(), INTERVAL (WEEKDAY(CURRENT_DATE()) + 1) DAY) AS sunday_date
-                        ),
-                        last_week_total AS (
+                        yesterday_total AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS total_guest_in_house
                               FROM bookings 
-                              WHERE check_in <= (SELECT sunday_date FROM last_week_sunday)
-                              AND check_out > (SELECT sunday_date FROM last_week_sunday) And status = 'Checked-out'
+                              WHERE check_in = CURRENT_DATE() - INTERVAL 1 DAY
+                              AND check_out >= CURRENT_DATE() - INTERVAL 1 DAY
+                              AND status = 'Checked-in' AND booking_type = 'Check-in'
                         )
                         SELECT 
-                              (SELECT total_guest_in_house FROM today_total) AS latest_total_guest,
-                              (SELECT total_guest_in_house FROM last_week_total) AS total_guest_in_house_last_week,
-                              CASE 
+                        (SELECT total_guest_in_house FROM today_total) AS latest_total_guest,
+                        (SELECT total_guest_in_house FROM yesterday_total) AS total_guest_in_house_yesterday,
+                        CASE 
                               WHEN (SELECT total_guest_in_house FROM today_total) = 0 
-                                    AND (SELECT total_guest_in_house FROM last_week_total) = 0 THEN 0
-                              WHEN (SELECT total_guest_in_house FROM last_week_total) = 0 THEN 100
+                                    AND (SELECT total_guest_in_house FROM yesterday_total) = 0 
+                                    THEN 0
+                              WHEN (SELECT total_guest_in_house FROM yesterday_total) = 0 
+                                    THEN 100
                               ELSE ROUND(
                                     (
-                                          ((SELECT total_guest_in_house FROM today_total) -
-                                          (SELECT total_guest_in_house FROM last_week_total)) /
-                                          (SELECT total_guest_in_house FROM last_week_total)
-                                    ) * 100, 2)
-                        END AS change_rate_percent
+                                          (SELECT total_guest_in_house FROM today_total) -
+                                          (SELECT total_guest_in_house FROM yesterday_total)
+                                    ) / (SELECT total_guest_in_house FROM yesterday_total) * 100
+                                    , 2)
+                        END AS change_rate_percent;
                   ''')
                   data = cursor.fetchone()
-
+                  print(data)
                   return {'today': data.get('latest_total_guest') , 'change': data.get('change_rate_percent')}
 
       def today_guest(self):
@@ -268,7 +269,7 @@ class Dashboard:
                                     COALESCE(SUM(total_guest), 0) AS today_checkin_guests
                               FROM bookings
                               WHERE DATE(check_in) = CURRENT_DATE()
-                              AND status = 'Checked-in'
+                              AND booking_type = 'Check-in' AND status = 'Checked-in'
                         ),
 
                         today_checkout AS (
@@ -286,7 +287,7 @@ class Dashboard:
                                     COALESCE(SUM(total_guest), 0) AS day_guest_guests
                               FROM bookings
                               WHERE DATE(check_in) = CURRENT_DATE()
-                              AND status = 'Day Guest'
+                              AND booking_type = 'Day Guest' AND status = 'Checked-in'
                         ),
 
                         reservation AS (
@@ -294,8 +295,8 @@ class Dashboard:
                                     COUNT(*) AS reservation_count,
                                     COALESCE(SUM(total_guest), 0) AS reservation_guests
                               FROM bookings
-                              WHERE DATE(check_in) >= CURRENT_DATE()
-                              AND status = 'Reserved'
+                              WHERE DATE(check_in) >= CURRENT_DATE() 
+                              AND booking_type = 'Reservation' AND status = 'Reserved'
                         )
 
                         SELECT 

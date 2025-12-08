@@ -12,16 +12,16 @@ CREATE TABLE bookings (
     payment ENUM(
         'Direct Payment',
         'ZUZU (Online Payment)',
+        'Refunded',
         'Pending'
     ) NOT NULL,
     status ENUM(
         'Reserved',
-        'Day Guest',
         'Checked-in',
         'Checked-out',
         'Cancelled'
     ) DEFAULT 'Reserved',
-    accomodations VARCHAR(100)
+    accomodations VARCHAR(255)
         COLLATE utf8mb4_bin
         DEFAULT NULL,
     check_in DATE NOT NULL,
@@ -52,8 +52,6 @@ CREATE TABLE accomodation_spaces (
     name VARCHAR(50) NOT NULL,
     room INT(11) NOT NULL,
     status VARCHAR(39) NOT NULL,
-    staff_assign VARCHAR(100) NULL,
-    date DATE NULL,
     rate INT(11) NOT NULL,
     orig_rate INT(11) NOT NULL,
     promo VARCHAR(100) DEFAULT NULL
@@ -67,7 +65,7 @@ CREATE TABLE promos (
     discount INT(11) NOT NULL,
     area VARCHAR(100) NOT NULL,
     end_date DATE NOT NULL,
-    status ENUM('Active', 'Expired') NOT NULL
+    status ENUM('Active', 'Expired', 'Upcoming') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- admin table
@@ -85,10 +83,14 @@ CREATE TABLE admin (
 -- notifications
 CREATE TABLE notifications (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    room_name VARCHAR(20)  NOT NULL,
-    room_no INT(11) NOT NULL
+    name VARCHAR(255) NULL,
+    date TIMESTAMP  NULL,
+    room_name VARCHAR(20)   NULL,
+    room_no VARCHAR(3)  NULL,
+    alert_type VARCHAR(50)  NULL,
+    classification VARCHAR(50) NULL,
+    counts int(50) NULL,
+    guests int(50) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- staff attendance table
@@ -112,7 +114,7 @@ CREATE TABLE staff_details (
     monthly_salary INT(11) NOT NULL,
     estimate_weekly INT(100) NOT NULL,
     estimate_month INT(100) NOT NULL,
-    position VARCHAR(100) NOT NULL,
+    job_position VARCHAR(100) NOT NULL,
     avl_leave INT(11) NOT NULL,
     status ENUM('On Leave', 'Active', 'Absent') NOT NULL,
     workdays DOUBLE NOT NULL,
@@ -125,7 +127,7 @@ CREATE TABLE staff_leaves_data (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     staff_id INT(11) NOT NULL,
     name VARCHAR(100) NOT NULL,
-    position VARCHAR(50) NOT NULL,
+    job_position VARCHAR(50) NOT NULL,
     date DATE NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -133,8 +135,9 @@ CREATE TABLE staff_leaves_data (
 CREATE TABLE room_assign_history (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    room VARCHAR(50) NOT NULL,
     date DATE NOT NULL,
-    room VARCHAR(50)
+    status VARCHAR(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -142,72 +145,73 @@ CREATE TABLE room_assign_history (
 INSERT INTO admin (username, password, email, contact, code, hash_pass, date_pass_change)
 VALUES ('admin', 'plainpass123', 'admin@example.com', '09123456789', 123456, '$2y$10$9H0p1KdEQ1gEoH9s2lO0gOVYBWqs0ioY1hGQfgF4FklajfHsyAqLC','2025-01-01');
 
--- new 
-insert into notifications(name, date, room_name, room_no) VALUES ('temporary', CURRENT_DATE() - INTERVAL 1 DAY, 'occupancy', 0)
+-- temporary data for notifications
+INSERT INTO notifications(name, date, room_name, room_no, alert_type, classification, counts, guests) VALUES ('temporary', CURRENT_DATE() - INTERVAL 1 DAY, NULL, NULL , 'occupancy', NULL , NULL, NULL );
 
 -- accommodation_spaces
-INSERT INTO accomodation_spaces (name, room, status, date, rate, orig_rate, promo, staff_assign)
+INSERT INTO accomodation_spaces (name, room, status, rate, orig_rate, promo)
 VALUES
-('Premium', 101, 'avl', NULL, 10000, 10000, 'None', NULL),
-('Premium', 102, 'avl', NULL, 10000, 10000, 'None', NULL),
-('Premium', 103, 'avl', NULL, 10000, 10000, 'None', NULL),
-('Premium', 104, 'avl', NULL, 10000, 10000, 'None', NULL),
-('Family', 101, 'avl', NULL, 3000, 3000, 'None', NULL),
-('Family', 102, 'avl', NULL, 3000, 3000, 'None', NULL),
-('Family', 103, 'avl', NULL, 3000, 3000, 'None', NULL),
-('Family', 104, 'avl', NULL, 3000, 3000, 'None', NULL),
-('Family', 105, 'avl', NULL, 3000, 3000, 'None', NULL),
-('Family', 106, 'avl', NULL, 3000, 3000, 'None', NULL),
-('Family', 107, 'avl', NULL, 3000, 3000, 'None', NULL),
-('Barkada', 101, 'avl', NULL, 7000, 7000, 'None', NULL),
-('Barkada', 102, 'avl', NULL, 7000, 7000, 'None', NULL),
-('Barkada', 103, 'avl', NULL, 7000, 7000, 'None', NULL),
-('Barkada', 104, 'avl', NULL, 7000, 7000, 'None', NULL),
-('Barkada', 105, 'avl', NULL, 7000, 7000, 'None', NULL),
-('Barkada', 106, 'avl', NULL, 7000, 7000, 'None', NULL),
-('Barkada', 107, 'avl', NULL, 7000, 7000, 'None', NULL),
-('Standard', 101, 'avl', NULL, 8000, 8000, 'None', NULL),
-('Standard', 102, 'avl', NULL, 8000, 8000, 'None', NULL),
-('Standard', 103, 'avl', NULL, 8000, 8000, 'None', NULL),
-('Garden', 101, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 102, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 103, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 104, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 105, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 106, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 107, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 108, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 109, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 110, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 111, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Garden', 112, 'avl', NULL, 3500, 3500, 'None', NULL),
-('Cabana', 101, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Cabana', 102, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Cabana', 103, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Cabana', 104, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Cabana', 105, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Cabana', 106, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Cabana', 107, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Cabana', 108, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Small', 101, 'avl', NULL, 500, 500, 'None', NULL),
-('Small', 102, 'avl', NULL, 500, 500, 'None', NULL),
-('Small', 103, 'avl', NULL, 500, 500, 'None', NULL),
-('Small', 104, 'avl', NULL, 500, 500, 'None', NULL),
-('Small', 105, 'avl', NULL, 500, 500, 'None', NULL),
-('Small', 106, 'avl', NULL, 500, 500, 'None', NULL),
-('Small', 107, 'avl', NULL, 500, 500, 'None', NULL),
-('Small', 108, 'avl', NULL, 500, 500, 'None', NULL),
-('Big', 101, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Big', 102, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Big', 103, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Big', 104, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Big', 105, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Big', 106, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Big', 107, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Big', 108, 'avl', NULL, 1000, 1000, 'None', NULL),
-('Hall', 101, 'avl', NULL, 1000, 1000, 'None', NULL);
+('Premium', 101, 'avl', 10000, 10000, 'None'),
+('Premium', 102, 'avl', 10000, 10000, 'None'),
+('Premium', 103, 'avl', 10000, 10000, 'None'),
+('Premium', 104, 'avl', 10000, 10000, 'None'),
+('Family', 101, 'avl', 3000, 3000, 'None'),
+('Family', 102, 'avl', 3000, 3000, 'None'),
+('Family', 103, 'avl', 3000, 3000, 'None'),
+('Family', 104, 'avl', 3000, 3000, 'None'),
+('Family', 105, 'avl', 3000, 3000, 'None'),
+('Family', 106, 'avl', 3000, 3000, 'None'),
+('Family', 107, 'avl', 3000, 3000, 'None'),
+('Barkada', 101, 'avl', 7000, 7000, 'None'),
+('Barkada', 102, 'avl', 7000, 7000, 'None'),
+('Barkada', 103, 'avl', 7000, 7000, 'None'),
+('Barkada', 104, 'avl', 7000, 7000, 'None'),
+('Barkada', 105, 'avl', 7000, 7000, 'None'),
+('Barkada', 106, 'avl', 7000, 7000, 'None'),
+('Barkada', 107, 'avl', 7000, 7000, 'None'),
+('Standard', 101, 'avl', 8000, 8000, 'None'),
+('Standard', 102, 'avl', 8000, 8000, 'None'),
+('Standard', 103, 'avl', 8000, 8000, 'None'),
+('Garden', 101, 'avl', 3500, 3500, 'None'),
+('Garden', 102, 'avl', 3500, 3500, 'None'),
+('Garden', 103, 'avl', 3500, 3500, 'None'),
+('Garden', 104, 'avl', 3500, 3500, 'None'),
+('Garden', 105, 'avl', 3500, 3500, 'None'),
+('Garden', 106, 'avl', 3500, 3500, 'None'),
+('Garden', 107, 'avl', 3500, 3500, 'None'),
+('Garden', 108, 'avl', 3500, 3500, 'None'),
+('Garden', 109, 'avl', 3500, 3500, 'None'),
+('Garden', 110, 'avl', 3500, 3500, 'None'),
+('Garden', 111, 'avl', 3500, 3500, 'None'),
+('Garden', 112, 'avl', 3500, 3500, 'None'),
+('Cabana', 101, 'avl', 1000, 1000, 'None'),
+('Cabana', 102, 'avl', 1000, 1000, 'None'),
+('Cabana', 103, 'avl', 1000, 1000, 'None'),
+('Cabana', 104, 'avl', 1000, 1000, 'None'),
+('Cabana', 105, 'avl', 1000, 1000, 'None'),
+('Cabana', 106, 'avl', 1000, 1000, 'None'),
+('Cabana', 107, 'avl', 1000, 1000, 'None'),
+('Cabana', 108, 'avl', 1000, 1000, 'None'),
+('Small', 101, 'avl', 500, 500, 'None'),
+('Small', 102, 'avl', 500, 500, 'None'),
+('Small', 103, 'avl', 500, 500, 'None'),
+('Small', 104, 'avl', 500, 500, 'None'),
+('Small', 105, 'avl', 500, 500, 'None'),
+('Small', 106, 'avl', 500, 500, 'None'),
+('Small', 107, 'avl', 500, 500, 'None'),
+('Small', 108, 'avl', 500, 500, 'None'),
+('Big', 101, 'avl', 1000, 1000, 'None'),
+('Big', 102, 'avl', 1000, 1000, 'None'),
+('Big', 103, 'avl', 1000, 1000, 'None'),
+('Big', 104, 'avl', 1000, 1000, 'None'),
+('Big', 105, 'avl', 1000, 1000, 'None'),
+('Big', 106, 'avl', 1000, 1000, 'None'),
+('Big', 107, 'avl', 1000, 1000, 'None'),
+('Big', 108, 'avl', 1000, 1000, 'None'),
+('Hall', 101, 'avl', 1000, 1000, 'None');
 
--- trigger for updating data on bookings then affect the accomodation data
+
+-- create  trigger for updating data on bookings then affect the accomodation data
 DELIMITER $$
 
 CREATE TRIGGER after_booking_update
@@ -224,7 +228,12 @@ END$$
 
 DELIMITER ;
 
+-- show trigger
+SHOW TRIGGERS;
 
+
+-- create auto check-out guest event scheduler
+SET time_zone = '+08:00';
 DELIMITER $$
 
 CREATE EVENT IF NOT EXISTS auto_checkout_guests
@@ -232,30 +241,29 @@ ON SCHEDULE EVERY 1 DAY
 STARTS CURRENT_DATE()
 DO
 BEGIN
-    -- 1. Update booking status
+    -- Update booking status
     UPDATE bookings
     SET status = 'Checked-out'
     WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE())
     AND status = 'Checked-in';
 
-    -- 2. Update accomodation_spaces for rooms that just checked out
+    -- Update accomodation_spaces for rooms that just checked out
     UPDATE accomodation_spaces a
     JOIN bookings b
-      ON a.name = TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1))
-     AND a.room = CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED)
+        ON a.name = TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1))
+        AND a.room = CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED)
     SET a.status = 'need-clean'
-    WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE())
-      AND b.status = 'Checked-out';
+    WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE()) AND b.status = 'Checked-out';
 
-    -- 3. Insert notifications for housekeeping
-    INSERT INTO notifications(name, date, room_name, room_no)
+    -- Insert notifications for housekeeping
+    INSERT INTO notifications(name, date, room_name, room_no, alert_type, classification)
     SELECT CONCAT('(System check-out): Housekeeping requested for ', b.accomodations),
-           NOW(),
-           TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1)) ,
-           CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED)
+            NOW(),
+            TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1)) ,
+            CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED),
+            'housekeeping', 'system-checkout'
     FROM bookings b
-    WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE())
-      AND b.status = 'Checked-out';
+    WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE()) AND b.status = 'Checked-in';
 END$$
 
 DELIMITER ;
@@ -265,5 +273,8 @@ SHOW VARIABLES LIKE 'event_scheduler';
 
 -- turned on the event
 SET GLOBAL event_scheduler = ON;
+
+-- remove the event
+DROP EVENT auto_checkout_guests;
 
 

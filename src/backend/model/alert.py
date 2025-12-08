@@ -46,7 +46,7 @@ class Alerts:
                         avg_next_week = sum(item["value"] for item in next_week_forecast) / len(next_week_forecast)
                   
                   if avg_next_week < 60:
-                        cursor.execute (''' SELECT * FROM notifications WHERE room_name = 'occupancy' ''')
+                        cursor.execute (''' SELECT * FROM notifications WHERE alert_type = 'occupancy' ''')
                         data = cursor.fetchone()
 
                         db_date = data.get('date')
@@ -54,11 +54,11 @@ class Alerts:
                         
                         if (db_date.date() != now.date() or data.get('name') == 'temporary'):
                               cursor.execute('''
-                                    UPDATE notifications SET name = %s, date =%s WHERE room_name = 'occupancy'
+                                    UPDATE notifications SET name = %s, date =%s WHERE alert_type = 'occupancy'
                               ''', (f"Next week's forecasted occupancy is {round(avg_next_week, 2)}% (Target: 30%). Consider applying promotion!", now))
                               con.commit()
                         
-                        cursor.execute (''' SELECT * FROM promos WHERE status = 'Active' ''')
+                        cursor.execute (''' SELECT * FROM promos WHERE status IN ('Upcoming', 'Active') ''')
                         promo = cursor.fetchone()
 
                         if bool(promo) == False:
@@ -73,7 +73,103 @@ class Alerts:
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute('''   
-                        SELECT * FROM notifications WHERE room_name <> 'occupancy'
+                        SELECT * FROM notifications WHERE alert_type = 'housekeeping'
+                  ''')
+            data = cursor.fetchall()
+
+            return {'success': bool(data), 'data': data} 
+
+      def generate_alerts(self):
+            alerts = [
+                  {
+                        'query': '''
+                              SELECT
+                                    COUNT(*) as count,
+                                    COALESCE(SUM(total_guest), 0) as total_guest
+                              FROM bookings
+                              WHERE check_out = CURRENT_DATE() AND status = 'Checked-in' AND booking_type = 'Check-in';
+                        ''',
+                        'type': 'bookings',
+                        'classification': 'checkout-today',
+                        'template': "Checkout Reminder: {count} day guest booking(s) with a total of {total_guest} guest(s) are scheduled to leave today. Please process their checkout accordingly."
+                  },
+                  {
+                        'query': '''
+                              SELECT
+                                    COUNT(*) as count,
+                                    COALESCE(SUM(total_guest), 0) as total_guest
+                              FROM bookings
+                              WHERE check_out = CURRENT_DATE() AND status = 'Checked-in' AND booking_type = 'Day Guest';
+                        ''',
+                        'type': 'bookings',
+                        'classification': 'day-guest',
+                        'template': "Day Guest - Checkout Reminder: {count} day guest(s) booking(s) with {total_guest} guest(s) are scheduled to check out today. Kindly verify and process their checkout."
+                  },
+                  {
+                        'query': '''
+                              SELECT
+                                    COUNT(*) as count,
+                                    COALESCE(SUM(total_guest), 0) as total_guest
+                              FROM bookings
+                              WHERE check_in = CURRENT_DATE() AND status = 'Reserved' AND booking_type = 'Reservation';
+                        ''',
+                        'type': 'bookings',
+                        'classification': 'check-in-reservation-today',
+                        'template': "Reservation Reminder: {count} reservation(s) with {total_guest} guest(s) are scheduled to check in today. Please prepare accordingly."
+                  },
+                  {
+                        'query': '''
+                              SELECT
+                                    COUNT(*) as count,
+                                    COALESCE(SUM(total_guest), 0) as total_guest
+                              FROM bookings
+                              WHERE check_in = CURRENT_DATE() + INTERVAL 1 DAY AND status = 'Reserved' AND booking_type = 'Reservation';
+                        ''',
+                        'type': 'bookings',
+                        'classification': 'reservation-tommorow',
+                        'template': "Reservation Reminder: {count} reservation(s) with {total_guest} guest(s) are scheduled to check in tomorrow. Please prepare accordingly."
+                  }
+            ]
+
+            with self.db.connect() as con:
+                  cursor = con.cursor()
+                  now = datetime.now(timezone.utc)
+
+                  for alert in alerts:
+                        cursor.execute(alert['query'])
+                        data = cursor.fetchone()
+                        count = int(data.get('count', 0))
+                        total_guest = int(data.get('total_guest', 0))
+
+                        if count > 0:
+                              message = alert['template'].format(count=count, total_guest=total_guest)
+                              
+                              cursor.execute(''' SELECT * FROM notifications WHERE classification = %s ''', (alert['classification'],))
+                              data = cursor.fetchall()
+
+                              # first load
+                              if bool(data) == False:
+                                    cursor.execute(''' INSERT INTO notifications (name, date, room_name, room_no, alert_type, classification, counts, guests) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', 
+                                    (message, now, None, None, alert['type'], alert['classification'], count, total_guest))
+                              else:
+                                    cursor.execute('''
+                                    UPDATE notifications
+                                          SET 
+                                          name = %s,
+                                          counts = counts + %s,
+                                          guests = guests + %s
+                                    WHERE classification = %s  ''', 
+                                    (message, count, total_guest, alert['classification']))
+                        else:
+                              cursor.execute(''' DELETE FROM notifications WHERE classification = %s''', (alert['classification']),)
+                              
+                  con.commit()
+
+      def bookings_alert(self):
+            with self.db.connect() as con:
+                  cursor = con.cursor()
+                  cursor.execute('''   
+                        SELECT * FROM notifications WHERE alert_type = 'bookings'
                   ''')
             data = cursor.fetchall()
 
@@ -87,10 +183,122 @@ class Alerts:
                   ''')
                   data = cursor.fetchone()
 
-                  cursor.execute (''' SELECT * FROM promos WHERE date <= CURRENT_DATE() AND end_date >= CURRENT_DATE() ''')
+                  cursor.execute ('''
+                        SELECT 
+                              upcoming_count,
+                              active_count,
+                              (upcoming_count + active_count) AS total_count
+                        FROM (
+                        SELECT
+                              SUM(CASE WHEN date > CURRENT_DATE() AND status = 'Upcoming' THEN 1 ELSE 0 END) AS upcoming_count,
+                              SUM(CASE WHEN date <= CURRENT_DATE() AND end_date >= CURRENT_DATE() AND status = 'Active' THEN 1 ELSE 0 END) AS active_count
+                        FROM promos
+                        ) AS counts;
+                  ''')
                   promo = cursor.fetchone()
-
-                  if bool(promo) == False:
-                        return {'count': data.get('count')}
+                  
+                  if promo.get('total_count') != None:
+                        if int(promo.get('total_count')) == 0:
+                              return {'count': data.get('count')}
+                        else:
+                              return {'count': int(data.get('count')) - 1}
                   else:
-                        return {'count': int(data.get('count')) - 1}
+                        return {'count': data.get('count')}
+                  
+      def cron_jobs(self):
+            with self.db.connect() as conn:
+                  cursor = conn.cursor()
+
+                  # Expire outdated promos
+                  cursor.execute(""" UPDATE promos SET status = 'Expired' WHERE end_date < CURDATE() AND status = 'Active' """)
+                  
+                  # Apply Today Promo
+                  today = date.today()
+
+                  cursor.execute('''
+                        SELECT id, name, discount, area
+                        FROM promos
+                        WHERE status = 'Upcoming' AND date = %s
+                  ''', (today,))
+                  promos = cursor.fetchall()
+
+                  for promo in promos:
+                        promo_id = promo.get('id')
+                        name = promo.get('name')
+                        discount = int(promo.get('discount')) / 100
+                        areas = promo.get('area')\
+
+                        for area in areas.split(','):  
+                              cursor.execute('''
+                                    UPDATE accomodation_spaces
+                                    SET promo=%s, rate=rate*(1-%s)
+                                    WHERE name=%s
+                              ''', (name, discount, area.strip()))
+                              conn.commit()
+                        # Mark promo as active
+                        cursor.execute('UPDATE promos SET status="Active" WHERE id=%s', (promo_id,))
+
+                  # Restore room rates after promo expired
+                  cursor.execute(""" 
+                        UPDATE accomodation_spaces AS a
+                        LEFT JOIN promos AS p
+                        ON a.promo = p.name
+                        SET a.rate = a.orig_rate
+                        WHERE p.end_date < CURDATE()
+                        AND LOWER(TRIM(a.promo)) != 'None';
+                  """)
+
+                  #reset salary data every new week
+                  cursor.execute(''' 
+                        UPDATE staff_details
+                        SET 
+                              weekly_salary = 0,
+                              monthly_salary = CASE
+                              WHEN MONTH(reset_date) != MONTH(CURRENT_DATE()) OR YEAR(reset_date) != YEAR(CURRENT_DATE())
+                              THEN 0
+                              ELSE monthly_salary
+                              END,
+                              reset_date = CURRENT_DATE()
+                        WHERE 
+                              WEEK(reset_date, 1) != WEEK(CURRENT_DATE(), 1)
+                              OR MONTH(reset_date) != MONTH(CURRENT_DATE())
+                              OR YEAR(reset_date) != YEAR(CURRENT_DATE());
+                  ''')
+
+                  conn.commit()
+
+      def auto_checkout_guest(self):
+            with self.db.connect() as con:
+                  cursor = con.cursor()
+                  cursor.execute('''   
+                        SELECT * from bookings where status = 'Checked-in' and check_out = CURRENT_DATE() - INTERVAL 1 DAY;
+                  ''')
+                  data = cursor.fetchone()
+
+                  if data:
+                        cursor.execute('''
+                              UPDATE bookings
+                              SET status = 'Checked-out'
+                              WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE())
+                              AND status = 'Checked-in';
+                        ''')
+                        con.commit()
+
+                        accomodation = data.get('accomodations').split(',')      
+
+                        for area in accomodation:
+                              room_name = area.split(' ')[0].lower().strip()
+                              room_no = area.split()[-1].strip()
+                              message = f"(System check-out): Housekeeping requested for {area}"
+
+                              if room_name not in ['cabana', 'small', 'big', 'hall']:
+                                    cursor.execute(''' INSERT INTO notifications (name, date, room_name, room_no, alert_type, classification) VALUES (%s, NOW(), %s, %s, %s, %s)
+                                    ''', (message, room_name, int(room_no), 'housekeeping', 'system-checkout'))
+                                    
+                                    cursor.execute('''
+                                          UPDATE accomodation_spaces a
+                                          SET status = 'need-clean'
+                                          WHERE name = %s AND room = %s;
+                                    ''', (room_name, room_no))
+                                    con.commit()
+                                    
