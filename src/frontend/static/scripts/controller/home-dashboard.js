@@ -132,8 +132,9 @@ function timeAgo(inputTime) {
 }
 
 function viewAllNotifications(){
-      document.querySelectorAll('#notificationsList div').forEach(row => row.remove());
-      const generated_row = allNotifications.join('\n');
+      const unique = [...new Set(allNotifications)];
+      const generated_row = unique.join('\n');
+
       const modal = `
             <div id="notificationsModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                   <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-md p-6 relative fade-in-up">
@@ -149,7 +150,7 @@ function viewAllNotifications(){
                         </div>
 
                         <!-- Notifications List -->
-                        <div class="max-h-80 overflow-y-auto border-t border-b border-gray-200 dark:border-gray-700 py-2">
+                        <div class="max-h-80 overflow-y-auto border-t border-b border-gray-200 dark:border-gray-700 py-2 thin-scroll">
                               <ul id="notificationsList" class="space-y-2 text-gray-700 dark:text-gray-300">
                                     ${generated_row}
                               </ul>
@@ -296,7 +297,7 @@ export async function notifications() {
                         <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-500 mt-0.5"></i>
                         <div class="flex flex-col flex-1"">
                               <p class="text-sm text-gray-800 dark:text-gray-100">${notification}</p>
-                              <span class="text-xs text-gray-500 mt-1">${time}</span>
+                              <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">${time}</span>
                         </div>
                   </div>
             `;
@@ -317,7 +318,7 @@ export async function notifications() {
                               <i data-lucide="house" class="w-5 h-5 text-blue-400 mt-0.5"></i>
                               <div class="flex flex-col flex-1"">
                                     <p class="text-sm text-gray-800 dark:text-gray-100">${notification+'. Clean now!'}</p>
-                                    <span class="text-xs  text-gray-800 dark:text-gray-500 mt-1">${time}</span>
+                                    <span class="text-xs  text-gray-500 dark:text-gray-400 mt-1">${time}</span>
                               </div>
                         </div>
                   `;
@@ -352,7 +353,7 @@ export async function notifications() {
                               <i data-lucide="${icon}" class="w-5 h-5 ${icon_color} mt-0.5 font-bold"></i>
                               <div class="flex flex-col flex-1"">
                                     <p class="text-sm text-gray-800 dark:text-gray-100">${notification}</p>
-                                    <span class="text-xs  text-gray-800 dark:text-gray-500 mt-1">${time}</span>
+                                    <span class="text-xs  dark:text-gray-400 text-gray-500 mt-1">${time}</span>
                               </div>
                         </div>
                   `;

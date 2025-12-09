@@ -46,7 +46,7 @@ class Staff_Management:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM staff_details''')
+                        cursor.execute(''' SELECT * FROM staff_details ORDER BY FIELD(job_position, 'Front Desk', 'Security Guard',  'Maintenance', 'Janitor')''')
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}

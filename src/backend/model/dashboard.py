@@ -140,13 +140,13 @@ class Dashboard:
                               SELECT 
                                     COALESCE(SUM(total_amount), 0) AS today_revenue
                               FROM bookings
-                              WHERE check_in = CURDATE() and status IN ('Checked-in', 'Day Guest')
+                              WHERE check_in = CURDATE() and booking_type IN ('Check-in', 'Day Guest') AND payment != 'Pending'
                         ),
                         yesterday AS (
                               SELECT
                                     COALESCE(SUM(total_amount), 0) AS yesterday_revenue
                               FROM bookings
-                              WHERE status NOT IN ('Cancelled', 'Reservation')
+                              WHERE status NOT IN ('Cancelled', 'Reserved') AND payment != 'Pending'
                               AND check_in = CURDATE() - INTERVAL 1 DAY 
                         )
                         SELECT 

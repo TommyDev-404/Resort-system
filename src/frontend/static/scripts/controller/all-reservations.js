@@ -62,14 +62,14 @@ function createTable(id, guest_name, checkin, checkout, stay_count, accomodation
 
                   <!-- TRAVELER -->
                   <td class="px-3 py-4 text-center">
-                        <div class="block w-[230px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
+                        <div class="block w-[200px] mx-auto overflow-x-auto whitespace-nowrap truncate">
                               <span class="font-medium">${guest_name}</span>
                         </div>
                   </td>
 
                   <!-- BOOKING DATE -->
                   <td class="px-3 py-4 text-center">
-                        <div class="block w-[200px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
+                        <div class="block w-[220px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
                               <span class="text-gray-700 dark:text-gray-100">
                               ${checkin} - ${checkout}
                               <label class="text-gray-500 dark:text-gray-200 text-xs">
@@ -158,23 +158,19 @@ function renderAddBookingModal(){
             
                               <section>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                          <div class="flex flex-col gap-0.5">
-                                                <label class="text-sm text-gray-600 dark:text-gray-200">Select Inquery Type</label>
-                                                <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
-                                                      <option class="text-black " value="Reservation">Reservation (Advance Booking)</option>
-                                                      <option class="text-black" value="Check-in">Checked-in (Room Stay)</option>
-                                                      <option class="text-black" value="Day Guest">Day Guest (No Room Stay)</option>
-                                                </select>
-                                          </div>
-                                          
-                                          <div class="flex flex-col gap-0.5">
-                                                <label class="text-sm text-gray-600 dark:text-gray-200">Select Payment Type</label>
-                                                <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
-                                                      <option class="text-black "  value="Direct Payment">Direct Payment</option>
-                                                      <option class="text-black "  value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
-                                                      <option class="text-black "  value="Pending">Pending</option>
-                                                </select>
-                                          </div>
+                                          <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                                <option class="text-black "  value="" disabled selected hidden>Select Booking Type</option>
+                                                <option class="text-black " value="Reservation">Reservation (Advance Booking)</option>
+                                                <option class="text-black" value="Check-in">Checked-in (Room Stay)</option>
+                                                <option class="text-black" value="Day Guest">Day Guest (No Room Stay)</option>
+                                          </select>
+                                    
+                                          <select id="payment" name="payment" class="border border-gray-300 focus:border-blue-500 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 p-3 rounded-md transition-all"required>
+                                                <option class="text-black "  value="" disabled selected hidden>Select Payment Type</option>
+                                                <option class="text-black "  value="Direct Payment">Direct Payment</option>
+                                                <option class="text-black "  value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
+                                                <option class="text-black "  value="Pending">Pending</option>
+                                          </select>
                                     </div>
                               </section>
             
@@ -296,18 +292,18 @@ function showAccomodationAvlForm(e){
 function saveAccomodationRoom(){
       const checked = document.querySelectorAll('input[type="checkbox"]:checked');
 
-      checked.forEach(cb => {
-            if (!savedAccomodations.includes(cb.value)){
-                  savedAccomodations.push(cb.value);
-                  
-                  const tag = `<label class="h-10 bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg inline-flex justify-between items-center gap-2 text-white text-sm font-medium shadow-sm transition" id="${cb.value.split(' ').join('-')}"> ${cb.value} <span class="remove-btn text-lg font-bold cursor-pointer"  data-acc="${cb.value}">&times;</span></label>`;
-                  document.querySelector("#selected-accomodations").innerHTML += tag;
-            }
-      });
-
-      document.querySelector('input[name="accomodations_selected"]').value = savedAccomodations;
-      
+      if (checked.length > 0){
+            checked.forEach(cb => {
+                  if (!savedAccomodations.includes(cb.value)){
+                        savedAccomodations.push(cb.value);
+                        console.log(cb.value);
+                        const tag = `<label class="h-10 bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg inline-flex justify-between items-center gap-2 text-white text-sm font-medium shadow-sm transition" id="${cb.value.split(' ').join('-')}"> ${cb.value} <span class="remove-btn text-lg font-bold cursor-pointer"  data-acc="${cb.value}">&times;</span></label>`;
+                        document.querySelector("#selected-accomodations").innerHTML += tag;
+                  }
+            });
+      }
       console.log(savedAccomodations);
+      document.querySelector('input[name="accomodations_selected"]').value = savedAccomodations;
       closeAccomodationRoom();
 }
 
@@ -403,51 +399,76 @@ function enableActionBtns(e){
                               }
                         }else if (booking_type === 'Reservation'){
                               // enable change date, checkin,  & cancel reservation btns
-                              if (status === 'Reserved' && reservationDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
+                              if (status === 'Reserved' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
                                     btn.style.opacity = '1';
                                     btn.style.pointerEvents = 'auto';
                               }
-                              // enable change date & cancel reservation btns
-                              if (status === 'Reserved' && reservationDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
+
+                              if (status === 'Checked-in' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
                                     btn.style.opacity = '1';
                                     btn.style.pointerEvents = 'auto';
                               }
                         }else{
                               // enable check-out btn only
-                              if (status === 'Checked-in' && checkoutDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
+                              if (status === 'Checked-in' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
                                     btn.style.opacity = '1';
                                     btn.style.pointerEvents = 'auto';
                               }
                               
-                              if (status === 'Checked-in' && checkoutDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
+                              if (status === 'Checked-in' && checkoutDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
                                     btn.style.opacity = '1';
                                     btn.style.pointerEvents = 'auto';
                               }
                         }
                         
                   } else { // Not Paid
-                        if (status === 'Checked-in'  && checkoutDate.toDateString() === todayDate.toDateString() && (btn.getAttribute('id') === 'mark-checkout' || btn.getAttribute('id') === 'mark-paid')) {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
-                        }
-                        
-                        if (status === 'Checked-out' && btn.getAttribute('id') === 'mark-paid') {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
-                        }
-                        
-                        if (status === 'Checked-in' && checkoutDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-checkout') {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
-                        }
+                        if (booking_type === 'Day Guest'){
+                              if (status === 'Checked-in' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                              
+                              if (status === 'Checked-out' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                        }else if (booking_type === 'Reservation'){
+                              // enable change date, checkin,  & cancel reservation btns
+                              if (status === 'Reserved' && reservationDate > todayDate && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
 
-                        if (status === 'Reserved' && reservationDate.toDateString() !== todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
-                        }
-                        if (status === 'Reserved' && reservationDate.toDateString() === todayDate.toDateString() && btn.getAttribute('id') !== 'mark-checkout') {
-                              btn.style.opacity = '1';
-                              btn.style.pointerEvents = 'auto';
+                              if (status === 'Reserved' && reservationDate <= todayDate && btn.getAttribute('id') !== 'mark-checkout') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+
+                              if (status === 'Checked-in' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                              
+                              if (status === 'Checked-out' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                        }else{
+                              // past checkout
+                              if (status === 'Checked-in' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                              // past checkout and not paid
+                              if (status === 'Checked-out' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+                              // future checkout
+                              if (status === 'Checked-in' && checkoutDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
                         }
                   }
             });
@@ -659,62 +680,70 @@ async function renderViewReservationDetails(id){
             const modal = `
                   <div id="details-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
                         <div class="relative w-full max-w-xl bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-8 overflow-hidden">
-                              <!-- Close button -->
-                              <span id="close-details" class="absolute top-4 right-4 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 text-2xl font-bold transition cursor-pointer">&times;</span>
-
-                              <!-- Header -->
-                              <h2 class="text-center text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Guest Details</h2>
-
-                              <!-- Details grid -->
-                              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-900 dark:text-gray-200">
-                                    <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Name</p>
-                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.name}</div>
-                                    </div>
-                                    
-                                    <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Check-in</p>
-                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${check_in}</div>
-                                    </div>
-                                    
-                                    <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Check-out</p>
-                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${check_out}</div>
-                                    </div>
-                                    
-                                    <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Total Guest</p>
-                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.total_guest}</div>
-                                    </div>
-                                    
-                                    <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Booking Type</p>
-                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.booking_type}</div>
-                                    </div>
-                                    
-                                    <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Status</p>
-                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.status}</div>
-                                    </div>
-                                    
-                                    <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Payment</p>
-                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.payment}</div>
-                                    </div>
-                                    
-                                    <div>
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Total Paid (₱)</p>
-                                          <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.total_amount}</div>
-                                    </div>
-                                    
-                                    <!-- Accommodations with scrollable content -->
-                                          <div class="md:col-span-2">
-                                          <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Accommodations</p>
-                                          <div class="max-h-32 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-gray-900 dark:text-gray-200">
-                                                ${result.data.accomodations.split(',').map(accs => accs.trim()).join(', ')}
-                                          </div>
+                        <!-- Close button -->
+                        <span id="close-details" class="absolute top-4 right-4 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 text-2xl font-bold transition cursor-pointer">&times;</span>
+                  
+                        <!-- Header -->
+                        <h2 class="text-center text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Guest Details</h2>
+                  
+                        <!-- Details grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-900 dark:text-gray-200">
+                              <div>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Name</p>
+                                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.name}</div>
+                              </div>
+                  
+                              <div>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Check-in</p>
+                                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${check_in}</div>
+                              </div>
+                  
+                              <div>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Check-out</p>
+                                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${check_out}</div>
+                              </div>
+                  
+                              <div>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Total Guest</p>
+                                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.total_guest}</div>
+                              </div>
+                  
+                              <div>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Booking Type</p>
+                                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.booking_type}</div>
+                              </div>
+                  
+                              <div>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Status</p>
+                                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.status}</div>
+                              </div>
+                  
+                              <div>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Payment</p>
+                                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.payment}</div>
+                              </div>
+                  
+                              <div>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Total Paid (₱)</p>
+                                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2">${result.data.total_amount}</div>
+                              </div>
+                  
+                              <!-- Promo / Discount (only show if available) -->
+                              <div class="md:col-span-2">
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Promo / Room Affected</p>
+                                    <div class="max-h-25 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-gray-900 dark:text-gray-200">
+                                          ${result.data.promo}
                                     </div>
                               </div>
+                  
+                              <!-- Accommodations with scrollable content -->
+                              <div class="md:col-span-2">
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Accommodations</p>
+                                    <div class="max-h-32 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-gray-900 dark:text-gray-200">
+                                    ${result.data.accomodations.split(',').map(accs => accs.trim()).join(', ')}
+                                    </div>
+                              </div>
+                        </div>
                         </div>
                   </div>
             `;
@@ -730,11 +759,11 @@ async function getReservationDate(){
 
       const response = await fetch(`/get-reservation-date?id=${id}`);
       const result = await response.json();
-      
+      console.log(result);
       const formatCheckin = new Date(result.check_in).toISOString().split('T')[0];
       const formatCheckout = new Date(result.check_out).toISOString().split('T')[0];
 
-      renderEditReservedModal(id, formatCheckin, formatCheckout, result.status); 
+      renderEditReservedModal(id, formatCheckin, formatCheckout, result.booking_type); 
 }
 
 async function generateAvlAccomodation(accomodation){
@@ -743,7 +772,7 @@ async function generateAvlAccomodation(accomodation){
       const response = await fetch(`/avl-rooms?room_name=${room_name[0]}`);
       const result = await response.json();
       const rooms = result.rooms;
-
+      console.log(accomodation);
       for (let i = 0; i < rooms.length; i++){
             const p = `<label class="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-200 dark:hover:bg-white/10 hover:bg-green-200" id="card"><input type="checkbox" class="text-gray-100 dark:text-gray-800" name="avl" value="${accomodation} ${rooms[i]}" required> ${accomodation} ${rooms[i]}</label>`;
             document.querySelector('#avl-accomodations').innerHTML += p;
@@ -949,8 +978,6 @@ document.addEventListener('click', (e) => {
       if (e.target.closest('#cancel-bookings')) cancelBooking();
       if (e.target.closest('#update-reservation-date')) getReservationDate();
       if (e.target.closest('.tab-item')) bookingsCategories(e);
-      if (e.target.closest('#close-message')) document.querySelector('#success-message').remove();
-      if (e.target.closest('#close-failed-message')) document.querySelector('#failed-message').remove();
 
       // icon click 
       if (e.target.closest('#view-full-info')) renderViewReservationDetails(e.target.closest('tr').getAttribute('id'));           
@@ -1027,6 +1054,5 @@ export function initPageReservation(){
       resetDropDown();
       recentBookings();
       summaryCards();
-      notifications();
 }
 

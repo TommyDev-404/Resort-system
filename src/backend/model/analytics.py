@@ -122,39 +122,42 @@ class Analytics:
                               WITH today_rev AS (
                               SELECT 
                                     COALESCE(
-                                          SUM(premium  * {self.accomodation_data('Premium')}) +
-                                          SUM(standard * {self.accomodation_data('Standard')}) +
-                                          SUM(garden   * {self.accomodation_data('Garden')}) +
-                                          SUM(barkada  * {self.accomodation_data('Barkada')}) +
-                                          SUM(family   * {self.accomodation_data('Family')}) +
-                                          SUM(cabana   * {self.accomodation_data('Cabana')}) +
-                                          SUM(small    * {self.accomodation_data('Small')}) +
-                                          SUM(big      * {self.accomodation_data('Big')}) +
-                                          SUM(hall     * {self.accomodation_data('Hall')})
+                                          SUM(
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.premium   * {self.accomodation_data('Premium')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.standard  * {self.accomodation_data('Standard')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.garden    * {self.accomodation_data('Garden')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.barkada   * {self.accomodation_data('Barkada')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.family    * {self.accomodation_data('Family')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.cabana    * {self.accomodation_data('Cabana')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.small     * {self.accomodation_data('Small')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.big       * {self.accomodation_data('Big')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.hall      * {self.accomodation_data('Hall')}
+                                          )
                                     , 0) AS revenue_today
                               FROM accomodation_data a
                               JOIN bookings b ON a.booking_id = b.booking_id
                               WHERE DATE(a.check_in) = CURDATE()
-                              AND b.payment <> 'Pending' AND b.status IN ('Checked-in', 'Day Guest')
+                              AND b.payment <> 'Pending' AND b.booking_type IN ('Check-in', 'Day Guest') AND b.status = 'Checked-in'
                               ),
-
                               yesterday_rev AS (
                               SELECT 
                                     COALESCE(
-                                          SUM(premium  * {self.accomodation_data('Premium')}) +
-                                          SUM(standard * {self.accomodation_data('Standard')}) +
-                                          SUM(garden   * {self.accomodation_data('Garden')}) +
-                                          SUM(barkada  * {self.accomodation_data('Barkada')}) +
-                                          SUM(family   * {self.accomodation_data('Family')}) +
-                                          SUM(cabana   * {self.accomodation_data('Cabana')}) +
-                                          SUM(small    * {self.accomodation_data('Small')}) +
-                                          SUM(big      * {self.accomodation_data('Big')}) +
-                                          SUM(hall     * {self.accomodation_data('Hall')})
+                                          SUM(
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.premium   * {self.accomodation_data('Premium')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.standard  * {self.accomodation_data('Standard')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.garden    * {self.accomodation_data('Garden')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.barkada   * {self.accomodation_data('Barkada')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.family    * {self.accomodation_data('Family')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.cabana    * {self.accomodation_data('Cabana')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.small     * {self.accomodation_data('Small')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.big       * {self.accomodation_data('Big')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.hall      * {self.accomodation_data('Hall')}
+                                          )
                                     , 0) AS revenue_yesterday
                               FROM accomodation_data a
                               JOIN bookings b ON a.booking_id = b.booking_id
                               WHERE DATE(a.check_in) = CURDATE() - INTERVAL 1 DAY
-                              AND b.payment <> 'Pending' AND b.status IN ('Checked-in', 'Day Guest')
+                              AND b.payment <> 'Pending' AND b.booking_type IN ('Check-in', 'Day Guest') AND b.status = 'Checked-in'
                               )
 
                               SELECT
@@ -195,21 +198,23 @@ class Analytics:
                         query = f'''
                               SELECT 
                                     COALESCE(
-                                          SUM(premium  * {self.accomodation_data('Premium')}) +
-                                          SUM(standard * {self.accomodation_data('Standard')}) +
-                                          SUM(garden   * {self.accomodation_data('Garden')}) +
-                                          SUM(barkada  * {self.accomodation_data('Barkada')}) +
-                                          SUM(family   * {self.accomodation_data('Family')}) +
-                                          SUM(cabana   * {self.accomodation_data('Cabana')}) +
-                                          SUM(small    * {self.accomodation_data('Small')}) +
-                                          SUM(big      * {self.accomodation_data('Big')}) +
-                                          SUM(hall     * {self.accomodation_data('Hall')})
+                                          SUM(
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.premium   * {self.accomodation_data('Premium')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.standard  * {self.accomodation_data('Standard')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.garden    * {self.accomodation_data('Garden')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.barkada   * {self.accomodation_data('Barkada')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.family    * {self.accomodation_data('Family')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.cabana    * {self.accomodation_data('Cabana')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.small     * {self.accomodation_data('Small')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.big       * {self.accomodation_data('Big')} +
+                                                GREATEST(DATEDIFF(a.check_out, a.check_in), 1) * a.hall      * {self.accomodation_data('Hall')}
+                                          )
                                     , 0) AS revenue
                               FROM accomodation_data a
                               JOIN bookings b ON a.booking_id = b.booking_id
                               WHERE MONTH(a.check_in) = MONTH(CURDATE())
                               AND YEAR(a.check_in) = YEAR(CURDATE())
-                              AND b.payment <> 'Pending' AND b.status IN ('Checked-in', 'Day Guest')
+                              AND b.payment <> 'Pending' AND b.booking_type IN ('Check-in', 'Day Guest') AND b.status = 'Checked-in'
                         '''
                         cursor.execute(query)
 

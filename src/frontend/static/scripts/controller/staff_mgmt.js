@@ -66,10 +66,10 @@ function renderAddStaffModal(){
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
                                     <select id="addPosition" name="position" class="text-gray-900 w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                          <option value="" disabled selected hidden>Select Position</option>
                                           <option value="Front Desk">Front Desk</option>
-                                          <option value="Janitor">Janitor</option>
-                                          <option value="Gardener">Gardener</option>
                                           <option value="Security Guard">Security Guard</option>
+                                          <option value="Janitor">Janitor</option>
                                           <option value="Maintenance">Maintenance</option>
                                     </select>
                               </div>

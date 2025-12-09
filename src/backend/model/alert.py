@@ -91,7 +91,7 @@ class Alerts:
                         ''',
                         'type': 'bookings',
                         'classification': 'checkout-today',
-                        'template': "Checkout Reminder: {count} day guest booking(s) with a total of {total_guest} guest(s) are scheduled to leave today. Please process their checkout accordingly."
+                        'template': "Checkout Reminder: {count} booking(s) with a total of {total_guest} guest(s) are scheduled to leave today. Please process their checkout accordingly."
                   },
                   {
                         'query': '''
@@ -210,8 +210,18 @@ class Alerts:
                   cursor = conn.cursor()
 
                   # Expire outdated promos
-                  cursor.execute(""" UPDATE promos SET status = 'Expired' WHERE end_date < CURDATE() AND status = 'Active' """)
+                  cursor.execute(""" UPDATE promos SET status = 'Expired' WHERE end_date <= CURDATE() AND status = 'Active' """)
                   
+                  # Restore room rates after promo expired
+                  cursor.execute(""" 
+                        UPDATE accomodation_spaces AS a
+                        LEFT JOIN promos AS p
+                        ON a.promo = p.name
+                        SET a.rate = a.orig_rate
+                        WHERE p.end_date < CURDATE()
+                        AND LOWER(TRIM(a.promo)) != 'None';
+                  """)
+
                   # Apply Today Promo
                   today = date.today()
 
@@ -237,16 +247,6 @@ class Alerts:
                               conn.commit()
                         # Mark promo as active
                         cursor.execute('UPDATE promos SET status="Active" WHERE id=%s', (promo_id,))
-
-                  # Restore room rates after promo expired
-                  cursor.execute(""" 
-                        UPDATE accomodation_spaces AS a
-                        LEFT JOIN promos AS p
-                        ON a.promo = p.name
-                        SET a.rate = a.orig_rate
-                        WHERE p.end_date < CURDATE()
-                        AND LOWER(TRIM(a.promo)) != 'None';
-                  """)
 
                   #reset salary data every new week
                   cursor.execute(''' 
@@ -286,19 +286,35 @@ class Alerts:
 
                         accomodation = data.get('accomodations').split(',')      
 
-                        for area in accomodation:
-                              room_name = area.split(' ')[0].lower().strip()
-                              room_no = area.split()[-1].strip()
-                              message = f"(System check-out): Housekeeping requested for {area}"
+                        cursor.execute(''' SELECT * FROM bookings WHERE booking_id = %s ''', (id,))
+                        data = cursor.fetchone()
+                        check_out = data.get('check_out')
 
-                              if room_name not in ['cabana', 'small', 'big', 'hall']:
-                                    cursor.execute(''' INSERT INTO notifications (name, date, room_name, room_no, alert_type, classification) VALUES (%s, NOW(), %s, %s, %s, %s)
-                                    ''', (message, room_name, int(room_no), 'housekeeping', 'system-checkout'))
-                                    
-                                    cursor.execute('''
-                                          UPDATE accomodation_spaces a
-                                          SET status = 'need-clean'
-                                          WHERE name = %s AND room = %s;
-                                    ''', (room_name, room_no))
-                                    con.commit()
+                        if check_out < date.today():
+                              for area in accomodation:
+                                    room_name = area.split(' ')[0].lower().strip()
+                                    room_no = area.split()[-1].strip()
+                                    if room_name not in ['cabana', 'small', 'big', 'hall']:
+                                          cursor.execute('''
+                                                UPDATE accomodation_spaces a
+                                                SET status = 'avl'
+                                                WHERE name = %s AND room = %s;
+                                          ''', (room_name, room_no))
+                                          con.commit()
+                        else:      
+                              for area in accomodation:
+                                    room_name = area.split(' ')[0].lower().strip()
+                                    room_no = area.split()[-1].strip()
+                                    message = f"(System check-out): Housekeeping requested for {area}"
+
+                                    if room_name not in ['cabana', 'small', 'big', 'hall']:
+                                          cursor.execute(''' INSERT INTO notifications (name, date, room_name, room_no, alert_type, classification) VALUES (%s, NOW(), %s, %s, %s, %s)
+                                          ''', (message, room_name, int(room_no), 'housekeeping', 'system-checkout'))
+                                          
+                                          cursor.execute('''
+                                                UPDATE accomodation_spaces a
+                                                SET status = 'need-clean'
+                                                WHERE name = %s AND room = %s;
+                                          ''', (room_name, room_no))
+                                          con.commit()
                                     
