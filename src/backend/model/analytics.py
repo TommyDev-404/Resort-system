@@ -82,12 +82,28 @@ class Analytics:
       def daily_revenue(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
+                  
+                  if accomodation_type != None:
+                        cursor.execute(''' SELECT * FROM bookings WHERE check_in = CURRENT_DATE() ''')
+                        data = cursor.fetchall()
 
+                        selected_area_revenue = 0
+                        if data:
+                              for d in data:
+                                    revenue = d.get('area_revenue').split(',')
+
+                                    for rev in revenue:
+                                          area_type = rev.split(':')[0]
+                                          revenue = rev.split(':')[1]
+
+                                          if accomodation_type.strip() == area_type.strip():
+                                                selected_area_revenue += int(revenue)
+                                          
                   if accomodation_type:
                         query = f'''                          
                               WITH daily AS (
                                     SELECT 
-                                          ROUND(COALESCE(SUM({accomodation_type}* {self.accomodation_data(accomodation_type.capitalize())}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
+                                          ROUND(COALESCE(SUM({accomodation_type}* {selected_area_revenue}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
                                     FROM accomodation_data AS a
                                     JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
@@ -96,7 +112,7 @@ class Analytics:
                               ),
                               previous AS (
                                     SELECT 
-                                          ROUND(COALESCE(SUM({accomodation_type} * {self.accomodation_data(accomodation_type.capitalize())}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
+                                          ROUND(COALESCE(SUM({accomodation_type} * {selected_area_revenue}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
                                     FROM accomodation_data AS a
                                     JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
@@ -183,10 +199,27 @@ class Analytics:
       def monthly_revenue(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
+
+                  if accomodation_type != None:
+                        cursor.execute(''' SELECT * FROM bookings WHERE check_in = CURRENT_DATE() ''')
+                        data = cursor.fetchall()
+
+                        selected_area_revenue = 0
+                        if data:
+                              for d in data:
+                                    revenue = d.get('area_revenue').split(',')
+
+                                    for rev in revenue:
+                                          area_type = rev.split(':')[0]
+                                          revenue = rev.split(':')[1]
+
+                                          if accomodation_type.strip() == area_type.strip():
+                                                selected_area_revenue += int(revenue)
+                                          
                   if accomodation_type:
                         query = f'''                          
                               SELECT 
-                                    ROUND(COALESCE(SUM({accomodation_type}* {self.accomodation_data(accomodation_type.capitalize())}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
+                                    ROUND(COALESCE(SUM({accomodation_type}* {selected_area_revenue}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
                               FROM accomodation_data AS a
                               JOIN bookings AS b
                               ON a.booking_id = b.booking_id

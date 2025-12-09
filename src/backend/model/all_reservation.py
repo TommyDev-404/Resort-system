@@ -98,8 +98,6 @@ class Reservation:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * from promos where date = CURRENT_DATE() ''')
-                        data = cursor.fetchone()
 
                         parts = accomodations_selected.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
@@ -120,9 +118,15 @@ class Reservation:
                         guest_revenue = int(total_guest) * 200
                         amount = guest_revenue
                         
+                        room_revenue = []
                         for room in rooms:
-                              amount += self.accomodation_data(room.capitalize()) * night_stay if night_stay > 0 else self.accomodation_data(room.capitalize()) * 1
+                              price = self.accomodation_data(room.capitalize()) * night_stay if night_stay > 0 else self.accomodation_data(room.capitalize()) * 1
+                              amount += price
+                              room_revenue.append({'room': room, 'revenue' : price})
                         
+                        cursor.execute(''' SELECT * from promos where date = CURRENT_DATE() ''')
+                        data = cursor.fetchone()
+
                         room_affected = []
                         if data:
                               promo_area = data.get('area').split(',')
@@ -131,16 +135,16 @@ class Reservation:
                               count = 0
                               for room in rooms:
                                     if room.capitalize() in promo_area:
-                                          room_affected.append(parts[0])
+                                          room_affected.append(parts[count])
                                     count += 1
-                              
-                        if len(room_affected) > 0:
-                              full_promo_name = f''' {promo_name} : ({",  ".join(room_affected)})'''
-                        else:
-                              full_promo_name = 'No promo.'
+                        
+                        full_promo_name = f'{promo_name} discount' if len(room_affected) > 0 else 'No promo.'
+                        area_revenues = []
+                        for rev in room_revenue:
+                              area_revenues.append(f'{rev.get('room')}:{rev.get('revenue')}')
 
-                        cursor.execute(''' INSERT INTO bookings (name, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, promo) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-                        ''', (name, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, status, amount, full_promo_name))
+                        cursor.execute(''' INSERT INTO bookings (name, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, promo, promo_area, area_revenue) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+                        ''', (name, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, status, amount, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.', ",".join(area_revenues)))
 
                         if cursor.rowcount != 0: result_list.append(True)
 
@@ -451,24 +455,28 @@ class Reservation:
                         cursor.execute(''' UPDATE bookings SET status = 'Checked-in' where booking_id = %s ''', (id))
                         con.commit()
 
-                        cursor.execute(''' SELECT * FROM bookings WHERE booking_id = %s ''', (id,))
-                        data = cursor.fetchone()
-                        booking_type = data.get('booking_type')
-
                         parts = accomodation.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
                         
-                        if booking_type == 'Reservation':
+                        """
+                        cursor.execute(''' SELECT * FROM bookings WHERE booking_id = %s ''', (id,))
+                        data = cursor.fetchone()
+                        booking_type = data.get('booking_type')
+
+                        
+                        if booking_type == 'Reservation' and data.get('status') == 'Reserved':
                               for room, number in set(zip(rooms, room_no)):
                                     if room not in ['cabana', 'small', 'big', 'hall']:
                                           cursor.execute('''UPDATE accomodation_spaces SET status = "reserved" WHERE name=%s AND room=%s''', (room.capitalize(), number))
                                     con.commit()
                         else:
-                              for room, number in set(zip(rooms, room_no)):
-                                    if room not in ['cabana', 'small', 'big', 'hall']:
-                                          cursor.execute('''UPDATE accomodation_spaces SET status = "occupied" WHERE name=%s AND room=%s''', (room.capitalize(), number))
-                              con.commit()
+                        """
+
+                        for room, number in set(zip(rooms, room_no)):
+                              if room not in ['cabana', 'small', 'big', 'hall']:
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = "occupied" WHERE name=%s AND room=%s''', (room.capitalize(), number))
+                        con.commit()
                         
                         self.alert.generate_alerts()
 

@@ -161,7 +161,7 @@ function renderAddBookingModal(){
                                           <select id="booking_type" name="booking_type" class="border border-gray-300 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                                 <option class="text-black "  value="" disabled selected hidden>Select Booking Type</option>
                                                 <option class="text-black " value="Reservation">Reservation (Advance Booking)</option>
-                                                <option class="text-black" value="Check-in">Checked-in (Room Stay)</option>
+                                                <option class="text-black" value="Check-in">Check-In (Room Stay)</option>
                                                 <option class="text-black" value="Day Guest">Day Guest (No Room Stay)</option>
                                           </select>
                                     
@@ -444,7 +444,12 @@ function enableActionBtns(e){
                                     btn.style.pointerEvents = 'auto';
                               }
 
-                              if (status === 'Checked-in' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
+                              if (status === 'Checked-in' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                    btn.style.opacity = '1';
+                                    btn.style.pointerEvents = 'auto';
+                              }
+
+                              if (status === 'Checked-in' && checkoutDate > todayDate &&  btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
                                     btn.style.opacity = '1';
                                     btn.style.pointerEvents = 'auto';
                               }
@@ -730,9 +735,16 @@ async function renderViewReservationDetails(id){
                   
                               <!-- Promo / Discount (only show if available) -->
                               <div class="md:col-span-2">
-                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Promo / Room Affected</p>
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Promo Name</p>
                                     <div class="max-h-25 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-gray-900 dark:text-gray-200">
                                           ${result.data.promo}
+                                    </div>
+                              </div>
+
+                              <div class="md:col-span-2">
+                                    <p class="font-medium text-gray-600 dark:text-gray-400 mb-1">Area Affected</p>
+                                    <div class="max-h-25 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-gray-900 dark:text-gray-200">
+                                          ${result.data.promo_area}
                                     </div>
                               </div>
                   
@@ -896,10 +908,10 @@ async function getTotalsCountData() {
       if (result.success){
             updateBadge('all-data', result.all);
             updateBadge('reserved-data', result.reserved);
-            updateBadge('day-guest', result.day_guest);
+            //updateBadge('day-guest', result.day_guest);
             updateBadge('check_out-data', result.checkout);
             updateBadge('check_in-data', result.checkin);
-            updateBadge('paid-data', result.paid);
+            //updateBadge('paid-data', result.paid);
             updateBadge('not_paid-data', result.not_paid);
             updateBadge('cancelled-reservation-data', result.cancelled);
       }else{
