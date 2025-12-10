@@ -165,6 +165,14 @@ class Alerts:
                               
                   con.commit()
 
+                  cursor.execute(''' UPDATE bookings
+                        SET status = 'Cancelled', payment = CASE WHEN payment != 'Pending' THEN 'Refunded' ELSE 'None' END
+                        WHERE status = 'Reserved'
+                        AND check_in < DATE_SUB(CURDATE(), INTERVAL 7 DAY);
+                  ''')
+
+                  con.commit()
+
       def bookings_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -208,6 +216,12 @@ class Alerts:
       def cron_jobs(self):
             with self.db.connect() as conn:
                   cursor = conn.cursor()
+
+                  cursor.execute(''' UPDATE bookings
+                        SET status = 'Cancelled', payment = CASE WHEN payment != 'Pending' THEN 'Refunded' ELSE 'None' END
+                        WHERE status = 'Reserved'
+                        AND check_in < DATE_SUB(CURDATE(), INTERVAL 7 DAY);
+                  ''')
 
                   # Expire outdated promos
                   cursor.execute(""" UPDATE promos SET status = 'Expired' WHERE end_date <= CURDATE() AND status = 'Active' """)

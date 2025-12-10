@@ -424,8 +424,13 @@ async function removePromo(e){
       const id = tr.getAttribute('data-id');
       const td = tr.querySelectorAll('td');
       
-      const area_affected = td[4].textContent.trim();
-      
+      let area_affected = null;
+      if (td[4].textContent.trim() === 'All Areas'){
+            area_affected = 'Premium Villa Room, Standard Villa Room, Family Room, Barkada Room, Garden View Room, Cabana Cottage, Small Cottage, Big Cottage, Hall';
+      }else{
+            area_affected = td[4].textContent.trim();
+      }
+            
       const response = await fetch(`/remove-promo?id=${id}&area_promos=${area_affected}`, {
             method: 'DELETE'
       });

@@ -13,7 +13,8 @@ CREATE TABLE bookings (
         'Direct Payment',
         'ZUZU (Online Payment)',
         'Refunded',
-        'Pending'
+        'Pending',
+        'None'
     ) NOT NULL,
     status ENUM(
         'Reserved',

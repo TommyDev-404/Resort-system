@@ -452,5 +452,3 @@ class Dashboard:
 
                   return {'data' : data}
 
-
-      

@@ -113,6 +113,7 @@ async function renderAddStaffAttendanceModal(){
                                     <div class="mb-4">
                                           <label for="attendanceType" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Attendance Type:</label>
                                           <select id="attendanceType" class="px-3 py-2 min-w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full">
+                                                <option value="" hidden>Select Attendance Type</option>
                                                 <option value="Present">Present</option>
                                                 <option value="Absent">Absent</option>
                                           </select>
@@ -398,7 +399,7 @@ async function showAllOnLeave(){
 
 function createStaffListRow(id, staff_name, position, status){
       const row = `
-            <li data-id="${id}" class="p-4 rounded-xl bg-gray-50 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-md flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:-translate-y-1">
+            <li data-id="${id}" class="p-4 rounded-xl bg-gray-50 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-md flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:scale-101">
                   <div>
                         <div class="flex items-center gap-2">
                               <span class="font-semibold text-lg text-gray-900 dark:text-gray-100">${staff_name}</span>

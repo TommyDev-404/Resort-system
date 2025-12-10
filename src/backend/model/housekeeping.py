@@ -17,7 +17,7 @@ class Housekeeping:
                                     SUM(CASE WHEN status = 'need-clean' THEN 1 ELSE 0 END) AS need_clean,
                                     SUM(CASE WHEN status = 'avl' THEN 1 ELSE 0 END) AS ready,
                                     SUM(CASE WHEN status = 'on-clean' THEN 1 ELSE 0 END) AS on_clean,
-                                    SUM(CASE WHEN status = 'maintenance' THEN 1 ELSE 0 END) AS maintenance
+                                    SUM(CASE WHEN status = 'reserved' THEN 1 ELSE 0 END) AS reserved
                               FROM accomodation_spaces WHERE name = 'Premium' OR name = 'Standard' OR name = 'Garden' OR name = 'Barkada'  OR name = 'Family'
                               GROUP BY name;
                         ''')
@@ -38,13 +38,13 @@ class Housekeeping:
                                     SUM(CASE WHEN status = 'need-clean' THEN 1 ELSE 0 END) AS total_need_clean,
                                     SUM(CASE WHEN status = 'avl' THEN 1 ELSE 0 END) AS total_ready,
                                     SUM(CASE WHEN status = 'on-clean' THEN 1 ELSE 0 END) AS total_on_clean,
-                                    SUM(CASE WHEN status = 'maintenance' THEN 1 ELSE 0 END) AS total_maintenance,
+                                    SUM(CASE WHEN status = 'reserved' THEN 1 ELSE 0 END) AS reserved,
                                     SUM(CASE WHEN status = 'occupied' THEN 1 ELSE 0 END) AS total_occupied
                               FROM accomodation_spaces WHERE name = 'Premium' OR name = 'Standard' OR name = 'Garden' OR name = 'Barkada'  OR name = 'Family';
                         ''')
                         data = cursor.fetchone()
 
-                        return {'total_room': data.get('total_rooms'), 'occupied': data.get('total_occupied'),'need_clean': data.get('total_need_clean'), 'ready': data.get('total_ready'), 'on_clean': data.get('total_on_clean'), 'maintenance': data.get('total_maintenance')}
+                        return {'total_room': data.get('total_rooms'), 'occupied': data.get('total_occupied'),'need_clean': data.get('total_need_clean'), 'ready': data.get('total_ready'), 'on_clean': data.get('total_on_clean'), 'reserved': data.get('reserved')}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}

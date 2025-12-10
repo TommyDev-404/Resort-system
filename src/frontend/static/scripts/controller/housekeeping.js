@@ -43,14 +43,15 @@ function failedMessageCard(message){
       });
 }
 
-function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied){
+function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied, reserved){
       const row = `
             <tr data-room="${acc_name}" class="fade-in-up border-b border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5">
                   <td class="px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">${acc_name}</td>
                   <td class="px-6 py-4 text-gray-800 dark:text-gray-100">${acc_count}</td>
                   <td class="px-6 py-4 ${Number(need_clean) > 0 ? 'text-red-600' : 'text-blue-600'} dark:text-gray-blue-500 font-bold">${need_clean}</td>
                   <td class="px-6 py-4 text-yellow-600 dark:text-gray-yellow-500 font-bold">${on_clean}</td>
-                  <td class="px-6 py-4 text-green-600  dark:text-green-blue-500 font-bold">${ready}</td>
+                  <td class="px-6 py-4 text-green-600  dark:text-green-500 font-bold">${ready}</td>
+                  <td class="px-6 py-4 text-emerald-600  dark:text-emerald-500 font-bold">${reserved}</td>
                   <td class="px-6 py-4 text-rose-600 dark:text-rose-500 font-bold">${occupied}</td>
                   <td class="px-6 py-4 flex justify-center">
                         <button class="px-4 py-2 text-sm bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex gap-2 items-center" id="view-room-details"><i data-lucide="building" class="text-lg"></i>View Rooms</button>
@@ -302,7 +303,7 @@ async function accomodationData(){
                   "Standard": "Standard Villa Room"
             };
             result.data.forEach(data => {
-                  createRowData(areaNames[data.name], data.total_room, data.need_clean, data.on_clean, data.ready, data.occupied, data.maintenance);
+                  createRowData(areaNames[data.name], data.total_room, data.need_clean, data.on_clean, data.ready, data.occupied, data.reserved);
             });
       }else{
             const empty_row = `
@@ -394,6 +395,7 @@ async function getSummarryCardData(){
       document.getElementById('ready').textContent = result.ready;
       document.getElementById('occupied').textContent = result.occupied;
       document.getElementById('all-areas').textContent = result.total_room;
+      document.getElementById('reserved').textContent = result.reserved;
 }
 
 async function markReady(btn){

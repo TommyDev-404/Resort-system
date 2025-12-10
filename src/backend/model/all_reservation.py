@@ -527,19 +527,28 @@ class Reservation:
                   with self.db.connect() as con:
                         cursor = con.cursor()
 
+                        cursor.execute(''' SELECT * FROM bookings WHERE booking_id = %s ''', (id,))
+                        data = cursor.fetchone()
+                        payment = data.get('payment')
+
                         parts = accomodation.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
 
                         for room, number in set(zip(rooms, room_no)):
                               cursor.execute('''UPDATE accomodation_spaces SET status = "avl" WHERE name=%s AND room=%s''', (room.capitalize(), number))
-                        
-                        cursor.execute(''' UPDATE bookings SET payment = 'Refunded', status = 'Cancelled' where booking_id = %s ''', (id,))
+                              con.commit()
+
+                        if payment.strip() != 'Pending':
+                              cursor.execute(''' UPDATE bookings SET payment = 'Refunded', status = 'Cancelled' where booking_id = %s ''', (id,))
+                        else:
+                              cursor.execute(''' UPDATE bookings SET payment = 'None', status = 'Cancelled' where booking_id = %s ''', (id,))
+
                         cursor.execute(''' DELETE FROM accomodation_data WHERE booking_id = %s ''', (id,))
                         con.commit()
 
                         self.alert.generate_alerts()
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Cancelled successfully!' if cursor.rowcount != 0 else 'Failed!'}
+                        return {'success': bool(cursor.rowcount > 0), 'message': 'Cancelled successfully!' if cursor.rowcount > 0 else 'Failed!'}
 
             except Exception as e:
                   con.rollback()
@@ -587,6 +596,8 @@ class Reservation:
                         added_night = night_stay2 - night_stay if night_stay2 > night_stay else night_stay - night_stay2
 
                         added_amount = 0
+                        selected_area_list = []
+
                         for area in areas:
                               area_name = area.split(' ')[0].lower().strip()
                               cursor.execute(''' SELECT rate as rate FROM accomodation_spaces WHERE name = %s LIMIT 1 ''', (area_name,))
@@ -594,10 +605,32 @@ class Reservation:
 
                               added_amount += float(area_data.get('rate')) * added_night
 
+                              cursor.execute(''' SELECT * FROM bookings WHERE check_in = CURRENT_DATE() ''')
+                              data = cursor.fetchall()
+
+                              if data:
+                                    for d in data:
+                                          revenue = d.get('area_revenue').split(',')
+                                          for rev in revenue:
+                                                area_type = rev.split(':')[0]
+                                                revenue = rev.split(':')[1]
+                                                if area.split()[0].strip().lower() == area_type.strip():
+                                                      selected_area_list.append({'name': area_type, 'revenue': revenue})
+
                         if night_stay2 > night_stay:
                               cursor.execute(''' UPDATE bookings SET check_in = %s, check_out = %s, total_amount = total_amount + %s WHERE booking_id = %s ''', (edit_checkin, edit_checkout, added_amount, id))
                         else:
-                              cursor.execute(''' UPDATE bookings SET check_in = %s, check_out = %s, total_amount = total_amount - %s WHERE booking_id = %s ''', (edit_checkin, edit_checkout, added_amount, id))
+                              if new_checkout == check_in:
+                                    new_area_revenue = []
+                                    for area in selected_area_list:
+                                          name = area.get('name')
+                                          rev = area.get('revenue')
+
+                                          new_area_revenue.append(f'''{name}:{int(rev)/2}''')
+                                          
+                                    cursor.execute(''' UPDATE bookings SET check_in = %s, check_out = %s, total_amount = total_amount / 2, area_revenue = %s WHERE booking_id = %s ''', (edit_checkin, edit_checkout, ", ".join(new_area_revenue), id))
+                              else:
+                                    cursor.execute(''' UPDATE bookings SET check_in = %s, check_out = %s, total_amount = total_amount - %s WHERE booking_id = %s ''', (edit_checkin, edit_checkout, added_amount, id))
                         
                         if booking_type == 'Reservation':
                               if new_checkin > date.today():

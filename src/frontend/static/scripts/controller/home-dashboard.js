@@ -180,7 +180,7 @@ function updateMetric(valueId, rateId, iconId, value, change) {
 
       if (change < 0) {
             // LIGHT MODE
-            rateEl.classList.add('text-red-900');
+            rateEl.classList.add('text-red-600');
             iconEl.classList.add('text-red-600');
 
             // DARK MODE

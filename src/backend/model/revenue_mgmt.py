@@ -45,18 +45,19 @@ class RevenueMgmt:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
       def update_promo(self, id, dates, promo_name, duration, promo_rate, areas_promo, prev_area):
+            print(prev_area)
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         
                         areas = areas_promo.split(',')
-                        prev_areas = prev_area.split(', ')
+                        prev_areas = prev_area.split(',')
                         promotions = f"{promo_name} - {promo_rate}%"
                         discount = int(promo_rate)/100
 
                         for area in prev_areas:
                               cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = orig_rate WHERE name = %s ''', 
-                              ("None", area.split(' ')[0].strip()))
+                              ("None", area))
                               con.commit()
 
                         converted_date = datetime.strptime(dates, "%Y-%m-%d").date()

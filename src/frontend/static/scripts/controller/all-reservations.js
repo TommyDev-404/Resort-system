@@ -581,6 +581,32 @@ function selectAllRooms(){
       checkboxes.forEach(cb => cb.checked = true);
 }
 
+function showAccomodationBasedOnBookingType(e){
+      const selectedBookingType = e.target.value;
+
+      if (selectedBookingType === 'Day Guest') {
+            const allowedAreas = ['Cabana Cottage', 'Hall', 'Big Cottage', 'Small Cottage'];
+
+            document.querySelectorAll('.btn-acc').forEach(btn => {
+                  const area = btn.getAttribute('data-section');
+
+                  if (allowedAreas.includes(area.trim())) {
+                        btn.disabled = false; 
+                        btn.classList.remove('opacity-20', 'cursor-not-allowed', 'pointer-events-none'); // optional style
+                  } else {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-20', 'cursor-not-allowed', 'pointer-events-none'); // optional style
+                  }
+            });
+      }else {
+            document.querySelectorAll('.btn-acc').forEach(btn => {
+                  btn.disabled = false;
+                  btn.classList.remove('opacity-20', 'cursor-not-allowed', 'pointer-events-none');
+            });
+      }      
+}
+
+
 // --------------- POST DATA Fetching -------------- //
 async function addBooking(e){
       e.preventDefault();      
@@ -1050,7 +1076,6 @@ async function searchGuest(e){
       }
 }
 
-
 // ---------- Event Listeners ----------------- //
 document.addEventListener('click', (e) => {
       // btn click
@@ -1119,6 +1144,8 @@ document.addEventListener('change', (e) => {
                   icon.classList.remove('text-white');
             }
       }
+
+      if (e.target.closest('#booking_type'))  showAccomodationBasedOnBookingType(e);
 });
 
 document.addEventListener('input', (e) => {
