@@ -39,12 +39,15 @@ class Dashboard:
                                     THEN 0
                               WHEN (SELECT total_guest_in_house FROM yesterday_total) = 0 
                                     THEN 100
-                              ELSE ROUND(
-                                    (
-                                          (SELECT total_guest_in_house FROM today_total) -
-                                          (SELECT total_guest_in_house FROM yesterday_total)
-                                    ) / (SELECT total_guest_in_house FROM yesterday_total) * 100
-                                    , 2)
+                              ELSE LEAST(
+                                          100, 
+                                          ROUND(
+                                          (
+                                                (SELECT total_guest_in_house FROM today_total) -
+                                                (SELECT total_guest_in_house FROM yesterday_total)
+                                          ) / (SELECT total_guest_in_house FROM yesterday_total) * 100
+                                          , 2)
+                                    )
                         END AS change_rate_percent;
                   ''')
                   data = cursor.fetchone()
@@ -72,7 +75,7 @@ class Dashboard:
                               CASE 
                                     WHEN yesterday.guests = 0 AND today.guests = 0 THEN 0
                                     WHEN yesterday.guests = 0 AND today.guests > 0 THEN 100
-                                    ELSE ROUND(((today.guests - yesterday.guests) / yesterday.guests) * 100, 2)
+                                    ELSE LEAST(100, ROUND(((today.guests - yesterday.guests) / yesterday.guests) * 100, 2))
                               END AS change_rate
                         FROM today, yesterday;
                   ''')                                            
@@ -103,10 +106,7 @@ class Dashboard:
                         CASE
                               WHEN yesterday.yesterday_checkin = 0 THEN 
                                     CASE WHEN today.today_checkin > 0 THEN 100 ELSE 0 END
-                              ELSE ROUND(
-                                    (today.today_checkin - yesterday.yesterday_checkin) / yesterday.yesterday_checkin * 100, 
-                                    2
-                              )
+                              ELSE LEAST(100, ROUND((today.today_checkin - yesterday.yesterday_checkin) / yesterday.yesterday_checkin * 100, 2))
                         END AS change_rate_percent
                         FROM today, yesterday;
                   ''')
@@ -140,23 +140,30 @@ class Dashboard:
                               SELECT 
                                     COALESCE(SUM(total_amount), 0) AS today_revenue
                               FROM bookings
-                              WHERE check_in = CURDATE() and booking_type IN ('Check-in', 'Day Guest') AND payment != 'Pending'
+                              WHERE check_in = CURDATE()
+                              AND booking_type IN ('Check-in', 'Day Guest')
+                              AND payment != 'Pending'
                         ),
                         yesterday AS (
                               SELECT
                                     COALESCE(SUM(total_amount), 0) AS yesterday_revenue
                               FROM bookings
-                              WHERE status NOT IN ('Cancelled', 'Reserved') AND payment != 'Pending'
+                              WHERE status NOT IN ('Cancelled', 'Reserved')
+                              AND payment != 'Pending'
                               AND check_in = CURDATE() - INTERVAL 1 DAY 
                         )
                         SELECT 
-                              today.today_revenue,
-                              yesterday.yesterday_revenue,
-                              CASE 
-                                    WHEN yesterday.yesterday_revenue = 0 THEN 100
-                                    WHEN today.today_revenue = 0 AND yesterday.yesterday_revenue > 0 THEN -100
-                                    ELSE ROUND((today.today_revenue - yesterday.yesterday_revenue) / yesterday.yesterday_revenue * 100, 2)
-                              END AS achievement_percent
+                        today.today_revenue,
+                        yesterday.yesterday_revenue,
+                        CASE
+                              WHEN yesterday.yesterday_revenue = 0 AND today.today_revenue = 0 THEN 0        -- both zero
+                              WHEN yesterday.yesterday_revenue = 0 AND today.today_revenue > 0 THEN 100      -- new revenue appears
+                              WHEN yesterday.yesterday_revenue > 0 AND today.today_revenue = 0 THEN -100      -- drop to zero
+                              ELSE ROUND(
+                                    (today.today_revenue - yesterday.yesterday_revenue) 
+                                    / yesterday.yesterday_revenue * 100, 2
+                              )
+                        END AS achievement_percent
                         FROM today, yesterday;
                   ''')
                   data = cursor.fetchone()

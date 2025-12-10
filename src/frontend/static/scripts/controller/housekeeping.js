@@ -3,8 +3,8 @@ import { notifications } from "./home-dashboard.js";
 // -------------------- HELPERS ------------------------- //
 function successMessageCard(message, redirect = null) {
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4  fade-in-up">
                         <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
@@ -26,8 +26,8 @@ function successMessageCard(message, redirect = null) {
 
 function failedMessageCard(message){
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4  fade-in-up">
                         <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-failed-message">Okay</button>
@@ -349,13 +349,16 @@ async function allStaffs(){
                   const opt = `
                         <option value="${staff.staff_name}">${staff.staff_name}</option>
                   `;
-
                   staff_list.push(opt);
             });
 
             return staff_list.join('\n');
       }else{
             failedMessageCard('No staffs yet.');
+            const empty_opt = `
+                  <option value="">No staff.</option>
+            `;
+            return empty_opt;
       }
 }
 

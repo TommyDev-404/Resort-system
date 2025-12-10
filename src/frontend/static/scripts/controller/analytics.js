@@ -577,22 +577,19 @@ async function monthlyRevenue(type=null){
       const changeEl = document.getElementById('monthly-revenue-change');
       const iconEl = document.getElementById('change-monthly-icon');
       
-      if (res.change < 0) {
-            changeEl.classList.remove('dark:text-green-400');
-            changeEl.classList.add('dark:text-red-400');
-            
-            iconEl.setAttribute("data-lucide", "arrow-down");
-            iconEl.classList.remove("dark:text-green-400");
-            iconEl.classList.add("dark:text-red-400");
-      } else {
-            changeEl.classList.remove('dark:text-red-400');
-            changeEl.classList.add('dark:text-green-400');
-            
-            iconEl.setAttribute("data-lucide", "arrow-up");
-            iconEl.classList.remove("dark:text-red-400");
-            iconEl.classList.add("dark:text-green-400");
+      if (res.change < 0){
+            document.getElementById('monthly-revenue-change').classList.remove('text-green-500');
+            document.getElementById('monthly-revenue-change').classList.add('text-red-500');
+            document.getElementById('change-monthly-icon').setAttribute("data-lucide", "arrow-down");
+            document.getElementById('change-monthly-icon').classList.remove("text-green-500");
+            document.getElementById('change-monthly-icon').classList.add("text-red-500");
+      }else{
+            document.getElementById('monthly-revenue-change').classList.remove('text-red-500');
+            document.getElementById('monthly-revenue-change').classList.add('text-green-500');
+            document.getElementById('change-monthly-icon').setAttribute("data-lucide", "arrow-up");
+            document.getElementById('change-monthly-icon').classList.remove("text-red-500");
+            document.getElementById('change-monthly-icon').classList.add("text-green-500");
       }
-      
       lucide.createIcons();
 }
 

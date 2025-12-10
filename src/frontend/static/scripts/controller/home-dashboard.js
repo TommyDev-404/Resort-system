@@ -246,10 +246,10 @@ async function todayGuest() {
 async function todayProjectedRevenue() {
       const response = await fetch('/revenue');
       const res = await response.json();
-
+      console.log(res);
       updateMetric(
             'total-revenue',
-            'target-revenue',
+            'change-rate-revenue',
             'target-revenue-icon',
             formatPesoShort(Number(res.current_revenue)),
             Number(res.change)

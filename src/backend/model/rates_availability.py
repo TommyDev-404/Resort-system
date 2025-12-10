@@ -192,7 +192,6 @@ class RatesAndAvailability:
                               AND p.status = 'Active' AND p.date <= CURRENT_DATE() AND p.end_date >= CURRENT_DATE()
 
                               ORDER BY a.room_type;
-
                         ''')
 
                         data = cursor.fetchall()

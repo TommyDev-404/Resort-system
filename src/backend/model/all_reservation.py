@@ -332,23 +332,6 @@ class Reservation:
                                     ORDER BY check_in DESC;
                               ''', (year, month))
 
-                        if category == 'paid-data':
-                              cursor.execute('''
-                                    SELECT 
-                                          booking_id,
-                                          name, 
-                                          check_in, 
-                                          check_out, 
-                                          accomodations, 
-                                          booking_type,
-                                          status, 
-                                          payment,
-                                          DATE(check_out) - DATE(check_in) AS stay_gap
-                                    FROM bookings
-                                    WHERE YEAR(check_in) = %s
-                                    AND MONTH(check_in) = %s AND payment <> "Pending"
-                                    ORDER BY check_in DESC;
-                              ''', (year, month))
                         if category == 'not_paid-data':
                               cursor.execute('''
                                     SELECT 
@@ -363,7 +346,7 @@ class Reservation:
                                           DATE(check_out) - DATE(check_in) AS stay_gap
                                     FROM bookings
                                     WHERE YEAR(check_in) = %s
-                                    AND MONTH(check_in) = %s AND payment = "Pending"
+                                    AND MONTH(check_in) = %s AND status <> 'Reserved' AND payment = "Pending"
                                     ORDER BY check_in DESC;
                               ''', (year, month))
                         
@@ -685,7 +668,7 @@ class Reservation:
                                     SELECT COALESCE(COUNT(payment), 0) AS total_npaid 
                                     FROM bookings 
                                     WHERE MONTH(check_in) = %s
-                                    AND YEAR(check_in) = %s
+                                    AND YEAR(check_in) = %s AND status <> 'Reserved'
                                     AND payment = 'Pending'
                               ),
                               cancelled AS (

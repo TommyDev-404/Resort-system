@@ -241,7 +241,7 @@ function renderAddBookingModal(){
 
                                           <div class="btn-acc flex flex-col items-center justify-center bg-gray-600 hover:bg-gray-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Hall">
                                                 <i data-lucide="users" class="lucide w-5 h-5"></i>
-                                                <label for="Hall">Hall (<span id="count-h"></span>)</label> 
+                                                <label>Hall (<span id="count-h"></span>)</label> 
                                           </div>
                                     </div>
 
@@ -260,18 +260,16 @@ function renderAddBookingModal(){
                   <div class="accomodation-avl-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden">
                         <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fade-in-up">
                               <span id="close-accomodation-avl" class="absolute top-4 right-4 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 text-2xl cursor-pointer">&times;</span>
-                              <!-- Title -->
                               <h2 id="accomodation_label" class="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center mt-2">Premium Villa Rooms</h2>
-
-                              <!-- Available List -->
                               <div id="avl-accomodations" class="mt-5 max-h-[240px] overflow-y-auto thin-scroll space-y-2 p-1 flex flex-col"></div>
-
                               <!-- Bottom Buttons -->
-                              <div class="mt-6 flex gap-3" >
-                                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition"  id="select-accomodation-avl">Select</button>
+                              <div class="mt-6 flex gap-3">
+                                    <button id="select-all-areas" class="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 py-3 rounded-lg font-medium flex-1 transition">Select All</button>
+                                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition" id="select-accomodation-avl">Saved</button>
                               </div>
                         </div>
                   </div>
+
             </div>
       `;
 
@@ -578,6 +576,11 @@ function updateBadge(id, value) {
       }
 }
 
+function selectAllRooms(){
+      const checkboxes = document.querySelectorAll(`#avl-accomodations input[name="avl"]`);
+      checkboxes.forEach(cb => cb.checked = true);
+}
+
 // --------------- POST DATA Fetching -------------- //
 async function addBooking(e){
       e.preventDefault();      
@@ -842,12 +845,13 @@ async function getReservationDate(){
 }
 
 async function generateAvlAccomodation(accomodation){
+      document.querySelectorAll('#avl-accomodations label').forEach(label => label.remove());
       let room_name = accomodation.split(' ');
 
       const response = await fetch(`/avl-rooms?room_name=${room_name[0]}`);
       const result = await response.json();
       const rooms = result.rooms;
-      console.log(accomodation);
+
       for (let i = 0; i < rooms.length; i++){
             const p = `
                   <label  class="acc-card flex gap-2 justify-center bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-300 dark:border-gray-700 cursor-pointer transition select-none hover:bg-gray-100 dark:hover:bg-gray-700"">
@@ -1075,6 +1079,8 @@ document.addEventListener('click', (e) => {
             if (e.target.closest('#close-reservation-overlay')) document.querySelector('#update-reservation-overlay').remove();
             if (e.target.closest('.remove-btn')) removeAccomodation(e);
       }
+
+      if (e.target.closest('#select-all-areas')) selectAllRooms();
 });
 
 // submit

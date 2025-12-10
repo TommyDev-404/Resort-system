@@ -98,3 +98,16 @@ class RevenueMgmt:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
+      def get_promo_area(self, id):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+
+                        cursor.execute("SELECT area FROM promos WHERE id = %s;", (id,))
+                        promos = cursor.fetchone()
+                        
+                        return {'success': bool(promos), 'data': promos.get('area')}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+      

@@ -27,9 +27,9 @@ CREATE TABLE bookings (
     check_in DATE NOT NULL,
     check_out DATE NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
-    promo VARCHAR(255) NOT NULL,
-    promo_area VARCHAR(255) NOT NULL,
-    area_revenue VARCHAR(255) NOT NULL
+    promo VARCHAR(255)  NULL,
+    promo_area VARCHAR(255)  NULL,
+    area_revenue VARCHAR(255)  NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- accomodation data table

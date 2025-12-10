@@ -372,6 +372,10 @@ def get_all_promo():
 def remove_promo():
       return jsonify(rev.remove_promo(request.args.get('id'), request.args.get('area_promos')))
 
+@app.route('/get-promo-area-data', methods=['GET'])
+def get_promo_area():
+      return jsonify(rev.get_promo_area(request.args.get('id')))
+
 
 #--------------- STAFF MANAGEMENT ------------------#
 @app.route('/add-staff', methods=['POST'])
