@@ -28,8 +28,6 @@ CREATE TABLE bookings (
         DEFAULT NULL,
     check_in DATE NOT NULL,
     check_out DATE NOT NULL,
-    resort_income DECIMAL(10,2) NULL,
-    zuzu_charge DECIMAL(10,2) NULL,
     total_amount DECIMAL(10,2) NOT NULL,
     paid_date DATE NULL,
     promo VARCHAR(255)  NULL,

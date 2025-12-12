@@ -94,7 +94,7 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
-      def add_booking(self, name, total_guest, booking_type, payment, accomodations_selected, book_date, checkin, checkout, date_paid_add=None):
+      def add_booking(self, name, total_guest, booking_type, payment, accomodations_selected, checkin, checkout, book_date=None, date_paid_add=None):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -141,15 +141,11 @@ class Reservation:
                         full_promo_name = f'{promo_name} discount' if len(room_affected) > 0 else 'No promo.'
 
                         if payment == 'ZUZU (Online Payment)':
-                              zuzu_charge = amount * 0.05
-                              resort_payment = amount * 0.95
-                        else:
-                              zuzu_charge = 0
-                              resort_payment = amount 
+                              amount = amount - (amount * 0.05)
                         
-                        cursor.execute(''' INSERT INTO bookings (name, date_book, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, resort_income, zuzu_charge, paid_date, promo, promo_area) 
-                        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-                        ''', (name, book_date, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, status, amount, resort_payment, zuzu_charge, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
+                        cursor.execute(''' INSERT INTO bookings (name, date_book, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, paid_date, promo, promo_area) 
+                        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+                        ''', (name, book_date if book_date != None else checkin, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, status, amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
                         
                         if cursor.rowcount != 0: result_list.append(True)
 
@@ -194,7 +190,10 @@ class Reservation:
                         for r in room_revenue:
                               key = r.get('room').lower().strip()
                               if key in areas:
-                                    areas[key] = r.get('revenue')  
+                                    if payment == 'ZUZU (Online Payment)':
+                                          areas[key] = r.get('revenue') - (r.get('revenue') * 0.05)
+                                    else:
+                                          areas[key] = r.get('revenue')  
 
                         total = sum(areas.values())
 
@@ -708,9 +707,16 @@ class Reservation:
                                     new_amount += nightly_rate
 
                                     day += timedelta(days=1)
+                              else:
+                                    if promo_start == today:
+                                          new_amount += promo_rate / 2
+                                          revenue_per_area += promo_rate / 2
+                                    else:
+                                          new_amount += orig_rate / 2
+                                          revenue_per_area += orig_rate / 2
 
-                              new_area_revenue[area_name] = revenue_per_area
-
+                              new_area_revenue[area_name] = revenue_per_area - (revenue_per_area * 0.05) if data.get('payment') == 'ZUZU (Online Payment)' else revenue_per_area
+                              print(new_area_revenue[area_name])
                         total = sum([
                               new_area_revenue["premium"],
                               new_area_revenue["standard"],
@@ -724,11 +730,7 @@ class Reservation:
                         ])
 
                         if data.get('payment') == 'ZUZU (Online Payment)':
-                              zuzu_charge = new_amount * 0.05
-                              resort_payment = new_amount * 0.95
-                        else:
-                              zuzu_charge = 0
-                              resort_payment = new_amount 
+                              new_amount = new_amount - (new_amount * 0.05)
 
                         cursor.execute('''
                               UPDATE area_revenue SET
@@ -761,8 +763,8 @@ class Reservation:
                               id  # WHERE condition comes last
                         ))
 
-                        cursor.execute(''' UPDATE bookings SET check_in = %s, check_out = %s, total_amount = %s, resort_income = %s, zuzu_charge = %s WHERE booking_id = %s ''', 
-                        (edit_checkin, edit_checkout, new_amount, resort_payment, zuzu_charge, id))
+                        cursor.execute(''' UPDATE bookings SET check_in = %s, check_out = %s, total_amount = %s WHERE booking_id = %s ''', 
+                        (edit_checkin, edit_checkout, new_amount, id))
 
                         con.commit()
 

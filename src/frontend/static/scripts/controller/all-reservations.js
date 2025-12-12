@@ -182,7 +182,7 @@ function renderAddBookingModal(){
                                     <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2"><i data-lucide="calendar" class="lucide w-4 h-4"></i> Schedule</h3>
                                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                                           <div>
-                                                <label class="text-gray-600 dark:text-gray-200 text-xs mb-1 block">Booking Date</label>
+                                                <label class="book_date_label text-gray-600 dark:text-gray-200 text-xs mb-1 block">Date Book</label>
                                                 <input type="date" name="book_date" class="w-full border date-icon border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                           </div>
                                           <div>
@@ -615,6 +615,25 @@ function showPaymentDate(e){
       const dateLabel = document.querySelector('.date_paid_label');
 
       if (selectedPaymentType === 'Pending') {
+            dateInput.disabled = true; // disables the input
+            dateInput.classList.add('opacity-20', 'cursor-not-allowed'); // optional styling
+            dateLabel.classList.remove('text-gray-600', 'dark:text-gray-200');
+            dateLabel.classList.add('text-gray-200', 'dark:text-gray-600');
+      } else {
+            dateInput.disabled = false; // enables the input
+            dateInput.classList.remove('opacity-20', 'cursor-not-allowed');
+            dateLabel.classList.remove('text-gray-200', 'dark:text-gray-600');
+            dateLabel.classList.add('text-gray-600', 'dark:text-gray-200');
+      }
+}
+
+function showBookingDate(e){
+      const selectedBookingType = e.target.value;
+
+      const dateInput = document.querySelector('input[name="book_date"]'); // select the input
+      const dateLabel = document.querySelector('.book_date_label');
+
+      if (selectedBookingType !== 'Reservation') {
             dateInput.disabled = true; // disables the input
             dateInput.classList.add('opacity-20', 'cursor-not-allowed'); // optional styling
             dateLabel.classList.remove('text-gray-600', 'dark:text-gray-200');
@@ -1180,6 +1199,7 @@ document.addEventListener('change', (e) => {
 
       if (e.target.closest('#booking_type'))  showAccomodationBasedOnBookingType(e);
       if (e.target.closest('#payment'))  showPaymentDate(e);
+      if (e.target.closest('#booking_type'))  showBookingDate(e);
 });
 
 document.addEventListener('input', (e) => {

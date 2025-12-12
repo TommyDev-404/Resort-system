@@ -118,6 +118,7 @@ class Housekeeping:
                               JOIN staff_attendance sa
                               ON st.id = sa.staff_id 
                               WHERE st.job_position NOT IN ('Front Desk', 'Security Guard') AND sa.date = CURRENT_DATE()
+                              AND status != 'Absent'
                         ''')
                         data = cursor.fetchall()
 
