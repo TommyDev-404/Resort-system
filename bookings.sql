@@ -1,3 +1,5 @@
+Use resort_db;
+
 -- bookings
 INSERT INTO bookings (name, check_in, check_out, accomodations,  total_guest, payment, status, booking_type, total_amount)VALUES ('KhenGuerero', '2023-05-06', '2023-05-07', 'PV#01', 11, 'Direct Payment', 'Checked-out', 'Check-in', 12200);
 INSERT INTO bookings (name, check_in, check_out, accomodations,  total_guest, payment, status, booking_type, total_amount)VALUES ('Ms.DAnicacSarza', '2023-05-06', '2023-05-07', 'SV#06AndPV02', 7, 'Direct Payment', 'Checked-out', 'Check-in', 19400);
@@ -873,3 +875,6 @@ INSERT INTO bookings (name, check_in, check_out, accomodations,  total_guest, pa
 INSERT INTO bookings (name, check_in, check_out, accomodations,  total_guest, payment, status, booking_type, total_amount)VALUES ('NiinaBarbecho', '2025-08-25', '2025-08-26', '3GardenRoom', 4, 'Direct Payment', 'Checked-out', 'Check-in', 4300);
 INSERT INTO bookings (name, check_in, check_out, accomodations,  total_guest, payment, status, booking_type, total_amount)VALUES ('CoachAyesha', '2025-08-25', '2023-09-30', 'SmallCottage', 4, 'Direct Payment', 'Checked-out', 'Check-in', 1300);
 INSERT INTO bookings (name, check_in, check_out, accomodations,  total_guest, payment, status, booking_type, total_amount)VALUES ('CoachAyesha', '2025-10-19', '2025-10-21', 'SmallCottage', 5, 'Direct Payment', 'Checked-out', 'Check-in', 1500);
+
+UPDATE bookings set zuzu_charge = total_amount * 0.5 WHERE payment = 'ZUZU (Online Payment)';
+UPDATE bookings set resort_income = total_amount * 0.95 WHERE payment = 'Direct Payment';

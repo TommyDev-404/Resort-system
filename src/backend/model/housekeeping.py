@@ -112,7 +112,13 @@ class Housekeeping:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM staff_details WHERE job_position NOT IN ('Front Desk', 'Security Guard') ''')
+                        cursor.execute(''' 
+                              SELECT * 
+                              FROM staff_details st
+                              JOIN staff_attendance sa
+                              ON st.id = sa.staff_id 
+                              WHERE st.job_position NOT IN ('Front Desk', 'Security Guard') AND sa.date = CURRENT_DATE()
+                        ''')
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}

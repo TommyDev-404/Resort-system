@@ -21,6 +21,26 @@ class RevenueMgmt:
                                     cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = rate * (1 - %s) WHERE name = %s ''', 
                                     (promotions, discount, area.split(' ')[0].strip()))
                                     con.commit()
+                              
+                              cursor.execute(''' SELECT * FROM bookings WHERE check_out > %s''', (dates,))
+                              booking_data = cursor.fetchall()
+
+                              for data in booking_data:
+                                    accomodations = data.get('accomodations').split(',')
+                                    id = data.get('booking_id')
+                                    
+                                    area_under_promo = []
+                                    for area in accomodations:
+                                          name = area.split(' ')[0].strip()
+
+                                          if name in areas:
+                                                area_under_promo.append(area)
+                                    
+                                    if len(area_under_promo) > 0:
+                                          cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', 
+                                          (f'{promotions} discount', ','.join(area_under_promo), id))
+                                          con.commit()
+                                    
                         else:
                               cursor.execute(''' INSERT INTO promos(date, name, discount, area, end_date, status) VALUES(%s, %s, %s, %s, %s, %s)''', (dates, promotions, promo_rate, areas_promo, duration, 'Upcoming'))
                               
@@ -87,12 +107,36 @@ class RevenueMgmt:
                         cursor = con.cursor()
                         areas = areas_promo.split(', ')
                         
-                        cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
-                        con.commit()
                         for area in areas:
                               cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = orig_rate WHERE name = %s ''', 
                               ('None', area.split(' ')[0]))
                               con.commit()
+
+                              cursor.execute(''' SELECT * FROM promos WHERE id = %s''', (id,))
+                              promo_data = cursor.fetchone()
+
+                              cursor.execute(''' SELECT * FROM bookings WHERE check_out > %s''', (promo_data.get('date'),))
+                              booking_data = cursor.fetchall()
+
+                              for data in booking_data:
+                                    accomodations = data.get('accomodations').split(',')
+                                    bid = data.get('booking_id')
+                                    
+                                    area_under_promo = []
+                                    for are in accomodations:
+                                          name = are.split(' ')[0].strip()
+                                          promo_area = area.split(' ')[0].strip()
+
+                                          if name in promo_area:
+                                                area_under_promo.append(area)
+                                    
+                                    if len(area_under_promo) > 0:
+                                          cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', 
+                                          ('No promo.', 'No accomodations under promo.', bid))
+                                          con.commit()
+
+                        cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
+                        con.commit()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': "Promotions remove successfully" if bool(cursor.rowcount != 0) else "Failed to remove promotions."}
             except Exception as e:

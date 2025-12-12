@@ -593,10 +593,11 @@ async function monthlyRevenue(type=null){
       lucide.createIcons();
 }
 
-async function targetRevenue(){
-      const response = await fetch('/target-revenue');
+async function targetRevenue(type=null){
+      const url = type ? `/target-revenue-type?accomodation_type=${type}` : '/target-revenue';
+      const response = await fetch(url);
       const res = await response.json();
-      
+
       document.getElementById('target').textContent =  formatPesoShort(Number(res.target));
 }
 
@@ -622,6 +623,7 @@ document.getElementById('roomTypeFilter').addEventListener('change', async(e) =>
             drawCheckinForecastChart(e.target.value);
             drawRevenueChart(e.target.value);
             loadAccomodationType(e.target.options[e.target.selectedIndex].text);
+            targetRevenue(e.target.value);
       }else {
             occupancyData();
             monthlyRevenue();
@@ -629,6 +631,7 @@ document.getElementById('roomTypeFilter').addEventListener('change', async(e) =>
             drawCheckinForecastChart();
             drawRevenueChart();
             loadAccomodationType();
+            targetRevenue();
       }
 });
 

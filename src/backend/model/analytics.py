@@ -82,171 +82,73 @@ class Analytics:
       def daily_revenue(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
-                  
-                  if accomodation_type != None:
-                        cursor.execute(''' SELECT * FROM bookings WHERE check_in = CURRENT_DATE() ''')
-                        data = cursor.fetchall()
-
-                        selected_area_revenue = 0
-                        if data:
-                              for d in data:
-                                    revenue = d.get('area_revenue').split(',')
-                                    print(revenue)
-                                    for rev in revenue:
-                                          area_type = rev.split(':')[0]
-                                          revenue = rev.split(':')[1]
-
-                                          if accomodation_type.strip() == area_type.strip():
-                                                selected_area_revenue += int(float(revenue))
 
                   if accomodation_type:
-                        print(selected_area_revenue)
-                        query = f'''                          
-                              WITH daily AS (
-                                    SELECT 
-                                          ROUND(COALESCE(SUM({accomodation_type}* {selected_area_revenue}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
-                                    FROM accomodation_data AS a
-                                    JOIN bookings AS b
+                        query = f'''      
+                              WITH today AS (
+                              SELECT COALESCE(SUM({accomodation_type.lower()}), 0) AS total
+                              FROM area_revenue AS a
+                              JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
-                                    WHERE date(a.check_in) = CURDATE()
-                                    AND b.payment <> 'Pending' AND b.status IN ('Checked-in', 'Checked-out', 'Day Guest')
+                              WHERE DATE(b.paid_date) = CURDATE()
+                                    AND b.payment <> 'Pending'
                               ),
-                              previous AS (
-                                    SELECT 
-                                          ROUND(COALESCE(SUM({accomodation_type} * {selected_area_revenue}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
-                                    FROM accomodation_data AS a
-                                    JOIN bookings AS b
+                              yesterday AS (
+                              SELECT COALESCE(SUM({accomodation_type.lower()}), 0) AS total
+                              FROM area_revenue AS a
+                              JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
-                                    WHERE date(a.check_in) = CURDATE() - INTERVAL 1 DAY
-                                    AND b.payment <> 'Pending' AND b.status IN ('Checked-in', 'Checked-out', 'Day Guest')
+                              WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
+                                    AND b.payment <> 'Pending'
                               )
                               SELECT 
-                              daily.revenue AS revenue_today,
-                              previous.revenue AS prev_revenue,
+                              today.total AS revenue_today,
+                              yesterday.total AS prev_revenue,
                               CASE
-                                    WHEN previous.revenue = 0 THEN 
+                                    WHEN yesterday.total = 0 THEN 
                                           CASE 
-                                                WHEN daily.revenue > 0 THEN 100
-                                                ELSE 0
+                                          WHEN today.total > 0 THEN 100
+                                          WHEN yesterday.total > 0 AND today.total = 0 THEN -100
+                                          WHEN yesterday.total = 0 AND today.total = 0 THEN 0
+                                          ELSE 0
                                           END
-                                    ELSE ROUND((daily.revenue - previous.revenue) / previous.revenue * 100)
+                                    ELSE ROUND((today.total - yesterday.total) / yesterday.total * 100)
                               END AS change_rate_percent
-                              FROM daily, previous;
+                              FROM today, yesterday;
                         '''
                         cursor.execute(query)
                   else:
                         query = f'''                                                  
-                              WITH today_rev AS (
-                              SELECT 
-                                    COALESCE(
-                                          SUM(
-                                                CASE 
-                                                      -- Day Guest same-day bookings
-                                                      WHEN DATEDIFF(a.check_out, a.check_in) = 0 AND b.booking_type = 'Day Guest' THEN
-                                                            1 * a.premium  * {self.accomodation_data('Premium')} +
-                                                            1 * a.standard * {self.accomodation_data('Standard')} +
-                                                            1 * a.garden   * {self.accomodation_data('Garden')} +
-                                                            1 * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                            1 * a.family   * {self.accomodation_data('Family')} +
-                                                            1 * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                            1 * a.small    * {self.accomodation_data('Small')} +
-                                                            1 * a.big      * {self.accomodation_data('Big')} +
-                                                            1 * a.hall     * {self.accomodation_data('Hall')}
-
-                                                      -- Check-in same-day bookings (0.5 rate)
-                                                      WHEN DATEDIFF(a.check_out, a.check_in) = 0 AND b.booking_type = 'Check-in' THEN
-                                                            0.5 * a.premium  * {self.accomodation_data('Premium')} +
-                                                            0.5 * a.standard * {self.accomodation_data('Standard')} +
-                                                            0.5 * a.garden   * {self.accomodation_data('Garden')} +
-                                                            0.5 * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                            0.5 * a.family   * {self.accomodation_data('Family')} +
-                                                            0.5 * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                            0.5 * a.small    * {self.accomodation_data('Small')} +
-                                                            0.5 * a.big      * {self.accomodation_data('Big')} +
-                                                            0.5 * a.hall     * {self.accomodation_data('Hall')}
-
-                                                      -- Multi-day bookings
-                                                      ELSE
-                                                            DATEDIFF(a.check_out, a.check_in) * a.premium  * {self.accomodation_data('Premium')} +
-                                                            DATEDIFF(a.check_out, a.check_in) * a.standard * {self.accomodation_data('Standard')} +
-                                                            DATEDIFF(a.check_out, a.check_in) * a.garden   * {self.accomodation_data('Garden')} +
-                                                            DATEDIFF(a.check_out, a.check_in) * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                            DATEDIFF(a.check_out, a.check_in) * a.family   * {self.accomodation_data('Family')} +
-                                                            DATEDIFF(a.check_out, a.check_in) * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                            DATEDIFF(a.check_out, a.check_in) * a.small    * {self.accomodation_data('Small')} +
-                                                            DATEDIFF(a.check_out, a.check_in) * a.big      * {self.accomodation_data('Big')} +
-                                                            DATEDIFF(a.check_out, a.check_in) * a.hall     * {self.accomodation_data('Hall')}
-                                                END
-                                          )
-                                    , 0) AS revenue_today
-                              FROM accomodation_data a
-                              JOIN bookings b ON a.booking_id = b.booking_id
-                              WHERE DATE(a.check_in) = CURDATE()
-                              AND b.payment <> 'Pending' AND b.booking_type IN ('Check-in', 'Day Guest') AND b.status IN ('Checked-in', 'Checked-out', 'Day Guest')
+                              WITH today AS (
+                              SELECT COALESCE(SUM(a.total), 0) AS total
+                              FROM area_revenue AS a
+                              JOIN bookings AS b
+                                    ON a.booking_id = b.booking_id
+                              WHERE DATE(b.paid_date) = CURDATE()
+                                    AND b.payment <> 'Pending'
                               ),
-                              yesterday_rev AS (
-                              SELECT 
-                                    COALESCE(
-                                          SUM(
-                                                CASE 
-                                                -- Day Guest same-day bookings
-                                                WHEN DATEDIFF(a.check_out, a.check_in) = 0 AND b.booking_type = 'Day Guest' THEN
-                                                      1 * a.premium  * {self.accomodation_data('Premium')} +
-                                                      1 * a.standard * {self.accomodation_data('Standard')} +
-                                                      1 * a.garden   * {self.accomodation_data('Garden')} +
-                                                      1 * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                      1 * a.family   * {self.accomodation_data('Family')} +
-                                                      1 * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                      1 * a.small    * {self.accomodation_data('Small')} +
-                                                      1 * a.big      * {self.accomodation_data('Big')} +
-                                                      1 * a.hall     * {self.accomodation_data('Hall')}
-
-                                                -- Check-in same-day bookings (0.5 rate)
-                                                WHEN DATEDIFF(a.check_out, a.check_in) = 0 AND b.booking_type = 'Check-in' THEN
-                                                      0.5 * a.premium  * {self.accomodation_data('Premium')} +
-                                                      0.5 * a.standard * {self.accomodation_data('Standard')} +
-                                                      0.5 * a.garden   * {self.accomodation_data('Garden')} +
-                                                      0.5 * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                      0.5 * a.family   * {self.accomodation_data('Family')} +
-                                                      0.5 * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                      0.5 * a.small    * {self.accomodation_data('Small')} +
-                                                      0.5 * a.big      * {self.accomodation_data('Big')} +
-                                                      0.5 * a.hall     * {self.accomodation_data('Hall')}
-
-                                                -- Multi-day bookings
-                                                ELSE
-                                                      DATEDIFF(a.check_out, a.check_in) * a.premium  * {self.accomodation_data('Premium')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.standard * {self.accomodation_data('Standard')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.garden   * {self.accomodation_data('Garden')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.family   * {self.accomodation_data('Family')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.small    * {self.accomodation_data('Small')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.big      * {self.accomodation_data('Big')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.hall     * {self.accomodation_data('Hall')}
-                                                END
-                                          )
-                                    , 0) AS revenue_yesterday
-                              FROM accomodation_data a
-                              JOIN bookings b ON a.booking_id = b.booking_id
-                              WHERE DATE(a.check_in) = CURDATE() - INTERVAL 1 DAY
-                              AND b.payment <> 'Pending' AND b.booking_type IN ('Check-in', 'Day Guest') AND b.status IN ('Checked-in', 'Checked-out', 'Day Guest')
+                              yesterday AS (
+                              SELECT COALESCE(SUM(a.total), 0) AS total
+                              FROM area_revenue AS a
+                              JOIN bookings AS b
+                                    ON a.booking_id = b.booking_id
+                              WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
+                                    AND b.payment <> 'Pending'
                               )
-
-                              SELECT
-                              today_rev.revenue_today as revenue_today,
-                              yesterday_rev.revenue_yesterday as prev_revenue,
-                              CASE 
-                                    WHEN yesterday_rev.revenue_yesterday = 0 THEN 
-                                          CASE WHEN today_rev.revenue_today > 0 THEN 100 ELSE 0 END
-                                    ELSE 
-                                          ROUND(
-                                          (today_rev.revenue_today - yesterday_rev.revenue_yesterday)
-                                          / yesterday_rev.revenue_yesterday * 100
-                                          )
+                              SELECT 
+                              today.total AS revenue_today,
+                              yesterday.total AS prev_revenue,
+                              CASE
+                                    WHEN yesterday.total = 0 THEN 
+                                          CASE 
+                                          WHEN today.total > 0 THEN 100
+                                          WHEN yesterday.total > 0 AND today.total = 0 THEN -100
+                                          WHEN yesterday.total = 0 AND today.total = 0 THEN 0
+                                          ELSE 0
+                                          END
+                                    ELSE ROUND((today.total - yesterday.total) / yesterday.total * 100)
                               END AS change_rate_percent
-                              FROM today_rev, yesterday_rev;
-
+                              FROM today, yesterday;
                         '''
                         cursor.execute(query)
                   data = cursor.fetchone()
@@ -257,84 +159,24 @@ class Analytics:
             with self.db.connect() as con:
                   cursor = con.cursor()
 
-                  if accomodation_type != None:
-                        cursor.execute(''' SELECT * FROM bookings WHERE check_in = CURRENT_DATE() ''')
-                        data = cursor.fetchall()
-
-                        selected_area_revenue = 0
-                        if data:
-                              for d in data:
-                                    revenue = d.get('area_revenue').split(',')
-
-                                    for rev in revenue:
-                                          area_type = rev.split(':')[0]
-                                          revenue = rev.split(':')[1]
-
-                                          if accomodation_type.strip() == area_type.strip():
-                                                selected_area_revenue += int(float(revenue))
-                                          
                   if accomodation_type:
-                        query = f'''                          
-                              SELECT 
-                                    ROUND(COALESCE(SUM({accomodation_type}* {selected_area_revenue}) / NULLIF(SUM({accomodation_type}),0), 0)) AS revenue
-                              FROM accomodation_data AS a
+                        query = f'''            
+                              SELECT COALESCE(SUM({accomodation_type.lower()}), 0) AS revenue
+                              FROM area_revenue AS a
                               JOIN bookings AS b
                               ON a.booking_id = b.booking_id
-                              WHERE MONTH(a.check_in) = MONTH(CURDATE())
-                              AND b.payment <> 'Pending' AND b.status IN ('Checked-in', 'Checked-out', 'Day Guest')
+                              WHERE MONTH(b.paid_date) = MONTH(CURDATE())
+                              AND b.payment <> 'Pending'
                         '''
                         cursor.execute(query)
                   else:
                         query = f'''
-                              SELECT 
-                                    COALESCE(
-                                          SUM(
-                                                CASE 
-                                                -- Day Guest same-day bookings
-                                                WHEN DATEDIFF(a.check_out, a.check_in) = 0 AND b.booking_type = 'Day Guest' THEN
-                                                      1 * a.premium  * {self.accomodation_data('Premium')} +
-                                                      1 * a.standard * {self.accomodation_data('Standard')} +
-                                                      1 * a.garden   * {self.accomodation_data('Garden')} +
-                                                      1 * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                      1 * a.family   * {self.accomodation_data('Family')} +
-                                                      1 * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                      1 * a.small    * {self.accomodation_data('Small')} +
-                                                      1 * a.big      * {self.accomodation_data('Big')} +
-                                                      1 * a.hall     * {self.accomodation_data('Hall')}
-
-                                                -- Check-in same-day bookings (0.5 rate)
-                                                WHEN DATEDIFF(a.check_out, a.check_in) = 0 AND b.booking_type = 'Check-in' THEN
-                                                      0.5 * a.premium  * {self.accomodation_data('Premium')} +
-                                                      0.5 * a.standard * {self.accomodation_data('Standard')} +
-                                                      0.5 * a.garden   * {self.accomodation_data('Garden')} +
-                                                      0.5 * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                      0.5 * a.family   * {self.accomodation_data('Family')} +
-                                                      0.5 * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                      0.5 * a.small    * {self.accomodation_data('Small')} +
-                                                      0.5 * a.big      * {self.accomodation_data('Big')} +
-                                                      0.5 * a.hall     * {self.accomodation_data('Hall')}
-
-                                                -- Multi-day bookings
-                                                ELSE
-                                                      DATEDIFF(a.check_out, a.check_in) * a.premium  * {self.accomodation_data('Premium')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.standard * {self.accomodation_data('Standard')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.garden   * {self.accomodation_data('Garden')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.barkada  * {self.accomodation_data('Barkada')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.family   * {self.accomodation_data('Family')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.cabana   * {self.accomodation_data('Cabana')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.small    * {self.accomodation_data('Small')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.big      * {self.accomodation_data('Big')} +
-                                                      DATEDIFF(a.check_out, a.check_in) * a.hall     * {self.accomodation_data('Hall')}
-                                                END
-                                          ), 0
-                                    ) AS revenue
-                              FROM accomodation_data a
-                              JOIN bookings b ON a.booking_id = b.booking_id
-                              WHERE MONTH(a.check_in) = MONTH(CURDATE())
-                              AND YEAR(a.check_in) = YEAR(CURDATE())
+                              SELECT COALESCE(SUM(total), 0) AS revenue
+                              FROM area_revenue AS a
+                              JOIN bookings AS b
+                              ON a.booking_id = b.booking_id
+                              WHERE MONTH(b.paid_date) = MONTH(CURDATE())
                               AND b.payment <> 'Pending'
-                              AND b.booking_type IN ('Check-in', 'Day Guest')
-                              AND b.status IN ('Checked-in', 'Checked-out', 'Day Guest');
                         '''
                         cursor.execute(query)
 
@@ -434,45 +276,48 @@ class Analytics:
 
             return self.revenue_forecast.forecast_occupancy(dates, values)
       
-      def  get_target_revenue(self):
+      def  get_target_revenue(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
-                  cursor.execute('''
-                        WITH 
-                        monthly_data AS (
-                        SELECT 
-                              YEAR(check_in) AS year,
-                              MONTH(check_in) AS month,
-                              SUM(total_amount) AS monthly_revenue
-                        FROM bookings
-                        WHERE status NOT IN ('Cancelled')
-                        GROUP BY YEAR(check_in), MONTH(check_in)
-                        ),
-                        target AS (
-                        SELECT ROUND(AVG(monthly_revenue), 2) AS target_revenue
-                        FROM monthly_data
-                        ),
-                        current_month AS (
-                        SELECT 
-                              ROUND(SUM(total_amount), 2) AS current_revenue
-                        FROM bookings
-                        WHERE status NOT IN ('Cancelled')
-                              AND YEAR(check_in) = YEAR(CURDATE())
-                              AND MONTH(check_in) = MONTH(CURDATE())
-                        )
-                        SELECT 
-                        current_month.current_revenue,
-                        target.target_revenue,
-                        CASE 
-                              WHEN target.target_revenue = 0 THEN 0
-                              ELSE ROUND((current_month.current_revenue / target.target_revenue) * 100, 2)
-                        END AS achievement_percent
-                        FROM current_month, target;
-                  ''')     
+                  
+                  if accomodation_type != None:
+                        area = {
+                              'premium': 190000,
+                              'standard': 200250,
+                              'garden': 170680,
+                              'barkada': 159050,
+                              'family': 150000,
+                              'cabana': 129890,
+                              'big': 130450,
+                              'small': 86000,
+                              'hall': 30500
+                        }
 
-                  data = cursor.fetchone()
+                        return {'target': area[accomodation_type.lower().strip()]}
+                  else:
+                        cursor.execute('''
+                              WITH 
+                              monthly_data AS (
+                              SELECT 
+                                    YEAR(check_in) AS year,
+                                    MONTH(check_in) AS month,
+                                    SUM(total_amount) - SUM(total_guest * 200) AS monthly_revenue
+                              FROM bookings
+                              WHERE status NOT IN ('Cancelled')
+                              GROUP BY YEAR(check_in), MONTH(check_in)
+                              ),
+                              target AS (
+                              SELECT ROUND(AVG(monthly_revenue), 2) AS target_revenue
+                              FROM monthly_data
+                              )
+                              SELECT 
+                              target.target_revenue
+                              FROM  target;
+                        ''')     
+
+                        data = cursor.fetchone()
                         
-                  return {'target': data.get('target_revenue')}
+                        return {'target': data.get('target_revenue')}
                               
       def accomodation_data(self, query):
             with self.db.connect() as con:

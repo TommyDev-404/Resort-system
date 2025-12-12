@@ -7,6 +7,7 @@ USE resort_db;
 CREATE TABLE bookings (
     booking_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    date_book  DATE NULL,
     total_guest INT(11) NOT NULL,
     booking_type ENUM('Reservation', 'Check-in', 'Day Guest')NOT NULL,
     payment ENUM(
@@ -27,10 +28,30 @@ CREATE TABLE bookings (
         DEFAULT NULL,
     check_in DATE NOT NULL,
     check_out DATE NOT NULL,
+    resort_income DECIMAL(10,2) NULL,
+    zuzu_charge DECIMAL(10,2) NULL,
     total_amount DECIMAL(10,2) NOT NULL,
+    paid_date DATE NULL,
     promo VARCHAR(255)  NULL,
-    promo_area VARCHAR(255)  NULL,
-    area_revenue VARCHAR(255)  NULL
+    promo_area VARCHAR(255)  NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- area_revenue
+CREATE TABLE area_revenue (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT(11) NOT NULL,
+    check_in DATE NOT NULL,
+    check_out DATE NOT NULL,
+    premium INT(11) DEFAULT 0,
+    standard INT(11) DEFAULT 0,
+    garden INT(11) DEFAULT 0,
+    barkada INT(11) DEFAULT 0,
+    family INT(11) DEFAULT 0,
+    cabana INT(11) DEFAULT 0,
+    small INT(11) DEFAULT 0,
+    big INT(11) DEFAULT 0,
+    hall INT(11) DEFAULT 0,
+    total INT(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- accomodation data table

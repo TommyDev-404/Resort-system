@@ -1,3 +1,5 @@
+Use resort_db;
+
 -- accomodation data
 INSERT INTO accomodation_data (check_in, check_out, premium, standard, garden, barkada, family, cabana, small, big, hall, total) VALUES ('2023-05-06', '2023-05-07', 1, 0, 0, 0, 0, 0, 0, 0, 0, 1);
 INSERT INTO accomodation_data (check_in, check_out, premium, standard, garden, barkada, family, cabana, small, big, hall, total) VALUES ('2023-05-06', '2023-05-07', 1, 1, 0, 0, 0, 0, 0, 0, 0, 2);

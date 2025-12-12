@@ -13,10 +13,11 @@ class Accounting:
                         cursor.execute(''' 
                               SELECT 
                                     CONCAT(MONTHNAME(check_in), ' ', YEAR(check_in)) AS month_year,
-                                    COALESCE(SUM(CASE WHEN payment = 'Direct Payment' THEN total_amount ELSE 0 END), 0) AS direct,
-                                    COALESCE(SUM(CASE WHEN payment = 'ZUZU (Online Payment)' THEN total_amount ELSE 0 END), 0) AS online
+                                    COALESCE(SUM(resort_income), 0) AS direct,
+                                    COALESCE(SUM(zuzu_charge), 0) AS online,
+                                    COALESCE(SUM(total_amount), 0) AS total
                               FROM bookings
-                              WHERE YEAR(check_in) = %s
+                              WHERE YEAR(check_in) = %s AND status != 'Cancelled' AND payment != 'Pending'
                               GROUP BY month_year
                               ORDER BY MIN(check_in);
                         ''', (year))
@@ -33,11 +34,11 @@ class Accounting:
                         cursor = con.cursor()
                         cursor.execute(''' 
                               SELECT 
-                                    COALESCE(SUM(CASE WHEN payment = 'Direct Payment' THEN total_amount ELSE 0 END), 0) AS direct,
-                                    COALESCE(SUM(CASE WHEN payment = 'Online Payment' THEN total_amount ELSE 0 END), 0) AS online,
+                                    COALESCE(SUM(resort_income), 0) AS direct,
+                                    COALESCE(SUM(zuzu_charge), 0) AS online,
                                     COALESCE(SUM(total_amount), 0) AS total_revenue
                               FROM bookings
-                              WHERE DATE(check_in) = CURDATE() and status IN ('Checked-in', 'Checked-out', 'Day Guest');
+                              WHERE DATE(paid_date) = CURRENT_DATE() AND payment != 'Pending';
                         ''')
                         data = cursor.fetchone()
 

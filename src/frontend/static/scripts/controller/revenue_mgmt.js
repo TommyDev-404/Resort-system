@@ -150,14 +150,14 @@ function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_
                   
                                     <!-- Start Date -->
                                     <div>
-                                          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                                          <input type="date" name="date" required  value="${start_date}"   class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
+                                          <label class="date-icon block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+                                          <input type="date" name="date" required  value="${start_date}"   class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
                                     </div>
                   
                                     <!-- End Date -->
                                     <div>
                                           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                                          <input type="date" name="end_date" required value="${end_date}"   class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
+                                          <input type="date" name="end_date" required value="${end_date}"   class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
                                     </div>
                               </div>
 
@@ -228,15 +228,13 @@ function renderAddPromoModal(){
                                     <!-- Start Date -->
                                     <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                                    <input type="date" name="date" required
-                                          class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
+                                    <input type="date" name="date" required class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
                                     </div>
                   
                                     <!-- End Date -->
                                     <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                                    <input type="date" name="end_date" required
-                                          class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
+                                    <input type="date" name="end_date" required  class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
                                     </div>
                               </div>
 
@@ -322,6 +320,7 @@ async function applyPromo(e) {
       document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value) });
       form.append('area_list', area_list);
       
+      console.log(Object.fromEntries(form.entries()));
       const response = await fetch('/promo', {
             method: 'POST', 
             headers: {'Content-Type': 'application/json'},

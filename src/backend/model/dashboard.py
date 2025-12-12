@@ -19,16 +19,12 @@ class Dashboard:
                         today_total AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS total_guest_in_house
                               FROM bookings 
-                              WHERE check_in <= CURRENT_DATE()
-                              AND check_out >= CURRENT_DATE()
-                              AND status = 'Checked-in' AND booking_type = 'Check-in'
+                              WHERE status = 'Checked-in' AND booking_type IN ('Check-in', 'Reservation', 'Day Guest')
                         ),
                         yesterday_total AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS total_guest_in_house
                               FROM bookings 
-                              WHERE check_in = CURRENT_DATE() - INTERVAL 1 DAY
-                              AND check_out >= CURRENT_DATE() - INTERVAL 1 DAY
-                              AND status = 'Checked-in' AND booking_type = 'Check-in'
+                              WHERE status = 'Checked-in' AND booking_type IN ('Check-in', 'Reservation', 'Day Guest')
                         )
                         SELECT 
                         (SELECT total_guest_in_house FROM today_total) AS latest_total_guest,
@@ -51,7 +47,7 @@ class Dashboard:
                         END AS change_rate_percent;
                   ''')
                   data = cursor.fetchone()
-                  print(data)
+
                   return {'today': data.get('latest_total_guest') , 'change': data.get('change_rate_percent')}
 
       def today_guest(self):
@@ -140,17 +136,15 @@ class Dashboard:
                               SELECT 
                                     COALESCE(SUM(total_amount), 0) AS today_revenue
                               FROM bookings
-                              WHERE check_in = CURDATE()
-                              AND booking_type IN ('Check-in', 'Day Guest')
+                              WHERE paid_date = CURRENT_DATE() 
                               AND payment != 'Pending'
                         ),
                         yesterday AS (
                               SELECT
                                     COALESCE(SUM(total_amount), 0) AS yesterday_revenue
                               FROM bookings
-                              WHERE status NOT IN ('Cancelled', 'Reserved')
-                              AND payment != 'Pending'
-                              AND check_in = CURDATE() - INTERVAL 1 DAY 
+                              WHERE payment != 'Pending'
+                              AND paid_date = CURRENT_DATE() - INTERVAL 1 DAY 
                         )
                         SELECT 
                         today.today_revenue,

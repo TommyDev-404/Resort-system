@@ -129,7 +129,7 @@ class Staff_Management:
                               morning_in = datetime.strptime('08:00', '%H:%M').time()
                               afternoon_in= datetime.strptime('13:00', '%H:%M').time()
                               morning_out = datetime.strptime('12:00', '%H:%M').time()
-                              afternoon_out = datetime.strptime('16:40', '%H:%M').time()
+                              afternoon_out = datetime.strptime('16:30', '%H:%M').time()
 
                               if new_time_in <= morning_in:
                                     if new_time_out == afternoon_out:
@@ -152,7 +152,6 @@ class Staff_Management:
                               cursor.execute('''
                                     UPDATE staff_attendance SET  time_out = %s, status = %s  WHERE staff_id = %s
                               ''', (new_time_out.strftime("%I:%M %p"), new_status, data.get('id')))
-
 
                               if new_status == 'Present (Overtime)':
                                     cursor.execute("SELECT daily_salary FROM staff_details WHERE id = %s", (data.get('id'),))

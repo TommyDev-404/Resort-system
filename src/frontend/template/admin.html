@@ -11,6 +11,16 @@
       <script src="https://unpkg.com/lucide@latest" defer></script>
 
 	<style>
+                        
+            /* Light mode (default) = black icon */
+            .date-icon::-webkit-calendar-picker-indicator {
+                  filter: invert(0);
+            }
+
+            /* Dark mode = white icon */
+            .dark .date-icon::-webkit-calendar-picker-indicator {
+                  filter: invert(1);
+            }
 		.metric-card {
 				transition: transform 0.2s;
 		}
@@ -207,7 +217,7 @@
                                           <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2"><span data-lucide="calendar-plus" class="w-5 h-5 text-blue-500 dark:text-blue-400"></span>Total Bookings</p>
                                           <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">(Today)</span>
                                     </div>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="bookings-data">---</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="bookings-data">--</p>
                                     <div class="mt-2 flex items-center gap-2 text-sm">
                                           <div class="flex items-center gap-1">
                                                 <span data-lucide="arrow-up-right" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-rate-bookings-icon"></span>
@@ -226,7 +236,7 @@
                                     </p>
                                     <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">(Today)</span>
                                     </div>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="today-guest">---</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="today-guest">--</p>
                                     <div class="mt-2 flex items-center gap-2 text-sm">
                                     <div class="flex items-center gap-1">
                                     <span data-lucide="arrow-up-right" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-rate-today-guest-icon"></span>
@@ -241,11 +251,10 @@
                                     <div class="flex items-center justify-between">
                                     <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2">
                                     <span data-lucide="users" class="w-5 h-5 text-teal-500 dark:text-teal-400"></span>
-                                    Guests In-House
+                                    Guests Currently Checked-in
                                     </p>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">(Today)</span>
                                     </div>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-guest-in-house">---</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-guest-in-house">--</p>
                                     <div class="mt-2 flex items-center gap-2 text-sm">
                                     <div class="flex items-center gap-1">
                                     <span data-lucide="arrow-up-right" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-rate-guest-icon"></span>
@@ -264,7 +273,7 @@
                                     </p>
                                     <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">(Today)</span>
                                     </div>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-revenue">---</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-revenue">--</p>
                                     <div class="mt-2 flex items-center gap-2 text-sm">
                                     <div class="flex items-center gap-1">
                                     <span data-lucide="arrow-up-right" class="w-4 h-4 text-green-500 dark:text-green-400" id="target-revenue-icon"></span>
@@ -577,7 +586,7 @@
                                           <div class="flex justify-between items-center">
                                                 <div>
                                                       <p class="text-sm font-medium text-gray-600 dark:text-gray-200 flex items-center gap-2"><span class="bg-purple-100 dark:bg-purple-700 p-2 rounded-full flex items-center justify-center"><i data-lucide="building-2" class="w-5 h-5 text-purple-600 dark:text-purple-200"></i></span>Daily Occupancy</p>
-                                                      <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="occupancy-percentage">78%</p>
+                                                      <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="occupancy-percentage">--</p>
                                                       <div class="flex items-center gap-1 text-xs mt-1">
                                                             <span data-lucide="arrow-up" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-occupancy-icon"></span>
                                                             <span class="text-gray-500 dark:text-gray-300 font-medium"><label id="occupancy-change" class="font-semibold dark:text-green-400">+5%</label> vs Yesterday</span>
@@ -591,7 +600,7 @@
                                           <div class="flex justify-between items-center">
                                                 <div>
                                                       <p class="text-sm font-medium text-gray-600 dark:text-gray-200 flex items-center gap-2"><span class="bg-green-100 dark:bg-green-700 p-2 rounded-full flex items-center justify-center"><i data-lucide="calendar" class="w-5 h-5 text-green-600 dark:text-green-200" ></i></span>Today's Revenue</p>
-                                                      <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="today-revenue-analytics">---</p>
+                                                      <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="today-revenue-analytics">--</p>
                                                       <div class="flex items-center gap-1 text-xs mt-1">
                                                             <span data-lucide="arrow-up" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-today-icon"></span>
                                                             <span class="text-gray-500 dark:text-gray-300 font-medium"><label id="today-revenue-change" class="font-semibold dark:text-green-400">+2%</label> vs Yesterday</span>
@@ -605,7 +614,7 @@
                                           <div class="flex justify-between items-center">
                                                 <div>
                                                       <p class="text-sm font-medium text-gray-600 dark:text-gray-200 flex items-center gap-2"><span class="bg-blue-100 dark:bg-blue-700 p-2 rounded-full flex items-center justify-center"><i data-lucide="calendar-range" class="w-5 h-5 text-blue-600 dark:text-blue-200"></i></span>Monthly Revenue</p>
-                                                      <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="monthly-revenue-analytics">---</p>
+                                                      <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="monthly-revenue-analytics">--</p>
                                                       <div class="flex items-center gap-1 text-xs mt-1">
                                                             <span data-lucide="arrow-up" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-monthly-icon"></span>
                                                             <span class="text-gray-500 dark:text-gray-300 font-medium"><label id="monthly-revenue-change" class="font-semibold dark:text-green-400">-3%</label> vs Target</span>
@@ -619,7 +628,7 @@
                                           <div class="flex justify-between items-center">
                                                 <div>
                                                       <p class="text-sm font-medium text-gray-600 dark:text-gray-200 flex items-center gap-2"><span class="bg-red-100 dark:bg-red-700 p-2 rounded-full flex items-center justify-center"><i data-lucide="target" class="w-5 h-5 text-red-600 dark:text-red-200"></i></span>Target Revenue</p>
-                                                      <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="target">---</p>
+                                                      <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="target">--</p>
                                                 </div>
                                           </div>
                                           <span class="text-xs font-medium text-gray-500 dark:text-gray-300 mt-2">(This month)</span>
@@ -839,7 +848,7 @@
                               <div class="flex justify-between px-6 items-center gap-6 mt-4">
                                     <!-- Buttons -->
                                     <div class="flex flex-wrap items-center gap-3">
-                                          <button id="update-reservation-date" class="btn flex items-center gap-2 bg-teal-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-teal-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i data-lucide="edit" class="text-lg"></i> Change Date</button>
+                                          <button id="update-reservation-date" class="btn flex items-center gap-2 bg-teal-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-teal-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i data-lucide="edit" class="text-lg"></i>Change Date</button>
                                           <button id="mark-paid" class="btn flex items-center gap-2 bg-green-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-green-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i data-lucide="credit-card" class="text-lg"></i> Mark as Paid</button>
                                           <button id="mark-checkin" class="btn flex items-center gap-2 bg-blue-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-blue-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i data-lucide="log-in" class="text-lg"></i> Check-In</button>
                                           <button id="mark-checkout" class="btn flex items-center gap-2 bg-amber-500 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-sm hover:bg-amber-600 hover:shadow-md transition-all duration-200" style="pointer-events: none; opacity: 0.4;"><i data-lucide="log-out" class="text-lg"></i> Check-Out</button>
@@ -861,11 +870,12 @@
                                     <table class="min-w-full text-sm text-center border-collapse table-fixed">
                                           <thead class="bg-gray-800 text-white sticky top-0 z-10 px-3">
                                                 <tr>
-                                                      <th class="p-3 border-l-2  font-semibold uppercase tracking-wider whitespace-nowrap">Select</th>
-                                                      <th class="p-3 font-semibold uppercase tracking-wider text-sm whitespace-nowrap">Traveler Details</th>
-                                                      <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap">Booking Details</th>
+                                                      <th class="p-3  font-semibold uppercase tracking-wider whitespace-nowrap">Select</th>
+                                                      <th class="p-3 font-semibold uppercase tracking-wider text-sm whitespace-nowrap">Guest Name</th>
+                                                      <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap">Date Book</th>
+                                                      <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap">Booking Sched.</th>
                                                       <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap" >Accommodations</th>
-                                                      <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap">Booking Type</th>
+                                                      <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap" >Booking Type</th>
                                                       <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap ">Status</th>
                                                       <th class=" p-3 font-semibold uppercase tracking-wider whitespace-nowrap">Payment</th>
                                                       <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap ">Action</th>
@@ -1066,7 +1076,7 @@
                               <!-- Direct Payment Card -->
                               <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-103">
                                     <div>
-                                          <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Direct Payment <span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
+                                          <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Resort Income <span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
                                           <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="direct-payment">$5,100</p>
                                     </div>
                                     <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-700 rounded-full">
@@ -1077,7 +1087,7 @@
                               <!-- ZUZU Payment Card -->
                               <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-103">
                                     <div>
-                                          <p class="text-sm font-medium text-gray-700 dark:text-gray-200">ZUZU Payment (Online) <span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
+                                          <p class="text-sm font-medium text-gray-700 dark:text-gray-200">ZUZU Charge<span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
                                           <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="online-payment">$8,900</p>
                                     </div>
                                     <div class="w-12 h-12 flex items-center justify-center bg-blue-100 dark:bg-blue-700 rounded-full">
@@ -1088,7 +1098,7 @@
                               <!-- Total Booking Revenue Card -->
                               <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-103">
                                     <div>
-                                          <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Total Booking Revenue <span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
+                                          <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Total Revenue <span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
                                           <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="booking-revenue">$14,000</p>
                                     </div>
                                     <div class="w-12 h-12 flex items-center justify-center bg-yellow-100 dark:bg-yellow-700 rounded-full">
@@ -1110,8 +1120,9 @@
 							<thead class="bg-gray-800  text-white text-sm sticky top-0 z-30">
 								<tr>
                                                       <th class="px-6 py-3 text-center font-medium uppercase tracking-wider">Date</th>
-                                                      <th class="px-6 py-3 text-center font-medium uppercase tracking-wider ">Online Payment</th>
-                                                      <th class="px-6 py-3 text-center font-medium uppercase tracking-wider ">Direct Payment</th>
+                                                      <th class="px-6 py-3 text-center font-medium uppercase tracking-wider ">Resort Revenue</th>
+                                                      <th class="px-6 py-3 text-center font-medium uppercase tracking-wider ">Zuzu Charge</th>
+                                                      <th class="px-6 py-3 text-center font-medium uppercase tracking-wider ">Overall Income</th>
                                                 </tr>
 							</thead>
 							<tbody id="accounting-tbody"></tbody>

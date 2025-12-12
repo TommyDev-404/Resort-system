@@ -206,6 +206,11 @@ def revenue_forecast_type():
 def target_revenue():
       return jsonify(analytics.get_target_revenue())
 
+@app.route('/target-revenue-type', methods=['GET'])
+def target_revenue_type():
+      return jsonify(analytics.get_target_revenue(request.args.get('accomodation_type')))
+
+
 
 #--------------- ALL RESERVATION ------------------#
 @app.route('/avl-spaces', methods=['GET'])

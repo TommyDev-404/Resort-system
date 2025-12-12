@@ -87,7 +87,7 @@ function renderAddStaffModal(){
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
-                                    <input type="date" id="addDateStarted" name="date_started" class="text-gray-900  w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="date" id="addDateStarted" name="date_started" class="date-icon text-gray-900  w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                               
                               <button type="submit" class="mt-3 px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">Add Staff</button>
@@ -122,13 +122,13 @@ async function renderAddStaffAttendanceModal(){
                                     <div class="mb-6 flex flex-col md:flex-row gap-4">
                                           <div class="flex-1">
                                                 <label for="attendanceDateAll" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date:</label>
-                                                <input type="date" id="attendanceDateAll" required class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                                <input type="date" id="attendanceDateAll" required class="date-icon px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                           </div>
                                     
                                           <!-- Time-in Input (only shows if Present) -->
                                           <div class="flex-1" id="timeInWrapper">
                                                 <label for="attendanceTimein" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time-in:</label>
-                                                <input type="time" id="attendanceTimein" required class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                                <input type="time" id="attendanceTimein" required class="date-icon px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                           </div>
                                     </div>
 
@@ -179,7 +179,7 @@ async function renderUpdateAttendanceModal(e){
                               <div class="mb-6 flex justify-start w-full">
                                     <div class="flex flex-col">
                                           <label for="attendanceTimeout" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time-out:</label>
-                                          <input type="time" id="attendanceTimeout" required class="px-3 py-2 w-90 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                          <input type="time" id="attendanceTimeout" required class="px-3 py-2 w-90 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500  date-icon">
                                     </div>
                               </div>
 
@@ -349,7 +349,7 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
-                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800  dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="date-icon w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800  dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
@@ -1071,7 +1071,7 @@ async function sortAttendanceData(){
                   isAttendanceNotEmpty = true;
                   const empty_row = `
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-200 ease-in-out">
-                              <td colspan="6" class="text-center  dark:bg-gray-800 dark:text-white text-gray-600 py-3 bg-gray-50">No data.</td>
+                              <td colspan="6" class="text-center  bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:text-white text-gray-600 py-3 ">No data.</td>
                         </tr>
                   `;
                   

@@ -1,14 +1,16 @@
 
 
-function createRow(date, direct, online){
+function createRow(date, direct, online, total){
       const online_payment =  Number(online).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })
       const direct_payment =  Number(direct).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })
+      const total_revenue =  Number(total).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })
       
       const row = `
             <tr class="fade-in-up z-10 text-gray-800 bg-gray-50 dark:bg-white/2 hover:bg-black/5 dark:hover:bg-white/5 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700">
                   <td class="px-6 py-4 text-center whitespace-nowrap">${date}</td>
-                  <td class="px-6 py-4 text-center  whitespace-nowrap">${online_payment}</td>
                   <td class="px-6 py-4 text-center  whitespace-nowrap">${direct_payment}</td>
+                  <td class="px-6 py-4 text-center  whitespace-nowrap">${online_payment}</td>
+                  <td class="px-6 py-4 text-center  whitespace-nowrap">${total_revenue}</td>
             </tr>
       `;
 
@@ -57,7 +59,7 @@ async function loadBookingRevenue(year) {
       if (result.success){
             removePrevRow();
             result.data.forEach(data => {
-                  createRow(data.month_year, data.direct, data.online);
+                  createRow(data.month_year, data.direct, data.online, data.total);
             });
       }else {
             alert('Failed to fetch data.');

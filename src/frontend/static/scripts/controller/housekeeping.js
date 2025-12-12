@@ -97,6 +97,7 @@ function createRowForRoomDetails(room_name, room_no, status){
       if (status === 'occupied') (new_status = 'Occupied', bg_color = 'bg-purple-100 text-purple-700 dark:text-white dark:bg-purple-500');
       if (status === 'need-clean') (new_status = 'Need Clean', bg_color = 'bg-blue-100 text-blue-700 dark:text-white dark:bg-blue-500');
       if (status === 'on-clean') (new_status = 'Cleaning', bg_color = 'bg-yellow-100 text-yellow-700 dark:text-white dark:bg-yellow-500');
+      if (status === 'reserved') (new_status = 'Reserved', bg_color = 'bg-emerald-100 text-emerald-600 dark:text-white dark:bg-emerald-400');
 
       const row = `
             <tr data-room="${room_name}" class="bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700">
@@ -220,7 +221,7 @@ async function renderAssignStaffModal(area_name, room_no){
                                     </div>
                                     <div class="text-sm text-gray-600 dark:text-gray-300 mt-3 flex flex-col">
                                           <label>Date Assigned:</label>
-                                          <input type="date" name="date" class="p-4 border border-gray-400 dark:border-gray-200 dark:text-gray-100 text-gray-800 rounded-sm" required>
+                                          <input type="date" name="date" class="p-4 border border-gray-400 dark:border-gray-200 dark:text-gray-100 text-gray-800 rounded-sm date-icon" required>
                                     </div>
                               </div>
                               <div class="flex justify-end gap-3">
@@ -348,16 +349,15 @@ async function allStaffs(){
 
             result.data.forEach(staff => {
                   const opt = `
-                        <option value="${staff.staff_name}">${staff.staff_name}</option>
+                        <option value="${staff.staff_name}" class="text-md">${staff.staff_name}</option>
                   `;
                   staff_list.push(opt);
             });
-
+            staff_list.unshift('<option value="" hidden class="py-3">Choose Staff ↓</option>');
             return staff_list.join('\n');
       }else{
-            failedMessageCard('No staffs yet.');
             const empty_opt = `
-                  <option value="">No staff.</option>
+                  <option value="">No staff available to clean today.</option>
             `;
             return empty_opt;
       }

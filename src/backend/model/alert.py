@@ -165,13 +165,7 @@ class Alerts:
                               
                   con.commit()
 
-                  cursor.execute(''' UPDATE bookings
-                        SET status = 'Cancelled', payment = CASE WHEN payment != 'Pending' THEN 'Refunded' ELSE 'None' END
-                        WHERE status = 'Reserved'
-                        AND check_in < DATE_SUB(CURDATE(), INTERVAL 7 DAY);
-                  ''')
-
-                  con.commit()
+                  self.auto_cancell_7d()
 
       def bookings_alert(self):
             with self.db.connect() as con:
@@ -216,12 +210,8 @@ class Alerts:
       def cron_jobs(self):
             with self.db.connect() as conn:
                   cursor = conn.cursor()
-
-                  cursor.execute(''' UPDATE bookings
-                        SET status = 'Cancelled', payment = CASE WHEN payment != 'Pending' THEN 'Refunded' ELSE 'None' END
-                        WHERE status = 'Reserved'
-                        AND check_in < DATE_SUB(CURDATE(), INTERVAL 7 DAY);
-                  ''')
+                  
+                  self.auto_cancell_7d()
 
                   # Expire outdated promos
                   cursor.execute(""" UPDATE promos SET status = 'Expired' WHERE end_date <= CURDATE() AND status = 'Active' """)
@@ -332,3 +322,39 @@ class Alerts:
                                           ''', (room_name, room_no))
                                           con.commit()
                                     
+      def auto_cancell_7d(self):
+            with self.db.connect() as con:
+                  cursor = con.cursor()  # <--- important
+
+                  cursor.execute('''   
+                        SELECT * FROM bookings 
+                        WHERE status = 'Reserved' 
+                        AND DATE(check_in) < DATE_SUB(CURDATE(), INTERVAL 7 DAY);
+                  ''')
+                  rows = cursor.fetchall()
+
+                  for data in rows:
+                        area = data.get('accomodations').split(',')
+                        id = data.get('booking_id')
+
+                        for a in area:
+                              name = a.split()[0].strip()
+                              room = a.split()[-1].strip()
+
+                              cursor.execute('''   
+                                    UPDATE accomodation_spaces
+                                    SET status = 'avl'
+                                    WHERE name = %s AND room = %s
+                              ''', (name, room))
+                              con.commit()
+                        
+                        cursor.execute(''' DELETE FROM area_revenue WHERE booking_id = %s ''', (id,))
+
+                  cursor.execute('''   
+                        UPDATE bookings
+                        SET status = 'Cancelled', payment = CASE WHEN payment != 'Pending' THEN 'Refunded' ELSE 'None' END
+                        WHERE status = 'Reserved'
+                        AND DATE(check_in) < DATE_SUB(CURDATE(), INTERVAL 7 DAY);
+                  ''')
+
+                  con.commit()
