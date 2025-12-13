@@ -525,17 +525,17 @@ async function occupancyData(type=null) {
       document.getElementById('current-occupancy-data').textContent = `${Math.round(res.current)}%`;
 
       if (res.change < 0){
-            document.getElementById('occupancy-change').classList.remove('text-green-500');
-            document.getElementById('occupancy-change').classList.add('text-red-500');
+            document.getElementById('occupancy-change').classList.remove('text-green-500', 'dark:text-green-400');
+            document.getElementById('occupancy-change').classList.add('text-red-500', 'dark:text-red-500');
             document.getElementById('change-occupancy-icon').setAttribute("data-lucide", "arrow-down");
-            document.getElementById('change-occupancy-icon').classList.remove("text-green-500");
-            document.getElementById('change-occupancyt-icon').classList.add("text-red-500");
+            document.getElementById('change-occupancy-icon').classList.remove("text-green-500", 'dark:text-green-400');
+            document.getElementById('change-occupancyt-icon').classList.add("text-red-500", 'dark:text-red-500');
       }else{
-            document.getElementById('occupancy-change').classList.remove('text-red-500');
-            document.getElementById('occupancy-change').classList.add('text-green-500');
+            document.getElementById('occupancy-change').classList.remove('text-red-500', 'dark:text-red-500');
+            document.getElementById('occupancy-change').classList.add('text-green-500', 'dark:text-green-400');
             document.getElementById('change-occupancy-icon').setAttribute("data-lucide", "arrow-up");
-            document.getElementById('change-occupancy-icon').classList.remove("text-red-500");
-            document.getElementById('change-occupancy-icon').classList.add("text-green-500");
+            document.getElementById('change-occupancy-icon').classList.remove("text-red-500", 'dark:text-red-500');
+            document.getElementById('change-occupancy-icon').classList.add("text-green-500", 'dark:text-green-400');
       }
 
       lucide.createIcons();
@@ -550,17 +550,17 @@ async function dailyRevenue(type=null){
       document.getElementById('today-revenue-change').textContent = res.change < 0? `${res.change}%` : `+${res.change}%`;
 
       if (res.change < 0){
-            document.getElementById('today-revenue-change').classList.remove('text-green-500');
-            document.getElementById('today-revenue-change').classList.add('text-red-500');
+            document.getElementById('today-revenue-change').classList.remove('text-green-500', 'dark:text-green-400');
+            document.getElementById('today-revenue-change').classList.add('text-red-500', 'dark:text-red-500');
             document.getElementById('change-today-icon').setAttribute("data-lucide", "arrow-down");
-            document.getElementById('change-today-icon').classList.remove("text-green-500");
-            document.getElementById('change-today-icon').classList.add("text-red-500");
+            document.getElementById('change-today-icon').classList.remove("text-green-500", 'dark:text-green-400');
+            document.getElementById('change-today-icon').classList.add("text-red-500", 'dark:text-red-500');
       }else{
-            document.getElementById('today-revenue-change').classList.remove('text-red-500');
-            document.getElementById('today-revenue-change').classList.add('text-green-500');
+            document.getElementById('today-revenue-change').classList.remove('text-red-500', 'dark:text-red-500');
+            document.getElementById('today-revenue-change').classList.add('text-green-500', 'dark:text-green-400');
             document.getElementById('change-today-icon').setAttribute("data-lucide", "arrow-up");
-            document.getElementById('change-today-icon').classList.remove("text-red-500");
-            document.getElementById('change-today-icon').classList.add("text-green-500");
+            document.getElementById('change-today-icon').classList.remove("text-red-500", 'dark:text-red-500');
+            document.getElementById('change-today-icon').classList.add("text-green-500", 'dark:text-green-400');
       }
       
       lucide.createIcons();
@@ -574,21 +574,18 @@ async function monthlyRevenue(type=null){
       document.getElementById('monthly-revenue-analytics').textContent = formatPesoShort(Number(res.monthly));
       document.getElementById('monthly-revenue-change').textContent = res.change < 0 ? `${res.change}%` : `+${res.change}%`;    
       
-      const changeEl = document.getElementById('monthly-revenue-change');
-      const iconEl = document.getElementById('change-monthly-icon');
-      
       if (res.change < 0){
-            document.getElementById('monthly-revenue-change').classList.remove('text-green-500');
-            document.getElementById('monthly-revenue-change').classList.add('text-red-500');
+            document.getElementById('monthly-revenue-change').classList.remove('text-green-500', 'dark:text-green-400');
+            document.getElementById('monthly-revenue-change').classList.add('text-red-500', 'dark:text-red-500');
             document.getElementById('change-monthly-icon').setAttribute("data-lucide", "arrow-down");
-            document.getElementById('change-monthly-icon').classList.remove("text-green-500");
-            document.getElementById('change-monthly-icon').classList.add("text-red-500");
+            document.getElementById('change-monthly-icon').classList.remove("text-green-500", 'dark:text-green-400');
+            document.getElementById('change-monthly-icon').classList.add("text-red-500", 'dark:text-red-500');
       }else{
-            document.getElementById('monthly-revenue-change').classList.remove('text-red-500');
-            document.getElementById('monthly-revenue-change').classList.add('text-green-500');
+            document.getElementById('monthly-revenue-change').classList.remove('text-red-500'), 'dark:text-red-500';
+            document.getElementById('monthly-revenue-change').classList.add('text-green-500', 'dark:text-greeen-500');
             document.getElementById('change-monthly-icon').setAttribute("data-lucide", "arrow-up");
-            document.getElementById('change-monthly-icon').classList.remove("text-red-500");
-            document.getElementById('change-monthly-icon').classList.add("text-green-500");
+            document.getElementById('change-monthly-icon').classList.remove("text-red-500", 'dark:text-red-500');
+            document.getElementById('change-monthly-icon').classList.add("text-green-500", 'dark:text-green-400');
       }
       lucide.createIcons();
 }

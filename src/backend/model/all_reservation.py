@@ -648,14 +648,9 @@ class Reservation:
                         data = cursor.fetchone()
 
                         areas = data.get('accomodations').split(',')
-                        check_in = data.get('check_in')
-                        check_out = data.get('check_out')     
-                        old_night_stay = (check_out - check_in).days     
 
                         new_checkin = datetime.strptime(edit_checkin, "%Y-%m-%d").date()
                         new_checkout = datetime.strptime(edit_checkout, "%Y-%m-%d").date()
-                        night_stay2 = (new_checkout - new_checkin).days
-                        added_night = night_stay2 - old_night_stay if night_stay2 > old_night_stay else old_night_stay - night_stay2
 
                         guest_revenue = int(data.get('total_guest')) * 200
                         today = date.today()
@@ -684,29 +679,29 @@ class Reservation:
                               else:
                                     promo_start = None  # no promo today
 
-                              # Loop night by night
-                              day = new_checkin
-                              while day < new_checkout:
-
-                                    if promo_start and day >= promo_start:
-                                          print('promo Started')
-                                          promo_end = promo_data.get('end_date') if promo_data.get('end_date') else None
-                                          if promo_end and day > promo_end:
-                                                print('promo end')
-                                                nightly_rate = orig_rate
-                                                print(nightly_rate)
+                              if new_checkin < new_checkout:
+                                    # Loop night by night
+                                    day = new_checkin
+                                    while day < new_checkout:
+                                          print(day, new_checkout)
+                                          if promo_start and day >= promo_start:
+                                                print('promo Started')
+                                                promo_end = promo_data.get('end_date') if promo_data.get('end_date') else None
+                                                if promo_end and day > promo_end:
+                                                      print('promo end')
+                                                      nightly_rate = orig_rate
+                                                      print(nightly_rate)
+                                                else:
+                                                      print('promo applied')
+                                                      nightly_rate = promo_rate
+                                                      print(nightly_rate)
                                           else:
-                                                print('promo applied')
-                                                nightly_rate = promo_rate
-                                                print(nightly_rate)
-                                    else:
-                                          nightly_rate = orig_rate
-                                          print('no promo')
-                                          
-                                    revenue_per_area += nightly_rate
-                                    new_amount += nightly_rate
+                                                nightly_rate = orig_rate
+                                                
+                                          revenue_per_area += nightly_rate
+                                          new_amount += nightly_rate
 
-                                    day += timedelta(days=1)
+                                          day += timedelta(days=1)
                               else:
                                     if promo_start == today:
                                           new_amount += promo_rate / 2
@@ -714,9 +709,8 @@ class Reservation:
                                     else:
                                           new_amount += orig_rate / 2
                                           revenue_per_area += orig_rate / 2
-
                               new_area_revenue[area_name] = revenue_per_area - (revenue_per_area * 0.05) if data.get('payment') == 'ZUZU (Online Payment)' else revenue_per_area
-                              print(new_area_revenue[area_name])
+
                         total = sum([
                               new_area_revenue["premium"],
                               new_area_revenue["standard"],

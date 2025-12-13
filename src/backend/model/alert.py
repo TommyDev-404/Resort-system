@@ -274,54 +274,55 @@ class Alerts:
       def auto_checkout_guest(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
-                  cursor.execute('''   
-                        SELECT * from bookings where status = 'Checked-in' and check_out = CURRENT_DATE() - INTERVAL 1 DAY;
+
+                  # 1. Get guests whose checkout was YESTERDAY and still checked-in
+                  cursor.execute('''
+                        SELECT booking_id, accomodations, check_out
+                        FROM bookings
+                        WHERE status = 'Checked-in'
+                        AND check_out = CURRENT_DATE() - INTERVAL 1 DAY;
                   ''')
-                  data = cursor.fetchone()
+                  bookings = cursor.fetchall()
 
-                  if data:
-                        cursor.execute('''
-                              UPDATE bookings
-                              SET status = 'Checked-out'
-                              WHERE check_out <= CURRENT_DATE() AND MONTH(check_out) = MONTH(CURRENT_DATE()) AND YEAR(check_out) = YEAR(CURRENT_DATE())
-                              AND status = 'Checked-in';
-                        ''')
-                        con.commit()
+                  if not bookings:
+                        return  # nothing to process
 
-                        accomodation = data.get('accomodations').split(',')      
+                  # 2. Update booking status to Checked-out
+                  booking_ids = [b['booking_id'] for b in bookings]
+                  cursor.execute(f'''
+                        UPDATE bookings
+                        SET status = 'Checked-out'
+                        WHERE booking_id IN ({','.join(['%s'] * len(booking_ids))});
+                  ''', booking_ids)
 
-                        cursor.execute(''' SELECT * FROM bookings WHERE booking_id = %s ''', (id,))
-                        data = cursor.fetchone()
-                        check_out = data.get('check_out')
+                  # 3. Process each booking
+                  for booking in bookings:
+                        accomodations = booking['accomodations'].split(',')
 
-                        if check_out < date.today():
-                              for area in accomodation:
-                                    room_name = area.split(' ')[0].lower().strip()
-                                    room_no = area.split()[-1].strip()
-                                    if room_name not in ['cabana', 'small', 'big', 'hall']:
-                                          cursor.execute('''
-                                                UPDATE accomodation_spaces a
-                                                SET status = 'avl'
-                                                WHERE name = %s AND room = %s;
-                                          ''', (room_name, room_no))
-                                          con.commit()
-                        else:      
-                              for area in accomodation:
-                                    room_name = area.split(' ')[0].lower().strip()
-                                    room_no = area.split()[-1].strip()
-                                    message = f"(System check-out): Housekeeping requested for {area}"
+                        for area in accomodations:
+                              area = area.strip()
+                              room_name = area.split()[0].lower()
+                              room_no = area.split()[-1]
 
-                                    if room_name not in ['cabana', 'small', 'big', 'hall']:
-                                          cursor.execute(''' INSERT INTO notifications (name, date, room_name, room_no, alert_type, classification) VALUES (%s, NOW(), %s, %s, %s, %s)
-                                          ''', (message, room_name, int(room_no), 'housekeeping', 'system-checkout'))
-                                          
-                                          cursor.execute('''
-                                                UPDATE accomodation_spaces a
-                                                SET status = 'need-clean'
-                                                WHERE name = %s AND room = %s;
-                                          ''', (room_name, room_no))
-                                          con.commit()
-                                    
+                        if room_name not in ['cabana', 'small', 'big', 'hall']:
+                              message = f"(System check-out): Housekeeping requested for {area}"
+
+                              # Insert notification
+                              cursor.execute('''
+                                    INSERT INTO notifications
+                                    (name, date, room_name, room_no, alert_type, classification)
+                                    VALUES (%s, NOW(), %s, %s, %s, %s);
+                              ''', (message, room_name, int(room_no), 'housekeeping', 'system-checkout'))
+
+                              # Set room as need-clean
+                              cursor.execute('''
+                                    UPDATE accomodation_spaces
+                                    SET status = 'need-clean'
+                                    WHERE name = %s AND room = %s;
+                              ''', (room_name, room_no))
+
+                  con.commit()
+
       def auto_cancell_7d(self):
             with self.db.connect() as con:
                   cursor = con.cursor()  # <--- important
