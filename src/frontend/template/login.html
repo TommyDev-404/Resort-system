@@ -45,7 +45,7 @@
 		content: "";
 		position: absolute;
 		inset: 0; /* top:0; left:0; bottom:0; right:0 */
-		background: rgba(0, 0, 0, 0.1); /* dark overlay */
+		background: rgba(0, 0, 0, 0.2); /* dark overlay */
 		z-index: 0;
 	}
 
@@ -58,103 +58,97 @@
 </style>
 
 <body>
-	<div class="login-container w-full flex justify-center items-center max-h-screen bg-black/20">
-		<!-- Overlay Container -->
-		<div class="absolute  inset-0  flex items-center justify-center z-10 fade-in-up">
-			<div class="relative w-[30%] bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden px-8 py-6 flex flex-col items-center">
-				<!-- LOGO -->
-				<div class="flex flex-col items-center w-full mb-6">
-					<!-- Logo -->
-					<img src="{{ url_for('static', filename='assets/logo.webp') }}" class="w-10 h-10 rounded-full mb-1 shadow-xl" alt="Logo">
-					
-					<!-- Divider with text in the middle -->
-					<div class="flex w-full items-center my-1">
-						<div class="flex-grow border-t-1 border-gray-900"></div>
-						<p class="mx-4 text-gray-700 font-semibold tracking-wider uppercase text-xs">GRAND VILLA LAGUNA</p>
-						<div class="flex-grow border-t-1 border-gray-900"></div>
-					</div>
+
+	<!-- Overlay Container -->
+	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[35%] p-6 overflow-hidden bg-transparent backdrop-blur-[20px] border border-white/40 rounded-xl shadow-2xl before:content-[''] before:absolute before:inset-0 before:border before:border-white/20 before:rounded-xl before:pointer-events-none">
+		<!-- CONTENT LAYER -->
+		<div class="relative z-10">
+			<!-- LOGO -->
+			<div class="flex flex-col items-center w-full mb-6">
+				<img src="{{ url_for('static', filename='assets/logo.webp') }}" class="w-10 h-10 rounded-full mb-1 shadow-xl opacity-90" alt="Logo">
+				<div class="flex w-full items-center my-1">
+					<div class="flex-grow border-t border-white/30"></div>
+					<p class="mx-4 text-white/80 font-semibold tracking-wider uppercase text-xs">GRAND VILLA LAGUNA</p>
+					<div class="flex-grow border-t border-white/30"></div>
 				</div>
-				
-				<!-- LOGIN FORM -->
-				<div id="loginForm" class="w-full flex flex-col items-center transition-all duration-500 ease-in-out opacity-100">
-					<img src="{{ url_for('static', filename='assets/user.png') }}" class="w-16 h-16" alt="Admin User Icon">
-					<h1 class="text-2xl font-bold mb-6">Admin Login</h1>
-
-					<form class="loginForm w-full flex flex-col gap-4">
-						<div class="relative">
-						<img src="{{ url_for('static', filename='assets/user.png') }}" width="28" class="absolute top-4 right-4" alt="Username Icon">
-						<input type="text" placeholder="Username" name="username" required class="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-4 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"/>
-						</div>
-
-						<div class="passField relative">
-							<img src="{{ url_for('static', filename='assets/pass.png') }}" width="25" class="absolute top-4 right-4" alt="Password Icon">
-							<input type="password" name="password" placeholder="Password" required class="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-4 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"/>
-						</div>
-
-						<a id="forgotLink" class="self-end text-gray-500 text-sm hover:text-blue-600 underline cursor-pointer">Forgot password?</a>
-
-						<button type="submit" class="bg-primary-blue hover:bg-blue-600 text-white font-semibold py-3 rounded-full w-full mt-4 transition">Login</button>
-					</form>
-
-					<div class="flex flex-col items-center mt-4">
-						<p class="text-gray-700 font-normal mb-2 text-xs tracking-wide">Resort Social Media's:</p>
-						
-						<div class="flex gap-4 justify-center items-center">
-							<a href=" https://www.facebook.com/grandvillalaguna" target="_blank" rel="noopener" class="transform transition duration-300 hover:scale-110 hover:shadow-lg rounded-full">
-								<img src="{{ url_for('static', filename='assets/fbs.png') }}" class="w-10 h-10 rounded-full" alt="Facebook Icon">
-							</a>
-							<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09" target="_blank" rel="noopener" class="transform transition duration-300 hover:scale-110 hover:shadow-lg rounded-full">
-								<img src="{{ url_for('static', filename='assets/twitter.png') }}" class="w-8 h-8 rounded-full" alt="Twitter Icon">
-							</a>
-							<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw" target="_blank" rel="noopener" class="transform transition duration-300 hover:scale-110 hover:shadow-lg rounded-full">
-								<img src="{{ url_for('static', filename='assets/insta.avif') }}" class="w-10 h-10 rounded-full" alt="Instagram Icon">
-							</a>
-						</div>
-					</div>
-				
-				</div>
-
-				<!-- FORGOT PASSWORD FORM -->
-				<div id="forgotForm" class="hidden w-full flex flex-col items-center gap-4 transition-all duration-500 ease-in-out opacity-0">
-					<div class="flex flex-col items-center justify-center">
-						<img src="{{ url_for('static', filename='assets/user.png') }}" class="w-16 h-16" alt="Admin User Icon">
-						<h2 class="text-xl font-bold mb-2 text-gray-800 dark:text-gray-100">Forgot Password</h2>
-						<p class="text-sm text-center text-gray-500 mb-4">Enter your email and we’ll send a verification code to reset your password.</p>
-					</div>
-					<div class="flex gap-2 w-full">
-					<input type="email" placeholder="Enter your email" name="email" class="flex-1 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition" required />
-					<button type="button" id="get_code" class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-medium transition">Get Code</button>
-					</div>
-
-					<input type="text" name="code" maxlength="6" placeholder="Enter 6-digit code" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition" required />
-
-					<button type="button" id="link-change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full mt-4 transition">Continue</button>
-
-					<p class="text-center text-sm text-gray-500 mt-2">Remember your password? <span id="backToLogin" class="text-blue-600 hover:underline cursor-pointer">Login</span></p>
-				</div>
-
-				<!-- CHANGE PASSWORD FORM -->
-				<div id="changePasswordForm" class="hidden w-full flex flex-col items-center gap-4 transition-all duration-500 ease-in-out opacity-0">
-					<div class="flex flex-col items-center justify-center">
-						<img src="{{ url_for('static', filename='assets/user.png') }}" class="w-16 h-16" alt="Admin User Icon">
-						<h2 class="text-xl font-bold mb-2 text-center text-gray-800 dark:text-gray-100">Change Password</h2>
-						<p class="text-sm text-center text-gray-500 mb-4">Update your account password securely below.</p>
-					</div>
-
-					<input type="password" name="new_password" placeholder="Enter new password" required class="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition"/>
-					<div class="flex items-start w-full -mt-2">
-						<label class="text-sm text-gray-500 flex items-center gap-2"><input type="checkbox" name="show_change_pass" id="showPassword">Show Password</label>
-					</div>
-					
-					<button type="submit" id="change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full mt-2 transition">Continue</button>
-					<p class="text-center text-sm text-gray-500 mt-2">Remember your password? <span id="backToLogin2" class="text-blue-600 hover:underline cursor-pointer">Login</span></p>
-				</div>
-
 			</div>
+			
+			<!-- LOGIN FORM -->
+			<div id="loginForm" class="w-full flex flex-col items-center transition-all duration-500 ease-in-out opacity-100">
+				<form class="loginForm w-full flex flex-col gap-4">
+					<div class="flex flex-col items-center justify-center">
+						<img src="{{ url_for('static', filename='assets/admin.png') }}" class="w-16 h-16 opacity-90" alt="Admin User Icon">
+						<h1 class="text-2xl font-bold mb-6 text-white">Admin Login</h1>
+					</div>
+
+					<!-- Username -->
+					<div class="relative">
+						<img src="{{ url_for('static', filename='assets/admin.png') }}" width="30" class="absolute top-3 right-3.5 z-10"alt="Username Icon">
+						<input type="text" name="username" required placeholder="Username" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-md text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+					</div>
+				
+					<!-- Password -->
+					<div class="passField relative">
+						<img src="{{ url_for('static', filename='assets/pass.png') }}" width="25" class="absolute top-3.5 right-4 z-10" alt="Password Icon">
+						<input type="password" name="password" required placeholder="Password" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-md text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+					</div>
+
+					<a id="forgotLink" class="self-end text-white/70 text-sm hover:text-blue-400 underline cursor-pointer">Forgot password?</a>
+					<button type="submit" class="bg-primary-blue hover:bg-blue-600 text-white font-semibold py-3 rounded-full w-full mt-4 transition">Login</button>
+				</form>
+			
+				<!-- Socials -->
+				<div class="flex flex-col items-center mt-4">
+					<p class="text-white/70 mb-2 text-xs tracking-wide">Resort Social Media's:</p>
+					<div class="flex gap-4 justify-center items-center">
+						<a href="https://www.facebook.com/grandvillalaguna" target="_blank" class="transform transition hover:scale-110 hover:shadow-lg rounded-full">
+							<img src="{{ url_for('static', filename='assets/fbs.png') }}" class="w-6 h-6 rounded-full opacity-90">
+						</a>
+					
+						<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09" target="_blank" class="transform transition hover:scale-110 hover:shadow-lg rounded-full">
+							<img src="{{ url_for('static', filename='assets/twitter.png') }}" class="w-6 h-6 rounded-full opacity-90">
+						</a>
+					
+						<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw" target="_blank" class="transform transition hover:scale-110 hover:shadow-lg rounded-full">
+							<img src="{{ url_for('static', filename='assets/insta.png') }}" class="w-6 h-6 rounded-full opacity-90">
+						</a>
+					</div>
+				</div>
+			</div>
+			
+			<!-- FORGOT PASSWORD -->
+			<div id="forgotForm" class="hidden w-full flex flex-col items-center gap-4 transition-all duration-500 ease-in-out opacity-0">
+				<div class="flex flex-col items-center justify-center">
+					<img src="{{ url_for('static', filename='assets/forgot.png') }}" class="w-16 h-16 opacity-90" alt="Admin User Icon">
+					<h1 class="text-2xl font-bold mb-6 text-white">Forgot Password</h1>
+				</div>
+				
+				<p class="text-sm text-center text-white/70">Enter your email and we’ll send a verification code.</p>
+				<div class="flex gap-2 w-full">
+					<input type="email" name="email" required placeholder="Enter your email" class="flex-1 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+					<button id="get_code" class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-medium transition">Get Code</button>
+				</div>
+				<input type="text" name="code" maxlength="6" required placeholder="Enter 6-digit code" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+				<button id="link-change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full mt-4 transition">Continue</button>
+				<p class="text-sm text-white/70 mt-2 flex gap-1 items-center">Remember your password?<span id="backToLogin" class="text-blue-400 hover:underline cursor-pointer">Login</span></p>
+			</div>
+			
+			<!-- CHANGE PASSWORD -->
+			<div id="changePasswordForm" class="hidden w-full flex flex-col items-center gap-1 transition-all duration-500 ease-in-out opacity-0">
+				<div class="flex flex-col items-center justify-center">
+					<img src="{{ url_for('static', filename='assets/change.png') }}" class="w-16 h-16 opacity-90" alt="Admin User Icon">
+					<h1 class="text-2xl font-bold mb-6 text-white">Change Password</h1>
+				</div>
+
+				<input type="password" name="new_password" required placeholder="Enter new password" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+				<label class="text-sm text-white/70 flex items-center gap-2 w-full"><input type="checkbox" id="showPassword">Show Password</label>
+				<button id="change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full transition mt-6">Update</button>
+				<p class="text-sm text-white/70">Remember your password?<span id="backToLogin2" class="text-blue-400 hover:underline cursor-pointer">Login</span></p>
+			</div>
+			
 		</div>
-
 	</div>
-
+	
 
 <div id="loadingPortal"></div>
 <div id="messagePortal"></div>

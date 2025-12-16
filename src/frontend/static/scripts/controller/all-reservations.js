@@ -291,7 +291,6 @@ function renderEditReservedModal(id, check_in, check_out, booking_type){
                         <form id="update-reserved-form">
                               <div class="flex flex-col gap-6 mt-2">
                                     <input type="hidden" name="id" value="${id}">
-                                    <input type="hidden" name="booking_type" value="${booking_type}">
                                     <div class="flex flex-col gap1 text-gray-600 dark:text-gray-200">
                                           Edit Check-In:
                                           <input type="date" name="edit_checkin" class="border border-gray-300 text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_in}">
@@ -870,7 +869,7 @@ async function renderViewReservationDetails(id){
                                                 <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${paid_date}</div>
                                           </div>
                                           <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Payment Method</p>
+                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Payment ${result.data.payment === 'None' | result.data.payment === "Refunded" ? 'Status' : 'Method'}</p>
                                                 <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.payment}</div>
                                           </div>
                                           <div>
@@ -888,7 +887,7 @@ async function renderViewReservationDetails(id){
                                           </div>
                                           <div>
                                                 <p class="text-gray-600 dark:text-gray-400 font-normal">Area Affected</p>
-                                                <div class="max-h-20 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.promo_area}</div>
+                                                <div class="max-h-20 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.promo_area.split(',').map(acc => acc.trim()).join(', ')}</div>
                                           </div>
                                     </div>
 

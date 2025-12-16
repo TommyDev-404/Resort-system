@@ -1,7 +1,10 @@
 import pymysql
 from datetime import date
+import psutil, os, time
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
 from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
+
+process = psutil.Process(os.getpid())
 
 app = Flask(__name__, template_folder='frontend/template', static_folder='frontend/static')
 app.secret_key = 'i_love_u'  # secret key
@@ -373,6 +376,10 @@ def update_promo():
 def get_all_promo():
       return jsonify(rev.get_promo_data())
 
+@app.route('/get-promo', methods=['GET'])
+def get_promo():
+      return jsonify(rev.get_promo_data(request.args.get('id')))
+
 @app.route('/remove-promo', methods=['DELETE'])
 def remove_promo():
       return jsonify(rev.remove_promo(request.args.get('id'), request.args.get('area_promos')))
@@ -472,6 +479,13 @@ def logout():
       session.clear()
       return redirect(url_for('login_page'))
 
+"""
+@app.after_request
+def log_memory_usage(response):
+      mem = process.memory_info().rss / (1024 * 1024)
+      print(f"[MEMORY] {mem:.2f} MB")
+      return response
+"""
 
 if __name__ == '__main__':
       app.run(debug=True)

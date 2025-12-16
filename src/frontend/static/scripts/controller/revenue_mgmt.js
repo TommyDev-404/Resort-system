@@ -43,56 +43,225 @@ function failedMessageCard(message){
       });
 }
 
-function createRow(id, date, promo_name, discount, area, end, status){
-      const all_area = {
-            'Premium': 'Premium Villa Room',
-            'Standard': 'Standard Villa Room',
-            'Family': 'Family Room',
-            'Barkada': 'Barkada Room',
-            'Garden': 'Garden View Room',
-            'Cabana': 'Cabana Cottage',
-            'Small': 'Small Cottage',
-            'Big': 'Big Cottage',
-            'Hall': 'Hall'
-      }
-
-      const areas_under_promo = area.split(',').map(a => a.trim()); // promo areas as array
-      const all_area_keys = Object.keys(all_area); // ['Premium', 'Standard', ...]
-
-      // Check if all areas are under promo
-      let formatted_area_name;
-      if (all_area_keys.every(key => areas_under_promo.includes(key))) {
-          formatted_area_name = ['All Areas']; // just display "All Areas"
-      } else {
-            formatted_area_name = areas_under_promo.map(a => all_area[a] || a);
-      }
-
+function createpromoListRow(id, promo_name, promo_start, promo_end, area){
       const row = `
-            <tr class="text-center bg-gray-50 dark:bg-white/2 hover:bg-black/5 text-gray-700 dark:text-gray-100 dark:hover:bg-white/5 border-b border-gray-300 dark:border-gray-700 transition fade-in-up text-sm" data-id=${id}>
-                  <td class="py-3 px-2">${date}</td>
-                  <td class="py-3 px-2">${end}</td>
-                  <td class="py-3 px-2 font-medium ">${promo_name}</td>
-                  <td class="py-3 px-2 text-center">${discount}</td>
-                  <td class="py-3 px-2">${formatted_area_name.join(', ')}</td>
-                  <td class="py-3 px-2 text-center"><span class="inline-block text-white font-semibold text-sm px-3 py-1 rounded-full ${status === 'Active' ? 'bg-green-500' : status == 'Upcoming' ? 'bg-blue-500' : 'bg-orange-500'} shadow-md">${status}</span></td>
-                  <td class="flex gap-2 items-center justify-center py-3 px-2">
-                        <button id="update-promo" class="bg-teal-500 hover:bg-teal-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 items-center justify-center cursor-pointer">
-                              <i data-lucide="eye" class="text-white text-lg"></i>
+            <li data-id="${id}" data-area="${area}"  class="p-4 rounded-xl bg-gray-50 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-md flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:scale-101">
+                  <div>
+                        <div class="flex items-center gap-2">
+                              <span class="font-semibold text-lg text-gray-900 dark:text-gray-100">${promo_name}</span>
+                        </div>
+                  
+                        <div class="text-sm text-gray-500 dark:text-gray-400">${promo_start} - ${promo_end}</div>
+                  </div>
+                  
+                  <div class="flex gap-2">
+                        <button id="viewPromoInfo" class="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-gray-700 rounded-lg">
+                              <i data-lucide="eye"></i>
                         </button>
-                        <button id="remove-promo" class="bg-red-500 hover:bg-red-600 py-2 px-3 rounded-sm text-white text-sm flex gap-2 items-center justify-center cursor-pointer">
-                              <i data-lucide="trash" class="text-white text-lg"></i>
+                  
+                        <button id="updatePromoInfo" class="p-2 text-yellow-500 hover:bg-yellow-100 dark:hover:bg-gray-700 rounded-lg">
+                              <i data-lucide="edit">edit</i>
                         </button>
-                  </td>
-            </tr>
+                  
+                        <button id="removePromoInfo" class="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-gray-700 rounded-lg">
+                              <i data-lucide="trash-2"></i>
+                        </button>
+                  </div>
+            </li>
       `;
 
-      document.getElementById('promo-tbody').innerHTML += row;
+      document.getElementById('promoList').innerHTML += row; 
       lucide.createIcons();
 }
 
-function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_affected){
+function selectAllAreas(e){
+      const checkboxes = document.querySelectorAll(".area-checkbox");
+      checkboxes.forEach(cb => cb.checked = e.target.checked);
+}
+
+function resetToAddPromoForm() {
+      const promoModal = document.querySelector('.promoModal');
+      const formTitle = promoModal.querySelector('h3');
+      formTitle.textContent = 'Add New Promotion';
+      
+      const promoForm = promoModal.querySelector('form');
+      promoForm.id = 'promosForm';
+      promoForm.querySelector('input[name="id"]')?.remove();
+      promoForm.querySelector('input[name="prev_area"]')?.remove();
+      promoForm.reset();      
+}
+
+async function applyPromo(e) {
+      e.preventDefault();
+      const form = new FormData(e.target);
+
+      let area_list = [];
+      document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value) });
+      form.append('area_list', area_list);
+      
+      const response = await fetch('/promo', {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(Object.fromEntries(form.entries()))
+      });
+      const res = await response.json();
+
+      if (res.success){
+            successMessageCard(res.message);
+            e.target.reset();
+            getAllPromo();
+            notifications();
+      }else{
+            failedMessageCard(res.message);
+      }
+}
+
+async function updatePromo(e) {
+      e.preventDefault();
+      const form = new FormData(e.target);
+
+      let area_list = [];
+      document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value)});
+      form.append('area_list', area_list);
+      
+      const response = await fetch('/update-promo', {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(Object.fromEntries(form.entries()))
+      });
+      const res = await response.json();
+
+      if (res.success){
+            successMessageCard(res.message);
+            e.target.reset();
+            resetToAddPromoForm();
+            getAllPromo();
+            notifications();
+      }else{
+            failedMessageCard(res.message);
+      }
+}
+
+async function getAllPromo() {
+      const response = await fetch('/get-all-promo');
+      const res = await response.json();
+      
+      document.querySelectorAll('ul li').forEach(row => row.remove());      
+      if (res.success){
+            res.data.forEach(row => {
+                  const start = new Date(row.date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+                  const end = new Date(row.end_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+                  let discount = row.name.split('-');
+
+                  createpromoListRow(row.id, discount[0], start, end, row.area);
+            });
+      }else{
+            const empty_row = `
+                  <li class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800 shadow-lg flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:scale-101">
+                        <div>
+                              <div id="name" class="font-medium text-gray-900 dark:text-gray-100">No promotions.</div>
+                        </div>
+                  </li>
+            `;
+            
+            document.getElementById('promoList').innerHTML += empty_row;
+      }
+}
+
+async function renderViewPromoDetails(id){
+      const response = await fetch(`/get-promo?id=${id}`);
+      const result = await response.json();
+
+      if (result.success){
+            const data = result.data;
+            const start = new Date(data.date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+            const end = new Date(data.end_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+            const areaNames = {
+                  "Barkada": "Barkada Room",
+                  "Family": "Family Room",
+                  "Garden": "Garden View Room",
+                  "Premium": "Premium Villa Room",
+                  "Standard": "Standard Villa Room",
+                  "Cabana": "Cabana Cottage",
+                  "Small": "Small Cottage",
+                  "Big": "Big Cottage",
+                  "Hall": "Hall"
+            };
+
+            const modal = `
+                  <div id="promo-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                        <div class="relative w-full max-w-3xl bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden ">
+
+                              <!-- Header -->
+                              <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">${data.name.split('-')[0].trim()} Details</h2>
+                                    <span id="close-promo" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 text-2xl font-bold transition cursor-pointer">&times;</span>
+                              </div>
+
+                              <!-- Body -->
+                              <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    <div class="space-y-2 md:col-span-1">
+                                          <div>
+                                                <p class="text-gray-600 dark:text-gray-400 font-normal text-sm">Promo Name</p>
+                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${data.name.split('-')[0].trim()}</div>
+                                          </div>
+                                          <div>
+                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Discount (%)</p>
+                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${data.discount}</div>
+                                          </div>
+                                    </div>
+
+                                    <!-- Schedule Info -->
+                                    <div class="space-y-2 md:col-span-1">
+                                          <div>
+                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Started</p>
+                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${start}</div>
+                                          </div>
+                                          <div>
+                                                <p class="text-gray-600 dark:text-gray-400 font-normal">End</p>
+                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${end}</div>
+                                          </div>
+                                    </div>
+                                    
+                                    <div class="md:col-span-2 space-y-2">
+                                          <h3 class="text-sm font-normal text-gray-700 dark:text-gray-300">Status</h3>
+                                          <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${data.status}</div>
+                                    </div>
+
+                                    <!-- Accommodations -->
+                                    <div class="md:col-span-2 space-y-2">
+                                          <h3 class="text-sm font-normal text-gray-700 dark:text-gray-300">Area Applied</h3>
+                                          <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${data.area.split(',').map(acc => areaNames[acc.trim()]).join(', ')}</div>
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
+            `;
+
+            document.getElementById('promoModalPortal').innerHTML += modal; 
+      }else{
+            alert(result.message);
+      }
+}
+
+async function renderDataToUpdatePromo(e){
+      const ul = e.target.closest('li');
+      const id = ul.getAttribute('data-id');
+      
+      const response = await fetch(`/get-promo?id=${id}`);
+      const res = await response.json();
+
+      const data = res.data;
+       // Extract values from td cells
+      const promo_name = data.name.split('-')[0].trim();
+      const discount = data.discount;
+      const start = formatDate(new Date(data.date));
+      const end = formatDate(new Date(data.end_date));
+      const area_affected = data.area;
+
+      // start filling the form
       const isChecked = (value) => {
-            return area_affected.split(',').map(area => area.trim().split(' ')[0]).includes(value) ? 'checked' : '';
+            return area_affected.split(',').map(area => area.trim().split(' ')[0]).includes(value) ? true : false;
       };
 
       const all_area = {
@@ -118,296 +287,35 @@ function renderUpdatePromo(id, promo_name, discount, start_date, end_date, area_
             isSelectedAll = false;
       }
 
-      const modal = `
-            <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" id="update-promo-overlay">
-                  <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl p-6 animate-fade-in-up relative border border-white/20">
-                  
-                        <!-- Close Button -->
-                        <span id="close-update-promo-modal" class="absolute right-4 top-4 text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white transition text-2xl cursor-pointer">&times;</span>
-                  
-                        <!-- Header -->
-                        <div class="flex items-center justify-center gap-2 mb-6">
-                              <i data-lucide="percent" class="w-6 h-6 text-primary-blue"></i>
-                              <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Update Promotion</h3>
-                        </div>
-                  
-                        <form id="updatePromosForm" class="space-y-6">
-                              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <input type="hidden" name="id" value="${id}">
-                                    <input type="hidden" name="prev_area" value="${area_affected}">
-                                    
-                                    <!-- Promotion Name -->
-                                    <div>
-                                          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Promotion Name</label>
-                                          <input type="text" id="promo_name" name="promo_name" value="${promo_name}" required  class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
-                                    </div>
-                  
-                                    <!-- Discount Rate -->
-                                    <div>
-                                          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Discount Rate (%)</label>
-                                          <input type="number" id="promo_rate" name="promo_rate" value="${Number(discount)}" required  class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
-                                    </div>
-                  
-                                    <!-- Start Date -->
-                                    <div>
-                                          <label class="date-icon block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                                          <input type="date" name="date" required  value="${start_date}"   class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
-                                    </div>
-                  
-                                    <!-- End Date -->
-                                    <div>
-                                          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                                          <input type="date" name="end_date" required value="${end_date}"   class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
-                                    </div>
-                              </div>
+      const promoModal = document.querySelector('.promoModal');
+      const formTitle = promoModal.querySelector('h3');
+      formTitle.textContent = 'Update Promotion';
 
-                              <div class="bg-gray-100 dark:bg-gray-800 p-5 rounded-xl border border-gray-300 dark:border-gray-700">
-                                    <!-- Select All Row -->
-                                    <div class="flex justify-between items-center mb-4">
-                                          <h2 class="font-semibold text-lg text-gray-900 dark:text-white">Areas to Apply Promotion</h2>
-                                          <label class="flex items-center gap-2 text-sm cursor-pointer text-gray-700 dark:text-gray-300"><input type="checkbox" id="selectAllCheckbox" ${isSelectedAll ? 'checked' : ''} class="w-4 h-4">Select All</label>
-                                    </div>
+      const promoForm = promoModal.querySelector('form');
+      promoForm.id = 'updatePromosForm';
 
-                                    <!-- Checkbox Grid -->
-                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                          <!-- Each checkbox item -->
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Premium" ${isChecked('Premium')} class="area-checkbox w-4 h-4">Premium Villa Room</label>
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Standard" ${isChecked('Standard')} class="area-checkbox w-4 h-4">Standard Villa Room</label>
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Garden" ${isChecked('Garden')} class="area-checkbox w-4 h-4">Garden View Room</label>
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Barkada" ${isChecked('Barkada')} class="area-checkbox w-4 h-4">Barkada Room</label>
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Family" ${isChecked('Family')}  class="area-checkbox w-4 h-4">Family Room</label>
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Cabana" ${isChecked('Cabana')}  class="area-checkbox w-4 h-4">Cabana Cottage</label>
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Small" ${isChecked('Small')} class="area-checkbox w-4 h-4">Small Cottage</label>
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Big" ${isChecked('Big')} class="area-checkbox w-4 h-4">Big Cottage</label>
-                                          <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white"><input type="checkbox" name="areas_promo" value="Hall"${isChecked('Hall')}  class="area-checkbox w-4 h-4">Hall</label>
-                                    </div>
-                              </div>
-
-                              <!-- Submit Button -->
-                              <button type="submit" class="w-full bg-primary-blue hover:bg-blue-700 text-white py-3 rounded-xl font-semibold shadow-md transition text-lg">Update Promotion</button>
-                        </form>
-                  </div>
-            </div>
+      const hiddenInputs = `
+            <input type="hidden" name="id" value="${id}">
+            <input type="hidden" name="prev_area" value="${area_affected}">
       `;
 
-      document.getElementById('promoModalPortal').innerHTML += modal;
-}
+      promoForm.innerHTML += hiddenInputs;
 
-function renderAddPromoModal(){
-      const modal = `
-            <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" id="promo-overlay">
-                  <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl p-6 animate-fade-in-up relative border border-white/20">
-                  
-                        <!-- Close Button -->
-                        <span id="close-promo-modal" class="absolute right-4 top-4 text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white transition text-2xl cursor-pointer">&times;</span>
-                  
-                        <!-- Header -->
-                        <div class="flex items-center justify-center gap-2 mb-6">
-                              <i data-lucide="percent" class="w-6 h-6 text-primary-blue"></i>
-                              <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Add Promotion</h3>
-                        </div>
-                  
-                        <form id="promosForm" class="space-y-6">
-                  
-                              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  
-                                    <!-- Promotion Name -->
-                                    <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Promotion Name</label>
-                                    <input type="text" id="promo_name" name="promo_name" required
-                                          class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
-                                    </div>
-                  
-                                    <!-- Discount Rate -->
-                                    <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Discount Rate (%)</label>
-                                    <input type="number" id="promo_rate" name="promo_rate" required
-                                          class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
-                                    </div>
-                  
-                                    <!-- Start Date -->
-                                    <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                                    <input type="date" name="date" required class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
-                                    </div>
-                  
-                                    <!-- End Date -->
-                                    <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                                    <input type="date" name="end_date" required  class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
-                                    </div>
-                              </div>
-
-                              <div class="bg-gray-100 dark:bg-gray-800 p-5 rounded-xl border border-gray-300 dark:border-gray-700">
-                                    <!-- Select All Row -->
-                                    <div class="flex justify-between items-center mb-4">
-                                    <h2 class="font-semibold text-lg text-gray-900 dark:text-white">Areas to Apply Promotion</h2>
-                  
-                                    <!-- Select All Checkbox -->
-                                    <label class="flex items-center gap-2 text-sm cursor-pointer text-gray-700 dark:text-gray-300"><input type="checkbox" id="selectAllCheckbox" class="w-4 h-4">Select All</label>
-                              </div>
-                  
-                                    <!-- Checkbox Grid -->
-                              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    <!-- Each checkbox item -->
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Premium" class="area-checkbox w-4 h-4">
-                                          Premium Villa Room
-                                    </label>
-                  
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Standard" class="area-checkbox w-4 h-4">
-                                          Standard Villa Room
-                                    </label>
-                  
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Garden" class="area-checkbox w-4 h-4">
-                                          Garden View Room
-                                    </label>
-                  
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Barkada" class="area-checkbox w-4 h-4">
-                                          Barkada Room
-                                    </label>
-                  
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Family" class="area-checkbox w-4 h-4">
-                                          Family Room
-                                    </label>
-                  
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Cabana" class="area-checkbox w-4 h-4">
-                                          Cabana Cottage
-                                    </label>
-                  
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Small" class="area-checkbox w-4 h-4">
-                                          Small Cottage
-                                    </label>
-                  
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Big" class="area-checkbox w-4 h-4">
-                                          Big Cottage
-                                    </label>
-                  
-                                    <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
-                                          <input type="checkbox" name="areas_promo" value="Hall" class="area-checkbox w-4 h-4">
-                                          Hall
-                                    </label>
-                                    </div>
-                              </div>
-                  
-                              <!-- Submit Button -->
-                              <button type="submit" class="w-full bg-primary-blue hover:bg-blue-700 text-white py-3 rounded-xl font-semibold shadow-md transition text-lg">Save Promotion</button>
-                        </form>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('promoModalPortal').innerHTML += modal;
-}
-
-function selectAllAreas(e){
-      const checkboxes = document.querySelectorAll(".area-checkbox");
-      checkboxes.forEach(cb => cb.checked = e.target.checked);
-}
-
-async function applyPromo(e) {
-      e.preventDefault();
-      const form = new FormData(e.target);
-
-      let area_list = [];
-      document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value) });
-      form.append('area_list', area_list);
+      const promoName = document.querySelector('input[name="promo_name"]');
+      const promoDiscount = document.querySelector('input[name="promo_rate"]');
+      const promoStart = document.querySelector('input[name="date"]');
+      const promoEnd = document.querySelector('input[name="end_date"]');
+      const selectAllAreaCheckbox = document.querySelector('#selectAllCheckbox');
+      const areas = document.querySelectorAll('input[name="areas_promo"]');
       
-      console.log(Object.fromEntries(form.entries()));
-      const response = await fetch('/promo', {
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(Object.fromEntries(form.entries()))
+      promoName.value = promo_name;
+      promoDiscount.value = discount;
+      promoStart.value = start;
+      promoEnd.value = end;
+      selectAllAreaCheckbox.checked = isSelectedAll ? true : false;
+      areas.forEach(area => {
+            area.checked = isChecked(area.value);
       });
-      const res = await response.json();
-
-      if (res.success){
-            successMessageCard(res.message);
-            e.target.reset();
-            document.querySelector('#promo-overlay').remove();
-            getAllPromo();
-            notifications();
-      }else{
-            failedMessageCard(res.message);
-      }
-}
-
-async function updatePromo(e) {
-      e.preventDefault();
-      const form = new FormData(e.target);
-
-      let area_list = [];
-      document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value)});
-      form.append('area_list', area_list);
-
-      const response = await fetch('/update-promo', {
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(Object.fromEntries(form.entries()))
-      });
-      const res = await response.json();
-
-      if (res.success){
-            successMessageCard(res.message);
-            e.target.reset();
-            document.querySelector('#update-promo-overlay').remove();
-            getAllPromo();
-            notifications();
-      }else{
-            failedMessageCard(res.message);
-      }
-}
-
-async function getAllPromo() {
-      const response = await fetch('/get-all-promo');
-      const res = await response.json();
-      
-      document.querySelectorAll('#promo-tbody tr').forEach(row => row.remove());
-      if (res.success){
-            res.data.forEach(row => {
-                  const start = new Date(row.date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
-                  const end = new Date(row.end_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
-                  let discount = row.name.split('-');
-
-                  createRow(row.id, start, discount[0], discount[1], row.area, end, row.status)
-            });
-      }else{
-            const empty_row = `
-                  <tr id="no-promo-row" class="dark:hover:bg-white/3 dark:bg-white/5 bg-gray-50 hover:bg-black/6 text-sm">
-                        <td colspan="7" class="text-center text-gray-800 dark:text-white py-4">No promotions yet.</td>
-                  </tr>
-            `;
-            
-            document.getElementById('promo-tbody').innerHTML += empty_row;
-      }
-}
-
-async function renderDataToUpdatePromo(e){
-      const tr = e.target.closest('tr');
-      const id = tr.getAttribute('data-id');
-      const td = tr.querySelectorAll('td');
-      
-      const response = await fetch(`/get-promo-area-data?id=${id}`);
-      const res = await response.json();
-
-       // Extract values from td cells
-      const promo_name = td[2].textContent.trim();
-      const discount = td[3].textContent.trim().replace('%', '');
-      const startDate = new Date(td[0].textContent.trim());
-      const endDate = new Date(td[1].textContent.trim());
-      const area_affected = res.data;
-      
-      const new_start = formatDate(startDate);
-      const new_end = formatDate(endDate);
-      
-      renderUpdatePromo(id, promo_name, discount, new_start, new_end, area_affected);
 }
 
 // Format back to YYYY-MM-DD
@@ -419,15 +327,16 @@ function formatDate(date) {
 }
 
 async function removePromo(e){
-      const tr = e.target.closest('tr');
+      const tr = e.target.closest('li');
       const id = tr.getAttribute('data-id');
-      const td = tr.querySelectorAll('td');
+      const area = tr.getAttribute('data-area');
+      console.log(area);
       
       let area_affected = null;
-      if (td[4].textContent.trim() === 'All Areas'){
+      if (area === 'All Areas'){
             area_affected = 'Premium Villa Room, Standard Villa Room, Family Room, Barkada Room, Garden View Room, Cabana Cottage, Small Cottage, Big Cottage, Hall';
       }else{
-            area_affected = td[4].textContent.trim();
+            area_affected = area;
       }
             
       const response = await fetch(`/remove-promo?id=${id}&area_promos=${area_affected}`, {
@@ -454,11 +363,10 @@ document.addEventListener('submit', (e) => {
 
 // click
 document.addEventListener('click', (e) => {     
-      if(e.target.closest('#update-promo')) renderDataToUpdatePromo(e);
-      if(e.target.closest('#remove-promo')) removePromo(e);
-      if(e.target.matches('#add-promo')) renderAddPromoModal();
-      if(e.target.matches('#close-promo-modal')) document.querySelector('#promo-overlay').remove();
-      if(e.target.matches('#close-update-promo-modal')) document.querySelector('#update-promo-overlay').remove();
+      if(e.target.closest('#viewPromoInfo')) renderViewPromoDetails(e.target.closest('li').getAttribute('data-id'));
+      if(e.target.closest('#removePromoInfo')) removePromo(e);
+      if(e.target.closest('#updatePromoInfo')) renderDataToUpdatePromo(e);
+      if(e.target.closest('#close-promo')) document.querySelector('#promo-overlay').remove();
 });
 
 document.addEventListener("change", (e) => {

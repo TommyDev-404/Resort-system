@@ -1139,40 +1139,111 @@
 				</div>
 				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-25px]">Manages strategies and executing pricing and promotion decisions to achieve the optimal balance of occupancy and Average Daily Rate (ADR).</p>
 
-                        <div class="space-y-6">
-                              <div class="flex justify-start">
-                                    <button id="add-promo" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[16px] py-2 px-6 rounded-md shadow-md flex items-center gap-2 transition-all duration-200">
-                                          <i data-lucide="plus"></i> Add Promotion
-                                    </button>
-                              </div>
-                              
-                              <div class="bg-white dark:bg-gray-900 rounded-sm shadow p-4 w-full h-[63vh] flex flex-col border border-gray-300 dark:border-gray-700">
-                                    <h1 class="text-gray-700 dark:text-gray-100 font-semibold text-lg mb-4 text-center">Recent Promotions Applied</h1>
-                                    <div class="overflow-x-auto overflow-y-auto flex-1">
-                                          <table class="min-w-full border-collapse">
-                                                <colgroup>
-                                                      <col style="width: 120px;"> <!-- Date -->
-                                                      <col style="width: 120px;"> <!-- End -->
-                                                      <col style="width: 300px;"> <!-- Promo Name -->
-                                                      <col style="width: 80px;"> <!-- Discount -->
-                                                      <col style="width: 500px;"> <!-- Applied Rooms -->
-                                                      <col style="width: 120px;"> <!-- Status -->
-                                                      <col style="width: 140px;"> <!-- Action -->
-                                                </colgroup>
-                                                <thead >
-                                                      <tr class="bg-gray-800 dark:bg-white/20 text-white">
-                                                            <th class="py-3 px-2 font-semibold">Start</th>
-                                                            <th class="py-3 px-2 font-semibold ">End</th>
-                                                            <th class="py-3 px-2 font-semibold ">Promotion Name</th>
-                                                            <th class="py-3 px-2 font-semibold">Discount%</th>
-                                                            <th class="py-3 px-2 font-semibold">Applied Rooms</th>
-                                                            <th class="py-3 px-2 font-semibold ">Status</th>
-                                                            <th class="py-3 px-2 font-semibold">Action</th>
-                                                      </tr>
-                                                </thead>
-                                                <tbody id="promo-tbody"></tbody>
-                                          </table>
+                        <div class="space-y-6 grid grid-cols-7">
+                              <div class="promoModal bg-white dark:bg-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl p-6 animate-fade-in-up relative border border-white/20 col-span-4">
+                                    <!-- Header -->
+                                    <div class="flex items-center justify-center gap-2 mb-6">
+                                          <i data-lucide="percent" class="w-6 h-6 text-primary-blue"></i>
+                                          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Add Promotion</h3>
                                     </div>
+                              
+                                    <form id="promosForm" class="space-y-6">
+                                          
+                                          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                <!-- Promotion Name -->
+                                                <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Promotion Name</label>
+                                                <input type="text" id="promo_name" name="promo_name" required
+                                                      class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
+                                                </div>
+                              
+                                                <!-- Discount Rate -->
+                                                <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Discount Rate (%)</label>
+                                                <input type="number" id="promo_rate" name="promo_rate" required
+                                                      class="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
+                                                </div>
+                              
+                                                <!-- Start Date -->
+                                                <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+                                                <input type="date" name="date" required class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
+                                                </div>
+                              
+                                                <!-- End Date -->
+                                                <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
+                                                <input type="date" name="end_date" required  class="date-icon mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-3 focus:ring-primary-blue focus:border-primary-blue transition">
+                                                </div>
+                                          </div>
+            
+                                          <div class="bg-gray-100 dark:bg-gray-800 p-5 rounded-xl border border-gray-300 dark:border-gray-700">
+                                                <!-- Select All Row -->
+                                                <div class="flex justify-between items-center mb-4">
+                                                <h2 class="font-semibold text-lg text-gray-900 dark:text-white">Areas to Apply Promotion</h2>
+                              
+                                                <!-- Select All Checkbox -->
+                                                <label class="flex items-center gap-2 text-sm cursor-pointer text-gray-700 dark:text-gray-300"><input type="checkbox" id="selectAllCheckbox" class="w-4 h-4">Select All</label>
+                                          </div>
+                              
+                                                <!-- Checkbox Grid -->
+                                          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                                                <!-- Each checkbox item -->
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Premium" class="area-checkbox w-4 h-4">
+                                                      Premium Villa Room
+                                                </label>
+                              
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Standard" class="area-checkbox w-4 h-4">
+                                                      Standard Villa Room
+                                                </label>
+                              
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Garden" class="area-checkbox w-4 h-4">
+                                                      Garden View Room
+                                                </label>
+                              
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Barkada" class="area-checkbox w-4 h-4">
+                                                      Barkada Room
+                                                </label>
+                              
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Family" class="area-checkbox w-4 h-4">
+                                                      Family Room
+                                                </label>
+                              
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Cabana" class="area-checkbox w-4 h-4">
+                                                      Cabana Cottage
+                                                </label>
+                              
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Small" class="area-checkbox w-4 h-4">
+                                                      Small Cottage
+                                                </label>
+                              
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Big" class="area-checkbox w-4 h-4">
+                                                      Big Cottage
+                                                </label>
+                              
+                                                <label class="flex items-center gap-2 p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-green-200 dark:hover:bg-gray-700 transition text-gray-900 dark:text-white">
+                                                      <input type="checkbox" name="areas_promo" value="Hall" class="area-checkbox w-4 h-4">
+                                                      Hall
+                                                </label>
+                                                </div>
+                                          </div>
+                              
+                                          <!-- Submit Button -->
+                                          <button type="submit" class="w-full bg-primary-blue hover:bg-blue-700 text-white py-2 rounded-xl font-semibold shadow-md transition text-md">Save Promotion</button>
+                                    </form>
+                              </div>
+
+                              <div class="bg-white dark:bg-gray-900 rounded-sm shadow p-4 w-full h-[63vh] flex flex-col border border-gray-300 dark:border-gray-700 col-span-3">
+                                    <h1 class="text-gray-700 dark:text-gray-100 font-semibold text-lg mb-4 text-center border-b border-gray-300 dark:border-gray-600 pb-2">Recent Promotions Applied</h1>
+                                    <ul id="promoList" class="flex-1 overflow-y-auto space-y-2 p-3"></ul>
                               </div>
                         </div>
                   </section>

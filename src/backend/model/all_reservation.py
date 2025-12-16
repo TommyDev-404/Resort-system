@@ -460,8 +460,8 @@ class Reservation:
                               SUM(CASE WHEN status = 'Checked-in' AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS total_guests,
 
                               -- Check-Ins today
-                              COUNT(CASE WHEN status = 'Checked-in' AND booking_type = 'Check-in' AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
-                              SUM(CASE WHEN status = 'Checked-in' AND booking_type = 'Check-in' AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkin,
+                              COUNT(CASE WHEN status = 'Checked-in' AND booking_type IN ('Check-in', 'Reservation') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
+                              SUM(CASE WHEN status = 'Checked-in' AND booking_type IN ('Check-in', 'Reservation') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkin,
 
                               -- Check-Outs today
                               COUNT(CASE WHEN status = 'Checked-out' AND check_out = CURRENT_DATE THEN 1 END) AS bookings_checkout,
@@ -637,7 +637,8 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def update_reservation_date(self, id, edit_checkin, edit_checkout, booking_type):
+      def update_reservation_date(self, id, edit_checkin, edit_checkout):
+            print(id)
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -680,21 +681,15 @@ class Reservation:
                                     promo_start = None  # no promo today
 
                               if new_checkin < new_checkout:
-                                    # Loop night by night
+                                    # Handle revenue if promo applied
                                     day = new_checkin
-                                    while day < new_checkout:
-                                          print(day, new_checkout)
-                                          if promo_start and day >= promo_start:
-                                                print('promo Started')
-                                                promo_end = promo_data.get('end_date') if promo_data.get('end_date') else None
-                                                if promo_end and day > promo_end:
-                                                      print('promo end')
-                                                      nightly_rate = orig_rate
-                                                      print(nightly_rate)
+                                    while day < new_checkout: # loop until the day every night the guest stay
+                                          if promo_start and day >= promo_start: # if promo start today and checkin is before promo start
+                                                promo_end = promo_data.get('end_date') if promo_data.get('end_date') else None # get the date when the promo ends
+                                                if promo_end and day > promo_end: # if promo end and the check in is after it
+                                                      nightly_rate = orig_rate # add the original rate 
                                                 else:
-                                                      print('promo applied')
-                                                      nightly_rate = promo_rate
-                                                      print(nightly_rate)
+                                                      nightly_rate = promo_rate # get the promo rate
                                           else:
                                                 nightly_rate = orig_rate
                                                 

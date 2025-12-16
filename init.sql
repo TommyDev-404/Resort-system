@@ -271,7 +271,7 @@ BEGIN
     AND status = 'Checked-in';
 
     -- Update accomodation_spaces for rooms that just checked out
-    UPDATE accomodation_spaces a
+    UPDATE accomodation_spaces asrc/frontend/static/assets/social.png
     JOIN bookings b
         ON a.name = TRIM(SUBSTRING_INDEX(b.accomodations, ' ', 1))
         AND a.room = CAST(SUBSTRING_INDEX(b.accomodations, ' ', -1) AS UNSIGNED)

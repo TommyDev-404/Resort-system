@@ -270,7 +270,7 @@ class Dashboard:
                                     COALESCE(SUM(total_guest), 0) AS today_checkin_guests
                               FROM bookings
                               WHERE DATE(check_in) = CURRENT_DATE()
-                              AND booking_type = 'Check-in' AND status = 'Checked-in'
+                              AND booking_type IN ('Check-in', 'Reservation') AND status = 'Checked-in'
                         ),
 
                         today_checkout AS (

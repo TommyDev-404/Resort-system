@@ -655,7 +655,7 @@ async function showAllStaff(){
                   });
             }else{
                   const empty_row = `
-                        <li class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800 shadow-lg flex justify-between items-center">
+                        <li class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800 shadow-lg flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:scale-101">
                               <div>
                                     <div id="name" class="font-medium text-gray-900 dark:text-gray-100">No data.</div>
                               </div>
