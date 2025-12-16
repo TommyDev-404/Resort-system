@@ -55,11 +55,11 @@ async function getSummaryData() {
 async function loadBookingRevenue(year) {
       const response = await fetch(`/load-revenue?year=${year}`);
       const result = await response.json();
-
+      console.log(result);
       if (result.success){
             removePrevRow();
             result.data.forEach(data => {
-                  createRow(data.month_year, data.direct, data.online, data.total);
+                  createRow(data.month_name, data.direct, data.online, data.total);
             });
       }else {
             alert('Failed to fetch data.');

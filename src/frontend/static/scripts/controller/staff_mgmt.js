@@ -28,8 +28,8 @@ function successMessageCard(message, redirect = null) {
 
 function failedMessageCard(message){
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up ">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-[60]" id="failed-message">
+                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
                         <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
                         <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
@@ -46,6 +46,7 @@ function failedMessageCard(message){
 }
 
 function renderAddStaffModal(){
+
       const modal = `
             <div id="addStaffModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                   <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-2xl p-6 relative fade-in-up">
@@ -100,7 +101,13 @@ function renderAddStaffModal(){
 }
 
 async function renderAddStaffAttendanceModal(){
+      document.getElementById('daySelect').value = new Date().getDate();
+      document.getElementById('monthSelect2').value = new Date().getMonth() + 1;
+      allStaffAttendance();
+      sumarryCards();
+      
       const generated_row = await getAllStaff();
+
       const modal =  `
                   <div id="bulkAttendanceModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                         <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[85%] max-w-4xl py-8 px-10 relative fade-in-up">
@@ -471,7 +478,7 @@ function createStaffAttendanceRow(staff_id, staff_name, time_in, time_out, date,
                               </div>
                         </td>
                         <td class="py-3 px-6 text-center">
-                              <label class="text-xs font-semibold py-1 px-3 rounded-2xl w-full overflow-x-auto scroll-hide whitespace-nowrap
+                              <label class="text-xs font-semibold py-1 px-3 rounded-2xl w-full overflow-x-auto scroll-hide whitespace-nowrap 
                                     ${status === "Absent"  ? 'text-red-600 bg-red-100 dark:text-white dark:bg-red-500' :
                                     status === '--' ? 'text-gray-900 dark:text-white ' :
                                     'text-green-600 bg-green-100 dark:text-white dark:bg-green-500' 
@@ -671,8 +678,11 @@ async function showAllStaff(){
 
 // for add staff attendance
 async function getAllStaff(){
+      const day = document.getElementById('daySelect').value;
+      const month = document.getElementById('monthSelect2').value;
+
       try{
-            const response = await fetch('/staff-list', {});
+            const response = await fetch(`/staff-list?day=${day || new Date().getDate()}&month=${month || new Date().getMonth() + 1}`);
             const result = await response.json();
 
             if (result.success){
@@ -717,8 +727,11 @@ async function getAllStaff(){
 
 // for update staff time out
 async function getAllPresentStaff(){
+      const day = document.getElementById('daySelect').value;
+      const month = document.getElementById('monthSelect2').value;
+
       try{
-            const response = await fetch('/all-present-staff', {});
+            const response = await fetch(`/all-present-staff?day=${day || new Date().getDate()}&month=${month || new Date().getMonth() + 1}`, {});
             const result = await response.json();
 
             if (result.success){
@@ -727,7 +740,7 @@ async function getAllPresentStaff(){
 
                   result.data.forEach(staff => {
                         const row = `
-                              <tr data-set="${staff.staff_id}" class="border-b border-gray-200 dark:border-gray-700 hover:bg-black/3 dark:bg-white/3">
+                              <tr data-set="${staff.staff_id}" data-date="${staff.date}" class="border-b border-gray-200 dark:border-gray-700 hover:bg-black/3 dark:bg-white/3">
                                     <td class="py-3 px-1 text-center">
                                           <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
                                                 <input type="checkbox" name="select_staff" class="timeout-checkbox hidden peer">
@@ -750,7 +763,7 @@ async function getAllPresentStaff(){
             }else{
                   const empty_row = `
                         <tr class="border-b border-gray-200 dark:border-gray-700">
-                              <td colspan="4" class="p-3 text-center dark:text-gray-100 text-gray-800">All staff is updated.</td>
+                              <td colspan="4" class="p-3 text-center dark:text-gray-100 text-gray-800">No data to update.</td>
                         </tr>
                   `;
                   
@@ -870,12 +883,13 @@ async function updateStaffAttendance(e){
       rows.forEach(row => {
             const selected = row.querySelector('input[type="checkbox"]:checked');
             const id = row.getAttribute('data-set');
+            const date = row.getAttribute('data-date');
             const td = row.querySelectorAll('td');
             const timeInStr = td[2].textContent;
             const time_in = new Date(`1970-01-01 ${timeInStr}`).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 
             if (selected) {
-                  data.push({ id, time_out, time_in});
+                  data.push({ id, time_out, time_in, date});
             }
       });
 
@@ -906,7 +920,7 @@ async function updateStaffAttendance(e){
 async function updateStaffInfo(e){
       e.preventDefault();
       const form = new FormData(e.target);
-      console.log(form);
+
       try{
             const response = await fetch('/update-staff-info', {
                   method: 'POST',
@@ -933,8 +947,12 @@ async function updateStaffInfo(e){
 
 async function allStaffAttendance(){
       document.querySelectorAll('#attendanceTable tr').forEach( row => row.remove());
+      
+      const day = document.getElementById('daySelect').value;
+      const month = document.getElementById('monthSelect2').value;
+
       try{
-            const response = await fetch('/all-staff-attendance', {});
+            const response = await fetch(`/all-staff-attendance?day=${day || new Date().getDate()}&month=${month || new Date().getMonth() + 1}`, {});
             const result = await response.json();
 
             if (result.success){ 
@@ -949,6 +967,7 @@ async function allStaffAttendance(){
 
                         createStaffAttendanceRow(staff.staff_id, staff.name, staff.time_in, staff.time_out, formattedDate, staff.status);
                   });
+                  
             }else{
                   isAttendanceNotEmpty = true;
                   const empty_row = `
@@ -959,7 +978,6 @@ async function allStaffAttendance(){
                   
                   document.getElementById('attendanceTable').innerHTML += empty_row; 
             }
-            enableTimeOutBtn();
       }catch(err){
             console.error(err);
       }
@@ -1066,7 +1084,6 @@ async function sortAttendanceData(){
 
                         createStaffAttendanceRow(staff.staff_id, staff.name, staff.time_in, staff.time_out, formattedDate, staff.status);
                   });
-
             }else{
                   isAttendanceNotEmpty = true;
                   const empty_row = `
@@ -1204,6 +1221,5 @@ export function initPageStaffMgmt(){
       showAllStaff();
       allStaffAttendance();
       sumarryCards();
-      enableTimeOutBtn();
       resetMonthAndDay();
 }

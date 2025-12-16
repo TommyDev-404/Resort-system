@@ -54,13 +54,13 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
-      def staff_list(self):
+      def staff_list(self, day, month):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM staff_details where id not in (select staff_id from staff_attendance where date = CURRENT_DATE()) and status <> 'On Leave' ''')
+                        cursor.execute(f''' SELECT * FROM staff_details where id not in (select staff_id from staff_attendance where MONTH(date) = {month} and DAY(date) = {day} and status <> 'On Leave') ''')
                         data = cursor.fetchall()
-
+                        
                         return {'success': bool(data), 'data': data}
             except Exception as e:
                   con.rollback()
@@ -89,27 +89,29 @@ class Staff_Management:
                               name = staff.get('name')
                               time_in = datetime.strptime(staff.get('time_in'), '%H:%M').time() if staff.get('time_in')else None
                               status = staff.get('status')
-                              date = staff.get('date')
+                              dates = datetime.strptime(staff.get('date'), '%Y-%m-%d').date()
 
                               if status != 'Absent':
                                     cursor.execute('''
                                           INSERT INTO staff_attendance (staff_id, name, time_in, time_out, date, status)
                                           VALUES (%s, %s, %s, %s, %s, %s)
-                                    ''', (staff_id, name, time_in.strftime("%I:%M %p") if time_in else None, '--', date, "--"))
+                                    ''', (staff_id, name, time_in.strftime("%I:%M %p") if time_in else None, '--', dates, "--"))
 
-                                    cursor.execute('''
-                                          UPDATE staff_details SET status = %s WHERE id = %s
-                                    ''', ('Active', staff_id))
+                                    if dates == date.today():
+                                          cursor.execute('''
+                                                UPDATE staff_details SET status = %s WHERE id = %s
+                                          ''', ('Active', staff_id))
                               else:
                                     # Absent case
                                     cursor.execute('''
                                           INSERT INTO staff_attendance (staff_id, name, time_in, time_out, date, status)
                                           VALUES (%s, %s, %s, %s, %s, %s)
-                                    ''', (staff_id, name, '--', '--', date, status))
+                                    ''', (staff_id, name, '--', '--', dates, status))
 
-                                    cursor.execute('''
-                                          UPDATE staff_details SET status = %s, absent = absent + 1 WHERE id = %s
-                                    ''', (status, staff_id))
+                                    if dates == date.today():
+                                          cursor.execute(''' UPDATE staff_details SET status = %s, absent = absent + 1 WHERE id = %s ''', (status, staff_id))
+                                    else:
+                                          cursor.execute(''' UPDATE staff_details SET absent = absent + 1 WHERE id = %s ''', (staff_id,))
 
                         con.commit()
                         return {'success': True, 'message': 'Added successfully!'}
@@ -125,6 +127,7 @@ class Staff_Management:
                         for data in updated_data:
                               new_time_out = datetime.strptime(data.get('time_out'), '%H:%M').time() if data.get('time_out') else None
                               new_time_in = datetime.strptime(data.get('time_in'), '%H:%M').time() if data.get('time_in') else None
+                              dates = datetime.strptime(data.get('date'), '%a, %d %b %Y %H:%M:%S %Z').date()
 
                               morning_in = datetime.strptime('08:00', '%H:%M').time()
                               afternoon_in= datetime.strptime('13:00', '%H:%M').time()
@@ -143,15 +146,16 @@ class Staff_Management:
                                           gap = datetime.combine(date.today(), new_time_out) - datetime.combine(date.today(), afternoon_out)
                                           gap_minutes = gap.total_seconds() / 60
                                           ot_hours = gap_minutes / 60   # example: 45 minutes = 0.75 hours
-                                          work_value = 1.0 + round(ot_hours, 1)
+                                          work_value = 1.0
                               elif new_time_in > morning_out and new_time_in <= afternoon_in:
                                     if new_time_out >= afternoon_out:
                                           new_status = "Present (Half Day)"
                                           work_value = 0.5
 
                               cursor.execute('''
-                                    UPDATE staff_attendance SET  time_out = %s, status = %s  WHERE staff_id = %s
-                              ''', (new_time_out.strftime("%I:%M %p"), new_status, data.get('id')))
+                                    UPDATE staff_attendance SET  time_out = %s, status = %s  WHERE staff_id = %s AND date = %s
+                              ''', (new_time_out.strftime("%I:%M %p"), new_status, data.get('id'), dates))
+                              #update_date = cursor.rowcount > 0
 
                               if new_status == 'Present (Overtime)':
                                     cursor.execute("SELECT daily_salary FROM staff_details WHERE id = %s", (data.get('id'),))
@@ -187,11 +191,11 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def all_staff_attendance(self):
+      def all_staff_attendance(self, day, month):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM staff_attendance WHERE date = CURRENT_DATE()''')
+                        cursor.execute(f''' SELECT * FROM staff_attendance WHERE DAY(date) = {day} AND MONTH(date) = {month} ''')
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}
@@ -199,11 +203,11 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
-      def all_present_staff(self):
+      def all_present_staff(self, day, month):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM staff_attendance WHERE date = CURRENT_DATE() AND status <> 'Absent' AND time_out = '--' ''')
+                        cursor.execute(f''' SELECT * FROM staff_attendance WHERE MONTH(date) = {month} AND DAY(date) = {day} AND status <> 'Absent' AND time_out = '--' ''')
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}
@@ -258,9 +262,10 @@ class Staff_Management:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' DELETE FROM staff_attendance WHERE staff_id = %s  AND date = %s''', (id, new_date))
-                        
+                        del_attendance = cursor.rowcount
+
                         if status != 'Absent':
-                              if status == 'Present (Whole Day)':
+                              if status in ['Present (Whole Day)', 'Present (Overtime)']:
                                     cursor.execute('''
                                           UPDATE staff_details
                                           SET 
@@ -314,7 +319,7 @@ class Staff_Management:
                               
                         con.commit()
 
-                        return {'success': bool(cursor.rowcount != 0), 'message': 'Removed successfully!' if bool(cursor.rowcount != 0) else 'Failed'}
+                        return {'success': bool(del_attendance), 'message': 'Removed successfully!' if bool(del_attendance) else 'Failed'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
@@ -338,7 +343,7 @@ class Staff_Management:
 
                                     (SELECT COUNT(*) 
                                     FROM staff_attendance 
-                                    WHERE status IN ('Present (Whole Day)', 'Present (Half Day)', 'Present (Overtime)')
+                                    WHERE status != 'Absent'
                                     AND MONTH(date) = %s AND DAY(date) = %s  AND YEAR(date) = YEAR(CURRENT_DATE())
                                     ) AS today_duty,
 
@@ -388,15 +393,3 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
-      def find_attendance(self, month, day):
-            try:
-                  with self.db.connect() as con:
-                        cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM staff_attendance WHERE MONTH(date) = %s AND DAY(date) = %s ''', (month, day))
-                        data = cursor.fetchall()
-
-                        return {'success': bool(data), 'data': data}
-            except Exception as e:
-                  con.rollback()
-                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
-      

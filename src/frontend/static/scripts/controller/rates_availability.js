@@ -42,7 +42,6 @@ function failedMessageCard(message){
       });
 }
 
-
 function openUpdateAreaModal(e) {
       const row = e.target.closest('tr'); // get the row
       const cells = row.querySelectorAll('td'); // get all td in that row
@@ -75,7 +74,7 @@ function openUpdateAreaModal(e) {
             </div>
       `;
 
-      document.getElementById('ratesAvailabilityPortal').innerHTML += cells[3].textContent.split('-').length > 1 ? modal2 : modal;
+      document.getElementById('ratesAvailabilityPortal').innerHTML += cells[0].textContent.split('-').length > 1 ? modal2 : modal;
       lucide.createIcons();
 }
 
@@ -178,10 +177,7 @@ async function updatePrice(e){
 document.addEventListener('click', (e) => {
       const btn = e.target.closest('.update-btn'); // ensures we get the button even if child is clicked
       
-      if (btn) {
-            const areaId = btn.id;
-            openUpdateAreaModal(e); // pass the ID to the modal
-      }
+      if (btn) openUpdateAreaModal(e); // pass the ID to the modal
 
       // Close modal
       if (e.target.matches('#close-area-update-modal')) {

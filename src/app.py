@@ -420,15 +420,15 @@ def search_staff():
 
 @app.route('/staff-list', methods=['GET'])
 def all_staff_list():
-      return jsonify(staff.staff_list())
+      return jsonify(staff.staff_list(request.args.get('day'), request.args.get('month')))
 
 @app.route('/all-staff-attendance', methods=['GET'])
 def all_staff_attendance():
-      return jsonify(staff.all_staff_attendance())
+      return jsonify(staff.all_staff_attendance(request.args.get('day'), request.args.get('month')))
 
 @app.route('/all-present-staff', methods=['GET'])
 def all_present_staff():
-      return jsonify(staff.all_present_staff())
+      return jsonify(staff.all_present_staff(request.args.get('day'), request.args.get('month')))
 
 @app.route('/individual-staff-attendance', methods=['GET'])
 def individual_staff_attendance():
@@ -452,7 +452,7 @@ def on_leave():
 
 @app.route('/sort-attendance-data', methods=['GET'])
 def sort_attendance():
-      return jsonify(staff.find_attendance(request.args.get('month'), request.args.get('day')))
+      return jsonify(staff.all_staff_attendance(request.args.get('day'), request.args.get('month')))
 
 
 #--------------- ADMIN PROFILE ------------------#
@@ -478,6 +478,14 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
+
+@app.route("/memory")
+def memory_usage():
+      mem = process.memory_info()
+      return jsonify({
+            "rss_mb": round(mem.rss / 1024 / 1024, 2),
+            "vms_mb": round(mem.vms / 1024 / 1024, 2)
+      })
 
 """
 @app.after_request

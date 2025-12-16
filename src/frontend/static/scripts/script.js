@@ -6,6 +6,7 @@ lucide.createIcons();
 const sidebarItems = document.querySelectorAll('.sidebar-item');
 const contentSections = document.querySelectorAll('.content-section');
 const sidebar = document.getElementById('sidebar');
+let prev_item = null;
 
 const sectionControllerMap = {
       'home-dashboard': () => import('./controller/home-dashboard.js'),
@@ -95,7 +96,8 @@ sidebarItems.forEach(item => {
                   logout();
             }
             else{
-                  switchContent(item.dataset.section)
+                  if (prev_item !== item.dataset.section) switchContent(item.dataset.section);
+                  prev_item = item.dataset.section;
             }
       });
 });
