@@ -1214,6 +1214,7 @@ export function initPageReservation(){
       getTotalsCountData();
       resetDropDown();
       recentBookings();
+      resetButtonAndCheckBox();
       summaryCards();
 }
 

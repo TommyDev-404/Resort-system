@@ -1,4 +1,4 @@
-import '../chart.umd.js';
+import './chart.umd.js';
 
 let occupancyChartPercentage = null;
 let allNotifications = [];

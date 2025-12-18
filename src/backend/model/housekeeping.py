@@ -13,12 +13,12 @@ class Housekeeping:
                               SELECT 
                                     name,
                                     COUNT(name) as total_room,
-                                    SUM(CASE WHEN status = 'occupied' THEN 1 ELSE 0 END) AS occupied,
-                                    SUM(CASE WHEN status = 'need-clean' THEN 1 ELSE 0 END) AS need_clean,
-                                    SUM(CASE WHEN status = 'avl' THEN 1 ELSE 0 END) AS ready,
-                                    SUM(CASE WHEN status = 'on-clean' THEN 1 ELSE 0 END) AS on_clean,
-                                    SUM(CASE WHEN status = 'reserved' THEN 1 ELSE 0 END) AS reserved
-                              FROM accomodation_spaces WHERE name = 'Premium' OR name = 'Standard' OR name = 'Garden' OR name = 'Barkada'  OR name = 'Family'
+                                    SUM(CASE WHEN status IN ("occupied") THEN 1 ELSE 0 END) AS occupied,
+                                    SUM(CASE WHEN status IN ("need-clean") THEN 1 ELSE 0 END) AS need_clean,
+                                    SUM(CASE WHEN status IN ("avl") THEN 1 ELSE 0 END) AS ready,
+                                    SUM(CASE WHEN status IN ("on-clean") THEN 1 ELSE 0 END) AS on_clean,
+                                    SUM(CASE WHEN status IN ("reserved") THEN 1 ELSE 0 END) AS reserved
+                              FROM accomodation_spaces WHERE name IN ("Premium", "Standard", "Garden", "Barkada", "Family")
                               GROUP BY name;
                         ''')
                         data = cursor.fetchall()
@@ -35,12 +35,12 @@ class Housekeeping:
                         cursor.execute('''
                               SELECT 
                                     COUNT(*) AS total_rooms,
-                                    SUM(CASE WHEN status = 'need-clean' THEN 1 ELSE 0 END) AS total_need_clean,
-                                    SUM(CASE WHEN status = 'avl' THEN 1 ELSE 0 END) AS total_ready,
-                                    SUM(CASE WHEN status = 'on-clean' THEN 1 ELSE 0 END) AS total_on_clean,
-                                    SUM(CASE WHEN status = 'reserved' THEN 1 ELSE 0 END) AS reserved,
-                                    SUM(CASE WHEN status = 'occupied' THEN 1 ELSE 0 END) AS total_occupied
-                              FROM accomodation_spaces WHERE name = 'Premium' OR name = 'Standard' OR name = 'Garden' OR name = 'Barkada'  OR name = 'Family';
+                                    SUM(CASE WHEN status IN ('need-clean') THEN 1 ELSE 0 END) AS total_need_clean,
+                                    SUM(CASE WHEN status IN ('avl') THEN 1 ELSE 0 END) AS total_ready,
+                                    SUM(CASE WHEN status IN ('on-clean') THEN 1 ELSE 0 END) AS total_on_clean,
+                                    SUM(CASE WHEN status IN ('reserved') THEN 1 ELSE 0 END) AS reserved,
+                                    SUM(CASE WHEN status IN ('occupied') THEN 1 ELSE 0 END) AS total_occupied
+                              FROM accomodation_spaces WHERE name IN ('Premium', 'Standard', 'Garden', 'Barkada', 'Family');
                         ''')
                         data = cursor.fetchone()
 
@@ -71,8 +71,8 @@ class Housekeeping:
                         cursor = con.cursor()
 
                         cursor.execute('''
-                              UPDATE accomodation_spaces SET status = 'on-clean' WHERE name = %s AND room = %s
-                        ''', (area_name.split(' ')[0], room_no))
+                              UPDATE accomodation_spaces SET status = %s WHERE name = %s AND room = %s
+                        ''', ('on-clean', area_name.split(' ')[0], room_no))
       
                         room = f'''{area_name}{room_no}'''
                         cursor.execute('''
@@ -95,11 +95,11 @@ class Housekeeping:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute('''
-                              UPDATE accomodation_spaces SET status = 'avl' WHERE name = %s AND room = %s
-                        ''', (area_name.split(' ')[0], room_no))
+                              UPDATE accomodation_spaces SET status = %s WHERE name = %s AND room = %s
+                        ''', ('avl', area_name.split(' ')[0], room_no))
                         
                         room = f'''{area_name} {room_no}'''
-                        cursor.execute(''' UPDATE room_assign_history SET status = 'avl' WHERE room = %s ''', (room,))
+                        cursor.execute(''' UPDATE room_assign_history SET status = %s WHERE room = %s ''', ('avl', room))
 
                         con.commit()
 
@@ -118,7 +118,7 @@ class Housekeeping:
                               JOIN staff_attendance sa
                               ON st.id = sa.staff_id 
                               WHERE st.job_position NOT IN ('Front Desk', 'Security Guard') AND sa.date = CURRENT_DATE()
-                              AND sa.status != 'Absent'
+                              AND sa.status NOT IN ('Absent')
                         ''')
                         data = cursor.fetchall()
 

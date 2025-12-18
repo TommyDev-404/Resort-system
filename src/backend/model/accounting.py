@@ -33,8 +33,8 @@ class Accounting:
                               LEFT JOIN bookings b
                               ON MONTH(b.check_in) = m.month
                               AND YEAR(b.check_in) = %s
-                              AND b.status != 'Cancelled'
-                              AND b.payment != 'Pending'
+                              AND b.status NOT IN ('Cancelled')
+                              AND b.payment NOT IN ('Pending')
                               GROUP BY m.month
                               ORDER BY m.month;
 
@@ -56,7 +56,7 @@ class Accounting:
                                     COALESCE(SUM(CASE WHEN payment = 'ZUZU (Online Payment)' THEN total_amount ELSE 0 END), 0) AS online,
                                     COALESCE(SUM(total_amount), 0) AS total_revenue
                               FROM bookings
-                              WHERE DATE(paid_date) = CURRENT_DATE() AND payment != 'Pending';
+                              WHERE DATE(paid_date) = CURRENT_DATE() AND payment NOT IN ('Pending');
                         ''')
                         data = cursor.fetchone()
 

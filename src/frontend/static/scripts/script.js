@@ -1,4 +1,4 @@
-import { notifications } from './controller/home-dashboard.js';
+import { notifications } from './home-dashboard.js';
 
 lucide.createIcons();
 
@@ -9,15 +9,15 @@ const sidebar = document.getElementById('sidebar');
 let prev_item = null;
 
 const sectionControllerMap = {
-      'home-dashboard': () => import('./controller/home-dashboard.js'),
-      'analytics': () => import('./controller/analytics.js'),
-      'all-reservations': () => import('./controller/all-reservations.js'),
-      'housekeeping': () => import('./controller/housekeeping.js'),
-      'rates-availability': () => import('./controller/rates_availability.js'),
-      'accounting': () => import('./controller/accounting.js'),
-      'revenue-management': () => import('./controller/revenue_mgmt.js'),
-      'staff-management': () => import('./controller/staff_mgmt.js'),
-      'admin-profile': () => import('./controller/admin.js')
+      'home-dashboard': () => import('./home-dashboard.js'),
+      'analytics': () => import('./analytics.js'),
+      'all-reservations': () => import('./all-reservations.js'),
+      'housekeeping': () => import('./housekeeping.js'),
+      'rates-availability': () => import('./rates_availability.js'),
+      'accounting': () => import('./accounting.js'),
+      'revenue-management': () => import('./revenue_mgmt.js'),
+      'staff-management': () => import('./staff_mgmt.js'),
+      'admin-profile': () => import('./admin.js')
 };
 
 /*---------------- SIDEBAR TOGGLE ----------------*/

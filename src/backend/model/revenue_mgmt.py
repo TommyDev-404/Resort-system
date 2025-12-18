@@ -23,8 +23,8 @@ class RevenueMgmt:
                                     cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = rate * (1 - %s) WHERE name = %s ''', 
                                     (promotions, discount, area.split(' ')[0].strip()))
                                     con.commit()
-                              
-                              cursor.execute(''' SELECT * FROM bookings WHERE check_in >= %s AND promo = 'No promo.' ''', (dates,))
+
+                              cursor.execute(''' SELECT * FROM bookings WHERE check_in >= %s AND promo = %s''', (dates, 'No promo.'))
                               booking_data = cursor.fetchall()
 
                               for data in booking_data:
@@ -251,7 +251,7 @@ class RevenueMgmt:
                               cursor.execute(''' SELECT * FROM promos WHERE id = %s''', (id,))
                               promo_data = cursor.fetchone()
 
-                              cursor.execute(''' SELECT * FROM bookings WHERE check_out >= %s AND promo != 'No promo.' ''', (promo_data.get('date'),))
+                              cursor.execute(''' SELECT * FROM bookings WHERE check_out >= %s AND promo NOT IN ('No promo.') ''', (promo_data.get('date'),))
                               booking_data = cursor.fetchall()
                               print(booking_data)
                               

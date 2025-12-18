@@ -91,7 +91,7 @@ class Analytics:
                               JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
                               WHERE DATE(b.paid_date) = CURDATE()
-                                    AND b.payment <> 'Pending'
+                                    AND b.payment NOT IN ('Pending')
                               ),
                               yesterday AS (
                               SELECT COALESCE(SUM({accomodation_type.lower()}), 0) AS total
@@ -99,7 +99,7 @@ class Analytics:
                               JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
                               WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
-                                    AND b.payment <> 'Pending'
+                                    AND b.payment NOT IN ('Pending')
                               )
                               SELECT 
                               today.total AS revenue_today,
@@ -166,7 +166,7 @@ class Analytics:
                               JOIN bookings AS b
                               ON a.booking_id = b.booking_id
                               WHERE MONTH(b.paid_date) = MONTH(CURDATE())
-                              AND b.payment <> 'Pending'
+                              AND b.payment NOT IN ('Pending')
                         '''
                         cursor.execute(query)
                   else:
@@ -176,7 +176,7 @@ class Analytics:
                               JOIN bookings AS b
                               ON a.booking_id = b.booking_id
                               WHERE MONTH(b.paid_date) = MONTH(CURDATE())
-                              AND b.payment <> 'Pending'
+                              AND b.payment NOT IN ('Pending')
                         '''
                         cursor.execute(query)
 

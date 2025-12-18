@@ -58,7 +58,7 @@ class Staff_Management:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(f''' SELECT * FROM staff_details where id not in (select staff_id from staff_attendance where MONTH(date) = {month} and DAY(date) = {day} and status <> 'On Leave') ''')
+                        cursor.execute(f''' SELECT * FROM staff_details where id not in (select staff_id from staff_attendance where MONTH(date) = {month} and DAY(date) = {day} and status NOT IN ('On Leave')) ''')
                         data = cursor.fetchall()
                         
                         return {'success': bool(data), 'data': data}

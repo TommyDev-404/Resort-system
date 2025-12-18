@@ -44,7 +44,7 @@ class RatesAndAvailability:
                                                 CASE 
                                                 WHEN a.check_in <= CURRENT_DATE()
                                                 AND a.check_out >= CURRENT_DATE()
-                                                AND b.status = 'Checked-in'
+                                                AND b.status IN ('Checked-in')
                                                 THEN standard ELSE 0 END
                                           ),
                                           3 - SUM(

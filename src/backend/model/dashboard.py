@@ -19,12 +19,12 @@ class Dashboard:
                         today_total AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS total_guest_in_house
                               FROM bookings 
-                              WHERE status = 'Checked-in' AND booking_type IN ('Check-in', 'Reservation', 'Day Guest')
+                              WHERE status = %s AND booking_type IN ('Check-in', 'Reservation', 'Day Guest')
                         ),
                         yesterday_total AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS total_guest_in_house
                               FROM bookings 
-                              WHERE status = 'Checked-in' AND booking_type IN ('Check-in', 'Reservation', 'Day Guest')
+                              WHERE status = %s AND booking_type IN ('Check-in', 'Reservation', 'Day Guest')
                         )
                         SELECT 
                         (SELECT total_guest_in_house FROM today_total) AS latest_total_guest,
@@ -45,7 +45,7 @@ class Dashboard:
                                           , 2)
                                     )
                         END AS change_rate_percent;
-                  ''')
+                  ''', ('Checked-in', 'Checked-in'))
                   data = cursor.fetchone()
 
                   return {'today': data.get('latest_total_guest') , 'change': data.get('change_rate_percent')}
@@ -137,13 +137,13 @@ class Dashboard:
                                     COALESCE(SUM(total_amount), 0) AS today_revenue
                               FROM bookings
                               WHERE paid_date = CURRENT_DATE() 
-                              AND payment != 'Pending'
+                              AND payment NOT IN ('Pending')
                         ),
                         yesterday AS (
                               SELECT
                                     COALESCE(SUM(total_amount), 0) AS yesterday_revenue
                               FROM bookings
-                              WHERE payment != 'Pending'
+                              WHERE payment NOT IN ('Pending')
                               AND paid_date = CURRENT_DATE() - INTERVAL 1 DAY 
                         )
                         SELECT 
@@ -270,7 +270,7 @@ class Dashboard:
                                     COALESCE(SUM(total_guest), 0) AS today_checkin_guests
                               FROM bookings
                               WHERE DATE(check_in) = CURRENT_DATE()
-                              AND booking_type IN ('Check-in', 'Reservation') AND status = 'Checked-in'
+                              AND booking_type IN ('Check-in', 'Reservation') AND status IN ('Checked-in')
                         ),
 
                         today_checkout AS (
@@ -279,7 +279,7 @@ class Dashboard:
                                     COALESCE(SUM(total_guest), 0) AS today_checkout_guests
                               FROM bookings
                               WHERE DATE(check_out) = CURRENT_DATE()
-                              AND status = 'Checked-out'
+                              AND status IN ('Checked-out')
                         ),
 
                         day_guest AS (
@@ -288,7 +288,7 @@ class Dashboard:
                                     COALESCE(SUM(total_guest), 0) AS day_guest_guests
                               FROM bookings
                               WHERE DATE(check_in) = CURRENT_DATE()
-                              AND booking_type = 'Day Guest' AND status = 'Checked-in'
+                              AND booking_type IN ('Day Guest') AND status IN ('Checked-in')
                         ),
 
                         reservation AS (
@@ -297,7 +297,7 @@ class Dashboard:
                                     COALESCE(SUM(total_guest), 0) AS reservation_guests
                               FROM bookings
                               WHERE DATE(check_in) >= CURRENT_DATE() 
-                              AND booking_type = 'Reservation' AND status = 'Reserved'
+                              AND booking_type IN ('Reservation') AND status IN ('Reserved')
                         )
 
                         SELECT 
@@ -341,7 +341,7 @@ class Dashboard:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' 
-                              SELECT * FROM bookings WHERE check_in >= CURRENT_DATE() AND status = 'Reserved' 
+                              SELECT * FROM bookings WHERE check_in >= CURRENT_DATE() AND status IN ('Reserved') 
                         ''')
                         data = cursor.fetchall()
 
@@ -360,7 +360,7 @@ class Dashboard:
                         FROM accomodation_data a
                         JOIN bookings b 
                         ON a.booking_id = b.booking_id
-                        WHERE a.check_in <= CURRENT_DATE() AND a.check_out >= CURRENT_DATE() AND b.status = 'Checked-in';
+                        WHERE a.check_in <= CURRENT_DATE() AND a.check_out >= CURRENT_DATE() AND b.status IN ('Checked-in');
                   ''')
             data = cursor.fetchone()
 
@@ -402,11 +402,11 @@ class Dashboard:
                   cursor.execute(''' 
                         with 
                         checkin as (
-                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status = 'Checked-out'
+                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status IN ('Checked-out')
                         ), day_guest as (
-                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status = 'Day Guest'
+                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status IN ('Day Guest')
                         ), cancelled as (
-                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status = 'Cancelled'
+                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status IN ('Cancelled')
                         ) 
                         SELECT 
                               checkin.total as checkin_total,
