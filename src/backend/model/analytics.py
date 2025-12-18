@@ -282,15 +282,15 @@ class Analytics:
                   
                   if accomodation_type != None:
                         area = {
-                              'premium': 190000,
-                              'standard': 200250,
-                              'garden': 170680,
-                              'barkada': 159050,
-                              'family': 150000,
-                              'cabana': 129890,
-                              'big': 130450,
-                              'small': 86000,
-                              'hall': 30500
+                              'premium': 100000,
+                              'standard': 90000,
+                              'garden': 120000,
+                              'barkada': 80000,
+                              'family': 95000,
+                              'cabana': 75000,
+                              'big': 70000,
+                              'small': 50000,
+                              'hall': 40000
                         }
 
                         return {'target': area[accomodation_type.lower().strip()]}

@@ -159,6 +159,7 @@ class RevenueMgmt:
                         cursor = con.cursor()
                         
                         promo_start = datetime.strptime(dates, "%Y-%m-%d").date()
+                        promo_end = datetime.strptime(duration, "%Y-%m-%d").date()
                         discount = float(promo_rate) / 100
                         areas = [a.strip() for a in areas_promo.split(',')]
                         promo_label = f"{promo_name} - {promo_rate}%"
@@ -169,7 +170,7 @@ class RevenueMgmt:
 
                         status = None
                         if promo_start <= date.today():
-                              status = 'Active'  if promo_start >= date.today() else  'Expired'
+                              status = 'Active'  if promo_end >= date.today() else  'Expired'
                         else:
                               status = 'Upcoming'
 
