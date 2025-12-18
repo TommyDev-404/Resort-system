@@ -5,7 +5,7 @@ const adminEmail = document.getElementById('admin-email');
 const datePasswordChange = document.getElementById('last-pass-changed');
 
 // ------------- HELPERS ---------------- //
-function successMessageCard(message, redirect = null) {
+function successMessageCard2(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -28,7 +28,7 @@ function successMessageCard(message, redirect = null) {
       });
 }
 
-function failedMessageCard(message){
+function failedMessageCard2(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -130,7 +130,7 @@ function renderCodeModal(){
       document.getElementById('adminModalPortal').innerHTML += modal;
 }
 
-function loadingAnimation(){
+function loadingAnimation3(){
       document.querySelector('#passwordModal').remove();
 
       const load = `
@@ -158,10 +158,10 @@ async function changePassv2(e) {
       const result = await response.json();
 
       if (result.success){
-            successMessageCard(result.message);
+            successMessageCard2(result.message);
             document.querySelector('#codeModal').remove();
       }else{
-            failedMessageCard(result.message);
+            failedMessageCard2(result.message);
       }
 }
 
@@ -176,7 +176,7 @@ async function changePass(e) {
       const form = new FormData(e.target);
       console.log(form);
       try {
-            loadingAnimation();
+            loadingAnimation3();
 
             const response = await fetch('/change-passwordv2', {
                   method: 'POST',
@@ -184,18 +184,18 @@ async function changePass(e) {
                   body: JSON.stringify(Object.fromEntries(form.entries()))
             });
             const result = await response.json();
-            console.log(result);
+
             if (result.success) {
-                  successMessageCard(result.message);
+                  successMessageCard2(result.message);
                   e.target.reset();
                   renderCodeModal();
             } else {
-                  failedMessageCard(result.message);
+                  failedMessageCard2(result.message);
                   renderChangePassword(adminEmail.textContent);
             }
       } catch (error) {
             console.error('Error:', error);
-            failedMessageCard('Something went wrong. Please try again.');
+            failedMessageCard2('Something went wrong. Please try again.');
       } finally {
             document.getElementById('loading').remove();
       }
@@ -211,11 +211,11 @@ async function editInfo(type) {
       const result = await response.json();
 
       if (result.success){
-            successMessageCard(result.message);
+            successMessageCard2(result.message);
             document.querySelector('#editModal').remove();
             adminProfile();
       }else{
-            failedMessageCard(result.message);
+            failedMessageCard2(result.message);
       }
 }
 
@@ -231,11 +231,9 @@ async function adminProfile() {
             adminNum.textContent = result.data.contact;
             datePasswordChange.textContent = formatDate;
       }else{
-            failedMessageCard(result.message);
+            failedMessageCard2(result.message);
       }
 }
-
-adminProfile();
 
 // -------------------- EVENT LISTENERS -----------------//
 document.addEventListener('click', (e) => {

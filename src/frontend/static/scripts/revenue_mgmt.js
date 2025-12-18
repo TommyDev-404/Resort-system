@@ -1,7 +1,7 @@
 import { notifications } from "./home-dashboard.js";
 
 // ---------------------- HELPERS ---------------------
-function successMessageCard(message, redirect = null) {
+function successMessageCard5(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -24,7 +24,7 @@ function successMessageCard(message, redirect = null) {
       });
 }
 
-function failedMessageCard(message){
+function failedMessageCard5(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up ">
@@ -107,12 +107,12 @@ async function applyPromo(e) {
       const res = await response.json();
 
       if (res.success){
-            successMessageCard(res.message);
+            successMessageCard5(res.message);
             e.target.reset();
             getAllPromo();
             notifications();
       }else{
-            failedMessageCard(res.message);
+            failedMessageCard5(res.message);
       }
 }
 
@@ -132,13 +132,13 @@ async function updatePromo(e) {
       const res = await response.json();
 
       if (res.success){
-            successMessageCard(res.message);
+            successMessageCard5(res.message);
             e.target.reset();
             resetToAddPromoForm();
             getAllPromo();
             notifications();
       }else{
-            failedMessageCard(res.message);
+            failedMessageCard5(res.message);
       }
 }
 
@@ -345,15 +345,13 @@ async function removePromo(e){
       const result = await response.json();
 
       if (result.success){
-            successMessageCard(result.message);
+            successMessageCard5(result.message);
             getAllPromo();
             notifications();
       }else{
-            failedMessageCard(result.message);
+            failedMessageCard5(result.message);
       }      
 }
-
-getAllPromo();
 
 // submit
 document.addEventListener('submit', (e) => {

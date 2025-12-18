@@ -5,7 +5,7 @@ let savedAccomodations = [];
 let category_data = 'all-data';
 
 // ---------------- RENDER HELPERS ------------------
-function successMessageCard(message, redirect = null) {
+function successMessageCard4(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -28,7 +28,7 @@ function successMessageCard(message, redirect = null) {
       });
 }
 
-function failedMessageCard(message){
+function failedMessageCard4(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -661,14 +661,14 @@ async function addBooking(e){
 
             if (result.success){
                   e.target.reset();
-                  successMessageCard(result.message);
+                  successMessageCard4(result.message);
                   notifications();
                   document.querySelector('#booking-overlay').remove();
                   recentBookings();
-                  summaryCards();
+                  summaryCardsDatas();
                   savedAccomodations.length =  0; // empty the array
             }else{
-                  successMessageCard(result.message);
+                  failedMessageCard4(result.message);
                   recentBookings();
             }
             
@@ -690,12 +690,12 @@ async function markAsCheckout(){
 
       if (result.success){
             notifications();
-            successMessageCard(result.message);
+            successMessageCard4(result.message);
             recentBookings();
-            summaryCards();
+            summaryCardsDatas();
             resetButtonAndCheckBox();
       }else{
-            failedMessageCard(result.message);
+            failedMessageCard4(result.message);
       }
       
       getTotalsCountData();
@@ -712,13 +712,13 @@ async function markAsCheckin(){
       const result = await response.json();
 
       if (result.success){
-            successMessageCard(result.message);
+            successMessageCard4(result.message);
             notifications();
-            summaryCards();
+            summaryCardsDatas();
             recentBookings();
             resetButtonAndCheckBox();
       }else{
-            failedMessageCard(result.message);
+            failedMessageCard4(result.message);
       }
       
       getTotalsCountData();
@@ -735,13 +735,13 @@ async function cancelBooking(){
       const result = await response.json();
 
       if (result.success){
-            successMessageCard(result.message);
+            successMessageCard4(result.message);
             notifications();
             recentBookings();
-            summaryCards
+            summaryCardsDatas();
             resetButtonAndCheckBox();
       }else{
-            failedMessageCard(result.message);
+            failedMessageCard4(result.message);
       }
       
       getTotalsCountData();
@@ -759,12 +759,12 @@ async function submitPayment(e){
       const result = await response.json();
 
       if (result.success){
-            successMessageCard(result.message);
+            successMessageCard4(result.message);
             document.querySelector('#mark-paid-overlay').remove();
             recentBookings();
             resetButtonAndCheckBox();
       }else{
-            failedMessageCard(result.message);
+            failedMessageCard4(result.message);
       }
       
       getTotalsCountData();
@@ -782,13 +782,13 @@ async function updateReservationDate(e){
       const result = await response.json();
 
       if (result.success){
-            successMessageCard(result.message);
+            successMessageCard4(result.message);
             notifications();
             document.querySelector('#update-reservation-overlay').remove();
             recentBookings();
             resetButtonAndCheckBox();
       }else {
-            failedMessageCard(result.message);
+            failedMessageCard4(result.message);
             document.querySelector('#update-reservation-overlay').remove();
       }
       
@@ -969,10 +969,9 @@ async function recentBookings(){
       
       document.querySelectorAll('tbody tr').forEach(row => row.remove());      
       resetToDefaultTabItem();
-      console.log(result.data);
+
       if (result.success){
             result.data.forEach(row => {
-                  
                   createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
@@ -1020,7 +1019,7 @@ function getMonths(){
       }
 }
 
-async function summaryCards(){
+async function summaryCardsDatas(){
       const response = await fetch('/summary-cards-data');
       const result = await response.json();
       
@@ -1215,6 +1214,6 @@ export function initPageReservation(){
       resetDropDown();
       recentBookings();
       resetButtonAndCheckBox();
-      summaryCards();
+      summaryCardsDatas();
 }
 

@@ -1,7 +1,7 @@
 import './chart.umd.js';
 
 let checkinChart = null;
-let revenueChart = null;
+let revenueCharts = null;
 let heavyMonthChart = null;
 let mostBookedAreaChart = null;
 let occupancyChart = null;
@@ -12,8 +12,8 @@ const observer = new MutationObserver(() => {
             checkinChart.destroy();
       }
 
-      if (typeof revenueChart !== 'undefined' && revenueChart) {
-            revenueChart.destroy();
+      if (typeof revenueCharts !== 'undefined' && revenueCharts) {
+            revenueCharts.destroy();
       }
 
       drawRevenueChart();
@@ -273,13 +273,13 @@ async function drawRevenueChart(type=null) {
       // Now latestRevenue and forecastedRevenue can be used in your chart
       const ctx = document.getElementById('revenueForecastChart').getContext('2d');
       
-      if (revenueChart) {
-            revenueChart.destroy();
+      if (revenueCharts) {
+            revenueCharts.destroy();
       }
 
       const isDarkMode = document.documentElement.classList.contains('dark');
 
-      revenueChart = new Chart(ctx, {
+      revenueCharts = new Chart(ctx, {
             type: 'bar',
             data: {
                   labels: months,
@@ -546,7 +546,7 @@ async function dailyRevenue(type=null){
       const response = await fetch(url);
       const res = await response.json();
 
-      document.getElementById('today-revenue-analytics').textContent = formatPesoShort(Number(res.current));
+      document.getElementById('today-revenue-analytics').textContent = formatPesoShort3(Number(res.current));
       document.getElementById('today-revenue-change').textContent = res.change < 0? `${res.change}%` : `+${res.change}%`;
 
       if (res.change < 0){
@@ -571,7 +571,7 @@ async function monthlyRevenue(type=null){
       const response = await fetch(url);
       const res = await response.json();
 
-      document.getElementById('monthly-revenue-analytics').textContent = formatPesoShort(Number(res.monthly));
+      document.getElementById('monthly-revenue-analytics').textContent = formatPesoShort3(Number(res.monthly));
       document.getElementById('monthly-revenue-change').textContent = res.change < 0 ? `${res.change}%` : `+${res.change}%`;    
       
       if (res.change < 0){
@@ -595,10 +595,10 @@ async function targetRevenue(type=null){
       const response = await fetch(url);
       const res = await response.json();
 
-      document.getElementById('target').textContent =  formatPesoShort(Number(res.target));
+      document.getElementById('target').textContent =  formatPesoShort3(Number(res.target));
 }
 
-function formatPesoShort(num) {
+function formatPesoShort3(num) {
       if (num >= 1_000_000_000) return "₱" + (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B";  
       if (num >= 1_000_000)     return "₱" + (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";  
       if (num >= 1_000)         return "₱" + (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";  

@@ -80,10 +80,10 @@ function logout(){
             try {
                   const response = await fetch('/logout', { method: 'POST' });
                   if (response.ok) {
-                        successMessageCard('You have been logged out.', '/login');
+                        successMessageCard6('You have been logged out.', '/login');
                   }
             } catch (err) {
-                  failedMessageCard(`Logout failed: ${err}`);
+                  failedMessageCard6(`Logout failed: ${err}`);
             }
       });
 }
@@ -108,7 +108,6 @@ document.addEventListener('click', (e) => {
       const logoText = document.getElementById('logoText');
       const hamburgerIcon = document.getElementById('hamburgerIcon');
       const textElements = sidebar.querySelectorAll('span');
-      const header = document.querySelector('header');
       const notificationModal = document.getElementById('notification-modal');
       const adminMenu = document.getElementById('adminMenu');
       const closeSidebar = document.getElementById('closeSidebar');
@@ -200,7 +199,7 @@ function logoutCard(){
       document.getElementById('logoutPortal').innerHTML += modal;
 }
 
-function successMessageCard(message, redirect = null) {
+function successMessageCard6(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
@@ -223,7 +222,7 @@ function successMessageCard(message, redirect = null) {
       });
 }
 
-function failedMessageCard(message){
+function failedMessageCard6(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">

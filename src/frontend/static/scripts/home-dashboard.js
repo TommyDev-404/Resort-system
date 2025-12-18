@@ -5,9 +5,9 @@ let allNotifications = [];
 let monthlyBookingsChart = null;
 let bookingTypeChart = null;
 let guestChart = null;
-let revenueChart = null;
+let hrevenueChartD = null;
 
-const observer = new MutationObserver(() => {
+const observers = new MutationObserver(() => {
 
       if (typeof occupancyChartPercentage !== 'undefined' && occupancyChartPercentage) {
             occupancyChartPercentage.destroy();
@@ -24,9 +24,9 @@ const observer = new MutationObserver(() => {
       if (typeof guestChart !== 'undefined' && guestChart) {
             guestChart.destroy();
       }
-      
-      if (typeof revenueChart !== 'undefined' && revenueChart) {
-            revenueChart.destroy();
+
+      if (typeof hrevenueChartD !== 'undefined' && hrevenueChartD) {
+            hrevenueChartD.destroy();
       }
 
 
@@ -37,7 +37,7 @@ const observer = new MutationObserver(() => {
       drawRevenueTrend();
 });
 
-observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+observers.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
 // --------------------------- HELPER ------------------------
 async function drawOccupancyPercentage(){
@@ -101,14 +101,14 @@ async function drawOccupancyPercentage(){
       });
 }
 
-function formatPesoShort(num) {
+function formatPesoShort2(num) {
       if (num >= 1_000_000_000) return "₱" + (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B";  
       if (num >= 1_000_000)     return "₱" + (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";  
       if (num >= 1_000)         return "₱" + (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";  
       return "₱" + num.toLocaleString("en-PH");
 }
 
-function loadingAnimation(){
+function loadingAnimation2(){
       const load = `
             <div id="loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
@@ -246,12 +246,12 @@ async function todayGuest() {
 async function todayProjectedRevenue() {
       const response = await fetch('/revenue');
       const res = await response.json();
-      console.log(res);
+
       updateMetric(
             'total-revenue',
             'change-rate-revenue',
             'target-revenue-icon',
-            formatPesoShort(Number(res.current_revenue)),
+            formatPesoShort2(Number(res.current_revenue)),
             Number(res.change)
       );
 }
@@ -873,9 +873,9 @@ async function drawRevenueTrend() {
       const textColor = isDark ? '#e5e7eb' : '#374151';
       const gridColor = isDark ? '#4b5563' : '#e5e7eb';
 
-      if (revenueChart) revenueChart.destroy();
+      if (hrevenueChartD) hrevenueChartD.destroy();
 
-      revenueChart = new Chart(ctx, {
+      hrevenueChartD = new Chart(ctx, {
             type: 'line',
             data: {
                   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -952,7 +952,7 @@ document.addEventListener('click', (e) => {
       if (e.target.matches('#last_month')) filteredDashboard('last_month');
 });
 
-loadingAnimation();
+loadingAnimation2();
 setTimeout(() => {
       document.querySelector('#loading').remove();
 }, 1000);

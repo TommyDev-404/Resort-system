@@ -70,7 +70,7 @@ loginForm.addEventListener('submit', (e) => loginAdmin(e) );
 
 
 // ----------------- HELPERS ---------------- //
-function loadingAnimation(){
+function loadingAnimation1(){
       const load = `
             <div id="loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
@@ -87,7 +87,7 @@ function showPassword() {
       input.setAttribute('type', type);
 }
 
-function successMessageCard(message, redirect = null) {
+function successMessageCard1(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -110,7 +110,7 @@ function successMessageCard(message, redirect = null) {
       });
 }
 
-function failedMessageCard(message){
+function failedMessageCard1(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -135,7 +135,7 @@ async function loginAdmin(e) {
       const form = new FormData(e.target);
 
       try {
-            loadingAnimation();
+            loadingAnimation1();
             
             const response = await fetch('/login/auth', {
                   method: 'POST',
@@ -145,13 +145,13 @@ async function loginAdmin(e) {
             const result = await response.json();
       
             if (result.success){
-                  successMessageCard(result.message, result.redirect);
+                  successMessageCard1(result.message, result.redirect);
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard1(result.message);
             }
       } catch (error) {
             console.error('Error:', error);
-            failedMessageCard('Something went wrong. Please try again.');
+            failedMessageCard1('Something went wrong. Please try again.');
       } finally {
             document.querySelector('#loading').remove();
       }
@@ -160,9 +160,9 @@ async function loginAdmin(e) {
 async function forgotPassword() {
       const email = document.querySelector('input[name="email"]').value;
 
-      if (email === '') return failedMessageCard('Empty input! Please fill in before getting code.')
+      if (email === '') return failedMessageCard1('Empty input! Please fill in before getting code.')
       try {
-            loadingAnimation();
+            loadingAnimation1();
 
             const response = await fetch(`/forgot-password`, {
                   method: 'POST',
@@ -172,14 +172,14 @@ async function forgotPassword() {
             const result = await response.json();
       
             if (result.success){
-                  successMessageCard(result.message);
+                  successMessageCard1(result.message);
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard1(result.message);
             }
       
       } catch (error) {
             console.error('Error:', error);
-            failedMessageCard('Something went wrong. Please try again.');
+            failedMessageCard1('Something went wrong. Please try again.');
       } finally {
             document.querySelector('#loading').remove();
       }
@@ -204,10 +204,10 @@ async function verifyCode() {
                         setTimeout(() => changePasswordForm.classList.add('opacity-100'), 50);
                   }, 300);
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard1(result.message);
             }
       }else {
-            failedMessageCard('No code inputted!');
+            failedMessageCard1('No code inputted!');
       }
 }
 
@@ -215,7 +215,7 @@ async function changePassword() {
       const new_password = document.querySelector('input[name="new_password"]').value;
       
       try {
-            loadingAnimation();
+            loadingAnimation1();
 
             const response = await fetch(`/change-password`, {
                   method: 'POST',
@@ -226,7 +226,7 @@ async function changePassword() {
       
             console.log(result);
             if (result.success){
-                  successMessageCard(result.message);
+                  successMessageCard1(result.message);
                   changePasswordForm.classList.remove('opacity-100');
                   setTimeout(() => {
                         changePasswordForm.classList.add('hidden');
@@ -234,11 +234,11 @@ async function changePassword() {
                         setTimeout(() => loginForm.classList.remove('opacity-0'), 50);
                   }, 300);
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard1(result.message);
             }
       } catch (error) {
             console.error('Error:', error);
-            failedMessageCard('Something went wrong. Please try again.');
+            failedMessageCard1('Something went wrong. Please try again.');
       } finally {
             document.querySelector('#loading').remove();
       }

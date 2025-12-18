@@ -1,9 +1,9 @@
 
 let isAttendanceNotEmpty = false;
-const tbody = document.getElementById('staffList');
+const tbodys = document.getElementById('staffList');
 
 // ------------ HELPER FUNCTIONS ------------
-function successMessageCard(message, redirect = null) {
+function successMessageCard3(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -26,7 +26,7 @@ function successMessageCard(message, redirect = null) {
       });
 }
 
-function failedMessageCard(message){
+function failedMessageCard3(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-[60]" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -518,18 +518,6 @@ function unselectAllCheckboxes() {
       lucide.createIcons();
 }
 
-function enableTimeOutBtn(){
-      const btn = document.getElementById('updateStaffAttendance');
-      
-      if (isAttendanceNotEmpty){
-            btn.style.opacity = '0.4';
-            btn.style.pointerEvents = 'none';
-      }else{
-            btn.style.opacity = '1';
-            btn.style.pointerEvents = 'auto';
-      }
-}
-
 function resetMonthAndDay(){ 
       let currentMonth = new Date().getMonth() + 1;
       let currentDay = new Date().getDate();
@@ -614,12 +602,12 @@ async function addStaff(e){
             const result = await response.json();
 
             if (result.success){
-                  successMessageCard(result.message);
+                  successMessageCard3(result.message);
                   document.querySelector('#addStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard3(result.message);
             }
       }catch(err){
             console.error(err);
@@ -669,7 +657,7 @@ async function showAllStaff(){
                         </li>
                   `;
                   
-                  tbody.innerHTML += empty_row;
+                  tbodys.innerHTML += empty_row;
             }
       }catch(err){
             console.error(err);
@@ -843,7 +831,7 @@ async function addStaffAttendance(e){
       });
 
       if (!allValid) {
-            failedMessageCard("Please mark attendance for all staff before submitting.");
+            failedMessageCard3("Please mark attendance for all staff before submitting.");
             return; // stop submission
       }
       
@@ -856,13 +844,13 @@ async function addStaffAttendance(e){
             const result = await response.json();
 
             if (result.success){
-                  successMessageCard(result.message);
+                  successMessageCard3(result.message);
                   document.querySelector('#bulkAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
                   showAllStaff();
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard3(result.message);
                   document.querySelector('#bulkAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
@@ -902,12 +890,12 @@ async function updateStaffAttendance(e){
             const result = await response.json();
 
             if (result.success){
-                  successMessageCard(result.message);
+                  successMessageCard3(result.message);
                   document.querySelector('#updateAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard3(result.message);
                   document.querySelector('#updateAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
@@ -930,12 +918,12 @@ async function updateStaffInfo(e){
             const result = await response.json();
 
             if (result.success){
-                  successMessageCard(result.message);
+                  successMessageCard3(result.message);
                   document.querySelector('#updateStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard3(result.message);
                   document.querySelector('#updateStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
@@ -1056,7 +1044,7 @@ async function searchStaff(name){
                         </li>
                   `;
                   
-                  tbody.innerHTML += empty_row;
+                  tbodys.innerHTML += empty_row;
             }
       }catch(err){
             console.error(err);
@@ -1109,11 +1097,11 @@ async function removeStaff(id){
             const result = await response.json();
 
             if (result.success){
-                  successMessageCard(result.message);
+                  successMessageCard3(result.message);
                   showAllStaff();
                   sumarryCards();
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard3(result.message);
             }
 
       }catch(err){
@@ -1135,12 +1123,12 @@ async function removeStaffAttendance(e){
             const result = await response.json();
 
             if (result.success){
-                  successMessageCard(result.message);
+                  successMessageCard3(result.message);
                   allStaffAttendance();
                   sumarryCards();
                   showAllStaff();
             }else{
-                  failedMessageCard(result.message);
+                  failedMessageCard3(result.message);
             }
 
       }catch(err){

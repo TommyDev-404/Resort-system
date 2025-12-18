@@ -1,6 +1,6 @@
 
 // ----------------- HELPERS ----------------- //
-function successMessageCard(message, redirect = null) {
+function successMessageCard8(message, redirect = null) {
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
@@ -23,7 +23,7 @@ function successMessageCard(message, redirect = null) {
       });
 }
 
-function failedMessageCard(message){
+function failedMessageCard8(message){
       const msg = `
             <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up ">
@@ -164,12 +164,12 @@ async function updatePrice(e){
       const result = await response.json();
 
       if (result.success){
-            successMessageCard(result.message);
+            successMessageCard8(result.message);
             e.target.reset();
             document.getElementById('update-area-modal').remove();
             renderTable();
       }else {
-            failedMessageCard(result.message);
+            failedMessageCard8(result.message);
       }
 }
 
@@ -189,8 +189,6 @@ document.addEventListener('click', (e) => {
 document.addEventListener('submit', (e) =>{
       if (e.target.matches('#updateAreaForm')) updatePrice(e);
 });      
-
-renderTable();
 
 // Load default category
 export function initPageRatesAndAvailability(){
