@@ -474,21 +474,6 @@ def logout():
       session.clear()
       return redirect(url_for('login_page'))
 
-@app.route("/memory")
-def memory_usage():
-      mem = process.memory_info()
-      return jsonify({
-            "rss_mb": round(mem.rss / 1024 / 1024, 2),
-            "vms_mb": round(mem.vms / 1024 / 1024, 2)
-      })
-
-"""
-@app.after_request
-def log_memory_usage(response):
-      mem = process.memory_info().rss / (1024 * 1024)
-      print(f"[MEMORY] {mem:.2f} MB")
-      return response
-"""
 
 if __name__ == '__main__':
-      app.run(debug=True)
+      app.run(debug=False)

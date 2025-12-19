@@ -166,7 +166,7 @@ CREATE TABLE room_assign_history (
 
 -- default admin credentials
 INSERT INTO admin (username, password, email, contact, code, hash_pass, date_pass_change)
-VALUES ('admin', 'plainpass123', 'admin@example.com', '09123456789', 123456, '$2y$10$9H0p1KdEQ1gEoH9s2lO0gOVYBWqs0ioY1hGQfgF4FklajfHsyAqLC','2025-01-01');
+VALUES ('admin', 'plainpass123', 'galiciarustom14@gmail.com', '09123456789', 123456, '$2y$10$9H0p1KdEQ1gEoH9s2lO0gOVYBWqs0ioY1hGQfgF4FklajfHsyAqLC','2025-01-01');
 
 -- temporary data for notifications
 INSERT INTO notifications(name, date, room_name, room_no, alert_type, classification, counts, guests) VALUES ('temporary', CURRENT_DATE() - INTERVAL 1 DAY, NULL, NULL , 'occupancy', NULL , NULL, NULL );
