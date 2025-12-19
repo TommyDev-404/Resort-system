@@ -32,7 +32,7 @@ class Accounting:
                               ) AS m
                               LEFT JOIN bookings b
                               ON MONTH(b.check_in) = m.month
-                              AND YEAR(b.check_in) = {year}
+                              AND YEAR(b.check_in) = '{year}'
                               AND b.status NOT IN ('Cancelled')
                               AND b.payment NOT IN ('Pending')
                               GROUP BY m.month

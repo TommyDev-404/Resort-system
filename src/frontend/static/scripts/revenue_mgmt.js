@@ -372,5 +372,5 @@ document.addEventListener("change", (e) => {
 });
 
 export async function initPageRevenueMgmt(){
-      await getAllPromo();
+      getAllPromo();
 }

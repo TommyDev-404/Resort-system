@@ -483,7 +483,3 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
-
-
-if __name__ == '__main__':
-      app.run(debug=True)

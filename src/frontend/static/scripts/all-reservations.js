@@ -1204,20 +1204,15 @@ document.addEventListener('input', (e) => {
       if (e.target.matches('input[name="guest-name"]')) searchGuest(e);
 });
 
-// -------------- Initialiaze when loaded ----------
-export async function initPageReservation() {
-      // Synchronous functions
-      switchTabs();
-      getMonths();
+// -------------- Initialiaze when loaded -----------
+switchTabs();
+getYears();
+getMonths();
+
+export function initPageReservation(){
+      getTotalsCountData();
       resetDropDown();
+      recentBookings();
       resetButtonAndCheckBox();
-
-      // Async functions run concurrently
-      await Promise.all([
-            getYears(),
-            getTotalsCountData(),
-            recentBookings(),
-            summaryCardsDatas()
-      ]);
+      summaryCardsDatas();
 }
-

@@ -611,8 +611,11 @@ function loadAccomodationType(accomodation_type=null){
       });
 }
 
+function resetDropdown(){
+      document.getElementById('roomTypeFilter').value = 'all';
+}
+
 // Filter
-/*
 document.getElementById('roomTypeFilter').addEventListener('change', async(e) => {
       if (e.target.value != 'all'){
             occupancyData(e.target.value);
@@ -647,41 +650,3 @@ export function initPageAnalytics() {
       drawMostBookedArea();
       drawOccupancyForecastChart();
 };
-*/
-
-document.getElementById('roomTypeFilter').addEventListener('change', async(e) => {
-      const type = e.target.value !== 'all' ? e.target.value : null;
-      await Promise.all([
-            occupancyData(type),
-            monthlyRevenue(type),
-            dailyRevenue(type),
-            drawCheckinForecastChart(type),
-            drawRevenueChart(type),
-            targetRevenue(type)
-      ]);
-      loadAccomodationType(type ? e.target.options[e.target.selectedIndex].text : null);
-});
-
-function resetDropdown(){
-      document.getElementById('roomTypeFilter').value = 'all';
-}
-
-export async function initPageAnalytics() {
-      // Synchronous functions
-      resetDropdown();
-      loadAccomodationType();
-
-      // Async functions run concurrently
-      await Promise.all([
-            occupancyData(),
-            monthlyRevenue(),
-            dailyRevenue(),
-            drawCheckinForecastChart(),
-            drawRevenueChart(),
-            targetRevenue(),
-            drawHeavyMonthChart(),
-            drawMostBookedArea(),
-            drawOccupancyForecastChart()
-      ]);
-      }
-      

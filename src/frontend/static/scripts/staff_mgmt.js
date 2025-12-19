@@ -1206,8 +1206,8 @@ getMonthsAndDays();
 
 // ----------- EXPORT ON LOAD ------------
 export async function initPageStaffMgmt(){
-      await showAllStaff();
-      await allStaffAttendance();
-      await sumarryCards();
+      showAllStaff();
+      allStaffAttendance();
+      sumarryCards();
       resetMonthAndDay();
 }

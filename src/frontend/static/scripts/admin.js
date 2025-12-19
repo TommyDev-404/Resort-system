@@ -279,6 +279,6 @@ document.addEventListener('change', (e) => {
       if(e.target.matches('#show')) showPassword();
 });
 
-export async function initPageAdmin(){
-      await adminProfile();
+export function initPageAdmin(){
+      adminProfile();
 }
