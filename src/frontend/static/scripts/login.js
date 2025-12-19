@@ -34,11 +34,11 @@ input.addEventListener('input', (e) => {
       const img = document.querySelector('.passField img');
       
       if (e.target.value != ''){
-            img.src = 'static/assets/eye.png';
+            img.src = 'static/assets/eye.webp';
             img.setAttribute('id', 'show');
       }else {
             e.target.setAttribute('type', 'password');
-            img.src = 'static/assets/pass.png';
+            img.src = 'static/assets/forgot.webp';
             img.setAttribute('id', 'ps-icon');
       }
 });
@@ -49,7 +49,7 @@ document.addEventListener('click', (e) => {
             const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
             input.setAttribute('type', type);
             
-            e.target.src = type === "password" ? 'static/assets/eye.png' : 'static/assets/hidden.png';
+            e.target.src = type === "password" ? 'static/assets/eye.webp' : 'static/assets/hidden.webp';
       }
       
       if (e.target.matches('#get_code')) forgotPassword(); 
@@ -68,6 +68,10 @@ document.addEventListener('change', (e) => {
 // submit form
 loginForm.addEventListener('submit', (e) => loginAdmin(e) );
 
+window.addEventListener('load', () => {
+      const initial = document.getElementById('initial-loading');
+      if (initial) initial.remove();
+});
 
 // ----------------- HELPERS ---------------- //
 function loadingAnimation1(){
@@ -106,7 +110,12 @@ function successMessageCard1(message, redirect = null) {
             const box = document.getElementById("success-message");
             box.remove();
 
-            if (redirect)  window.location.href = redirect;
+            if (redirect) {
+                  showLoader();
+                  setTimeout(() => {
+                        window.location.href = redirect;
+                }, 600); // short delay so spinner appears
+            }
       });
 }
 
@@ -129,13 +138,23 @@ function failedMessageCard1(message){
       });
 }
 
+function showLoader() {
+      loadingAnimation1(); // adds #loading
+}
+
+function hideLoader() {
+const loader = document.querySelector('#loading');
+if (loader) loader.remove();
+}  
+
 // ----------------- DATA --------------------//
 async function loginAdmin(e) {
       e.preventDefault();
       const form = new FormData(e.target);
 
       try {
-            loadingAnimation1();
+          // Show loader before fetch
+            showLoader();
             
             const response = await fetch('/login/auth', {
                   method: 'POST',
@@ -145,15 +164,17 @@ async function loginAdmin(e) {
             const result = await response.json();
       
             if (result.success){
+                  hideLoader();
                   successMessageCard1(result.message, result.redirect);
-            }else{
+            } else {
+                  hideLoader();
                   failedMessageCard1(result.message);
             }
+
       } catch (error) {
             console.error('Error:', error);
+            hideLoader();
             failedMessageCard1('Something went wrong. Please try again.');
-      } finally {
-            document.querySelector('#loading').remove();
       }
 }
 
@@ -162,8 +183,7 @@ async function forgotPassword() {
 
       if (email === '') return failedMessageCard1('Empty input! Please fill in before getting code.')
       try {
-            loadingAnimation1();
-
+            showLoader();
             const response = await fetch(`/forgot-password`, {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -172,16 +192,16 @@ async function forgotPassword() {
             const result = await response.json();
       
             if (result.success){
+                  hideLoader();
                   successMessageCard1(result.message);
             }else{
+                  hideLoader();
                   failedMessageCard1(result.message);
             }
       
       } catch (error) {
             console.error('Error:', error);
             failedMessageCard1('Something went wrong. Please try again.');
-      } finally {
-            document.querySelector('#loading').remove();
       }
 }
 
@@ -215,7 +235,7 @@ async function changePassword() {
       const new_password = document.querySelector('input[name="new_password"]').value;
       
       try {
-            loadingAnimation1();
+            showLoader();
 
             const response = await fetch(`/change-password`, {
                   method: 'POST',
@@ -224,8 +244,8 @@ async function changePassword() {
             });
             const result = await response.json();
       
-            console.log(result);
             if (result.success){
+                  hideLoader();
                   successMessageCard1(result.message);
                   changePasswordForm.classList.remove('opacity-100');
                   setTimeout(() => {
@@ -234,12 +254,13 @@ async function changePassword() {
                         setTimeout(() => loginForm.classList.remove('opacity-0'), 50);
                   }, 300);
             }else{
+                  hideLoader();
                   failedMessageCard1(result.message);
             }
       } catch (error) {
             console.error('Error:', error);
             failedMessageCard1('Something went wrong. Please try again.');
       } finally {
-            document.querySelector('#loading').remove();
+            hideLoader();
       }
 }

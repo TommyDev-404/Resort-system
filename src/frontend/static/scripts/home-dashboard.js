@@ -952,11 +952,7 @@ document.addEventListener('click', (e) => {
       if (e.target.matches('#last_month')) filteredDashboard('last_month');
 });
 
-loadingAnimation2();
-setTimeout(() => {
-      document.querySelector('#loading').remove();
-}, 1000);
-
+/*
 // Initial load: ensure the default content is shown and charts are drawn
 export function initPageDashboard() {
       allNotifications.length = 0;
@@ -975,4 +971,30 @@ export function initPageDashboard() {
       drawBookingTypeDistribution();
       drawGuestTrend();
       drawRevenueTrend();
+};
+*/
+
+export async function initPageDashboard() {
+      allNotifications.length = 0;
+
+      // Independent async calls in parallel
+      const tasks = [
+            mostBookedArea(),
+            todayGuest(),
+            totalGuestInHouse('today'),
+            totalOccupied(),
+            roomsData(),
+            upcomingArrivals(),
+            upcomingCheckouts(),
+            todaysBookings(),
+            todayProjectedRevenue(),
+            bookingOverviewCardsData(),
+            drawMonthlyBookings(),
+            drawOccupancyPercentage(),
+            drawBookingTypeDistribution(),
+            drawGuestTrend(),
+            drawRevenueTrend()
+      ];
+
+      await Promise.all(tasks);  // wait until all finish
 };

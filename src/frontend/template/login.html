@@ -6,7 +6,7 @@
 	<meta name="description" content="A resort management system with forecasting, reservations, and secure admin access for Laguna Grand-Villa Resort. Fast, reliable, and easy to use.">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="preload" href="{{ url_for('static', filename='style/output.css') }}" as="style" onload="this.rel='stylesheet'">
-      <link rel="icon" type="image/x-icon" href="/static/assets/user.png">
+      <link rel="icon" type="image/x-icon" href="/static/assets/admin.webp">
 	<script src="https://unpkg.com/lucide@latest" defer></script>
 	
 </head>
@@ -32,7 +32,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		background-image: url('{{ url_for("static", filename="assets/logo.webp") }}');
+		background-image: url('{{ url_for("static", filename="assets/bg.webp") }}');
 		background-size: cover;       /* cover the entire body */
 		background-position: center;  /* center the image */
 		background-repeat: no-repeat; /* avoid repeating */
@@ -57,10 +57,14 @@
 
 </style>
 
-<body>
+<body>]
+	<div id="initial-loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2">
+		<div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+		<p class="text-[15px] font-medium animate-pulse">Loading, please wait...</p>
+	</div>
 
 	<!-- Overlay Container -->
-	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[35%] p-6 overflow-hidden bg-transparent backdrop-blur-[20px] border border-white/40 rounded-xl shadow-2xl before:content-[''] before:absolute before:inset-0 before:border before:border-white/20 before:rounded-xl before:pointer-events-none">
+	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] p-6 overflow-hidden bg-transparent backdrop-blur-[20px] border border-white/40 rounded-xl shadow-2xl before:content-[''] before:absolute before:inset-0 before:border before:border-white/20 before:rounded-xl before:pointer-events-none">
 		<!-- CONTENT LAYER -->
 		<div class="relative z-10">
 			<!-- LOGO -->
@@ -77,19 +81,19 @@
 			<div id="loginForm" class="w-full flex flex-col items-center transition-all duration-500 ease-in-out opacity-100">
 				<form class="loginForm w-full flex flex-col gap-4">
 					<div class="flex flex-col items-center justify-center">
-						<img src="{{ url_for('static', filename='assets/admin.png') }}" class="w-16 h-16 opacity-90" alt="Admin User Icon">
+						<img src="{{ url_for('static', filename='assets/admin.webp') }}" class="w-12 h-12 opacity-100" alt="Admin User Icon">
 						<h1 class="text-2xl font-bold mb-6 text-white">Admin Login</h1>
 					</div>
 
 					<!-- Username -->
 					<div class="relative">
-						<img src="{{ url_for('static', filename='assets/admin.png') }}" width="30" class="absolute top-3 right-3.5 z-10"alt="Username Icon">
+						<img src="{{ url_for('static', filename='assets/admin.webp') }}" width="30" class="absolute top-3 right-3.5 z-10 opacity-100"alt="Username Icon">
 						<input type="text" name="username" required placeholder="Username" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-md text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
 					</div>
 				
 					<!-- Password -->
 					<div class="passField relative">
-						<img src="{{ url_for('static', filename='assets/pass.png') }}" width="25" class="absolute top-3.5 right-4 z-10" alt="Password Icon">
+						<img src="{{ url_for('static', filename='assets/forgot.webp') }}" width="22" class="absolute top-3.5 right-4 z-10 opacity-100" alt="Password Icon">
 						<input type="password" name="password" required placeholder="Password" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-md text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
 					</div>
 
@@ -99,27 +103,32 @@
 			
 				<!-- Socials -->
 				<div class="flex flex-col items-center mt-4">
-					<p class="text-white/70 mb-2 text-xs tracking-wide">Resort Social Media's:</p>
+					<p class="text-white/70 mb-2 text-xs tracking-wide">Resort social media:</p>
 					<div class="flex gap-4 justify-center items-center">
-						<a href="https://www.facebook.com/grandvillalaguna" target="_blank" class="transform transition hover:scale-110 hover:shadow-lg rounded-full">
-							<img src="{{ url_for('static', filename='assets/fbs.png') }}" class="w-6 h-6 rounded-full opacity-90" alt="Resort Facebook Page">
+						<a href="https://www.facebook.com/grandvillalaguna"target="_blank"
+						rel="noopener noreferrer"
+						aria-label="Visit Grand Villa Laguna on Facebook"
+						class="transform transition hover:scale-110 hover:shadow-lg rounded-full">
+							<img src="{{ url_for('static', filename='assets/facebook.webp') }}" class="w-6 h-6 rounded-full opacity-90" alt="">
 						</a>
 					
-						<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09" target="_blank" class="transform transition hover:scale-110 hover:shadow-lg rounded-full" alt="Resort Twitter Page">
-							<img src="{{ url_for('static', filename='assets/twitter.png') }}" class="w-6 h-6 rounded-full opacity-90">
+						<a href="https://x.com/GVilla72742?t=JvxM-upPPKSWsgkS-bOY6w&s=09" target="_blank" rel="noopener noreferrer" aria-label="Visit Grand Villa Laguna on Twitter"
+						class="transform transition hover:scale-110 hover:shadow-lg rounded-full">
+						<img src="{{ url_for('static', filename='assets/twitter.webp') }}" class="w-6 h-6 rounded-full opacity-90" alt="">
 						</a>
 					
-						<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw" target="_blank" class="transform transition hover:scale-110 hover:shadow-lg rounded-full" alt="Resort Instagram Page">
-							<img src="{{ url_for('static', filename='assets/insta.png') }}" class="w-6 h-6 rounded-full opacity-90">
+						<a href="https://www.instagram.com/grand_villaresort?igsh=dDVveXQ5Z3Q3NGpw" target="_blank" rel="noopener noreferrer" aria-label="Visit Grand Villa Laguna on Instagram"
+						class="transform transition hover:scale-110 hover:shadow-lg rounded-full">
+						<img src="{{ url_for('static', filename='assets/social.webp') }}" class="w-6 h-6 rounded-full opacity-90" alt="">
 						</a>
-					</div>
+					</div>				  
 				</div>
 			</div>
 			
 			<!-- FORGOT PASSWORD -->
 			<div id="forgotForm" class="hidden w-full flex flex-col items-center gap-4 transition-all duration-500 ease-in-out opacity-0">
 				<div class="flex flex-col items-center justify-center">
-					<img src="{{ url_for('static', filename='assets/forgot.png') }}" class="w-16 h-16 opacity-90" alt="Admin User Icon">
+					<img src="{{ url_for('static', filename='assets/forgot.webp') }}" class="w-12 h-12 opacity-100" alt="Admin User Icon">
 					<h1 class="text-2xl font-bold mb-6 text-white">Forgot Password</h1>
 				</div>
 				
@@ -130,20 +139,20 @@
 				</div>
 				<input type="text" name="code" maxlength="6" required placeholder="Enter 6-digit code" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
 				<button id="link-change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full mt-4 transition">Continue</button>
-				<p class="text-sm text-white/70 mt-2 flex gap-1 items-center">Remember your password?<span id="backToLogin" class="text-blue-400 hover:underline cursor-pointer">Login</span></p>
+				<p class="text-sm text-white/70 mt-2 flex gap-1 items-center">Remember your password?<span id="backToLogin" class="text-blue-700 hover:underline cursor-pointer">Login</span></p>
 			</div>
 			
 			<!-- CHANGE PASSWORD -->
 			<div id="changePasswordForm" class="hidden w-full flex flex-col items-center gap-1 transition-all duration-500 ease-in-out opacity-0">
 				<div class="flex flex-col items-center justify-center">
-					<img src="{{ url_for('static', filename='assets/change.png') }}" class="w-16 h-16 opacity-90" alt="Admin User Icon">
+					<img src="{{ url_for('static', filename='assets/change.webp') }}" class="w-12 h-12 opacity-100" alt="Admin User Icon">
 					<h1 class="text-2xl font-bold mb-6 text-white">Change Password</h1>
 				</div>
 
 				<input type="password" name="new_password" required placeholder="Enter new password" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
 				<label class="text-sm text-white/70 flex items-center gap-2 w-full"><input type="checkbox" id="showPassword">Show Password</label>
 				<button id="change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full transition mt-6">Update</button>
-				<p class="text-sm text-white/70">Remember your password?<span id="backToLogin2" class="text-blue-400 hover:underline cursor-pointer">Login</span></p>
+				<p class="text-sm text-white/70">Remember your password?<span id="backToLogin2" class="text-blue-700 hover:underline cursor-pointer">Login</span></p>
 			</div>
 			
 		</div>

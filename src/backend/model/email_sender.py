@@ -10,8 +10,8 @@ class OTPVerification:
       def verify_acc(self, user_email):
 
             # Email credentialsEmail sent successfully!
-            system_email = "rustomgalicia1@gmail.com"
-            password = "gwrk yfve hhsa pepi"  # For Gmail, use an App Password
+            system_email = "grandsightlaguna.noreply404@gmail.com"
+            password = "baxe zgtt bico vnfa "  # For Gmail, use an App Password
 
             # Create the email
             message = MIMEMultipart()

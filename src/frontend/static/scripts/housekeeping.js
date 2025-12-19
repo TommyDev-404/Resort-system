@@ -514,8 +514,8 @@ document.addEventListener('change', (e) => {
 
 getMonthsAndDays();
 
-export function initPageHousekeeping(){
-      getSummarryCardData();
-      accomodationData();
+export async function initPageHousekeeping(){
+      await getSummarryCardData();
+      await accomodationData();
       switchRoomStatus(document.querySelector('#room-status-btn'));
 }

@@ -1205,9 +1205,9 @@ document.addEventListener('submit', (e) => {
 getMonthsAndDays();
 
 // ----------- EXPORT ON LOAD ------------
-export function initPageStaffMgmt(){
-      showAllStaff();
-      allStaffAttendance();
-      sumarryCards();
+export async function initPageStaffMgmt(){
+      await showAllStaff();
+      await allStaffAttendance();
+      await sumarryCards();
       resetMonthAndDay();
 }

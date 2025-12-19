@@ -15,7 +15,6 @@ class Login:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-
                         cursor.execute(''' SELECT username FROM admin where username = %s ''', (username,))
                         data = cursor.fetchone()
 

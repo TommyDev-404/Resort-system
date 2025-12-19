@@ -70,9 +70,8 @@ document.addEventListener('change', (e) => {
       if (e.target.matches('#filter-payment')) loadBookingRevenue(e.target.value);
 });
 
-getYearNow();
-
-export function initPageAccounting(){
-      getSummaryData();
-      loadBookingRevenue('2025');
+export async function initPageAccounting(){
+      await getSummaryData();
+      await loadBookingRevenue('2025');
+      await getYearNow();
 }

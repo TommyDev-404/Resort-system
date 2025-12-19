@@ -371,6 +371,6 @@ document.addEventListener("change", (e) => {
       if (e.target.closest('#selectAllCheckbox')) selectAllAreas(e);
 });
 
-export function initPageRevenueMgmt(){
-      getAllPromo();
+export async function initPageRevenueMgmt(){
+      await getAllPromo();
 }

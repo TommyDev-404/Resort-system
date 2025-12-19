@@ -1,13 +1,14 @@
 import pymysql
-from datetime import date
+from datetime import date, timedelta
 import psutil, os, time
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
 from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
 
-process = psutil.Process(os.getpid())
-
 app = Flask(__name__, template_folder='frontend/template', static_folder='frontend/static')
 app.secret_key = 'i_love_u'  # secret key
+
+# Set session lifetime
+app.permanent_session_lifetime = timedelta(minutes=30)  # 30 minutes
 
 # prevent going back to homepage after logout or going direct on home page without authentication
 @app.after_request
@@ -18,7 +19,7 @@ def add_header(response):
       return response
 
 # Create DB object once here
-db = Database( host="localhost", user="tommy", password="2006", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
+db = Database( host="localhost", user="grandsight", password="123456", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
 
 # create instances of classes
 admin = Admin(db)
@@ -36,6 +37,10 @@ login = Login(db)
 
 # render templates
 #------------------ LOGIN ------------------#
+@app.route('/')
+def index():
+      return redirect(url_for('login_page'))
+
 @app.route('/login', methods=['GET'])
 def login_page():
       return render_template('login.html')
@@ -76,7 +81,12 @@ def bookings_alert():
 #------------------ LOGIN API ------------------#
 @app.route('/login/auth', methods=['POST'])
 def login_auth():
-      return jsonify(login.login(**request.get_json()))
+      data = request.get_json()
+      result = login.login(**data)  # your login function
+      if result['success']:
+            session.permanent = True
+            session['admin'] = True
+      return jsonify(result)
 
 #------------------ FORGOT PASSWORD API ------------------#
 @app.route('/forgot-password', methods=['POST'])
@@ -476,4 +486,4 @@ def logout():
 
 
 if __name__ == '__main__':
-      app.run(debug=False)
+      app.run(debug=True)

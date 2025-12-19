@@ -21,37 +21,31 @@ const sectionControllerMap = {
 };
 
 /*---------------- SIDEBAR TOGGLE ----------------*/
-function toggleSidebar() {
-      const isHidden = sidebar.classList.contains('-translate-x-full');
-      sidebar.classList.toggle('-translate-x-full', !isHidden);
-      sidebar.classList.toggle('translate-x-0', isHidden);
-      sidebar.classList.toggle('opacity-0', isHidden);
-      sidebar.classList.toggle('pointer-events-none', isHidden);
-      sidebar.classList.toggle('opacity-50', !isHidden);
+function loadingAnimation0(){
+      const load = `
+            <div id="loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2 backdrop-blur-[2px]">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingPortal').innerHTML += load;
+}
+
+function showLoader() {
+      loadingAnimation0(); // adds #loading inside #loadingPortal
+}
+
+function hideLoader() {
+      const loader = document.querySelector('#loading');
+      if (loader) loader.remove();
 }
 
 /*---------------- SWITCH CONTENT ----------------*/
-
 async function switchContent(sectionId) {
       if (!sectionId) return;
 
-      // Hide all sections
-      contentSections.forEach(section => section.classList.add('hidden'));
-
-      // Show target section
-      const targetSection = document.getElementById(sectionId);
-      if (targetSection) {
-            targetSection.classList.remove('hidden');
-            notifications();
-          // Dynamically import and initialize
-            if (sectionControllerMap[sectionId]) {
-                  const module = await sectionControllerMap[sectionId]();
-                  
-                  // Assuming each module exports `initPageX`
-                  const initFunc = Object.values(module)[0];
-                  if (initFunc) initFunc();
-            }
-      }
+      showLoader(); // spinner visible immediately
 
       // Update sidebar active state
       sidebarItems.forEach(item => {
@@ -63,9 +57,30 @@ async function switchContent(sectionId) {
             }
       });
 
-      // Hide sidebar on mobile after selection
-      if (window.innerWidth < 1024) toggleSidebar();
+      try {
+            // Hide all sections
+            contentSections.forEach(section => section.classList.add('hidden'));
+
+            // Show target section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) targetSection.classList.remove('hidden');
+
+            // Dynamically import module if exists
+            if (sectionControllerMap[sectionId]) {
+                  await notifications();
+                  const module = await sectionControllerMap[sectionId]();
+                  const initFunc = Object.values(module)[0];
+                  if (initFunc) await initFunc(); // wait if async
+            }
+
+      } catch (err) {
+            console.error(`Error loading ${sectionId}:`, err);
+      } finally {
+            hideLoader(); // hide spinner after everything is ready
+      }
+
 }
+
 
 function logout(){
       logoutCard();
