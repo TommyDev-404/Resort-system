@@ -132,34 +132,7 @@ class Dashboard:
                   cursor = con.cursor()
                   cursor.execute(''' 
                         WITH 
-                        today AS (  WITH 
                         today AS (
-                              SELECT 
-                                    COALESCE(SUM(total_amount), 0) AS today_revenue
-                              FROM bookings
-                              WHERE paid_date = CURRENT_DATE() 
-                              AND payment NOT IN ('Pending')
-                        ),
-                        yesterday AS (
-                              SELECT
-                                    COALESCE(SUM(total_amount), 0) AS yesterday_revenue
-                              FROM bookings
-                              WHERE payment NOT IN ('Pending')
-                              AND paid_date = CURRENT_DATE() - INTERVAL 1 DAY 
-                        )
-                        SELECT 
-                        today.today_revenue,
-                        yesterday.yesterday_revenue,
-                        CASE
-                              WHEN yesterday.yesterday_revenue = 0 AND today.today_revenue = 0 THEN 0        -- both zero
-                              WHEN yesterday.yesterday_revenue = 0 AND today.today_revenue > 0 THEN 100      -- new revenue appears
-                              WHEN yesterday.yesterday_revenue > 0 AND today.today_revenue = 0 THEN -100      -- drop to zero
-                              ELSE ROUND(
-                                    (today.today_revenue - yesterday.yesterday_revenue) 
-                                    / yesterday.yesterday_revenue * 100, 2
-                              )
-                        END AS achievement_percent
-                        FROM today, yesterday;
                               SELECT 
                                     COALESCE(SUM(total_amount), 0) AS today_revenue
                               FROM bookings
