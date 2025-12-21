@@ -58,12 +58,12 @@ class Dashboard:
                         today AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS guests
                               FROM bookings
-                              WHERE DATE(check_in) = CURDATE() AND status IN ('Checked-in', 'Day Guest')
+                              WHERE check_in = CURDATE() AND status IN ('Checked-in', 'Day Guest')
                         ),
                         yesterday AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS guests
                               FROM bookings
-                              WHERE DATE(check_in) = CURDATE() - INTERVAL 1 DAY AND status IN ('Checked-in', 'Day Guest', 'Checked-out')
+                              WHERE check_in = CURDATE() - INTERVAL 1 DAY AND status IN ('Checked-in', 'Day Guest', 'Checked-out')
                         )
                         SELECT 
                               today.guests AS today_guest,
@@ -87,13 +87,13 @@ class Dashboard:
                               today AS (
                                     SELECT COUNT(*) AS today_checkin
                                     FROM bookings
-                                    WHERE DATE(check_in) = CURRENT_DATE()
+                                    WHERE check_in = CURRENT_DATE()
                                     AND status IN ('Checked-in', 'Day Guest')
                               ),
                               yesterday AS (
                                     SELECT COUNT(*) AS yesterday_checkin
                                     FROM bookings
-                                    WHERE DATE(check_in) = (CURRENT_DATE() - INTERVAL 1 DAY)
+                                    WHERE check_in = (CURRENT_DATE() - INTERVAL 1 DAY)
                                     AND status NOT IN ('Cancelled', 'Reserved')
                               )
                         SELECT 
@@ -132,7 +132,34 @@ class Dashboard:
                   cursor = con.cursor()
                   cursor.execute(''' 
                         WITH 
+                        today AS (  WITH 
                         today AS (
+                              SELECT 
+                                    COALESCE(SUM(total_amount), 0) AS today_revenue
+                              FROM bookings
+                              WHERE paid_date = CURRENT_DATE() 
+                              AND payment NOT IN ('Pending')
+                        ),
+                        yesterday AS (
+                              SELECT
+                                    COALESCE(SUM(total_amount), 0) AS yesterday_revenue
+                              FROM bookings
+                              WHERE payment NOT IN ('Pending')
+                              AND paid_date = CURRENT_DATE() - INTERVAL 1 DAY 
+                        )
+                        SELECT 
+                        today.today_revenue,
+                        yesterday.yesterday_revenue,
+                        CASE
+                              WHEN yesterday.yesterday_revenue = 0 AND today.today_revenue = 0 THEN 0        -- both zero
+                              WHEN yesterday.yesterday_revenue = 0 AND today.today_revenue > 0 THEN 100      -- new revenue appears
+                              WHEN yesterday.yesterday_revenue > 0 AND today.today_revenue = 0 THEN -100      -- drop to zero
+                              ELSE ROUND(
+                                    (today.today_revenue - yesterday.yesterday_revenue) 
+                                    / yesterday.yesterday_revenue * 100, 2
+                              )
+                        END AS achievement_percent
+                        FROM today, yesterday;
                               SELECT 
                                     COALESCE(SUM(total_amount), 0) AS today_revenue
                               FROM bookings
@@ -247,7 +274,8 @@ class Dashboard:
                               CROSS JOIN (
                                     SELECT SUM(premium + standard + garden + barkada + family + cabana + small + big + hall) AS yearly_total
                                     FROM accomodation_data
-                                    WHERE YEAR(check_in) = YEAR(CURDATE())
+                                    WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
                                     ) AS total_table
                               ORDER BY total_bookings DESC
                               LIMIT 5;
@@ -382,7 +410,8 @@ class Dashboard:
                                     MONTH(check_in) AS month_num,
                                     COUNT(*) AS booking_count
                               FROM bookings
-                              WHERE YEAR(check_in) = YEAR(CURRENT_DATE())
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
+                              AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
                               GROUP BY MONTH(check_in)
                         )
                         SELECT 
@@ -402,11 +431,20 @@ class Dashboard:
                   cursor.execute(''' 
                         with 
                         checkin as (
-                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status IN ('Checked-out')
+                              SELECT COUNT(*) as total from bookings 
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
+                              AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
+                              AND status IN ('Checked-out')
                         ), day_guest as (
-                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status IN ('Day Guest')
+                              SELECT COUNT(*) as total from bookings 
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
+                              AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
+                              AND status IN ('Day Guest')
                         ), cancelled as (
-                              SELECT COUNT(*) as total from bookings where year(check_in) = year(CURRENT_DATE()) AND status IN ('Cancelled')
+                              SELECT COUNT(*) as total from bookings 
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
+                              AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
+                              AND status IN ('Cancelled')
                         ) 
                         SELECT 
                               checkin.total as checkin_total,
