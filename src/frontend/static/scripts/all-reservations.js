@@ -3,6 +3,7 @@ import { notifications} from "./home-dashboard.js";
 const tbody = document.getElementById('tbody');
 let savedAccomodations = [];
 let category_data = 'all-data';
+let roomCache = {};
 
 // ---------------- RENDER HELPERS ------------------
 function successMessageCard4(message, redirect = null) {
@@ -923,17 +924,13 @@ async function generateAvlAccomodation(accomodation){
       document.querySelectorAll('#avl-accomodations label').forEach(label => label.remove());
       let room_name = accomodation.split(' ');
 
-      const response = await fetch(`/avl-rooms?room_name=${room_name[0]}`);
-      const result = await response.json();
-      const rooms = result.rooms;
-      console.log(rooms);
+      let rooms = roomCache[room_name[0]] || [];
       for (let i = 0; i < rooms.length; i++){
             const p = `
                   <label  class="acc-card flex gap-2 justify-center bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-300 dark:border-gray-700 cursor-pointer transition select-none hover:bg-gray-100 dark:hover:bg-gray-700"">
                         <input type="checkbox" class="text-gray-100 dark:text-gray-800 w-3" name="avl" value="${accomodation} ${rooms[i]}" required>${accomodation} ${rooms[i]}
                   </label>
             `;
-            console.log(`${accomodation}`);
             document.querySelector('#avl-accomodations').innerHTML += p;
       }
 
@@ -944,9 +941,19 @@ async function generateAvlAccomodation(accomodation){
 }
 
 async function avl_spaces() {
+      const response1 = await fetch(`/avl-rooms`);
+      const result1 = await response1.json();
+      const rooms = result1.rooms;
+
+      rooms.forEach(([room, name]) => {
+            if (!roomCache[name]) {
+                  roomCache[name] = [];
+            }
+            roomCache[name].push(room);
+      });
+
       const response = await fetch('/avl-spaces');
       const result = await response.json();
-      console.log(result);
 
       document.getElementById('count-p').textContent = result.premium;
       document.getElementById('count-s').textContent = result.standard;
@@ -1129,7 +1136,7 @@ async function searchGuest(e){
 // ---------- Event Listeners ----------------- //
 document.addEventListener('click', (e) => {
       // btn click
-      if (e.target.closest('#add-booking-btn')) renderAddBookingModal();
+      if (e.target.closest('#add-booking-btn')) (resetDropDown(), recentBookings(), renderAddBookingModal());
       if (e.target.closest('#mark-paid')) renderMarkPaidModal();
       if (e.target.closest('#mark-checkin')) markAsCheckin();
       if (e.target.closest('#mark-checkout')) markAsCheckout();

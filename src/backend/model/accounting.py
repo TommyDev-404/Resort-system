@@ -12,7 +12,7 @@ class Accounting:
                         cursor = con.cursor()
                         cursor.execute(f"""
                               SELECT
-                                    DATE_FORMAT(STR_TO_DATE(m.month, '%m'), '%M') AS month_name,
+                                    MONTHNAME(STR_TO_DATE(CONCAT(m.month, '-01'), '%m-%d')) AS month_name,
                                     COALESCE(SUM(CASE WHEN b.payment = 'Direct Payment' THEN b.total_amount ELSE 0 END), 0) AS direct,
                                     COALESCE(SUM(CASE WHEN b.payment = 'ZUZU (Online Payment)' THEN b.total_amount ELSE 0 END), 0) AS online,
                                     COALESCE(SUM(b.total_amount), 0) AS total
@@ -33,8 +33,8 @@ class Accounting:
                               LEFT JOIN bookings b
                               ON MONTH(b.check_in) = m.month
                               AND YEAR(b.check_in) = '{year}'
-                              AND b.status NOT IN ('Cancelled')
-                              AND b.payment NOT IN ('Pending')
+                              AND b.status <> 'Cancelled'
+                              AND b.payment <> 'Pending'
                               GROUP BY m.month
                               ORDER BY m.month;
                         """)

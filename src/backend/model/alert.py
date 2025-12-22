@@ -1,7 +1,6 @@
 from backend.forecast import Forecast
 from datetime import datetime, timedelta, date, timezone
 
-
 class Alerts:
       def __init__(self, db):
             self.db = db
@@ -258,15 +257,11 @@ class Alerts:
                         SET 
                               weekly_salary = 0,
                               monthly_salary = CASE
-                              WHEN MONTH(reset_date) != MONTH(CURRENT_DATE()) OR YEAR(reset_date) != YEAR(CURRENT_DATE())
-                              THEN 0
-                              ELSE monthly_salary
+                                    WHEN reset_date < DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01') THEN 0
+                                    ELSE monthly_salary
                               END,
                               reset_date = CURRENT_DATE()
-                        WHERE 
-                              WEEK(reset_date, 1) != WEEK(CURRENT_DATE(), 1)
-                              OR MONTH(reset_date) != MONTH(CURRENT_DATE())
-                              OR YEAR(reset_date) != YEAR(CURRENT_DATE());
+                        WHERE reset_date < DATE_SUB(CURRENT_DATE(), INTERVAL WEEKDAY(CURRENT_DATE()) DAY);
                   ''')
 
                   conn.commit()

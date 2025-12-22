@@ -1,5 +1,5 @@
 from datetime import datetime
-from datetime import date
+from datetime import date, timedelta
 
 class Staff_Management: 
       def __init__(self, db):
@@ -58,7 +58,22 @@ class Staff_Management:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(f''' SELECT * FROM staff_details where id not in (select staff_id from staff_attendance where MONTH(date) = {month} and DAY(date) = {day} and status NOT IN ('On Leave')) ''')
+                        target_date = date(date.today().year, month, day)
+                        next_date = target_date + timedelta(days=1)
+                        print(target_date, next_date)
+                        query = """
+                        SELECT *
+                        FROM staff_details sd
+                        WHERE sd.id NOT IN (
+                        SELECT sa.staff_id
+                        FROM staff_attendance sa
+                        WHERE sa.date >= %s
+                              AND sa.date < %s
+                              AND sa.status <> 'On Leave'
+                        )
+                        """
+
+                        cursor.execute(query, (target_date, next_date))
                         data = cursor.fetchall()
                         
                         return {'success': bool(data), 'data': data}
@@ -194,8 +209,13 @@ class Staff_Management:
       def all_staff_attendance(self, day, month):
             try:
                   with self.db.connect() as con:
-                        cursor = con.cursor()
-                        cursor.execute(f''' SELECT * FROM staff_attendance WHERE DAY(date) = {day} AND MONTH(date) = {month} ''')
+                        cursor = con.cursor() 
+                        target_date = date(date.today().year, int(month), int(day))
+                        cursor.execute('''
+                        SELECT * 
+                        FROM staff_attendance 
+                        WHERE date = %s
+                        ''', (target_date,))
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}
@@ -207,14 +227,23 @@ class Staff_Management:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(f''' SELECT * FROM staff_attendance WHERE MONTH(date) = {month} AND DAY(date) = {day} AND status <> 'Absent' AND time_out = '--' ''')
-                        data = cursor.fetchall()
+                        target_date = f"{date.today().year}-{int(month)}-{int(day)}"  # format YYYY-MM-DD
+                        print('date: '+str(target_date))
+                        cursor.execute('''
+                        SELECT * 
+                        FROM staff_attendance 
+                        WHERE date = %s
+                              AND status not in ('Absent')
+                        ''', (target_date,))
 
+                        data = cursor.fetchall()
+                        print(data)
                         return {'success': bool(data), 'data': data}
+
             except Exception as e:
                   con.rollback()
-                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
-      
+                  return {'success': False, 'message': f'Query failed: {e}'}
+
       def individual_staff_attendance(self, id):
             try:
                   with self.db.connect() as con:

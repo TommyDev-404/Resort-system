@@ -139,15 +139,24 @@ class Housekeeping:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
+            from datetime import date
+
       def cleaning_history(self, month, day):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM room_assign_history WHERE MONTH(date) = %s AND DAY(date) = %s ''', (month, day))
-                        data = cursor.fetchall()
 
+                        target_date = date(date.today().year, int(month), int(day))
+
+                        cursor.execute('''
+                        SELECT * 
+                        FROM room_assign_history 
+                        WHERE date = %s
+                        ''', (target_date,))
+                        
+                        data = cursor.fetchall()
                         return {'success': bool(data), 'data': data}
+
             except Exception as e:
                   con.rollback()
-                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+                  return {'success': False, 'message': f'Query failed: {e}'}

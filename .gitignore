@@ -14,5 +14,6 @@ src/backend/excel/
 accomodation-data.sql
 bookings.sql
 init.sql
+indexes.sql
 
 src/frontend/scripts/

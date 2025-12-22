@@ -230,12 +230,8 @@ def summary_cards_data():
       return jsonify(reserve.summaryCardsData())
 
 @app.route('/avl-rooms', methods=['GET'])
-def avl_rooms():
-      return jsonify(reserve.get_avl_room(request.args.get('room_name')))
-
-@app.route('/avl-rooms-all', methods=['GET'])
 def avl_rooms_all():
-      return jsonify(reserve.get_avl_room_all())
+      return jsonify(reserve.get_avl_room())
 
 @app.route('/totals', methods=['GET'])
 def totals():
