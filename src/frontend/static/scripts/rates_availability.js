@@ -78,7 +78,28 @@ function openUpdateAreaModal(e) {
       lucide.createIcons();
 }
 
+function loadingAnimation0(){
+      const load = `
+            <div id="loading" class="absolute top-60 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingAccountingPortal').innerHTML += load;
+}
+
+function showLoader() {
+      loadingAnimation0(); // adds #loading inside #loadingPortal
+}
+
+function hideLoader() {
+      const loader = document.querySelector('#loading');
+      if (loader) loader.remove();
+}
+
 async function renderTable() {
+      showLoader();
       // Fetch data from backend
       let rows = [];
       try {
@@ -124,6 +145,7 @@ async function renderTable() {
 
       document.getElementById('table2-body').innerHTML = bodyHtml;
       lucide.createIcons();
+      hideLoader();
 }
 
 function areaTypeInfo(area){
@@ -131,24 +153,26 @@ function areaTypeInfo(area){
             'premium': 'Premium Villa Room',
             'standard': 'Standard Villa Room',
             'barkada': 'Barkada Room',
-            'family': 'Family Room',
             'garden': 'Garden View Room',
             'cabana': 'Cabana Cottage',
             'small': 'Small Cottage',
             'big': 'Big Cottage',
-            'hall' : "Hall"
+            'pavillion': 'Pavillion Hall',
+            'mariposa': 'Mariposa Hall',
+            'minicon': 'Minicon Hall'
       };
 
       const capacity = {
             'premium': '12',
             'standard': '10',
             'barkada': '8',
-            'family': '10',
             'garden': '4',
             'cabana': '30',
             'small': '20',
             'big': '50',
-            'hall' : "100"
+            'pavillion' : "150-200",
+            'mariposa' : "120",
+            'minicon' : "70",
       };
 
       return {'name': room_name[area], 'capacity': capacity[area]}

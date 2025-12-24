@@ -4,6 +4,7 @@ const tbody = document.getElementById('tbody');
 let savedAccomodations = [];
 let category_data = 'all-data';
 let roomCache = {};
+let searchTimeout;
 
 // ---------------- RENDER HELPERS ------------------
 function successMessageCard4(message, redirect = null) {
@@ -347,7 +348,7 @@ function showAccomodationAvlForm(e) {
       const section = card.dataset.section;
       document.getElementById('accomodation_label').textContent = `${section} Available's`;
       document.querySelector(".accomodation-avl-overlay").classList.remove("hidden");
-
+      
       generateAvlAccomodation(section);
 }
 
@@ -646,6 +647,30 @@ function showBookingDate(e){
       }
 }
 
+function debouncedSearch(e) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => searchGuest(e), 300);
+}
+
+function loadingAnimation0(){
+      const load = `
+            <div id="loading" class="absolute top-70 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingTablePortal').innerHTML += load;
+}
+
+function showLoader() {
+      loadingAnimation0(); // adds #loading inside #loadingPortal
+}
+
+function hideLoader() {
+      const loader = document.querySelector('#loading');
+      if (loader) loader.remove();
+}
 
 // --------------- POST DATA Fetching -------------- //
 async function addBooking(e){
@@ -923,15 +948,35 @@ async function getReservationDate(){
 async function generateAvlAccomodation(accomodation){
       document.querySelectorAll('#avl-accomodations label').forEach(label => label.remove());
       let room_name = accomodation.split(' ');
+      console.log(accomodation);
 
-      let rooms = roomCache[room_name[0]] || [];
-      for (let i = 0; i < rooms.length; i++){
-            const p = `
-                  <label  class="acc-card flex gap-2 justify-center bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-300 dark:border-gray-700 cursor-pointer transition select-none hover:bg-gray-100 dark:hover:bg-gray-700"">
-                        <input type="checkbox" class="text-gray-100 dark:text-gray-800 w-3" name="avl" value="${accomodation} ${rooms[i]}" required>${accomodation} ${rooms[i]}
-                  </label>
-            `;
+      let rooms = [];
+
+      if (accomodation === 'Hall'){
+            const halls = ['Pavillion', 'Mariposa', 'Minicon'];
+            let p = '';
+
+            halls.forEach(name => {
+                  if (roomCache[name]) {
+                        p +=  `
+                              <label  class="acc-card flex gap-2 justify-center bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-300 dark:border-gray-700 cursor-pointer transition select-none hover:bg-gray-100 dark:hover:bg-gray-700"">
+                                    <input type="checkbox" class="text-gray-100 dark:text-gray-800 w-3" name="avl" value="${name} ${101}" required>${name} ${101}
+                              </label>
+                        `;
+                  }
+            });
+
             document.querySelector('#avl-accomodations').innerHTML += p;
+      }else{
+            rooms = roomCache[room_name[0]];
+            for (let i = 0; i < rooms.length; i++){
+                  const p = `
+                        <label  class="acc-card flex gap-2 justify-center bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-300 dark:border-gray-700 cursor-pointer transition select-none hover:bg-gray-100 dark:hover:bg-gray-700"">
+                              <input type="checkbox" class="text-gray-100 dark:text-gray-800 w-3" name="avl" value="${accomodation} ${rooms[i]}" required>${accomodation} ${rooms[i]}
+                        </label>
+                  `;
+                  document.querySelector('#avl-accomodations').innerHTML += p;
+            }
       }
 
       savedAccomodations.forEach(value => {
@@ -951,7 +996,7 @@ async function avl_spaces() {
             }
             roomCache[name].push(room);
       });
-
+      console.log(roomCache);
       const response = await fetch('/avl-spaces');
       const result = await response.json();
 
@@ -967,6 +1012,9 @@ async function avl_spaces() {
 }
 
 async function recentBookings(){
+      document.querySelectorAll('tbody tr').forEach(row => row.remove());      
+      resetToDefaultTabItem();
+      showLoader();
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
       getTotalsCountData();
@@ -974,9 +1022,6 @@ async function recentBookings(){
       const response = await fetch(`/recent-bookings?year=${year ? year : new Date().getFullYear()}&month=${month}`);
       const result = await response.json();
       
-      document.querySelectorAll('tbody tr').forEach(row => row.remove());      
-      resetToDefaultTabItem();
-
       if (result.success){
             result.data.forEach(row => {
                   createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
@@ -990,6 +1035,7 @@ async function recentBookings(){
             
             tbody.innerHTML += empty_row;
       }
+      hideLoader();
 }
 
 async function getYears(){
@@ -1074,6 +1120,7 @@ async function getTotalsCountData() {
 }
 
 async function bookingsCategories(e){ 
+      document.querySelectorAll('tbody tr').forEach(row => row.remove());      
       // disable btns when navigating 
       const allBtns = document.querySelectorAll('.btn');
       allBtns.forEach(btn => {
@@ -1088,12 +1135,11 @@ async function bookingsCategories(e){
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
       category_data = category;
-
+      showLoader();
       const response = await fetch(`/category-bookings?year=${year}&month=${month}&category=${category}`);
       const result = await response.json();
 
       if (result.success){
-            document.querySelectorAll('tbody tr').forEach(row => row.remove());      
             result.data.forEach(row => {
                   createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
@@ -1107,17 +1153,19 @@ async function bookingsCategories(e){
             
             tbody.innerHTML += empty_row;
       }
+      hideLoader();
 }
 
 async function searchGuest(e){ 
       const name = e.target.value;
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
-
+      showLoader();
       const response = await fetch(`/search-guest?name=${name}&year=${year}&month=${month}&category=${category_data}`);
       const result = await response.json();
 
       document.querySelectorAll('tbody tr').forEach(row => row.remove());      
+      
       if (result.success){
             result.data.forEach(row => {
                   createTable(row['id'], row['date_book'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
@@ -1131,6 +1179,7 @@ async function searchGuest(e){
             
             tbody.innerHTML += empty_row;
       }
+      hideLoader();
 }
 
 // ---------- Event Listeners ----------------- //
@@ -1208,7 +1257,7 @@ document.addEventListener('change', (e) => {
 });
 
 document.addEventListener('input', (e) => {
-      if (e.target.matches('input[name="guest-name"]')) searchGuest(e);
+      if (e.target.matches('input[name="guest-name"]')) debouncedSearch(e);
 });
 
 // -------------- Initialiaze when loaded -----------

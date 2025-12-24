@@ -14,37 +14,68 @@ class Analytics:
             with self.db.connect() as con:
                   cursor = con.cursor()
                   if accomodation_type:
-                        query = f'''                                                  
-                              WITH current_mtd AS (
-                                    SELECT 
-                                          ROUND(COALESCE(SUM({accomodation_type}), 0) / ({self.accomodation_count(accomodation_type.capitalize())} * DAY(CURDATE())) * 100) AS occupancy
-                                    FROM accomodation_data a 
-                                    JOIN bookings b 
-                                    ON a.booking_id = b.booking_id
-                                    WHERE a.check_in <= CURDATE() AND a.check_out >= CURRENT_DATE() AND b.status IN ('Checked-in', 'Day Guest')
-                              ),
-                              previous_mtd AS (
-                                    SELECT 
-                                          ROUND(COALESCE(SUM({accomodation_type}), 0) / ({self.accomodation_count(accomodation_type.capitalize())} * DAY(CURDATE())) * 100) AS occupancy
-                                    FROM accomodation_data a
-                                    JOIN bookings b 
-                                    ON a.booking_id = b.booking_id
-                                    WHERE a.check_in <= CURDATE() - INTERVAL 1 DAY AND a.check_out = CURRENT_DATE() - INTERVAL 1 DAY AND b.status IN ('Checked-in', 'Day Guest')
-                              )
-                              SELECT
-                                    current_mtd.occupancy AS current_mtd_occupancy,
-                                    previous_mtd.occupancy AS previous_mtd_occupancy,
-                                    CASE
-                                          WHEN COALESCE(previous_mtd.occupancy, 0) = 0 THEN 
-                                                CASE 
-                                                WHEN current_mtd.occupancy > 0 THEN 100
-                                                ELSE 0
-                                                END
-                                          ELSE ROUND((current_mtd.occupancy - previous_mtd.occupancy) / previous_mtd.occupancy * 100, 2)
-                              END AS change_rate
-                              FROM current_mtd, previous_mtd
-                        '''
-
+                        if accomodation_type == 'hall':
+                              query = f'''                                                  
+                                    WITH current_mtd AS (
+                                          SELECT 
+                                                ROUND(COALESCE(SUM(a.pavillion + a.mariposa + a.minicon), 0) / ({self.accomodation_count(accomodation_type)} * DAY(CURDATE())) * 100) AS occupancy
+                                          FROM accomodation_data a 
+                                          JOIN bookings b 
+                                          ON a.booking_id = b.booking_id
+                                          WHERE a.check_in <= CURDATE() AND a.check_out >= CURRENT_DATE() AND b.status IN ('Checked-in', 'Day Guest')
+                                    ),
+                                    previous_mtd AS (
+                                          SELECT 
+                                                ROUND(COALESCE(SUM(a.pavillion + a.mariposa + a.minicon), 0) / ({self.accomodation_count(accomodation_type)} * DAY(CURDATE())) * 100) AS occupancy
+                                          FROM accomodation_data a
+                                          JOIN bookings b 
+                                          ON a.booking_id = b.booking_id
+                                          WHERE a.check_in <= CURDATE() - INTERVAL 1 DAY AND a.check_out = CURRENT_DATE() - INTERVAL 1 DAY AND b.status IN ('Checked-in', 'Day Guest')
+                                    )
+                                    SELECT
+                                          current_mtd.occupancy AS current_mtd_occupancy,
+                                          previous_mtd.occupancy AS previous_mtd_occupancy,
+                                          CASE
+                                                WHEN COALESCE(previous_mtd.occupancy, 0) = 0 THEN 
+                                                      CASE 
+                                                      WHEN current_mtd.occupancy > 0 THEN 100
+                                                      ELSE 0
+                                                      END
+                                                ELSE ROUND((current_mtd.occupancy - previous_mtd.occupancy) / previous_mtd.occupancy * 100, 2)
+                                    END AS change_rate
+                                    FROM current_mtd, previous_mtd
+                              '''
+                        else:
+                              query = f'''                                                  
+                                    WITH current_mtd AS (
+                                          SELECT 
+                                                ROUND(COALESCE(SUM(a.{accomodation_type}), 0) / ({self.accomodation_count(accomodation_type.capitalize())} * DAY(CURDATE())) * 100) AS occupancy
+                                          FROM accomodation_data a 
+                                          JOIN bookings b 
+                                          ON a.booking_id = b.booking_id
+                                          WHERE a.check_in <= CURDATE() AND a.check_out >= CURRENT_DATE() AND b.status IN ('Checked-in', 'Day Guest')
+                                    ),
+                                    previous_mtd AS (
+                                          SELECT 
+                                                ROUND(COALESCE(SUM(a.{accomodation_type}), 0) / ({self.accomodation_count(accomodation_type.capitalize())} * DAY(CURDATE())) * 100) AS occupancy
+                                          FROM accomodation_data a
+                                          JOIN bookings b 
+                                          ON a.booking_id = b.booking_id
+                                          WHERE a.check_in <= CURDATE() - INTERVAL 1 DAY AND a.check_out = CURRENT_DATE() - INTERVAL 1 DAY AND b.status IN ('Checked-in', 'Day Guest')
+                                    )
+                                    SELECT
+                                          current_mtd.occupancy AS current_mtd_occupancy,
+                                          previous_mtd.occupancy AS previous_mtd_occupancy,
+                                          CASE
+                                                WHEN COALESCE(previous_mtd.occupancy, 0) = 0 THEN 
+                                                      CASE 
+                                                      WHEN current_mtd.occupancy > 0 THEN 100
+                                                      ELSE 0
+                                                      END
+                                                ELSE ROUND((current_mtd.occupancy - previous_mtd.occupancy) / previous_mtd.occupancy * 100, 2)
+                                    END AS change_rate
+                                    FROM current_mtd, previous_mtd
+                              '''
                         cursor.execute(query)
                   else:
                         cursor.execute('''
@@ -76,7 +107,7 @@ class Analytics:
                         ''')
 
                   data = cursor.fetchone()
-            
+                  
                   return {'current': data.get('current_mtd_occupancy') , 'prev': data.get('previous_mtd_occupancy'), 'change': data.get('change_rate') if data.get('current_mtd_occupancy') > 0 else '0'}
 
       def daily_revenue(self, accomodation_type=None):
@@ -84,38 +115,72 @@ class Analytics:
                   cursor = con.cursor()
 
                   if accomodation_type:
-                        query = f'''      
-                              WITH today AS (
-                              SELECT COALESCE(SUM({accomodation_type.lower()}), 0) AS total
-                              FROM area_revenue AS a
-                              JOIN bookings AS b
-                                    ON a.booking_id = b.booking_id
-                              WHERE DATE(b.paid_date) = CURDATE()
-                                    AND b.payment NOT IN ('Pending')
-                              ),
-                              yesterday AS (
-                              SELECT COALESCE(SUM({accomodation_type.lower()}), 0) AS total
-                              FROM area_revenue AS a
-                              JOIN bookings AS b
-                                    ON a.booking_id = b.booking_id
-                              WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
-                                    AND b.payment NOT IN ('Pending')
-                              )
-                              SELECT 
-                              today.total AS revenue_today,
-                              yesterday.total AS prev_revenue,
-                              CASE
-                                    WHEN yesterday.total = 0 THEN 
-                                          CASE 
-                                          WHEN today.total > 0 THEN 100
-                                          WHEN yesterday.total > 0 AND today.total = 0 THEN -100
-                                          WHEN yesterday.total = 0 AND today.total = 0 THEN 0
-                                          ELSE 0
-                                          END
-                                    ELSE ROUND((today.total - yesterday.total) / yesterday.total * 100)
-                              END AS change_rate_percent
-                              FROM today, yesterday;
-                        '''
+                        if accomodation_type == 'hall':
+                              query = f'''      
+                                    WITH today AS (
+                                    SELECT COALESCE(SUM(pavillion + mariposa + minicon), 0) AS total
+                                    FROM area_revenue AS a
+                                    JOIN bookings AS b
+                                          ON a.booking_id = b.booking_id
+                                    WHERE DATE(b.paid_date) = CURDATE()
+                                          AND b.payment NOT IN ('Pending')
+                                    ),
+                                    yesterday AS (
+                                    SELECT COALESCE(SUM(pavillion + mariposa + minicon), 0) AS total
+                                    FROM area_revenue AS a
+                                    JOIN bookings AS b
+                                          ON a.booking_id = b.booking_id
+                                    WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
+                                          AND b.payment NOT IN ('Pending')
+                                    )
+                                    SELECT 
+                                    today.total AS revenue_today,
+                                    yesterday.total AS prev_revenue,
+                                    CASE
+                                          WHEN yesterday.total = 0 THEN 
+                                                CASE 
+                                                WHEN today.total > 0 THEN 100
+                                                WHEN yesterday.total > 0 AND today.total = 0 THEN -100
+                                                WHEN yesterday.total = 0 AND today.total = 0 THEN 0
+                                                ELSE 0
+                                                END
+                                          ELSE ROUND((today.total - yesterday.total) / yesterday.total * 100)
+                                    END AS change_rate_percent
+                                    FROM today, yesterday;
+                              '''
+                        else:
+                              query = f'''      
+                                    WITH today AS (
+                                    SELECT COALESCE(SUM({accomodation_type}), 0) AS total
+                                    FROM area_revenue AS a
+                                    JOIN bookings AS b
+                                          ON a.booking_id = b.booking_id
+                                    WHERE DATE(b.paid_date) = CURDATE()
+                                          AND b.payment NOT IN ('Pending')
+                                    ),
+                                    yesterday AS (
+                                    SELECT COALESCE(SUM({accomodation_type}), 0) AS total
+                                    FROM area_revenue AS a
+                                    JOIN bookings AS b
+                                          ON a.booking_id = b.booking_id
+                                    WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
+                                          AND b.payment NOT IN ('Pending')
+                                    )
+                                    SELECT 
+                                    today.total AS revenue_today,
+                                    yesterday.total AS prev_revenue,
+                                    CASE
+                                          WHEN yesterday.total = 0 THEN 
+                                                CASE 
+                                                WHEN today.total > 0 THEN 100
+                                                WHEN yesterday.total > 0 AND today.total = 0 THEN -100
+                                                WHEN yesterday.total = 0 AND today.total = 0 THEN 0
+                                                ELSE 0
+                                                END
+                                          ELSE ROUND((today.total - yesterday.total) / yesterday.total * 100)
+                                    END AS change_rate_percent
+                                    FROM today, yesterday;
+                              '''
                         cursor.execute(query)
                   else:
                         query = f'''                                                  
@@ -160,14 +225,24 @@ class Analytics:
                   cursor = con.cursor()
 
                   if accomodation_type:
-                        query = f'''            
-                              SELECT COALESCE(SUM({accomodation_type.lower()}), 0) AS revenue
+                        if accomodation_type == 'hall':
+                              query = f'''            
+                              SELECT COALESCE(SUM(a.pavillion + a.mariposa + a.minicon), 0) AS revenue
                               FROM area_revenue AS a
                               JOIN bookings AS b
                               ON a.booking_id = b.booking_id
                               WHERE MONTH(b.paid_date) = MONTH(CURDATE())
                               AND b.payment NOT IN ('Pending')
                         '''
+                        else:
+                              query = f"""
+                                    SELECT COALESCE(SUM(a.{accomodation_type}), 0) AS revenue
+                                    FROM area_revenue AS a
+                                    JOIN bookings AS b
+                                    ON a.booking_id = b.booking_id
+                                    WHERE MONTH(b.paid_date) = MONTH(CURDATE())
+                                    AND b.payment NOT IN ('Pending')
+                              """
                         cursor.execute(query)
                   else:
                         query = f'''
@@ -195,14 +270,24 @@ class Analytics:
                   cursor = con.cursor()
 
                   if type:
-                        query = f"""
-                              SELECT 
-                                    check_in AS ds,
-                                    sum({type})AS y
-                              FROM accomodation_data
-                              GROUP BY check_in
-                              ORDER BY check_in;
-                        """
+                        if type == 'hall':
+                              query = """
+                                    SELECT 
+                                          check_in AS ds,
+                                          SUM(pavillion + mariposa + minicon) AS y
+                                    FROM accomodation_data
+                                    GROUP BY check_in
+                                    ORDER BY check_in;
+                              """
+                        else:
+                              query = f"""
+                                    SELECT 
+                                          check_in AS ds,
+                                          SUM({type}) AS y
+                                    FROM accomodation_data
+                                    GROUP BY check_in
+                                    ORDER BY check_in;
+                              """
 
                         cursor.execute(query)
                   else:
@@ -227,22 +312,38 @@ class Analytics:
                   cursor = con.cursor()
 
                   if accomodation_type:
-                        query = f"""
-                              SELECT 
-                                    check_in AS ds,
-                                    SUM({accomodation_type} * {self.accomodation_data(accomodation_type.capitalize())}) AS y
-                              FROM accomodation_data
-                              GROUP BY check_in
+                        if accomodation_type == 'hall':
+                              query = f"""
+                                    SELECT 
+                                          check_in AS ds,
+                                          SUM((pavillion + mariposa + minicon) * {self.accomodation_data(accomodation_type)}) AS y
+                                    FROM accomodation_data
+                                    GROUP BY check_in
 
-                              UNION ALL
+                                    UNION ALL
 
-                              SELECT 
-                                    check_in AS ds,
-                                    SUM(total_guest * 200) AS y
-                              FROM bookings WHERE status != 'Cancelled'
-                              GROUP BY check_in;
-                        """
+                                    SELECT 
+                                          check_in AS ds,
+                                          SUM(total_guest * 200) AS y
+                                    FROM bookings WHERE status != 'Cancelled'
+                                    GROUP BY check_in;
+                              """
+                        else:
+                              query = f"""
+                                    SELECT 
+                                          check_in AS ds,
+                                          SUM({accomodation_type} * {self.accomodation_data(accomodation_type.capitalize())}) AS y
+                                    FROM accomodation_data
+                                    GROUP BY check_in
 
+                                    UNION ALL
+
+                                    SELECT 
+                                          check_in AS ds,
+                                          SUM(total_guest * 200) AS y
+                                    FROM bookings WHERE status != 'Cancelled'
+                                    GROUP BY check_in;
+                              """
                         cursor.execute(query)
                   else:      
                         cursor.execute('''
@@ -290,7 +391,7 @@ class Analytics:
                               'cabana': 75000,
                               'big': 70000,
                               'small': 50000,
-                              'hall': 40000
+                              'hall': 80000
                         }
 
                         return {'target': area[accomodation_type.lower().strip()]}
@@ -322,15 +423,32 @@ class Analytics:
       def accomodation_data(self, query):
             with self.db.connect() as con:
                   cursor = con.cursor()
-                  cursor.execute('SELECT rate from accomodation_spaces where name = %s ', (query,))
-                  data = cursor.fetchone()
 
+                  if query == 'hall':
+                        cursor.execute("""
+                        SELECT COALESCE(SUM(rate), 0) AS rate
+                        FROM accomodation_spaces
+                        WHERE name IN ('pavillion', 'mariposa', 'minicon')
+                        """)
+                  else:
+                        cursor.execute("""
+                        SELECT rate
+                        FROM accomodation_spaces
+                        WHERE name = %s
+                        """, (query,))
+                  data = cursor.fetchone()
+                  
                   return data.get('rate')
 
       def accomodation_count (self, area_name):
             with self.db.connect() as con:
                   cursor = con.cursor()
-                  cursor.execute('SELECT COUNT(*) AS count from accomodation_spaces where name = %s ', (area_name,))
+                  
+                  if area_name == 'hall':
+                        cursor.execute('SELECT COUNT(id) AS count from accomodation_spaces where name in ("pavillion", "mariposa", "minicon")')
+                  else:
+                        cursor.execute('SELECT COUNT(id) AS count from accomodation_spaces where name = %s ', (area_name,))
+
                   data = cursor.fetchone()
 
                   return data.get('count')

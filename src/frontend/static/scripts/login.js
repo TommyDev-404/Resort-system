@@ -70,7 +70,10 @@ loginForm.addEventListener('submit', (e) => loginAdmin(e) );
 
 window.addEventListener('load', () => {
       const initial = document.getElementById('initial-loading');
-      if (initial) initial.remove();
+      if (initial){
+            initial.remove();
+            document.getElementById('overlay-container').classList.remove('hidden');
+      }
 });
 
 // ----------------- HELPERS ---------------- //

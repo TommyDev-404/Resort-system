@@ -45,7 +45,7 @@ class Alerts:
                         avg_next_week = sum(item["value"] for item in next_week_forecast) / len(next_week_forecast)
                   
                   if avg_next_week < 60:
-                        cursor.execute (''' SELECT * FROM notifications WHERE alert_type = 'occupancy' ''')
+                        cursor.execute (''' SELECT date, name FROM notifications WHERE alert_type = 'occupancy' ''')
                         data = cursor.fetchone()
 
                         db_date = data.get('date')
@@ -72,7 +72,7 @@ class Alerts:
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute('''   
-                        SELECT * FROM notifications WHERE alert_type = 'housekeeping'
+                        SELECT name, date FROM notifications WHERE alert_type = 'housekeeping'
                   ''')
             data = cursor.fetchall()
 
@@ -83,7 +83,7 @@ class Alerts:
                   {
                         'query': '''
                               SELECT
-                                    COUNT(*) as count,
+                                    COUNT(booking_id) as count,
                                     COALESCE(SUM(total_guest), 0) as total_guest
                               FROM bookings
                               WHERE check_out = CURRENT_DATE() AND status = 'Checked-in' AND booking_type = 'Check-in';
@@ -95,7 +95,7 @@ class Alerts:
                   {
                         'query': '''
                               SELECT
-                                    COUNT(*) as count,
+                                    COUNT(booking_id) as count,
                                     COALESCE(SUM(total_guest), 0) as total_guest
                               FROM bookings
                               WHERE check_out = CURRENT_DATE() AND status = 'Checked-in' AND booking_type = 'Day Guest';
@@ -107,7 +107,7 @@ class Alerts:
                   {
                         'query': '''
                               SELECT
-                                    COUNT(*) as count,
+                                    COUNT(booking_id) as count,
                                     COALESCE(SUM(total_guest), 0) as total_guest
                               FROM bookings
                               WHERE check_in = CURRENT_DATE() AND status = 'Reserved' AND booking_type = 'Reservation';
@@ -119,7 +119,7 @@ class Alerts:
                   {
                         'query': '''
                               SELECT
-                                    COUNT(*) as count,
+                                    COUNT(booking_id) as count,
                                     COALESCE(SUM(total_guest), 0) as total_guest
                               FROM bookings
                               WHERE check_in = CURRENT_DATE() + INTERVAL 1 DAY AND status = 'Reserved' AND booking_type = 'Reservation';
@@ -143,7 +143,7 @@ class Alerts:
                         if count > 0:
                               message = alert['template'].format(count=count, total_guest=total_guest)
                               
-                              cursor.execute(''' SELECT * FROM notifications WHERE classification = %s ''', (alert['classification'],))
+                              cursor.execute(''' SELECT id FROM notifications WHERE classification = %s ''', (alert['classification'],))
                               data = cursor.fetchall()
 
                               # first load
@@ -170,7 +170,7 @@ class Alerts:
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute('''   
-                        SELECT * FROM notifications WHERE alert_type = 'bookings'
+                        SELECT name, date, classification FROM notifications WHERE alert_type = 'bookings'
                   ''')
             data = cursor.fetchall()
 
@@ -180,7 +180,7 @@ class Alerts:
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute('''   
-                        SELECT COUNT(*) as count FROM notifications WHERE name != 'temporary'
+                        SELECT COUNT(id) as count FROM notifications WHERE name != 'temporary'
                   ''')
                   data = cursor.fetchone()
 
@@ -323,7 +323,7 @@ class Alerts:
                   cursor = con.cursor()  # <--- important
 
                   cursor.execute('''   
-                        SELECT * FROM bookings 
+                        SELECT booking_id, accomodations FROM bookings 
                         WHERE status = 'Reserved' 
                         AND DATE(check_in) < DATE_SUB(CURDATE(), INTERVAL 7 DAY);
                   ''')

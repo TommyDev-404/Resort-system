@@ -34,7 +34,7 @@ class Housekeeping:
                         cursor = con.cursor()
                         cursor.execute('''
                               SELECT 
-                                    COUNT(*) AS total_rooms,
+                                    COUNT(name) AS total_rooms,
                                     SUM(CASE WHEN status IN ('need-clean') THEN 1 ELSE 0 END) AS total_need_clean,
                                     SUM(CASE WHEN status IN ('avl') THEN 1 ELSE 0 END) AS total_ready,
                                     SUM(CASE WHEN status IN ('on-clean') THEN 1 ELSE 0 END) AS total_on_clean,
@@ -56,7 +56,7 @@ class Housekeeping:
                         area = accomodation.split(' ')[0]
 
                         cursor.execute('''
-                              SELECT *  FROM accomodation_spaces WHERE name = %s
+                              SELECT room, status  FROM accomodation_spaces WHERE name = %s
                         ''', (area))
                         data = cursor.fetchall()
 
@@ -113,7 +113,7 @@ class Housekeeping:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' 
-                              SELECT * 
+                              SELECT staff_name
                               FROM staff_details st
                               JOIN staff_attendance sa
                               ON st.id = sa.staff_id 
@@ -131,8 +131,8 @@ class Housekeeping:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        print(room)
-                        cursor.execute(''' SELECT * FROM room_assign_history WHERE room = %s ORDER BY date DESC''', (room,))
+
+                        cursor.execute(''' SELECT date, name FROM room_assign_history WHERE room = %s ORDER BY date DESC''', (room,))
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}

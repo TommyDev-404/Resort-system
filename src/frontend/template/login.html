@@ -5,7 +5,7 @@
 	<title>Admin Login - Grand-Villa Laguna System</title>
 	<meta name="description" content="A resort management system with forecasting, reservations, and secure admin access for Laguna Grand-Villa Resort. Fast, reliable, and easy to use.">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="preload" href="{{ url_for('static', filename='style/output.css') }}" as="style" onload="this.rel='stylesheet'">
+	<link rel="stylesheet" href="{{ url_for('static', filename='style/output.css') }}">
       <link rel="icon" type="image/x-icon" href="/static/assets/admin.webp">
 	<script src="https://unpkg.com/lucide@latest" defer></script>
 	
@@ -45,7 +45,7 @@
 		content: "";
 		position: absolute;
 		inset: 0; /* top:0; left:0; bottom:0; right:0 */
-		background: rgba(0, 0, 0, 0.2); /* dark overlay */
+		background: rgba(0, 0, 0, 0.5); /* dark overlay */
 		z-index: 0;
 	}
 
@@ -57,14 +57,14 @@
 
 </style>
 
-<body>]
+<body>
 	<div id="initial-loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2">
 		<div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
 		<p class="text-[15px] font-medium animate-pulse">Loading, please wait...</p>
 	</div>
 
 	<!-- Overlay Container -->
-	<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] p-6 overflow-hidden bg-transparent backdrop-blur-[20px] border border-white/40 rounded-xl shadow-2xl before:content-[''] before:absolute before:inset-0 before:border before:border-white/20 before:rounded-xl before:pointer-events-none">
+	<div class="absolute hidden top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] p-6 overflow-hidden bg-transparent backdrop-blur-[20px] border border-white/40 rounded-xl shadow-2xl before:content-[''] before:absolute before:inset-0 before:border before:border-white/20 before:rounded-xl before:pointer-events-none" id="overlay-container">
 		<!-- CONTENT LAYER -->
 		<div class="relative z-10">
 			<!-- LOGO -->
@@ -88,17 +88,17 @@
 					<!-- Username -->
 					<div class="relative">
 						<img src="{{ url_for('static', filename='assets/admin.webp') }}" width="30" class="absolute top-3 right-3.5 z-10 opacity-100"alt="Username Icon">
-						<input type="text" name="username" required placeholder="Username" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-md text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+						<input type="text" name="username" required placeholder="Username" class="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-md text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
 					</div>
 				
 					<!-- Password -->
 					<div class="passField relative">
 						<img src="{{ url_for('static', filename='assets/forgot.webp') }}" width="22" class="absolute top-3.5 right-4 z-10 opacity-100" alt="Password Icon">
-						<input type="password" name="password" required placeholder="Password" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-md text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+						<input type="password" name="password" required placeholder="Password" class="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-md text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
 					</div>
 
 					<a id="forgotLink" class="self-end text-white/70 text-sm hover:text-blue-400 underline cursor-pointer">Forgot password?</a>
-					<button type="submit" class="bg-primary-blue hover:bg-blue-600 text-white font-semibold py-3 rounded-full w-full mt-4 transition">Login</button>
+					<button type="submit" class="bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded-full w-full mt-4 transition">Login</button>
 				</form>
 			
 				<!-- Socials -->
@@ -134,12 +134,12 @@
 				
 				<p class="text-sm text-center text-white/70">Enter your email and we’ll send a verification code.</p>
 				<div class="flex gap-2 w-full">
-					<input type="email" name="email" required placeholder="Enter your email" class="flex-1 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+					<input type="email" name="email" required placeholder="Enter your email" class="flex-1 bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
 					<button id="get_code" class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-medium transition">Get Code</button>
 				</div>
-				<input type="text" name="code" maxlength="6" required placeholder="Enter 6-digit code" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
-				<button id="link-change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full mt-4 transition">Continue</button>
-				<p class="text-sm text-white/70 mt-2 flex gap-1 items-center">Remember your password?<span id="backToLogin" class="text-blue-700 hover:underline cursor-pointer">Login</span></p>
+				<input type="text" name="code" maxlength="6" required placeholder="Enter 6-digit code" class="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+				<button id="link-change-pass" class="bg-blue-700 hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full mt-4 transition">Continue</button>
+				<p class="text-sm text-white/70 mt-2 flex gap-1 items-center">Remember your password?<span id="backToLogin" class="text-blue-500 hover:underline cursor-pointer">Login</span></p>
 			</div>
 			
 			<!-- CHANGE PASSWORD -->
@@ -149,10 +149,10 @@
 					<h1 class="text-2xl font-bold mb-6 text-white">Change Password</h1>
 				</div>
 
-				<input type="password" name="new_password" required placeholder="Enter new password" class="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
+				<input type="password" name="new_password" required placeholder="Enter new password" class="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-blue-500 transition">
 				<label class="text-sm text-white/70 flex items-center gap-2 w-full"><input type="checkbox" id="showPassword">Show Password</label>
-				<button id="change-pass" class="bg-primary-blue hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full transition mt-6">Update</button>
-				<p class="text-sm text-white/70">Remember your password?<span id="backToLogin2" class="text-blue-700 hover:underline cursor-pointer">Login</span></p>
+				<button id="change-pass" class="bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-full font-semibold w-full transition mt-6">Update</button>
+				<p class="text-sm text-white/70">Remember your password?<span id="backToLogin2" class="text-blue-500 hover:underline cursor-pointer">Login</span></p>
 			</div>
 			
 		</div>

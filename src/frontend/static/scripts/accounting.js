@@ -28,6 +28,26 @@ function formatPesoShort1(num) {
       return "₱" + num.toLocaleString("en-PH");
 }
 
+function loadingAnimation0(){
+      const load = `
+            <div id="loading" class="absolute top-50 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingAccountingPortal').innerHTML += load;
+}
+
+function showLoader() {
+      loadingAnimation0(); // adds #loading inside #loadingPortal
+}
+
+function hideLoader() {
+      const loader = document.querySelector('#loading');
+      if (loader) loader.remove();
+}
+
 async function getYearNow(){
       const response = await fetch('/get-years');
       const result = await response.json();
@@ -53,9 +73,10 @@ async function getSummaryData() {
 }
 
 async function loadBookingRevenue(year) {
+      showLoader();
       const response = await fetch(`/load-revenue?year=${year}`);
       const result = await response.json();
-      console.log(result);
+
       if (result.success){
             removePrevRow();
             result.data.forEach(data => {
@@ -64,6 +85,7 @@ async function loadBookingRevenue(year) {
       }else {
             alert('Failed to fetch data.');
       }
+      hideLoader();
 }
 
 document.addEventListener('change', (e) => {

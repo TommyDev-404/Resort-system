@@ -40,7 +40,7 @@ class Reservation:
                                     SELECT COUNT(name) AS bg FROM accomodation_spaces WHERE name = 'Big' AND status IN ('avl')
                                     ),
                                     hall AS (
-                                    SELECT COUNT(name) AS hall FROM accomodation_spaces WHERE name = 'Hall' AND status IN ('avl')
+                                    SELECT COUNT(name) AS hall FROM accomodation_spaces WHERE name in ('Pavillion', 'Mariposa', 'Minicon') AND status IN ('avl')
                                     )
                               SELECT 
                                     pr.pr, 
@@ -213,7 +213,7 @@ class Reservation:
 
                         total = sum(new_area_revenue.values())
 
-                        cursor.execute(''' SELECT * FROM bookings ORDER BY booking_id DESC LIMIT 1; ''')
+                        cursor.execute(''' SELECT booking_id FROM bookings ORDER BY booking_id DESC LIMIT 1; ''')
                         data_id = cursor.fetchone()
                         booking_id = data_id.get('booking_id')
 
@@ -381,7 +381,7 @@ class Reservation:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT COALESCE(COUNT(*), 0) as arrivals FROM bookings where status IN ('Reserved') AND check_in > CURRENT_DATE() ''')
+                        cursor.execute(''' SELECT COALESCE(COUNT(booking_id), 0) as arrivals FROM bookings where status IN ('Reserved') AND check_in > CURRENT_DATE() ''')
                         data = cursor.fetchone()
 
                         return {'upcoming_checkin': data.get('arrivals')}
@@ -489,7 +489,7 @@ class Reservation:
                         room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
                         now = datetime.now(timezone.utc)
 
-                        cursor.execute(''' SELECT * FROM bookings WHERE booking_id = %s ''', (id,))
+                        cursor.execute(''' SELECT check_out FROM bookings WHERE booking_id = %s ''', (id,))
                         data = cursor.fetchone()
                         check_out = data.get('check_out')
 
@@ -530,7 +530,7 @@ class Reservation:
                   with self.db.connect() as con:
                         cursor = con.cursor()
 
-                        cursor.execute(''' SELECT * FROM bookings WHERE booking_id = %s ''', (id,))
+                        cursor.execute(''' SELECT payment FROM bookings WHERE booking_id = %s ''', (id,))
                         data = cursor.fetchone()
                         payment = data.get('payment')
 
@@ -583,14 +583,13 @@ class Reservation:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def update_reservation_date(self, id, edit_checkin, edit_checkout):
-            print(id)
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM area_revenue WHERE booking_id = %s ''', (id,))
+                        cursor.execute(''' SELECT premium, standard, garden, barkada, cabana, small, big, pavillion, mariposa, minicon FROM area_revenue WHERE booking_id = %s ''', (id,))
                         area_data = cursor.fetchone()
 
-                        cursor.execute(''' SELECT * FROM bookings WHERE booking_id = %s ''', (id,))
+                        cursor.execute(''' SELECT accomodations, total_guest, payment FROM bookings WHERE booking_id = %s ''', (id,))
                         data = cursor.fetchone()
 
                         areas = data.get('accomodations').split(',')
@@ -661,11 +660,12 @@ class Reservation:
                               new_area_revenue["standard"],
                               new_area_revenue["garden"],
                               new_area_revenue["barkada"],
-                              new_area_revenue["family"],
                               new_area_revenue["cabana"],
                               new_area_revenue["big"],
                               new_area_revenue["small"],
-                              new_area_revenue["hall"]
+                              new_area_revenue["pavillion"],
+                              new_area_revenue["mariposa"],
+                              new_area_revenue["minicon"]
                         ])
 
                         if data.get('payment') == 'ZUZU (Online Payment)':
@@ -679,11 +679,12 @@ class Reservation:
                                     standard = %s,
                                     garden = %s,
                                     barkada = %s,
-                                    family = %s,
                                     cabana = %s,
                                     big = %s,
                                     small = %s,
-                                    hall = %s,
+                                    pavillion = %s,
+                                    mariposa = %s,
+                                    minicon = %s,
                                     total = %s
                               WHERE booking_id = %s
                               ''', (
@@ -693,11 +694,12 @@ class Reservation:
                               new_area_revenue["standard"],
                               new_area_revenue["garden"],
                               new_area_revenue["barkada"],
-                              new_area_revenue["family"],
                               new_area_revenue["cabana"],
                               new_area_revenue["big"],
                               new_area_revenue["small"],
-                              new_area_revenue["hall"],
+                              new_area_revenue["pavillion"],
+                              new_area_revenue["mariposa"],
+                              new_area_revenue["minicon"],
                               total,
                               id  # WHERE condition comes last
                         ))
@@ -873,18 +875,18 @@ class Reservation:
                               formatted_checkout = d.get('check_out').strftime("%b %d").lstrip("0")    
                               formatted_date     = d.get('date_book').strftime("%b %d").lstrip("0") if d.get('date_book') else '--'
 
-                        new_data.append({
-                              'id': d.get('booking_id'),
-                              'name': d.get('name'),
-                              'date_book': formatted_date,
-                              'checkin': formatted_checkin,
-                              'checkout': formatted_checkout,
-                              'accomodations': d.get('accomodations'),
-                              'booking_type': d.get('booking_type'),
-                              'status': d.get('status'),
-                              'stay': d.get('stay_gap'),
-                              'payment': d.get('payment')
-                        })
+                              new_data.append({
+                                    'id': d.get('booking_id'),
+                                    'name': d.get('name'),
+                                    'date_book': formatted_date,
+                                    'checkin': formatted_checkin,
+                                    'checkout': formatted_checkout,
+                                    'accomodations': d.get('accomodations'),
+                                    'booking_type': d.get('booking_type'),
+                                    'status': d.get('status'),
+                                    'stay': d.get('stay_gap'),
+                                    'payment': d.get('payment')
+                              })
 
                         return {'success': bool(new_data), 'data': new_data}
 

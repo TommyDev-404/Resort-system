@@ -289,8 +289,29 @@ function getMonthsAndDays(){
       }
 }
 
+function loadingAnimation0(){
+      const load = `
+            <div id="loading" class="absolute top-50 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingCleanPortal').innerHTML += load;
+}
+
+function showLoader() {
+      loadingAnimation0(); // adds #loading inside #loadingPortal
+}
+
+function hideLoader() {
+      const loader = document.querySelector('#loading');
+      if (loader) loader.remove();
+}
+
 // -------------------- DATA ------------------------- //
 async function accomodationData(){
+      showLoader();
       const response = await fetch('/total-area-data');
       const result = await response.json();
       
@@ -315,6 +336,7 @@ async function accomodationData(){
 
             document.getElementById('room-status-tbody').innerHTML += empty_row;
       }
+      hideLoader();
 }
 
 async function historyData(){
@@ -515,7 +537,7 @@ document.addEventListener('change', (e) => {
 getMonthsAndDays();
 
 export function initPageHousekeeping(){
-       getSummarryCardData();
-       accomodationData();
+      getSummarryCardData();
+      accomodationData();
       switchRoomStatus(document.querySelector('#room-status-btn'));
 }

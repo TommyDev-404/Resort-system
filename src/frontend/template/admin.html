@@ -6,7 +6,7 @@
 	<title>Admin System</title>
       <meta name="description" content="System main page">
 	<link rel="stylesheet" href="{{ url_for('static', filename='style/output.css') }}">
-      <link rel="icon" type="image/x-icon" href="/static/assets/logo.png">
+      <link rel="icon" type="image/x-icon" href="/static/assets/admin.webp">
       <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
       <script src="https://unpkg.com/lucide@latest" defer></script>
 
@@ -198,6 +198,7 @@
 		</header>
             
 		<main class="flex-1 overflow-auto px-6 py-3">
+                  <div id="loadingPortal"></div>
 
 			<!-- DASHBOARD -->
 			<section id="home-dashboard" class="content-section fade-in-up space-y-7">
@@ -308,8 +309,8 @@
                                                             </div>
                                                             <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Total Check-In</p>
                                                       </div>
-                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-checkin">0</p>
-                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Guests: <span id="total-checkin-guests" class="font-semibold dark:text-blue-400">0</span></p>
+                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-checkin">--</p>
+                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Guests: <span id="total-checkin-guests" class="font-semibold dark:text-blue-400">--</span></p>
                                                 </div>
                                                 
                                                 <!-- Check-Out -->
@@ -320,8 +321,8 @@
                                                             </div>
                                                             <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Total Check-Out</p>
                                                       </div>
-                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-checkout">0</p>
-                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Guests: <span id="total-checkout-guests" class="font-semibold dark:text-red-400">0</span></p>
+                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-checkout">--</p>
+                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Guests: <span id="total-checkout-guests" class="font-semibold dark:text-red-400">--</span></p>
                                                 </div>
                                                 
                                                 <!-- Day Guests -->
@@ -332,8 +333,8 @@
                                                             </div>
                                                             <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Day Guests</p>
                                                       </div>
-                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-dayguest">0</p>
-                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Guests: <span id="total-dayguest-guests" class="font-semibold dark:text-amber-400">0</span></p>
+                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-dayguest">--</p>
+                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Guests: <span id="total-dayguest-guests" class="font-semibold dark:text-amber-400">--</span></p>
                                                 </div>
                                                 
                                                 <!-- Reservations -->
@@ -347,8 +348,8 @@
                                                             </div>
                                                             <span class="text-xs text-gray-600 dark:text-gray-400">(All Reservations)</span>
                                                       </div>
-                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-reservations">0</p>
-                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Guests: <span id="total-reservations-guests" class="font-semibold dark:text-emerald-400">0</span></p>
+                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-reservations">--</p>
+                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Guests: <span id="total-reservations-guests" class="font-semibold dark:text-emerald-400">--</span></p>
                                                 </div>
                                           </div>
                                           
@@ -753,7 +754,7 @@
                                           </span>
                                     </div>
                                     <div class="text-center mt-2">
-                                          <span class="text-4xl font-extrabold text-gray-800 dark:text-white" id="total_guest_today">45</span>
+                                          <span class="text-4xl font-extrabold text-gray-800 dark:text-white" id="total_guest_today">--</span>
                                           <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Guests checked in today</p>
                                     </div>
                               </div>
@@ -770,20 +771,20 @@
                                           <!-- Check-Ins -->
                                           <div>
                                           <span class="text-gray-600 dark:text-gray-200">Check-Ins</span>
-                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-checkin">(10 guests)</p>
-                                          <span class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2 block" id="total_checkin">3</span>
+                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-checkin">(-- guests)</p>
+                                          <span class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2 block" id="total_checkin">--</span>
                                           </div>
                                           <!-- Day Guests -->
                                           <div>
                                           <span class="text-gray-600 dark:text-gray-200">Day Guests</span>
-                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-day-guest">(10 guests)</p>
-                                          <span class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-2 block" id="day_guests_today">3</span>
+                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-day-guest">(-- guests)</p>
+                                          <span class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-2 block" id="day_guests_today">--</span>
                                           </div>
                                           <!-- Check-Outs -->
                                           <div>
                                           <span class="text-gray-600 dark:text-gray-200">Check-Outs</span>
-                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-checkout">(10 guests)</p>
-                                          <span class="text-2xl font-bold text-red-600 dark:text-red-400 mt-2 block" id="total_checkout">3</span>
+                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-checkout">(-- guests)</p>
+                                          <span class="text-2xl font-bold text-red-600 dark:text-red-400 mt-2 block" id="total_checkout">--</span>
                                           </div>
                                     </div>
                               </div>
@@ -800,14 +801,14 @@
                                           <!-- Upcoming Arrivals -->
                                           <div>
                                           <span class="text-gray-600 dark:text-gray-200">Upcoming Arrivals</span>
-                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-upcoming">(12 guests)</p>
-                                          <span class="text-2xl font-bold text-green-600 dark:text-green-400 mt-2 block" id="upcoming_arrivals">5</span>
+                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-upcoming">(-- guests)</p>
+                                          <span class="text-2xl font-bold text-green-600 dark:text-green-400 mt-2 block" id="upcoming_arrivals">--</span>
                                           </div>
                                           <!-- Cancelled Bookings -->
                                           <div>
                                           <span class="text-gray-600 dark:text-gray-200">Cancelled Bookings</span>
-                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-cancel">(4 guests)</p>
-                                          <span class="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-2 block" id="cancelled">2</span>
+                                          <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-cancel">(-- guests)</p>
+                                          <span class="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-2 block" id="cancelled">--</span>
                                           </div>
                                     </div>
                               </div>
@@ -881,7 +882,9 @@
                                                       <th class="p-3 font-semibold uppercase tracking-wider whitespace-nowrap ">Action</th>
                                                 </tr>
                                           </thead>
-                                          <tbody id="tbody"></tbody>
+                                          <tbody id="tbody">
+                                                <div id="loadingTablePortal"></div>
+                                          </tbody>
                                     </table>
                               </div>
                               
@@ -904,7 +907,7 @@
                                     <i data-lucide="sparkles" class="w-6 h-6 text-blue-600 dark:text-blue-200"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase">To Be Cleaned</p>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-blue-400 mt-2" id="to-be-clean">6</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-blue-400 mt-2" id="to-be-clean">--</p>
                               </div>
                         
                               <!-- Cleaning in Progress -->
@@ -913,7 +916,7 @@
                                     <i data-lucide="loader" class="w-6 h-6 text-yellow-600 dark:text-yellow-200 animate-spin"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase">Cleaning in Progress</p>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-yellow-400 mt-2" id="on-clean">3</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-yellow-400 mt-2" id="on-clean">--</p>
                               </div>
                         
                               <!-- Ready / Cleaned -->
@@ -922,7 +925,7 @@
                                     <i data-lucide="check-circle" class="w-6 h-6 text-green-600 dark:text-green-200"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase">Ready / Cleaned</p>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-green-400 mt-2" id="ready">45</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-green-400 mt-2" id="ready">--</p>
                               </div>
 
                               <!-- Reserved-->
@@ -931,7 +934,7 @@
                                     <i data-lucide="calendar" class="w-6 h-6 text-emerald-600 dark:text-emerald-200"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase">Reserved</p>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-emerald-400 mt-2" id="reserved">45</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-emerald-400 mt-2" id="reserved">--</p>
                               </div>
                         
                               <!-- Occupied -->
@@ -940,7 +943,7 @@
                                     <i data-lucide="bed" class="w-6 h-6 text-rose-600 dark:text-rose-200"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase">Occupied</p>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-rose-400 mt-2" id="occupied">4</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-rose-400 mt-2" id="occupied">--</p>
                               </div>
                         
                               <!-- Total Rooms -->
@@ -949,7 +952,7 @@
                                     <i data-lucide="building" class="w-6 h-6 text-indigo-600 dark:text-indigo-200"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase">Total Rooms</p>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-indigo-400 mt-2" id="all-areas">83</p>
+                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-indigo-400 mt-2" id="all-areas">--</p>
                               </div>
                         </div>
                         
@@ -1002,7 +1005,9 @@
                                                       </tr>
                                                 </thead>
                               
-                                                <tbody id="room-status-tbody"></tbody>
+                                                <tbody id="room-status-tbody">
+                                                      <div id="loadingCleanPortal" class="relative"></div>
+                                                </tbody>
                                           </table>
                                     </div>
                               </div>
@@ -1056,7 +1061,9 @@
                                                       <th class="px-6 py-3 font-semibold uppercase  whitespace-nowrap">Action</th>
                                                 </tr>
                                           </thead>
-                                          <tbody id="table2-body"></tbody>
+                                          <tbody id="table2-body">
+                                                <div id="loadingRatesPortal" class="relative"></div>
+                                          </tbody>
                                     </table>
                               </div>
                         </div>
@@ -1077,7 +1084,7 @@
                               <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-103">
                                     <div>
                                           <p class="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">Direct Payment <span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
-                                          <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="direct-payment">$5,100</p>
+                                          <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="direct-payment">--</p>
                                     </div>
                                     <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-700 rounded-full">
                                     <i data-lucide="credit-card" class="w-6 h-6 text-green-600 dark:text-green-200"></i>
@@ -1088,7 +1095,7 @@
                               <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-103">
                                     <div>
                                           <p class="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">ZUZU Payment<span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
-                                          <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="online-payment">$8,900</p>
+                                          <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="online-payment">--</p>
                                     </div>
                                     <div class="w-12 h-12 flex items-center justify-center bg-blue-100 dark:bg-blue-700 rounded-full">
                                     <i data-lucide="globe" class="w-6 h-6 text-blue-600 dark:text-blue-200"></i>
@@ -1099,7 +1106,7 @@
                               <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-103">
                                     <div>
                                           <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Total Revenue <span class="text-xs text-gray-400 dark:text-gray-400">(Today)</span></p>
-                                          <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="booking-revenue">$14,000</p>
+                                          <p class="text-3xl font-bold mt-2 text-gray-900 dark:text-white" id="booking-revenue">--</p>
                                     </div>
                                     <div class="w-12 h-12 flex items-center justify-center bg-yellow-100 dark:bg-yellow-700 rounded-full">
                                           <i data-lucide="bar-chart-3" class="w-6 h-6 text-yellow-600 dark:text-yellow-200"></i>
@@ -1125,7 +1132,9 @@
                                                       <th class="px-6 py-3 text-center font-medium uppercase tracking-wider ">Overall Income</th>
                                                 </tr>
 							</thead>
-							<tbody id="accounting-tbody"></tbody>
+							<tbody id="accounting-tbody">
+                                                <div id="loadingAccountingPortal" class="relative"></div>
+                                          </tbody>
 						</table>
                               </div>
                         </div>
@@ -1242,6 +1251,7 @@
                               </div>
 
                               <div class="bg-white dark:bg-gray-900 rounded-sm shadow p-4 w-full h-[78vh] flex flex-col border border-gray-300 dark:border-gray-700 col-span-3">
+                                    <div class="relative" id="loadingRevenuePortal"></div>
                                     <h1 class="text-gray-700 dark:text-gray-100 font-semibold text-lg mb-4 text-center border-b border-gray-300 dark:border-gray-600 pb-2">Recent Promotions Applied</h1>
                                     <ul id="promoList" class="flex-1 overflow-y-auto space-y-2 p-3"></ul>
                               </div>
@@ -1268,7 +1278,7 @@
                                           <i data-lucide="users" class="w-6 h-6 text-blue-600 dark:text-blue-200"></i>
                                     </div>
                                     </div>
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-blue-400" id="total-staff">3</p>
+                                    <p class="text-3xl font-bold text-gray-900 dark:text-blue-400" id="total-staff">--</p>
                               </div>
                         
                               <!-- Total On Duty -->
@@ -1281,7 +1291,7 @@
                                           <i data-lucide="user-check" class="w-6 h-6 text-green-600 dark:text-green-200"></i>
                                     </div>
                                     </div>
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-green-400" id="on-duty">3</p>
+                                    <p class="text-3xl font-bold text-gray-900 dark:text-green-400" id="on-duty">--</p>
                               </div>
                         
                               <!-- Total Absent -->
@@ -1294,7 +1304,7 @@
                                           <i data-lucide="user-minus" class="w-6 h-6 text-red-600 dark:text-red-200"></i>
                                     </div>
                                     </div>
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-red-400" id="absent">3</p>
+                                    <p class="text-3xl font-bold text-gray-900 dark:text-red-400" id="absent">--</p>
                               </div>
                         
                               <!-- Total On Leave -->
@@ -1308,7 +1318,7 @@
                                     </div>
                                     </div>
                                     <div class="flex justify-between items-center mt-3">
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-yellow-400" id="on-leave">3</p>
+                                    <p class="text-3xl font-bold text-gray-900 dark:text-yellow-400" id="on-leave">--</p>
                                     <button id="viewOnLeave" class="bg-blue-500 dark:bg-blue-700 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium transition">
                                           View
                                     </button>
@@ -1451,7 +1461,7 @@
                               </div>
                         </div>
                   </section>
-
+                  
 		</main>
 	</div>
       
@@ -1465,7 +1475,6 @@
       <div id="logoutPortal"></div>
       <div id="messagePortal"></div>
       <div id="staffManagementPortal"></div>
-      <div id="loadingPortal"></div>
       
       <script type="module" src="{{ url_for('static', filename='scripts/script.js') }}" defer></script>
 </body>

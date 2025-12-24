@@ -73,23 +73,6 @@ class RatesAndAvailability:
                                     FROM accomodation_data a
                                     JOIN bookings b ON a.booking_id = b.booking_id
                                     UNION ALL
-                                    SELECT 'family',
-                                          7 - SUM(
-                                                CASE 
-                                                WHEN a.check_in <= CURRENT_DATE()
-                                                AND a.check_out >= CURRENT_DATE()
-                                                AND b.status = 'Checked-in'
-                                                THEN family ELSE 0 END
-                                          ),
-                                          7 - SUM(
-                                                CASE 
-                                                WHEN a.check_in <= CURRENT_DATE() + INTERVAL 1 DAY
-                                                AND a.check_out >= CURRENT_DATE() + INTERVAL 1 DAY
-                                                THEN family ELSE 0 END
-                                          )
-                                    FROM accomodation_data a
-                                    JOIN bookings b ON a.booking_id = b.booking_id
-                                    UNION ALL
                                     SELECT 'garden',
                                           12 - SUM(
                                                 CASE 
@@ -125,52 +108,86 @@ class RatesAndAvailability:
                                     JOIN bookings b ON a.booking_id = b.booking_id
                                     UNION ALL
                                     SELECT 'small',
-                                          8 - SUM(
+                                          3 - SUM(
                                                 CASE 
                                                 WHEN a.check_in <= CURRENT_DATE()
                                                 AND a.check_out >= CURRENT_DATE()
                                                 AND b.status = 'Checked-in'
                                                 THEN small ELSE 0 END
                                           ),
-                                          8 - SUM(
+                                          3 - SUM(
                                                 CASE 
                                                 WHEN a.check_in <= CURRENT_DATE() + INTERVAL 1 DAY
                                                 AND a.check_out >= CURRENT_DATE() + INTERVAL 1 DAY
                                                 THEN small ELSE 0 END
-                                          )
-                                    FROM accomodation_data a
-                                    JOIN bookings b ON a.booking_id = b.booking_id
-                                    UNION ALL
-                                    SELECT 'hall',
-                                          1 - SUM(
-                                                CASE 
-                                                WHEN a.check_in <= CURRENT_DATE()
-                                                AND a.check_out >= CURRENT_DATE()
-                                                AND b.status = 'Checked-in'
-                                                THEN hall ELSE 0 END
-                                          ),
-                                          1 - SUM(
-                                                CASE 
-                                                WHEN a.check_in <= CURRENT_DATE() + INTERVAL 1 DAY
-                                                AND a.check_out >= CURRENT_DATE() + INTERVAL 1 DAY
-                                                THEN hall ELSE 0 END
                                           )
                                     FROM accomodation_data a
                                     JOIN bookings b ON a.booking_id = b.booking_id
                                     UNION ALL
                                     SELECT 'big',
-                                          8 - SUM(
+                                          5 - SUM(
                                                 CASE 
                                                 WHEN a.check_in <= CURRENT_DATE()
                                                 AND a.check_out >= CURRENT_DATE()
                                                 AND b.status = 'Checked-in'
                                                 THEN big ELSE 0 END
                                           ),
-                                          8 - SUM(
+                                          5 - SUM(
                                                 CASE 
                                                 WHEN a.check_in <= CURRENT_DATE() + INTERVAL 1 DAY
                                                 AND a.check_out >= CURRENT_DATE() + INTERVAL 1 DAY
                                                 THEN big ELSE 0 END
+                                          )
+                                    FROM accomodation_data a
+                                    JOIN bookings b ON a.booking_id = b.booking_id
+                                    UNION ALL
+                                    SELECT 'mariposa',
+                                          1 - SUM(
+                                                CASE 
+                                                WHEN a.check_in <= CURRENT_DATE()
+                                                AND a.check_out >= CURRENT_DATE()
+                                                AND b.status = 'Checked-in'
+                                                THEN mariposa ELSE 0 END
+                                          ),
+                                          1 - SUM(
+                                                CASE 
+                                                WHEN a.check_in <= CURRENT_DATE() + INTERVAL 1 DAY
+                                                AND a.check_out >= CURRENT_DATE() + INTERVAL 1 DAY
+                                                THEN mariposa ELSE 0 END
+                                          )
+                                    FROM accomodation_data a
+                                    JOIN bookings b ON a.booking_id = b.booking_id
+                                    UNION ALL
+                                    SELECT 'minicon',
+                                          1 - SUM(
+                                                CASE 
+                                                WHEN a.check_in <= CURRENT_DATE()
+                                                AND a.check_out >= CURRENT_DATE()
+                                                AND b.status = 'Checked-in'
+                                                THEN minicon ELSE 0 END
+                                          ),
+                                          1 - SUM(
+                                                CASE 
+                                                WHEN a.check_in <= CURRENT_DATE() + INTERVAL 1 DAY
+                                                AND a.check_out >= CURRENT_DATE() + INTERVAL 1 DAY
+                                                THEN minicon ELSE 0 END
+                                          )
+                                    FROM accomodation_data a
+                                    JOIN bookings b ON a.booking_id = b.booking_id
+                                    UNION ALL
+                                    SELECT 'pavillion',
+                                          1 - SUM(
+                                                CASE 
+                                                WHEN a.check_in <= CURRENT_DATE()
+                                                AND a.check_out >= CURRENT_DATE()
+                                                AND b.status = 'Checked-in'
+                                                THEN pavillion ELSE 0 END
+                                          ),
+                                          1 - SUM(
+                                                CASE 
+                                                WHEN a.check_in <= CURRENT_DATE() + INTERVAL 1 DAY
+                                                AND a.check_out >= CURRENT_DATE() + INTERVAL 1 DAY
+                                                THEN pavillion ELSE 0 END
                                           )
                                     FROM accomodation_data a
                                     JOIN bookings b ON a.booking_id = b.booking_id

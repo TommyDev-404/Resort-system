@@ -12,7 +12,11 @@ class Accounting:
                         cursor = con.cursor()
                         cursor.execute(f"""
                               SELECT
-                                    MONTHNAME(STR_TO_DATE(CONCAT(m.month, '-01'), '%m-%d')) AS month_name,
+                                    ELT(
+                                          m.month,
+                                          'January','February','March','April','May','June',
+                                          'July','August','September','October','November','December'
+                                    ) AS month_name,
                                     COALESCE(SUM(CASE WHEN b.payment = 'Direct Payment' THEN b.total_amount ELSE 0 END), 0) AS direct,
                                     COALESCE(SUM(CASE WHEN b.payment = 'ZUZU (Online Payment)' THEN b.total_amount ELSE 0 END), 0) AS online,
                                     COALESCE(SUM(b.total_amount), 0) AS total

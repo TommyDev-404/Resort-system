@@ -46,7 +46,7 @@ class Staff_Management:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT * FROM staff_details ORDER BY FIELD(job_position, 'Front Desk', 'Security Guard',  'Maintenance', 'Janitor')''')
+                        cursor.execute(''' SELECT id, staff_name, job_position, status FROM staff_details ORDER BY FIELD(job_position, 'Front Desk', 'Security Guard',  'Maintenance', 'Janitor')''')
                         data = cursor.fetchall()
 
                         return {'success': bool(data), 'data': data}
@@ -62,7 +62,7 @@ class Staff_Management:
                         next_date = target_date + timedelta(days=1)
                         print(target_date, next_date)
                         query = """
-                        SELECT *
+                        SELECT id, staff_name, job_position
                         FROM staff_details sd
                         WHERE sd.id NOT IN (
                         SELECT sa.staff_id
@@ -230,7 +230,7 @@ class Staff_Management:
                         target_date = f"{date.today().year}-{int(month)}-{int(day)}"  # format YYYY-MM-DD
                         print('date: '+str(target_date))
                         cursor.execute('''
-                        SELECT * 
+                        SELECT id, staff_name, date, time_in
                         FROM staff_attendance 
                         WHERE date = %s
                               AND status not in ('Absent')
@@ -368,21 +368,21 @@ class Staff_Management:
                               )
                               
                               SELECT 
-                                    (SELECT COUNT(*) FROM staff_details) AS total_staff,
+                                    (SELECT COUNT(id) FROM staff_details) AS total_staff,
 
-                                    (SELECT COUNT(*) 
+                                    (SELECT COUNT(id) 
                                     FROM staff_attendance 
                                     WHERE status != 'Absent'
                                     AND MONTH(date) = %s AND DAY(date) = %s  AND YEAR(date) = YEAR(CURRENT_DATE())
                                     ) AS today_duty,
 
-                                    (SELECT COUNT(*) 
+                                    (SELECT COUNT(id) 
                                     FROM staff_attendance 
                                     WHERE status = 'Absent'
                                     AND MONTH(date) = %s AND DAY(date) = %s AND YEAR(date) = YEAR(CURRENT_DATE())
                                     ) AS today_absent,
 
-                                    (SELECT COUNT(*) 
+                                    (SELECT COUNT(id) 
                                     FROM staff_leaves_data
                                     WHERE date >= (SELECT sunday_date FROM last_week_sunday)
                                     AND date < (SELECT sunday_date FROM this_week_sunday)

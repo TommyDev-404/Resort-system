@@ -23,29 +23,34 @@ const sectionControllerMap = {
 /*---------------- SIDEBAR TOGGLE ----------------*/
 function loadingAnimation0(){
       const load = `
-            <div id="loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2 backdrop-blur-[2px]">
+            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center justify-center h-screen inset-0 bg-black/5 text-white space-y-2 backdrop-blur-[2px]">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black">Loading data...</p>
             </div>
       `;      
 
       document.getElementById('loadingPortal').innerHTML += load;
 }
 
-function showLoader() {
+function showLoader(sectionId) {
+      // Hide all sections
+      contentSections.forEach(section => section.classList.add('hidden'));
+
       loadingAnimation0(); // adds #loading inside #loadingPortal
 }
 
-function hideLoader() {
+function hideLoader(sectionId) {
       const loader = document.querySelector('#loading');
       if (loader) loader.remove();
+      
+      // Show target section
+      const targetSection = document.getElementById(sectionId);
+      if (targetSection) targetSection.classList.remove('hidden');
 }
 
 /*---------------- SWITCH CONTENT ----------------*/
 async function switchContent(sectionId) {
       if (!sectionId) return;
-
-      showLoader(); // spinner visible immediately
 
       // Update sidebar active state
       sidebarItems.forEach(item => {
@@ -56,15 +61,10 @@ async function switchContent(sectionId) {
                   item.classList.toggle('text-gray-900', !isActive);
             }
       });
-
+      
+      showLoader(sectionId);
+      
       try {
-            // Hide all sections
-            contentSections.forEach(section => section.classList.add('hidden'));
-
-            // Show target section
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) targetSection.classList.remove('hidden');
-
             // Dynamically import module if exists
             if (sectionControllerMap[sectionId]) {
                   notifications();
@@ -75,10 +75,8 @@ async function switchContent(sectionId) {
 
       } catch (err) {
             console.error(`Error loading ${sectionId}:`, err);
-      } finally {
-            hideLoader(); // hide spinner after everything is ready
       }
-
+      hideLoader(sectionId);
 }
 
 
@@ -195,7 +193,6 @@ window.addEventListener('DOMContentLoaded', () => {
       localStorage.getItem('theme') === 'dark' ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark');
       localStorage.getItem('theme') === 'dark' ? document.querySelector('#lightIcon').classList.toggle('hidden') : document.querySelector('#darkIcon').classList.toggle('hidden');
 });
-
 
 function logoutCard(){
       const modal = `

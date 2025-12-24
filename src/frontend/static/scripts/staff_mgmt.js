@@ -234,7 +234,7 @@ async function renderViewStaffInfo(id, staff_name, date_started, position, daily
                         
                         <div class="flex justify-between items-center mb-6 border-b border-gray-300 dark:border-gray-700 pb-4">
                               <div class="flex items-center gap-4 ">
-                                    <img id="staffPhoto" src="/static/assets/user.png" alt="Staff" class="w-16 h-16 rounded-full object-cover">
+                                    <img id="staffPhoto" src="/static/assets/user.webp" alt="Staff" class="w-16 h-16 rounded-full object-cover">
                                     <div>
                                           <h2 id="staffName" class="text-2xl font-bold text-gray-800 dark:text-white">${staff_name}</h2>
                                           <p id="staffPosition" class="text-gray-600 dark:text-gray-400 text-sm">${position}</p>

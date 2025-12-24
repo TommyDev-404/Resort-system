@@ -24,14 +24,13 @@ class RevenueMgmt:
                                     (promotions, discount, area.split(' ')[0].strip()))
                                     con.commit()
 
-                              cursor.execute(''' SELECT * FROM bookings WHERE check_in >= %s AND promo = %s''', (dates, 'No promo.'))
+                              cursor.execute(''' SELECT booking_id, accomodations, check_out, check_in FROM bookings WHERE check_in >= %s AND promo = %s''', (dates, 'No promo.'))
                               booking_data = cursor.fetchall()
 
                               for data in booking_data:
                                     accomodations = data.get('accomodations').split(',')
                                     id = data.get('booking_id')
-                                    print(id)
-                                    print(data)
+
                                     area_under_promo = []
                                     for area in accomodations:
                                           name = area.split(' ')[0].strip()
@@ -40,7 +39,7 @@ class RevenueMgmt:
                                                 area_under_promo.append(area)
                                     
                                     if len(area_under_promo) > 0:
-                                          cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', 
+                                          cursor.execute(''' UPDATE bookings SET  promo = %s, promo_area = %s WHERE booking_id = %s ''', 
                                           (f'{promotions} discount', ','.join(area_under_promo), id))
                                           con.commit()
                                     
@@ -249,10 +248,10 @@ class RevenueMgmt:
                               ('None', area.split(' ')[0]))
                               con.commit()
 
-                              cursor.execute(''' SELECT * FROM promos WHERE id = %s''', (id,))
+                              cursor.execute(''' SELECT date FROM promos WHERE id = %s''', (id,))
                               promo_data = cursor.fetchone()
 
-                              cursor.execute(''' SELECT * FROM bookings WHERE check_out >= %s AND promo NOT IN ('No promo.') ''', (promo_data.get('date'),))
+                              cursor.execute(''' SELECT booking_id, accomodations, check_in, check_out FROM bookings WHERE check_out >= %s AND promo NOT IN ('No promo.') ''', (promo_data.get('date'),))
                               booking_data = cursor.fetchall()
                               print(booking_data)
                               
