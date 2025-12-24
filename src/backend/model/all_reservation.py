@@ -106,7 +106,6 @@ class Reservation:
                         cursor.execute(''' SELECT * FROM promos WHERE status IN ('Active') ''')
                         promo_data = cursor.fetchone()
                         
-                        print(promo_data)
                         room_affected = []
 
                         count = 0
@@ -115,11 +114,12 @@ class Reservation:
                               "standard": 0,
                               "garden": 0,
                               "barkada": 0,
-                              "family": 0,
                               "cabana": 0,
                               "big": 0,
                               "small": 0,
-                              "hall": 0
+                              "pavillion": 0,
+                              "mariposa": 0,
+                              "minicon": 0
                         }
 
                         for room in rooms:
@@ -143,30 +143,22 @@ class Reservation:
                               if new_checkin < new_checkout:
                                     day = new_checkin
                                     while day < new_checkout:
-                                          print(day)
                                           if promo_start and day >= promo_start: # if promo start today and checkin is before promo start
                                                 if promo_end and day >= promo_end: # if promo end and the check in is after it
-                                                      print('promo expired')
                                                       nightly_rate = orig_rate # add the original rate 
                                                 else:
                                                       nightly_rate = promo_rate # get the promo rate
-                                                      print('promo applied')
                                           else:
                                                 nightly_rate = orig_rate
-                                                print('no promo')
 
                                           revenue_per_area += nightly_rate
                                           new_amount += nightly_rate
-                                          print(new_amount)
                                           day += timedelta(days=1)
                               else:
-                                    print('same day checkin checkout')
                                     if booking_type == 'Day Guest':
-                                          print('day guest')
                                           new_amount += promo_rate if promo_end and promo_end >= today else orig_rate
                                           revenue_per_area += promo_rate if promo_end and promo_end >= today else orig_rate
                                     else: # for same day checkin and checkout
-                                          print('checkin checkout')
                                           new_amount += promo_rate / 2 if promo_end and promo_end >= today else orig_rate / 2
                                           revenue_per_area += promo_rate / 2 if promo_end and promo_end >= today else orig_rate / 2
 
@@ -185,7 +177,7 @@ class Reservation:
                         
                         if cursor.rowcount != 0: result_list.append(True)
 
-                        cursor.execute(''' INSERT INTO accomodation_data(check_in, check_out, premium, standard, garden, barkada, family, cabana, small, big, hall, total) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ''', 
+                        cursor.execute(''' INSERT INTO accomodation_data(check_in, check_out, premium, standard, garden, barkada, cabana, small, big, pavillion, mariposa, minicon, total) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ''', 
                         (      
                               checkin, 
                               checkout, 
@@ -193,11 +185,12 @@ class Reservation:
                               counts.get('standard') if counts.get('standard') else 0, 
                               counts.get('garden') if counts.get('garden') else 0, 
                               counts.get('barkada') if counts.get('barkada') else 0,
-                              counts.get('family') if counts.get('family') else 0, 
                               counts.get('cabana') if counts.get('cabana') else 0, 
                               counts.get('small') if counts.get('small') else 0, 
                               counts.get('big') if counts.get('big') else 0, 
-                              counts.get('hall') if counts.get('hall') else 0,
+                              counts.get('pavillion') if counts.get('pavillion') else 0,
+                              counts.get('mariposa') if counts.get('mariposa') else 0,
+                              counts.get('minicon') if counts.get('minicon') else 0,
                               len(rooms)
                         ))
                         
@@ -219,8 +212,8 @@ class Reservation:
 
                         cursor.execute('''
                               INSERT INTO area_revenue
-                              (booking_id, check_in, check_out, premium, standard, garden, barkada, family, cabana, big, small, hall, total)
-                              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                              (booking_id, check_in, check_out, premium, standard, garden, barkada, cabana, big, small, pavillion, mariposa, minicon, total)
+                              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                               ''', (
                               booking_id,               # MUST BE THE FIRST VALUE
                               checkin,
@@ -229,11 +222,12 @@ class Reservation:
                               new_area_revenue["standard"],
                               new_area_revenue["garden"],
                               new_area_revenue["barkada"],
-                              new_area_revenue["family"],
                               new_area_revenue["cabana"],
                               new_area_revenue["big"],
                               new_area_revenue["small"],
-                              new_area_revenue["hall"],
+                              new_area_revenue["pavillion"],
+                              new_area_revenue["mariposa"],
+                              new_area_revenue["minicon"],
                               total
                         ))
 
@@ -643,13 +637,10 @@ class Reservation:
 
                                           day += timedelta(days=1)
                               else:
-                                    print("Check-in and Check-out dates are the same. Applying half-day rate.")
                                     if promo_end >= new_checkin:
-                                          print("Promo is active on the check-in date. Applying half promo rate.")
                                           new_amount += promo_rate / 2
                                           revenue_per_area += promo_rate / 2
                                     else:
-                                          print("No active promo on the check-in date. Applying half original rate.")
                                           new_amount += orig_rate / 2
                                           revenue_per_area += orig_rate / 2
 

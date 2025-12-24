@@ -663,8 +663,23 @@ function loadingAnimation0(){
       document.getElementById('loadingTablePortal').innerHTML += load;
 }
 
-function showLoader() {
-      loadingAnimation0(); // adds #loading inside #loadingPortal
+function loadingAnimationAdd(message){
+      const load = `
+            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center  bg-black/50 justify-center h-screen space-y-2 z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-gray-200">${message}...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingDataPortal').innerHTML += load;
+}
+
+function showLoader(type, message=null) {
+      if (type === 'table'){
+            loadingAnimation0(); // adds #loading inside #loadingPortal
+      }else{
+            loadingAnimationAdd(message)
+      }
 }
 
 function hideLoader() {
@@ -676,7 +691,7 @@ function hideLoader() {
 async function addBooking(e){
       e.preventDefault();      
       const form = new FormData(e.target);
-
+      showLoader('data', 'Adding guest');
       try{
             const response = await fetch('/add-booking', {
                   method: 'POST', 
@@ -702,12 +717,14 @@ async function addBooking(e){
       }catch(err){
             console.log(err);
       }
+      hideLoader();
 }
 
 async function markAsCheckout(){
       const id = retrieveCheckboxId().id;
       const accommodations = retrieveCheckboxId().accomodations;
       
+      showLoader('data', 'Checking-Out guest');
       const response = await fetch(`/mark-checkout?id=${id}&accomodation=${accommodations}`,{
             method: 'POST',
             headers: {'Content-Type': 'application/json'}
@@ -723,14 +740,15 @@ async function markAsCheckout(){
       }else{
             failedMessageCard4(result.message);
       }
-      
+      hideLoader();
       getTotalsCountData();
 }
 
 async function markAsCheckin(){
       const id = retrieveCheckboxId().id;
       const accommodations = retrieveCheckboxId().accomodations;
-
+      
+      showLoader('data', 'Checking-In guest');
       const response = await fetch(`/mark-checkin?id=${id}&accomodation=${accommodations}`,{
             method: 'POST',
             headers: {'Content-Type': 'application/json'}
@@ -746,7 +764,7 @@ async function markAsCheckin(){
       }else{
             failedMessageCard4(result.message);
       }
-      
+      hideLoader();
       getTotalsCountData();
 }
 
@@ -754,6 +772,7 @@ async function cancelBooking(){
       const id = retrieveCheckboxId().id;
       const accommodations = retrieveCheckboxId().accomodations;
       
+      showLoader('data', 'Cancelling booking');
       const response = await fetch(`/cancel-booking?id=${id}&accomodation=${accommodations}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'} 
@@ -769,15 +788,16 @@ async function cancelBooking(){
       }else{
             failedMessageCard4(result.message);
       }
-      
+      hideLoader();
       getTotalsCountData();
 }
 
 async function submitPayment(e){
       e.preventDefault();
+      showLoader('data', 'Adding Payment');
       const select = document.getElementById('mark-payment').value;
       const id = retrieveCheckboxId().id;
-      console.log();
+
       const response = await fetch(`/mark-paid?id=${id}&payment=${select}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'}
@@ -792,14 +812,15 @@ async function submitPayment(e){
       }else{
             failedMessageCard4(result.message);
       }
-      
+      hideLoader();
       getTotalsCountData();
 }
 
 async function updateReservationDate(e){
       e.preventDefault();
       const form = new FormData(e.target);
-
+      
+      showLoader('data', 'Updating booking schedule');
       const response = await fetch(`/update-reservation-date`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -817,12 +838,13 @@ async function updateReservationDate(e){
             failedMessageCard4(result.message);
             document.querySelector('#update-reservation-overlay').remove();
       }
-      
+      hideLoader();
       getTotalsCountData();
 }
 
 // --------------- GET DATA Fetching -------------- //
 async function renderViewReservationDetails(id){
+      showLoader('data', 'Retrieving booking details');
       const response = await fetch(`/view-details/${id}`);
       const result = await response.json();
 
@@ -931,11 +953,12 @@ async function renderViewReservationDetails(id){
       }else{
             alert(result.message);
       }
+      hideLoader();
 }
 
 async function getReservationDate(){
       const id = retrieveCheckboxId().id;
-
+      showLoader('data', 'Retrieving booking schedule');
       const response = await fetch(`/get-reservation-date?id=${id}`);
       const result = await response.json();
       console.log(result);
@@ -943,6 +966,7 @@ async function getReservationDate(){
       const formatCheckout = new Date(result.check_out).toISOString().split('T')[0];
 
       renderEditReservedModal(id, formatCheckin, formatCheckout, result.booking_type); 
+      hideLoader();
 }
 
 async function generateAvlAccomodation(accomodation){
@@ -1014,7 +1038,7 @@ async function avl_spaces() {
 async function recentBookings(){
       document.querySelectorAll('tbody tr').forEach(row => row.remove());      
       resetToDefaultTabItem();
-      showLoader();
+      showLoader('table');
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
       getTotalsCountData();
@@ -1135,7 +1159,7 @@ async function bookingsCategories(e){
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
       category_data = category;
-      showLoader();
+      showLoader('table');
       const response = await fetch(`/category-bookings?year=${year}&month=${month}&category=${category}`);
       const result = await response.json();
 
@@ -1160,7 +1184,7 @@ async function searchGuest(e){
       const name = e.target.value;
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
-      showLoader();
+      showLoader('table');
       const response = await fetch(`/search-guest?name=${name}&year=${year}&month=${month}&category=${category_data}`);
       const result = await response.json();
 
