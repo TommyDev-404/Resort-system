@@ -205,7 +205,7 @@ function renderAddBookingModal(){
                               <!-- Accommodations -->
                               <section>
                                     <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 text-center flex justify-center items-center gap-2"><i data-lucide="home" class="lucide w-4 h-4"></i> Select Accommodations</h3>
-                                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                                           <div class="btn-acc flex flex-col items-center justify-center bg-purple-600 hover:bg-purple-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Premium Villa">
                                                 <i data-lucide="bed" class="lucide w-5 h-5"></i>
                                                 <label>Premium Villa (<span id="count-p"></span>)</label> 
@@ -219,11 +219,6 @@ function renderAddBookingModal(){
                                           <div class="btn-acc flex flex-col items-center justify-center bg-teal-600 hover:bg-teal-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Garden View">
                                                 <i data-lucide="bed" class="lucide w-5 h-5"></i>
                                                 <label>Garden View (<span id="count-g"></span>)</label> 
-                                          </div>
-
-                                          <div class="btn-acc flex flex-col items-center justify-center bg-orange-600 hover:bg-orange-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Family Room">
-                                                <i data-lucide="bed" class="lucide w-5 h-5"></i>
-                                                <label>Family Room (<span id="count-f"></span>)</label> 
                                           </div>
                                     
                                           <div class="btn-acc flex flex-col items-center justify-center bg-pink-600 hover:bg-pink-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Barkada Room">
@@ -1020,14 +1015,13 @@ async function avl_spaces() {
             }
             roomCache[name].push(room);
       });
-      console.log(roomCache);
+      
       const response = await fetch('/avl-spaces');
       const result = await response.json();
 
       document.getElementById('count-p').textContent = result.premium;
       document.getElementById('count-s').textContent = result.standard;
       document.getElementById('count-g').textContent = result.garden;
-      document.getElementById('count-f').textContent = result.family;
       document.getElementById('count-bd').textContent = result.barkada;
       document.getElementById('count-c').textContent = result.cabana;
       document.getElementById('count-sm').textContent = result.small;

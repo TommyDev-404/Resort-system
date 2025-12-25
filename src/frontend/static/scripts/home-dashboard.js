@@ -102,9 +102,9 @@ async function drawOccupancyPercentage(){
 }
 
 function formatPesoShort2(num) {
-      if (num >= 1_000_000_000) return "₱" + (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B";  
-      if (num >= 1_000_000)     return "₱" + (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";  
-      if (num >= 1_000)         return "₱" + (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";  
+      if (num >= 1_000_000_000) return "₱" + (num / 1_000_000_000).toFixed(2).replace(/\.0$/, "") + "B";  
+      if (num >= 1_000_000)     return "₱" + (num / 1_000_000).toFixed(2).replace(/\.0$/, "") + "M";  
+      if (num >= 1_000)         return "₱" + (num / 1_000).toFixed(2).replace(/\.0$/, "") + "K";  
       return "₱" + num.toLocaleString("en-PH");
 }
 
@@ -426,7 +426,7 @@ async function mostBookedArea() {
       try{
             const response = await fetch('/top-booked-area');
             const res = await response.json();
-
+            console.log(res);
             if (res.success){
                   res.data.forEach(data => {
                         createMostBookedArea(data.area_name, data.percentage);
@@ -637,36 +637,37 @@ async function roomsData() {
                   </div>
             </div>
 
-            <div class="p-3 bg-orange-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
-                  <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Big Cottage</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[1].total_rooms - Number(res.data[1].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
-                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[1].today_avail}</span></p>
-                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-orange-500 h-2 rounded-full" style="width:${(Number(res.data[1].today_avail) / Number(res.data[1].total_rooms)*100)}%"></div>
+            <div class="grid grid-cols-2 col-span-3 gap-3">
+                  <div class="col-span-1 p-3 bg-orange-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Big Cottage</p>
+                        <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[1].total_rooms - Number(res.data[1].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
+                        <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[1].today_avail}</span></p>
+                        <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                              <div class="bg-orange-500 h-2 rounded-full" style="width:${(Number(res.data[1].today_avail) / Number(res.data[1].total_rooms)*100)}%"></div>
+                        </div>
                   </div>
-            </div>
-            
-            <div class="p-3 bg-pink-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
-                  <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Hall</p>
+                  
+                  <div class="col-span-1 p-3 bg-pink-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Hall</p>
 
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                        ${occupiedHallRooms}
-                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span>
-                  </p>
+                        <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                              ${occupiedHallRooms}
+                              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span>
+                        </p>
 
-                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">
-                        Available:
-                        <span class="font-semibold">${availableHallRooms}</span>
-                  </p>
+                        <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">
+                              Available:
+                              <span class="font-semibold">${availableHallRooms}</span>
+                        </p>
 
-                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div
-                              class="bg-pink-500 h-2 rounded-full transition-all"
-                              style="width:${hallPercentage.toFixed(1)}%">
+                        <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                              <div
+                                    class="bg-pink-500 h-2 rounded-full transition-all"
+                                    style="width:${hallPercentage.toFixed(1)}%">
+                              </div>
                         </div>
                   </div>
             </div>
-
       `;
 
       document.getElementById('rooms-data').innerHTML += rooms;

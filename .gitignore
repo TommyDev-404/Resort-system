@@ -15,5 +15,7 @@ accomodation-data.sql
 bookings.sql
 init.sql
 indexes.sql
+loop.py
+data.ods
 
 src/frontend/scripts/

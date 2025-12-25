@@ -223,34 +223,74 @@ class Dashboard:
                               SELECT 
                                     area_name,
                                     total_bookings,
-                                    ROUND((total_bookings / yearly_total) * 100, 2) AS percentage
+                                    ROUND((CAST(total_bookings AS DECIMAL(10,2)) / CAST(yearly_total AS DECIMAL(10,2))) * 100, 2) AS percentage
                               FROM (
-                                    SELECT 'premium' AS area_name, SUM(premium) AS total_bookings FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'standard', SUM(standard) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'garden', SUM(garden) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'barkada', SUM(barkada) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'cabana', SUM(cabana) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'small', SUM(small) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'big', SUM(big) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'pavillion', SUM(pavillion) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'mariposa', SUM(mariposa) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
-                                    UNION ALL
-                                    SELECT 'minicon', SUM(minicon) FROM accomodation_data WHERE YEAR(check_in) = YEAR(CURDATE())
+                              SELECT 'premium' AS area_name, SUM(premium) AS total_bookings
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'standard', SUM(standard)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'garden', SUM(garden)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'barkada', SUM(barkada)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'cabana', SUM(cabana)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'small', SUM(small)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'big', SUM(big)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'pavillion', SUM(pavillion)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'mariposa', SUM(mariposa)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+
+                              UNION ALL
+                              SELECT 'minicon', SUM(minicon)
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
                               ) AS summary
                               CROSS JOIN (
-                                    SELECT SUM(premium + standard + garden + barkada + cabana + small + big + pavillion + mariposa + minicon) AS yearly_total
-                                    FROM accomodation_data
-                                    WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
-                                    ) AS total_table
+                              SELECT 
+                                    SUM(premium + standard + garden + barkada + cabana + small + big + pavillion + mariposa + minicon) AS yearly_total
+                              FROM accomodation_data
+                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
+                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
+                              ) AS total_table
                               ORDER BY total_bookings DESC
                               LIMIT 5;
                         ''')
