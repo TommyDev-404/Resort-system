@@ -489,11 +489,11 @@ class Reservation:
 
                         if check_out < date.today():
                               for room, number in set(zip(rooms, room_no)):
-                                    if room.strip() not in ['cabana', 'small', 'big', 'hall']:
+                                    if room.strip() not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
                                           cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("avl", room.capitalize(), number))
                         else:
                               for room, number in set(zip(rooms, room_no)):
-                                    if room.strip() not in ['cabana', 'small', 'big', 'hall']:
+                                    if room.strip() not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
                                           cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("need-clean", room.capitalize(), number))
                                           cursor.execute(''' INSERT INTO notifications(name, date, room_name, room_no, alert_type) VALUES(%s, %s, %s, %s, %s) ''', (f'Housekeeping requested for {room_dict.get(room)}', now, room, number, 'housekeeping'))
                               
