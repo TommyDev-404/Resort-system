@@ -88,7 +88,7 @@ class Dashboard:
                         SELECT COUNT(booking_id) AS today_checkin
                         FROM bookings
                         WHERE date_book = CURRENT_DATE()
-                              AND booking_type IN ('Checked-in', 'Day Guest', 'Reserved')
+                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
                         ),
                         yesterday AS (
                         SELECT COUNT(booking_id) AS yesterday_checkin

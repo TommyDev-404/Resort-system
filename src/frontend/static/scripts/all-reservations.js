@@ -374,7 +374,6 @@ function resetDropDown(){
       document.getElementById('yearSelect').value = new Date().getFullYear();
       document.getElementById('monthSelect').value = new Date().getMonth() + 1;
       recentBookings(); 
-      renderAddBookingModal();
 }
 
 function switchTabs(){
@@ -1210,7 +1209,7 @@ async function searchGuest(e){
 // ---------- Event Listeners ----------------- //
 document.addEventListener('click', (e) => {
       // btn click
-      if (e.target.closest('#add-booking-btn')) resetDropDown();
+      if (e.target.closest('#add-booking-btn')) (resetDropDown(), renderAddBookingModal());
       if (e.target.closest('#mark-paid')) renderMarkPaidModal();
       if (e.target.closest('#mark-checkin')) markAsCheckin();
       if (e.target.closest('#mark-checkout')) markAsCheckout();
@@ -1293,7 +1292,6 @@ getMonths();
 export function initPageReservation(){
       getTotalsCountData();
       resetDropDown();
-      recentBookings();
       resetButtonAndCheckBox();
       summaryCardsDatas();
 }

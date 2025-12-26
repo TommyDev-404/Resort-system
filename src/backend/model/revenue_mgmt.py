@@ -73,15 +73,22 @@ class RevenueMgmt:
                               VALUES (%s, %s, %s, %s, %s, %s)
                         ''', (dates, promo_label, promo_rate, areas_promo, duration, status))
 
-                        if promo_end == date.today():
-                              # 2️⃣ Update accommodation prices (FROM BASE RATE)
+                        if promo_end > date.today():
+                              # Apply promo
                               cursor.execute(f'''
                                     UPDATE accomodation_spaces
                                     SET promo = %s,
                                     rate = orig_rate * (1 - %s)
                                     WHERE name IN ({','.join(['%s'] * len(areas))})
                               ''', [promo_label, discount, *areas])
-
+                        else:
+                              # reset price to orig rate
+                              cursor.execute(f'''
+                                    UPDATE accomodation_spaces
+                                    SET promo = %s,
+                                    rate = orig_rate 
+                                    WHERE name IN ({','.join(['%s'] * len(areas))})
+                              ''', ['None', *areas])
                         con.commit()
 
                         # 3️⃣ Find affected bookings
@@ -92,8 +99,6 @@ class RevenueMgmt:
                               AND check_out < %s
                         ''', (promo_end,))
                         bookings = cursor.fetchall()
-                        print(promo_end)
-                        print(bookings)
 
                         if bookings:
                               booking_areas  = []    
