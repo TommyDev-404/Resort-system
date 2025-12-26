@@ -454,7 +454,7 @@ class Reservation:
                         room_no = [parts[x].split(' ')[-1].lower() for x in range(len(parts))]
 
                         for room, number in set(zip(rooms, room_no)):
-                              if room not in ['cabana', 'small', 'big', 'hall']:
+                              if room not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
                                     cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("occupied", room.capitalize(), number))
                         con.commit()
                         
