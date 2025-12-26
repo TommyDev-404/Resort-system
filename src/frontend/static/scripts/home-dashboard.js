@@ -4,7 +4,6 @@ let occupancyChartPercentage = null;
 let allNotifications = [];
 let monthlyBookingsChart = null;
 let bookingTypeChart = null;
-let guestChart = null;
 let hrevenueChartD = null;
 
 const observers = new MutationObserver(() => {
@@ -20,10 +19,6 @@ const observers = new MutationObserver(() => {
       if (typeof bookingTypeChart !== 'undefined' && bookingTypeChart) {
             bookingTypeChart.destroy();
       }
-      
-      if (typeof guestChart !== 'undefined' && guestChart) {
-            guestChart.destroy();
-      }
 
       if (typeof hrevenueChartD !== 'undefined' && hrevenueChartD) {
             hrevenueChartD.destroy();
@@ -33,7 +28,6 @@ const observers = new MutationObserver(() => {
       drawOccupancyPercentage();
       drawMonthlyBookings();
       drawBookingTypeDistribution();
-      drawGuestTrend();
       drawRevenueTrend();
 });
 
@@ -117,6 +111,30 @@ function loadingAnimation2(){
       `;      
 
       document.getElementById('adminModalPortal').innerHTML += load;
+}
+
+function loadingAnimation0(){
+      const load = `
+            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center justify-center h-screen inset-0 bg-black/5 text-white space-y-2 backdrop-blur-[2px]">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Loading data...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingPortal').innerHTML += load;
+}
+
+function showLoader() {
+      loadingAnimation0(); // adds #loading inside #loadingPortal
+}
+
+function hideLoader(sectionId) {
+      const loader = document.querySelector('#loading');
+      if (loader) loader.remove();
+      
+      // Show target section
+      const targetSection = document.getElementById(sectionId);
+      if (targetSection) targetSection.classList.remove('hidden');
 }
 
 function timeAgo(inputTime) {
@@ -444,6 +462,12 @@ async function bookingOverviewCardsData() {
       const res = await response.json();
 
       const data = res.data;
+      document.getElementById('this-month').textContent = data.month_books;
+      document.getElementById('this-month-guests').textContent = data.month_guests;
+      
+      document.getElementById('this-week').textContent = data.week_books;
+      document.getElementById('this-week-guests').textContent = data.week_guests;
+
       document.getElementById('total-checkin').textContent = data.today_checkin_count;
       document.getElementById('total-checkin-guests').textContent = data.today_checkin_guests;
 
@@ -800,88 +824,6 @@ async function drawBookingTypeDistribution() {
       
 }
 
-async function drawGuestTrend() {
-      const response = await fetch('/revenue-guest-trend', { method: 'GET' });
-      const res = await response.json();
-  
-      const ctx = document.getElementById('guestChart').getContext('2d');
-  
-      // detect dark/light mode
-      const isDark = document.documentElement.classList.contains('dark');
-      const textColor = isDark ? '#e5e7eb' : '#374151';
-      const gridColor = isDark ? '#4b5563' : '#e5e7eb';
-      const tooltipColor = isDark ? '#ffffff' : '#000000';
-
-      if (guestChart) guestChart.destroy();
-  
-      guestChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                  datasets: [
-                        {
-                        label: 'Guests',
-                        data: res.data.map(d => d.guest_count),
-                        borderColor: 'rgba(34,197,94,1)',
-                        backgroundColor: 'rgba(34,197,94,0.2)',
-                        tension: 0.3
-                        }
-                  ]
-            },
-            options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                        legend: {
-                        labels: { color: textColor }
-                        },
-                        tooltip: {
-                              mode: 'nearest',
-                              intersect: false,
-                              backgroundColor: '#111827',
-                              titleColor: '#FBBF24',
-                              bodyColor: '#F9FAFB',
-                              borderColor: '#374151',
-                              borderWidth: 1,
-                              padding: 20,          // bigger box
-                              titleFont: {
-                                    size: 28,         // bigger title
-                                    weight: 'bold'
-                              },
-                              bodyFont: {
-                                  size: 26          // bigger body text
-                              },
-                              callbacks: {
-                                    label: function(context) {
-                                          const label = context.label || '';
-                                          const value = context.parsed.y;
-                                          return `${label}: ${value} Guests`;
-                                    }
-                              }
-                        }
-                  },
-                  scales: {
-                        y: {
-                        beginAtZero: true,
-                        suggestedMin: 0,
-                        suggestedMax: 50,
-                        ticks: {
-                              stepSize: 2,
-                              color: textColor
-                        },
-                        grid: { color: gridColor }
-                        },
-                        x: {
-                        ticks: {
-                              color: textColor
-                        },
-                        grid: { color: gridColor }
-                        }
-                  }
-            }
-      });
-}
-
 async function drawRevenueTrend() {
       const response = await fetch('/revenue-guest-trend', { method: 'GET' });
       const res = await response.json();
@@ -973,7 +915,7 @@ document.addEventListener('click', (e) => {
 });
 
 // Initial load: ensure the default content is shown and charts are drawn
-export function initPageDashboard() {
+export async function initPageDashboard() {
       allNotifications.length = 0;
       mostBookedArea();
       todayGuest();
@@ -988,6 +930,5 @@ export function initPageDashboard() {
       drawMonthlyBookings();
       drawOccupancyPercentage();
       drawBookingTypeDistribution();
-      drawGuestTrend();
       drawRevenueTrend();
 };

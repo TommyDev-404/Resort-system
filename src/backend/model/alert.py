@@ -299,7 +299,7 @@ class Alerts:
                               room_name = area.split()[0].lower()
                               room_no = area.split()[-1]
 
-                        if room_name not in ['cabana', 'small', 'big', 'hall']:
+                        if room_name not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
                               message = f"(System check-out): Housekeeping requested for {area}"
 
                               # Insert notification

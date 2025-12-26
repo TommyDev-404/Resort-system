@@ -201,7 +201,7 @@ function renderAddBookingModal(){
                                           </div>
                                     </div>
                               </section>
-
+                              
                               <!-- Accommodations -->
                               <section>
                                     <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 text-center flex justify-center items-center gap-2"><i data-lucide="home" class="lucide w-4 h-4"></i> Select Accommodations</h3>
@@ -660,7 +660,7 @@ function loadingAnimation0(){
 
 function loadingAnimationAdd(message){
       const load = `
-            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center  bg-black/50 justify-center h-screen space-y-2 z-50 ">
+            <div id="loading" class="absolute w-full top-0 left-0 flex flex-col items-center  bg-black/50 justify-center h-screen space-y-2 z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
                   <p class="text-[15px] font-medium animate-pulse text-gray-200">${message}...</p>
             </div>
@@ -680,6 +680,42 @@ function showLoader(type, message=null) {
 function hideLoader() {
       const loader = document.querySelector('#loading');
       if (loader) loader.remove();
+}
+
+function clearCache(cache) {
+      for (const key in cache) {
+            delete cache[key];
+      }
+}
+
+function areaTypeInfo(area){
+      const room_name = {
+            'premium': 'Premium Villa Room',
+            'standard': 'Standard Villa Room',
+            'barkada': 'Barkada Room',
+            'garden': 'Garden View Room',
+            'cabana': 'Cabana Cottage',
+            'small': 'Small Cottage',
+            'big': 'Big Cottage',
+            'pavillion': 'Pavillion Hall',
+            'mariposa': 'Mariposa Hall',
+            'minicon': 'Minicon Hall'
+      };
+
+      const capacity = {
+            'premium': '12',
+            'standard': '10',
+            'barkada': '8',
+            'garden': '4',
+            'cabana': '30',
+            'small': '20',
+            'big': '50',
+            'pavillion' : "150-200",
+            'mariposa' : "120",
+            'minicon' : "70",
+      };
+
+      return {'name': room_name[area], 'capacity': capacity[area]}
 }
 
 // --------------- POST DATA Fetching -------------- //
@@ -967,8 +1003,6 @@ async function getReservationDate(){
 async function generateAvlAccomodation(accomodation){
       document.querySelectorAll('#avl-accomodations label').forEach(label => label.remove());
       let room_name = accomodation.split(' ');
-      console.log(accomodation);
-
       let rooms = [];
 
       if (accomodation === 'Hall'){
@@ -1005,6 +1039,7 @@ async function generateAvlAccomodation(accomodation){
 }
 
 async function avl_spaces() {
+      clearCache(roomCache);
       const response1 = await fetch(`/avl-rooms`);
       const result1 = await response1.json();
       const rooms = result1.rooms;
