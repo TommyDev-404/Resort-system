@@ -373,6 +373,8 @@ function closeAccomodationRoom(){
 function resetDropDown(){
       document.getElementById('yearSelect').value = new Date().getFullYear();
       document.getElementById('monthSelect').value = new Date().getMonth() + 1;
+      recentBookings(); 
+      renderAddBookingModal();
 }
 
 function switchTabs(){
@@ -686,36 +688,6 @@ function clearCache(cache) {
       for (const key in cache) {
             delete cache[key];
       }
-}
-
-function areaTypeInfo(area){
-      const room_name = {
-            'premium': 'Premium Villa Room',
-            'standard': 'Standard Villa Room',
-            'barkada': 'Barkada Room',
-            'garden': 'Garden View Room',
-            'cabana': 'Cabana Cottage',
-            'small': 'Small Cottage',
-            'big': 'Big Cottage',
-            'pavillion': 'Pavillion Hall',
-            'mariposa': 'Mariposa Hall',
-            'minicon': 'Minicon Hall'
-      };
-
-      const capacity = {
-            'premium': '12',
-            'standard': '10',
-            'barkada': '8',
-            'garden': '4',
-            'cabana': '30',
-            'small': '20',
-            'big': '50',
-            'pavillion' : "150-200",
-            'mariposa' : "120",
-            'minicon' : "70",
-      };
-
-      return {'name': room_name[area], 'capacity': capacity[area]}
 }
 
 // --------------- POST DATA Fetching -------------- //
@@ -1238,7 +1210,7 @@ async function searchGuest(e){
 // ---------- Event Listeners ----------------- //
 document.addEventListener('click', (e) => {
       // btn click
-      if (e.target.closest('#add-booking-btn')) (resetDropDown(), recentBookings(), renderAddBookingModal());
+      if (e.target.closest('#add-booking-btn')) resetDropDown();
       if (e.target.closest('#mark-paid')) renderMarkPaidModal();
       if (e.target.closest('#mark-checkin')) markAsCheckin();
       if (e.target.closest('#mark-checkout')) markAsCheckout();
