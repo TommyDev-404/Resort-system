@@ -452,10 +452,11 @@ function enableActionBtns(e){
                   // Paid
                   if (payment !== 'Pending') {
                         if (booking_type === 'Day Guest'){
-                              if (status === 'Checked-in' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
+                              if (status === 'Checked-in' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
                                     btn.style.opacity = '1';
                                     btn.style.pointerEvents = 'auto';
                               }
+                              
                         }else if (booking_type === 'Reservation'){
                               // enable change date, checkin,  & cancel reservation btns
                               if (status === 'Reserved' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {

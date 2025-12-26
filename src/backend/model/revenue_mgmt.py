@@ -27,13 +27,13 @@ class RevenueMgmt:
                                     new_areas.append('Minicon')
                               else:
                                     new_areas.append(area)
-                        print(new_areas)
+
                         # 1️⃣ Insert promo
                         cursor.execute('''
                               INSERT INTO promos(date, name, discount, area, end_date, status)
                               VALUES (%s, %s, %s, %s, %s, %s)
                         ''', (dates, promo_label, promo_rate, ",".join(new_areas), duration, status))
-                        print(",".join(new_areas))
+
                         if promo_end > date.today():
                               # Apply promo
                               cursor.execute(f'''
@@ -58,7 +58,7 @@ class RevenueMgmt:
                               SELECT booking_id, accomodations, check_in, check_out
                               FROM bookings
                               WHERE status NOT IN ('Checked-out', 'Cancelled')
-                              AND check_out < %s
+                              AND check_in < %s
                         ''', (promo_end,))
                         bookings = cursor.fetchall()
 

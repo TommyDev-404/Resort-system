@@ -86,7 +86,7 @@ class Alerts:
                                     COUNT(booking_id) as count,
                                     COALESCE(SUM(total_guest), 0) as total_guest
                               FROM bookings
-                              WHERE check_out = CURRENT_DATE() AND status = 'Checked-in' AND booking_type = 'Check-in';
+                              WHERE check_out = CURRENT_DATE() AND status = 'Checked-in';
                         ''',
                         'type': 'bookings',
                         'classification': 'checkout-today',

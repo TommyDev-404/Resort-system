@@ -510,7 +510,8 @@ class Reservation:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        query = f" UPDATE bookings SET payment = '{payment}', paid_date = '{date.today()}' where booking_id = {id} and paid_date IS NULL"
+                        
+                        query = f" UPDATE bookings SET payment = '{payment}', paid_date = '{date.today()}', total_amount = {'total_amount - (total_amount * 0.05)' if payment == 'ZUZU (Online Payment)' else 'total_amount'} where booking_id = {id} and paid_date IS NULL"
                         cursor.execute(query)
                         con.commit()
 
