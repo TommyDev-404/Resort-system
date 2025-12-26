@@ -25,7 +25,7 @@ function loadingAnimation0(){
       const load = `
             <div id="loading" class="absolute top-0 left-0 flex flex-col items-center justify-center h-screen inset-0 bg-black/5 text-white space-y-2 backdrop-blur-[2px]">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse text-black">Loading data...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Loading data...</p>
             </div>
       `;      
 

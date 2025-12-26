@@ -91,19 +91,19 @@ function resetToAddPromoForm() {
       promoForm.reset();      
 }
 
-function loadingAnimation0(){
+function loadingAnimationAdd(message){
       const load = `
-            <div id="loading" class="absolute top-50 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
+            <div id="loading" class="absolute  w-full top-0 left-0 flex flex-col items-center  bg-black/50 justify-center h-screen space-y-2 z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-gray-200">${message}...</p>
             </div>
       `;      
 
-      document.getElementById('loadingRevenuePortal').innerHTML += load;
+      document.getElementById('loadingDataPortal').innerHTML += load;
 }
 
-function showLoader() {
-      loadingAnimation0(); // adds #loading inside #loadingPortal
+function showLoader(message=null) {
+      loadingAnimationAdd(message);
 }
 
 function hideLoader() {
@@ -118,7 +118,7 @@ async function applyPromo(e) {
       let area_list = [];
       document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value) });
       form.append('area_list', area_list);
-      
+      showLoader('Applying promo...');
       const response = await fetch('/promo', {
             method: 'POST', 
             headers: {'Content-Type': 'application/json'},
@@ -134,6 +134,7 @@ async function applyPromo(e) {
       }else{
             failedMessageCard5(res.message);
       }
+      hideLoader();
 }
 
 async function updatePromo(e) {
@@ -144,6 +145,7 @@ async function updatePromo(e) {
       document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value)});
       form.append('area_list', area_list);
       
+      showLoader('Updating promo...');
       const response = await fetch('/update-promo', {
             method: 'POST', 
             headers: {'Content-Type': 'application/json'},
@@ -160,10 +162,10 @@ async function updatePromo(e) {
       }else{
             failedMessageCard5(res.message);
       }
+      hideLoader();
 }
 
 async function getAllPromo() {
-      showLoader();
       const response = await fetch('/get-all-promo');
       const res = await response.json();
       
@@ -187,13 +189,13 @@ async function getAllPromo() {
             
             document.getElementById('promoList').innerHTML += empty_row;
       }
-      hideLoader();
 }
 
 async function renderViewPromoDetails(id){
       const response = await fetch(`/get-promo?id=${id}`);
       const result = await response.json();
-
+      
+      showLoader('Retrieving promo details...');
       if (result.success){
             const data = result.data;
             const start = new Date(data.date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
@@ -264,6 +266,7 @@ async function renderViewPromoDetails(id){
       }else{
             alert(result.message);
       }
+      hideLoader();
 }
 
 async function renderDataToUpdatePromo(e){
@@ -360,7 +363,8 @@ async function removePromo(e){
       }else{
             area_affected = area;
       }
-            
+      
+      showLoader('Remobing promo');
       const response = await fetch(`/remove-promo?id=${id}&area_promos=${area_affected}`, {
             method: 'DELETE'
       });
@@ -373,6 +377,7 @@ async function removePromo(e){
       }else{
             failedMessageCard5(result.message);
       }      
+      hideLoader();
 }
 
 // submit

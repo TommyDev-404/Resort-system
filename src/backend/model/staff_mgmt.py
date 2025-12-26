@@ -58,9 +58,9 @@ class Staff_Management:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        target_date = date(date.today().year, month, day)
+                        target_date = date(date.today().year, int(month), int(day))
                         next_date = target_date + timedelta(days=1)
-                        print(target_date, next_date)
+
                         query = """
                         SELECT id, staff_name, job_position
                         FROM staff_details sd
@@ -138,30 +138,37 @@ class Staff_Management:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-
+                        print(updated_data)
                         for data in updated_data:
                               new_time_out = datetime.strptime(data.get('time_out'), '%H:%M').time() if data.get('time_out') else None
                               new_time_in = datetime.strptime(data.get('time_in'), '%H:%M').time() if data.get('time_in') else None
                               dates = datetime.strptime(data.get('date'), '%a, %d %b %Y %H:%M:%S %Z').date()
+                              today = date.today()
+                              start_of_week = today - timedelta(days=today.weekday())  # Monday
+                              end_of_week = start_of_week + timedelta(days=6)          # Sunday
+
+                              is_this_week = start_of_week <= dates <= end_of_week
 
                               morning_in = datetime.strptime('08:00', '%H:%M').time()
                               afternoon_in= datetime.strptime('13:00', '%H:%M').time()
                               morning_out = datetime.strptime('12:00', '%H:%M').time()
                               afternoon_out = datetime.strptime('16:30', '%H:%M').time()
+                              overtime = datetime.strptime('17:00', '%H:%M').time()
 
                               if new_time_in <= morning_in:
-                                    if new_time_out == afternoon_out:
-                                          new_status = "Present (Whole Day)"
-                                          work_value = 1.0
+                                    if new_time_out >= afternoon_out:
+                                          if new_time_out >= overtime:
+                                                new_status = 'Present (Overtime)'
+                                                gap = datetime.combine(date.today(), new_time_out) - datetime.combine(date.today(), afternoon_out)
+                                                gap_minutes = gap.total_seconds() / 60
+                                                ot_hours = gap_minutes / 60   # example: 45 minutes = 0.75 hours
+                                                work_value = 1.0
+                                          else:
+                                                new_status = "Present (Whole Day)"
+                                                work_value = 1.0
                                     elif new_time_out >= morning_out and new_time_out < afternoon_in:
                                           new_status = "Present (Half Day)"
                                           work_value = 0.5
-                                    elif new_time_out > afternoon_out:
-                                          new_status = 'Present (Overtime)'
-                                          gap = datetime.combine(date.today(), new_time_out) - datetime.combine(date.today(), afternoon_out)
-                                          gap_minutes = gap.total_seconds() / 60
-                                          ot_hours = gap_minutes / 60   # example: 45 minutes = 0.75 hours
-                                          work_value = 1.0
                               elif new_time_in > morning_out and new_time_in <= afternoon_in:
                                     if new_time_out >= afternoon_out:
                                           new_status = "Present (Half Day)"
@@ -179,26 +186,45 @@ class Staff_Management:
 
                                     # compute overtime pay
                                     ot_pay = ot_hours * hourly_rate * 1.25  # 125% OT rate
-
-                                    # update salary
-                                    cursor.execute('''
-                                          UPDATE staff_details 
-                                          SET 
-                                                workdays = workdays + %s,
-                                                weekly_salary = weekly_salary + daily_salary + %s,
-                                                monthly_salary = monthly_salary + daily_salary + %s
-                                          WHERE id = %s
-                                    ''', (work_value, ot_pay, ot_pay, data.get('id')))
+                                    print(is_this_week)
+                                    if is_this_week:
+                                          # update salary
+                                          cursor.execute('''
+                                                UPDATE staff_details 
+                                                SET 
+                                                      workdays = workdays + %s,
+                                                      weekly_salary = weekly_salary + daily_salary + %s,
+                                                      monthly_salary = monthly_salary + daily_salary + %s
+                                                WHERE id = %s
+                                          ''', (work_value, ot_pay, ot_pay, data.get('id')))
+                                    else:
+                                          cursor.execute('''
+                                                UPDATE staff_details 
+                                                SET 
+                                                      workdays = workdays + %s,
+                                                      monthly_salary = monthly_salary + daily_salary + %s
+                                                WHERE id = %s
+                                          ''', (work_value, ot_pay, data.get('id')))
                               else:
-                                    cursor.execute('''
-                                          UPDATE staff_details 
-                                          SET 
-                                          workdays = workdays + %s,
-                                          weekly_salary = weekly_salary + (daily_salary * %s),
-                                          monthly_salary = monthly_salary + (daily_salary * %s)
-                                          WHERE id = %s
-                                    ''', (work_value, work_value, work_value, data.get('id')))
-                        
+                                    print(is_this_week, " 2")
+                                    if is_this_week:
+                                          cursor.execute('''
+                                                UPDATE staff_details 
+                                                SET 
+                                                workdays = workdays + %s,
+                                                weekly_salary = weekly_salary + (daily_salary * %s),
+                                                monthly_salary = monthly_salary + (daily_salary * %s)
+                                                WHERE id = %s
+                                          ''', (work_value, work_value, work_value, data.get('id')))
+                                    else:
+                                          cursor.execute('''
+                                                UPDATE staff_details 
+                                                SET 
+                                                workdays = workdays + %s,
+                                                monthly_salary = monthly_salary + (daily_salary * %s)
+                                                WHERE id = %s
+                                          ''', (work_value, work_value, data.get('id')))
+
                               con.commit()
                         
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if bool(cursor.rowcount != 0) else 'Failed'}
@@ -228,16 +254,14 @@ class Staff_Management:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         target_date = f"{date.today().year}-{int(month)}-{int(day)}"  # format YYYY-MM-DD
-                        print('date: '+str(target_date))
                         cursor.execute('''
-                        SELECT id, staff_name, date, time_in
+                        SELECT staff_id, name, date, time_in
                         FROM staff_attendance 
                         WHERE date = %s
-                              AND status not in ('Absent')
+                        AND status in ('--')
                         ''', (target_date,))
 
                         data = cursor.fetchall()
-                        print(data)
                         return {'success': bool(data), 'data': data}
 
             except Exception as e:

@@ -89,8 +89,23 @@ function loadingAnimation0(){
       document.getElementById('loadingAccountingPortal').innerHTML += load;
 }
 
-function showLoader() {
-      loadingAnimation0(); // adds #loading inside #loadingPortal
+function loadingAnimationAdd(message){
+      const load = `
+            <div id="loading" class="absolute w-full top-0 left-0 flex flex-col items-center  bg-black/50 justify-center h-screen space-y-2 z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-gray-200">${message}...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingDataPortal').innerHTML += load;
+}
+
+function showLoader(type, message=null) {
+      if (type === 'table'){
+            loadingAnimation0(); // adds #loading inside #loadingPortal
+      }else{
+            loadingAnimationAdd(message)
+      }
 }
 
 function hideLoader() {
@@ -99,7 +114,7 @@ function hideLoader() {
 }
 
 async function renderTable() {
-      showLoader();
+      showLoader('table');
       // Fetch data from backend
       let rows = [];
       try {
@@ -183,7 +198,7 @@ async function updatePrice(e){
       const form = new FormData(e.target);
       const price = form.get('update-price');
       const name = form.get('area-name-update').split(' ')[0];
-
+      showLoader('data', 'Updating price...');
       const response = await fetch(`/update-price?price=${price}&name=${name}`, { method: 'POST', headers: {'Content-Type': 'application/json'}});
       const result = await response.json();
 
@@ -195,6 +210,7 @@ async function updatePrice(e){
       }else {
             failedMessageCard8(result.message);
       }
+      hideLoader();
 }
 
 // --------------  EVENT LISTENERS --------------- //

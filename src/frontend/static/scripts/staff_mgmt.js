@@ -107,7 +107,7 @@ async function renderAddStaffAttendanceModal(){
       sumarryCards();
       
       const generated_row = await getAllStaff();
-
+      hideLoader();
       const modal =  `
                   <div id="bulkAttendanceModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                         <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[85%] max-w-4xl py-8 px-10 relative fade-in-up">
@@ -174,7 +174,7 @@ async function renderAddStaffAttendanceModal(){
 
 async function renderUpdateAttendanceModal(e){
       const generated_row = await getAllPresentStaff();
-
+      hideLoader();
       const modal = `
             <div id="updateAttendanceModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                   <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[85%] max-w-4xl py-8 px-10 relative fade-in-up">
@@ -264,12 +264,12 @@ async function renderViewStaffInfo(id, staff_name, date_started, position, daily
 
                         <div class="grid grid-cols-2 gap-4 mb-6">
                               <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/40 text-center shadow-sm">
-                                    <h3 class="text-sm text-gray-500 dark:text-gray-400">Actual Monthly</h3>
+                                    <h3 class="text-sm text-gray-500 dark:text-gray-400">Actual Weekly</h3>
                                     <p id="actualMonthlySalary" class="text-xl font-semibold text-green-700 dark:text-green-300">${actual_weekly.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</p>
                               </div>
                               
                               <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/40 text-center shadow-sm">
-                                    <h3 class="text-sm text-gray-500 dark:text-gray-400">Actual Weekly</h3>
+                                    <h3 class="text-sm text-gray-500 dark:text-gray-400">Actual Monthly</h3>
                                     <p id="actualWeeklySalary" class="text-xl font-semibold text-green-700 dark:text-green-300">${actual_monthly.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</p>
                               </div>
                         </div>
@@ -379,7 +379,8 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
 
 async function showAllOnLeave(){
       const generated_row = await thisWeekOnLeave();
-
+      
+      hideLoader();
       const modal = `
             <div id="onLeaveModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                   <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-3xl p-6 relative fade-in-up">
@@ -588,11 +589,31 @@ function getMonthsAndDays(){
       }
 }
 
+function loadingAnimationAdd(message){
+      const load = `
+            <div id="loading2" class="absolute top-0 left-0 flex flex-col items-center w-full bg-black/50 justify-center h-screen space-y-2 z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-gray-200">${message}...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingDataPortal').innerHTML += load;
+}
+
+function showLoader(type, message=null) {
+      loadingAnimationAdd(message)
+}
+
+function hideLoader() {
+      const loader = document.querySelector('#loading2');
+      if (loader) loader.remove();
+}
+
 // --------- DATA FETCHING FUNCTIONS -----------------
 async function addStaff(e){
       e.preventDefault();
       const form = new FormData(e.target);
-
+      showLoader('data', 'Adding staff...');
       try{
             const response = await fetch('/add-staff', {
                   method: 'POST',
@@ -612,9 +633,11 @@ async function addStaff(e){
       }catch(err){
             console.error(err);
       }
+      hideLoader();
 }
 
 async function viewStaffInfo(id){
+      showLoader('data', 'Retrieving staff details...');
       try{
             const response = await fetch(`/view-staff-info?id=${id}`);
             const result = await response.json();
@@ -636,6 +659,8 @@ async function viewStaffInfo(id){
       }catch(err){
             console.error(err);
       }
+
+      hideLoader();
 }
 
 async function showAllStaff(){
@@ -668,7 +693,7 @@ async function showAllStaff(){
 async function getAllStaff(){
       const day = document.getElementById('daySelect').value;
       const month = document.getElementById('monthSelect2').value;
-
+      showLoader('data', 'Retrieving staff data...');
       try{
             const response = await fetch(`/staff-list?day=${day || new Date().getDate()}&month=${month || new Date().getMonth() + 1}`);
             const result = await response.json();
@@ -717,7 +742,7 @@ async function getAllStaff(){
 async function getAllPresentStaff(){
       const day = document.getElementById('daySelect').value;
       const month = document.getElementById('monthSelect2').value;
-
+      showLoader('data', 'Retrieving present staff...');
       try{
             const response = await fetch(`/all-present-staff?day=${day || new Date().getDate()}&month=${month || new Date().getMonth() + 1}`, {});
             const result = await response.json();
@@ -764,6 +789,7 @@ async function getAllPresentStaff(){
 
 // for onleave modal
 async function thisWeekOnLeave(){
+      showLoader('data', 'Retrieving on-leave staff...');
       try{
             const response = await fetch('/thisweek-onleave-data');
             const result = await response.json();
@@ -835,6 +861,7 @@ async function addStaffAttendance(e){
             return; // stop submission
       }
       
+      showLoader('data', 'Adding staff attendance...');
       try{
             const response = await fetch('/add-staff-attendance', {
                   method: 'POST',
@@ -859,6 +886,7 @@ async function addStaffAttendance(e){
       }catch(err){
             console.error(err);
       } 
+      hideLoader();
 }
 
 async function updateStaffAttendance(e){
@@ -880,7 +908,8 @@ async function updateStaffAttendance(e){
                   data.push({ id, time_out, time_in, date});
             }
       });
-
+      
+      showLoader('data', 'Updating staff attendance...');
       try{
             const response = await fetch('/update-staff-attendance', {
                   method: 'POST',
@@ -903,12 +932,15 @@ async function updateStaffAttendance(e){
       }catch(err){
             console.error(err);
       } 
+
+      hideLoader();
 }
 
 async function updateStaffInfo(e){
       e.preventDefault();
       const form = new FormData(e.target);
-
+      
+      showLoader('data', 'Updating staff details...');
       try{
             const response = await fetch('/update-staff-info', {
                   method: 'POST',
@@ -931,6 +963,7 @@ async function updateStaffInfo(e){
       }catch(err){
             console.error(err);
       } 
+      hideLoader();
 }
 
 async function allStaffAttendance(){
@@ -1006,6 +1039,7 @@ async function individualStaffAttendance(id){
 }
 
 async function getIndividualStaffInfo(id){
+      showLoader('data', 'Retrieving individual staff details...');
       try{
             const response = await fetch(`/view-staff-info?id=${id}`);
             const result = await response.json();
@@ -1022,6 +1056,7 @@ async function getIndividualStaffInfo(id){
       }catch(err){
             console.error(err);
       }
+      hideLoader();
 }
 
 async function searchStaff(name){
@@ -1055,7 +1090,7 @@ async function sortAttendanceData(){
       document.querySelectorAll('#attendanceTable tr').forEach( row => row.remove());
       const month = document.getElementById('monthSelect2').value;
       const day = document.getElementById('daySelect').value;
-
+      
       try{
             const response = await fetch(`/sort-attendance-data?month=${month}&day=${day}`);
             const result = await response.json();
@@ -1090,6 +1125,7 @@ async function sortAttendanceData(){
 }
 
 async function removeStaff(id){
+      showLoader('data', 'Removing staff...');
       try{
             const response = await fetch(`/remove-staff?id=${id}`, {
                   method: 'DELETE'
@@ -1107,6 +1143,7 @@ async function removeStaff(id){
       }catch(err){
             console.error(err);
       }
+      hideLoader();
 }
 
 async function removeStaffAttendance(e){
@@ -1115,7 +1152,8 @@ async function removeStaffAttendance(e){
       const td = tr.querySelectorAll('td');
       const status = td[4].textContent.trim();
       const date = td[3].textContent.trim();
-
+      
+      showLoader('data', 'Removing staff attendance...');
       try{
             const response = await fetch(`/remove-staff-attendance?id=${id}&status=${status}&date=${date}`, {
                   method: 'DELETE'
@@ -1134,6 +1172,7 @@ async function removeStaffAttendance(e){
       }catch(err){
             console.error(err);
       }
+      hideLoader();
 }
 
 async function sumarryCards(){
@@ -1206,8 +1245,8 @@ getMonthsAndDays();
 
 // ----------- EXPORT ON LOAD ------------
 export async function initPageStaffMgmt(){
+      resetMonthAndDay();
       showAllStaff();
       allStaffAttendance();
       sumarryCards();
-      resetMonthAndDay();
 }

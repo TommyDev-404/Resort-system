@@ -60,6 +60,7 @@ class RevenueMgmt:
                         cursor = con.cursor()
 
                         promo_start = datetime.strptime(dates, "%Y-%m-%d").date()
+                        promo_end = datetime.strptime(duration, "%Y-%m-%d").date()
                         discount = float(promo_rate) / 100
                         areas = [a.strip() for a in areas_promo.split(',')]
                         promo_label = f"{promo_name} - {promo_rate}%"
@@ -72,56 +73,59 @@ class RevenueMgmt:
                               VALUES (%s, %s, %s, %s, %s, %s)
                         ''', (dates, promo_label, promo_rate, areas_promo, duration, status))
 
-                        # 2️⃣ Update accommodation prices (FROM BASE RATE)
-                        cursor.execute(f'''
-                              UPDATE accomodation_spaces
-                              SET promo = %s,
-                              rate = orig_rate * (1 - %s)
-                              WHERE name IN ({','.join(['%s'] * len(areas))})
-                        ''', [promo_label, discount, *areas])
+                        if promo_end == date.today():
+                              # 2️⃣ Update accommodation prices (FROM BASE RATE)
+                              cursor.execute(f'''
+                                    UPDATE accomodation_spaces
+                                    SET promo = %s,
+                                    rate = orig_rate * (1 - %s)
+                                    WHERE name IN ({','.join(['%s'] * len(areas))})
+                              ''', [promo_label, discount, *areas])
+
+                        con.commit()
 
                         # 3️⃣ Find affected bookings
                         cursor.execute('''
                               SELECT booking_id, accomodations, check_in, check_out
                               FROM bookings
                               WHERE status NOT IN ('Checked-out', 'Cancelled')
-                              AND check_out >= %s
-                        ''', (promo_start,))
-
+                              AND check_out < %s
+                        ''', (promo_end,))
                         bookings = cursor.fetchall()
+                        print(promo_end)
+                        print(bookings)
 
-                        booking_areas  = []
-                        for b in bookings:
-                              for a in b['accomodations'].split(','):
-                                    booking_areas.append(a.strip())
+                        if bookings:
+                              booking_areas  = []    
+                              for b in bookings:
+                                    for a in b['accomodations'].split(','):
+                                          booking_areas.append(a.strip())
 
-                        affected = []
+                              affected = []
+                              for area in booking_areas:
+                                    area_name = area.split(' ')[0].strip()
+                                    if area_name in areas:
+                                          affected.append(area)
 
-                        for area in booking_areas:
-                              area_name = area.split(' ')[0].strip()
-                              if area_name in areas:
-                                    affected.append(area)
-
-                        if affected:
-                              for ba in bookings:
-                                    cursor.execute('''
-                                          UPDATE bookings
-                                          SET promo = %s,
-                                          promo_area = %s
-                                          WHERE booking_id = %s
-                                    ''', (
-                                          f"{promo_label} discount",
-                                          ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
-                                          ba['booking_id']
-                                    ))
-                                    con.commit()
-
-                                    # Recalculate booking totals safely
-                                    self.reservation_model.update_reservation_date(
-                                          ba['booking_id'],
-                                          str(ba['check_in']),
-                                          str(ba['check_out'])
-                                    )
+                              if affected:
+                                    for ba in bookings:
+                                          cursor.execute('''
+                                                UPDATE bookings
+                                                SET promo = %s,
+                                                promo_area = %s
+                                                WHERE booking_id = %s
+                                          ''', (
+                                                f"{promo_label} discount",
+                                                ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
+                                                ba['booking_id']
+                                          ))
+                                          con.commit()
+                                          # Recalculate booking totals safely
+                                          self.reservation_model.update_reservation_date(
+                                                ba['booking_id'],
+                                                str(ba['check_in']),
+                                                str(ba['check_out'])
+                                          )
 
                         return {
                               'success': True,
@@ -244,8 +248,15 @@ class RevenueMgmt:
                         areas = areas_promo.split(', ')
                         
                         for area in areas:
-                              cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = orig_rate WHERE name = %s ''', 
-                              ('None', area.split(' ')[0]))
+                              areas_list = area.split(',')  # ['Premium', 'Standard']
+                              placeholders = ','.join(['%s'] * len(areas_list))
+
+                              query = f'''
+                                    UPDATE accomodation_spaces
+                                    SET promo = %s, rate = orig_rate
+                                    WHERE name IN ({placeholders})
+                              '''
+                              cursor.execute(query, ['None', *areas_list])
                               con.commit()
 
                               cursor.execute(''' SELECT date FROM promos WHERE id = %s''', (id,))

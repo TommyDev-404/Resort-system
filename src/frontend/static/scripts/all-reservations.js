@@ -686,7 +686,7 @@ function hideLoader() {
 async function addBooking(e){
       e.preventDefault();      
       const form = new FormData(e.target);
-      showLoader('data', 'Adding guest');
+      showLoader('data', 'Adding guest...');
       try{
             const response = await fetch('/add-booking', {
                   method: 'POST', 
@@ -719,7 +719,7 @@ async function markAsCheckout(){
       const id = retrieveCheckboxId().id;
       const accommodations = retrieveCheckboxId().accomodations;
       
-      showLoader('data', 'Checking-Out guest');
+      showLoader('data', 'Checking-Out guest...');
       const response = await fetch(`/mark-checkout?id=${id}&accomodation=${accommodations}`,{
             method: 'POST',
             headers: {'Content-Type': 'application/json'}
@@ -743,7 +743,7 @@ async function markAsCheckin(){
       const id = retrieveCheckboxId().id;
       const accommodations = retrieveCheckboxId().accomodations;
       
-      showLoader('data', 'Checking-In guest');
+      showLoader('data', 'Checking-In guest...');
       const response = await fetch(`/mark-checkin?id=${id}&accomodation=${accommodations}`,{
             method: 'POST',
             headers: {'Content-Type': 'application/json'}
@@ -767,7 +767,7 @@ async function cancelBooking(){
       const id = retrieveCheckboxId().id;
       const accommodations = retrieveCheckboxId().accomodations;
       
-      showLoader('data', 'Cancelling booking');
+      showLoader('data', 'Cancelling booking...');
       const response = await fetch(`/cancel-booking?id=${id}&accomodation=${accommodations}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'} 
@@ -789,7 +789,7 @@ async function cancelBooking(){
 
 async function submitPayment(e){
       e.preventDefault();
-      showLoader('data', 'Adding Payment');
+      showLoader('data', 'Adding Payment...');
       const select = document.getElementById('mark-payment').value;
       const id = retrieveCheckboxId().id;
 
@@ -815,7 +815,7 @@ async function updateReservationDate(e){
       e.preventDefault();
       const form = new FormData(e.target);
       
-      showLoader('data', 'Updating booking schedule');
+      showLoader('data', 'Updating booking schedule...');
       const response = await fetch(`/update-reservation-date`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -839,7 +839,7 @@ async function updateReservationDate(e){
 
 // --------------- GET DATA Fetching -------------- //
 async function renderViewReservationDetails(id){
-      showLoader('data', 'Retrieving booking details');
+      showLoader('data', 'Retrieving booking details...');
       const response = await fetch(`/view-details/${id}`);
       const result = await response.json();
 
@@ -953,7 +953,7 @@ async function renderViewReservationDetails(id){
 
 async function getReservationDate(){
       const id = retrieveCheckboxId().id;
-      showLoader('data', 'Retrieving booking schedule');
+      showLoader('data', 'Retrieving booking schedule...');
       const response = await fetch(`/get-reservation-date?id=${id}`);
       const result = await response.json();
       console.log(result);
