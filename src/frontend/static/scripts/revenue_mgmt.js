@@ -209,7 +209,9 @@ async function renderViewPromoDetails(id){
                   "Cabana": "Cabana Cottage",
                   "Small": "Small Cottage",
                   "Big": "Big Cottage",
-                  "Hall": "Hall"
+                  "Pavillion": "Pavillion Hall",
+                  "Mariposa": "Mariposa Hall",
+                  "Minicon": "Minicon Hall"
             };
 
             const modal = `

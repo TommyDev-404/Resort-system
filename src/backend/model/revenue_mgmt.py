@@ -6,54 +6,6 @@ class RevenueMgmt:
             self.db = db
             self.reservation_model = Reservation(db)
 
-      def apply_promo2(self, dates, promo_name, duration, promo_rate, areas_promo):
-            try:
-                  with self.db.connect() as con:
-                        cursor = con.cursor()
-                        
-                        areas = areas_promo.split(',')
-                        promotions = f"{promo_name} - {promo_rate}%"
-                        discount = int(promo_rate)/100
-
-                        converted_date = datetime.strptime(dates, "%Y-%m-%d").date()
-                        if converted_date <= date.today():
-                              cursor.execute(''' INSERT INTO promos(date, name, discount, area, end_date, status) VALUES(%s, %s, %s, %s, %s, %s)''', (dates, promotions, promo_rate, areas_promo, duration, 'Active'))
-
-                              for area in areas:
-                                    cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = rate * (1 - %s) WHERE name = %s ''', 
-                                    (promotions, discount, area.split(' ')[0].strip()))
-                                    con.commit()
-
-                              cursor.execute(''' SELECT booking_id, accomodations, check_out, check_in FROM bookings WHERE check_in >= %s AND promo = %s''', (dates, 'No promo.'))
-                              booking_data = cursor.fetchall()
-
-                              for data in booking_data:
-                                    accomodations = data.get('accomodations').split(',')
-                                    id = data.get('booking_id')
-
-                                    area_under_promo = []
-                                    for area in accomodations:
-                                          name = area.split(' ')[0].strip()
-
-                                          if name in areas:
-                                                area_under_promo.append(area)
-                                    
-                                    if len(area_under_promo) > 0:
-                                          cursor.execute(''' UPDATE bookings SET  promo = %s, promo_area = %s WHERE booking_id = %s ''', 
-                                          (f'{promotions} discount', ','.join(area_under_promo), id))
-                                          con.commit()
-                                    
-                                    self.reservation_model.update_reservation_date(id, str(data.get('check_in')), str(data.get('check_out')))
-                        else:
-                              cursor.execute(''' INSERT INTO promos(date, name, discount, area, end_date, status) VALUES(%s, %s, %s, %s, %s, %s)''', (dates, promotions, promo_rate, areas_promo, duration, 'Upcoming'))
-                              
-                        con.commit()
-
-                        return {'success': bool(cursor.rowcount != 0), 'message': "Promotions applied successfully" if bool(cursor.rowcount != 0) else "Failed to apply promotions."}
-            except Exception as e:
-                  con.rollback()
-                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
-
       def apply_promo(self, dates, promo_name, duration, promo_rate, areas_promo):
             try:
                   with self.db.connect() as con:
@@ -67,28 +19,38 @@ class RevenueMgmt:
 
                         status = 'Active' if promo_start <= date.today() else 'Upcoming'
 
+                        new_areas = []
+                        for area in areas:
+                              if area == 'Hall':
+                                    new_areas.append('Pavillion')
+                                    new_areas.append('Mariposa')
+                                    new_areas.append('Minicon')
+                              else:
+                                    new_areas.append(area)
+                        print(new_areas)
                         # 1️⃣ Insert promo
                         cursor.execute('''
                               INSERT INTO promos(date, name, discount, area, end_date, status)
                               VALUES (%s, %s, %s, %s, %s, %s)
-                        ''', (dates, promo_label, promo_rate, areas_promo, duration, status))
-
+                        ''', (dates, promo_label, promo_rate, ",".join(new_areas), duration, status))
+                        print(",".join(new_areas))
                         if promo_end > date.today():
                               # Apply promo
                               cursor.execute(f'''
                                     UPDATE accomodation_spaces
                                     SET promo = %s,
                                     rate = orig_rate * (1 - %s)
-                                    WHERE name IN ({','.join(['%s'] * len(areas))})
-                              ''', [promo_label, discount, *areas])
+                                    WHERE name IN ({','.join(['%s'] * len(new_areas))})
+                              ''', [promo_label, discount, *new_areas])
                         else:
                               # reset price to orig rate
                               cursor.execute(f'''
                                     UPDATE accomodation_spaces
                                     SET promo = %s,
                                     rate = orig_rate 
-                                    WHERE name IN ({','.join(['%s'] * len(areas))})
-                              ''', ['None', *areas])
+                                    WHERE name IN ({','.join(['%s'] * len(new_areas))})
+                              ''', ['None', *new_areas])
+
                         con.commit()
 
                         # 3️⃣ Find affected bookings
@@ -173,7 +135,16 @@ class RevenueMgmt:
                         promo_label = f"{promo_name} - {promo_rate}%"
                         prev_areas = prev_area.split(',')
 
+                        new_prev_areas = []
                         for area in prev_areas:
+                              if area == 'Hall':
+                                    new_prev_areas.append('Pavillion')
+                                    new_prev_areas.append('Mariposa')
+                                    new_prev_areas.append('Minicon')
+                              else:
+                                    new_prev_areas.append(area)
+                                    
+                        for area in new_prev_areas:
                               cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = orig_rate WHERE name = %s ''', ("None", area))
 
                         status = None
@@ -182,8 +153,17 @@ class RevenueMgmt:
                         else:
                               status = 'Upcoming'
 
+                        new_areas = []
+                        for area in areas:
+                              if area == 'Hall':
+                                    new_areas.append('Pavillion')
+                                    new_areas.append('Mariposa')
+                                    new_areas.append('Minicon')
+                              else:
+                                    new_areas.append(area)
+
                         # 1️⃣ Update promo
-                        cursor.execute(''' UPDATE promos SET date = %s, name = %s, discount = %s, area = %s, end_date = %s, status = %s WHERE id = %s''', (dates, promo_label, promo_rate, areas_promo, duration, status, id))
+                        cursor.execute(''' UPDATE promos SET date = %s, name = %s, discount = %s, area = %s, end_date = %s, status = %s WHERE id = %s''', (dates, promo_label, promo_rate, new_areas, duration, status, id))
                         promo_updated = cursor.rowcount > 0
 
                         # 2️⃣ Update accommodation prices (FROM BASE RATE)
@@ -191,8 +171,8 @@ class RevenueMgmt:
                               UPDATE accomodation_spaces
                               SET promo = %s,
                               rate = orig_rate * (1 - %s)
-                              WHERE name IN ({','.join(['%s'] * len(areas))})
-                        ''', [promo_label, discount, *areas])
+                              WHERE name IN ({','.join(['%s'] * len(new_areas))})
+                        ''', [promo_label, discount, *new_areas])
 
                         # 3️⃣ Find affected bookings
                         cursor.execute('''
@@ -251,11 +231,11 @@ class RevenueMgmt:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         areas = areas_promo.split(', ')
-                        
+
                         for area in areas:
                               areas_list = area.split(',')  # ['Premium', 'Standard']
                               placeholders = ','.join(['%s'] * len(areas_list))
-
+                              print(areas_list)
                               query = f'''
                                     UPDATE accomodation_spaces
                                     SET promo = %s, rate = orig_rate
@@ -269,8 +249,7 @@ class RevenueMgmt:
 
                               cursor.execute(''' SELECT booking_id, accomodations, check_in, check_out FROM bookings WHERE check_out >= %s AND promo NOT IN ('No promo.') ''', (promo_data.get('date'),))
                               booking_data = cursor.fetchall()
-                              print(booking_data)
-                              
+
                               for data in booking_data:
                                     accomodations = data.get('accomodations').split(',')
                                     bid = data.get('booking_id')
@@ -282,7 +261,7 @@ class RevenueMgmt:
 
                                           if name in promo_area:
                                                 area_under_promo.append(are)
-                                    print(area_under_promo)
+
                                     if len(area_under_promo) > 0:
                                           cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', 
                                           ('No promo.', 'No accomodations under promo.', bid))

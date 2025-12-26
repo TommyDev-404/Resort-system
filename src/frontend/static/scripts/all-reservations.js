@@ -243,7 +243,7 @@ function renderAddBookingModal(){
 
                                           <div class="btn-acc flex flex-col items-center justify-center bg-gray-600 hover:bg-gray-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Hall">
                                                 <i data-lucide="users" class="lucide w-5 h-5"></i>
-                                                <label>Hall (<span id="count-h"></span>)</label> 
+                                                <label>All Hall (<span id="count-h"></span>)</label> 
                                           </div>
                                     </div>
 
