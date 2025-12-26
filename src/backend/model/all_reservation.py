@@ -451,7 +451,7 @@ class Reservation:
 
                         parts = accomodation.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
-                        room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
+                        room_no = [parts[x].split(' ')[-1].lower() for x in range(len(parts))]
 
                         for room, number in set(zip(rooms, room_no)):
                               if room not in ['cabana', 'small', 'big', 'hall']:
@@ -470,17 +470,17 @@ class Reservation:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' UPDATE bookings SET status = %s where booking_id = %s ''', ("Checked-out", id))
-                  
+                        
                         parts = accomodation.split(',')
                         room_dict = {}
-
+                        print(parts)
                         for part in parts:
                               tokens = part.split(' ')  # split by space
                               room_type = tokens[0].lower()  # "Premium", "Garden", ...
                               room_dict[room_type] = part
                               
                         rooms = [parts[x].split(' ')[0].strip().lower() for x in range(len(parts))]
-                        room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
+                        room_no = [parts[x].split(' ')[-1].lower() for x in range(len(parts))]
                         now = datetime.now(timezone.utc)
 
                         cursor.execute(''' SELECT check_out FROM bookings WHERE booking_id = %s ''', (id,))
@@ -530,7 +530,7 @@ class Reservation:
 
                         parts = accomodation.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
-                        room_no = [parts[x].split(' ')[2].lower() for x in range(len(parts))]
+                        room_no = [parts[x].split(' ')[-1].lower() for x in range(len(parts))]
 
                         for room, number in set(zip(rooms, room_no)):
                               cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("avl", room.capitalize(), number))
