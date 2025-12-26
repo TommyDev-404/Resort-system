@@ -175,6 +175,8 @@ class RevenueMgmt:
                               WHERE name IN ({','.join(['%s'] * len(new_areas))})
                         ''', [promo_label, discount, *new_areas])
 
+                        con.commit()
+
                         # 3️⃣ Find affected bookings
                         cursor.execute('''
                               SELECT booking_id, accomodations, check_in, check_out
@@ -182,16 +184,18 @@ class RevenueMgmt:
                               WHERE status NOT IN ('Cancelled')
                               AND check_in >= %s and check_in < %s
                         ''', (promo_start, promo_end))
-
                         bookings = cursor.fetchall()
-
+                        
                         booking_areas  = []
                         for b in bookings:
                               for a in b['accomodations'].split(','):
                                     booking_areas.append(a.strip())
+                        
+                        for b in bookings:
+                              cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', ('No promo.', 'No accomodations under promo.', b['booking_id']))
+                              con.commit()
 
                         affected = []
-
                         for area in booking_areas:
                               area_name = area.split(' ')[0].strip()
                               if area_name in new_areas:
@@ -236,7 +240,7 @@ class RevenueMgmt:
                         for area in areas:
                               areas_list = area.split(',')  # ['Premium', 'Standard']
                               placeholders = ','.join(['%s'] * len(areas_list))
-                              print(areas_list)
+
                               query = f'''
                                     UPDATE accomodation_spaces
                                     SET promo = %s, rate = orig_rate
