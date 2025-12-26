@@ -57,9 +57,9 @@ class RevenueMgmt:
                         cursor.execute('''
                               SELECT booking_id, accomodations, check_in, check_out
                               FROM bookings
-                              WHERE status NOT IN ('Checked-out', 'Cancelled')
-                              AND check_in < %s
-                        ''', (promo_end,))
+                              WHERE status NOT IN ('Cancelled')
+                              AND check_in >= %s and check_in < %s
+                        ''', (promo_start, promo_end))
                         bookings = cursor.fetchall()
 
                         if bookings:
@@ -71,9 +71,9 @@ class RevenueMgmt:
                               affected = []
                               for area in booking_areas:
                                     area_name = area.split(' ')[0].strip()
-                                    if area_name in areas:
+                                    if area_name in new_areas:
                                           affected.append(area)
-
+                              print(affected)
                               if affected:
                                     for ba in bookings:
                                           cursor.execute('''
@@ -87,6 +87,7 @@ class RevenueMgmt:
                                                 ba['booking_id']
                                           ))
                                           con.commit()
+                                          print(ba)
                                           # Recalculate booking totals safely
                                           self.reservation_model.update_reservation_date(
                                                 ba['booking_id'],
@@ -163,7 +164,7 @@ class RevenueMgmt:
                                     new_areas.append(area)
 
                         # 1️⃣ Update promo
-                        cursor.execute(''' UPDATE promos SET date = %s, name = %s, discount = %s, area = %s, end_date = %s, status = %s WHERE id = %s''', (dates, promo_label, promo_rate, new_areas, duration, status, id))
+                        cursor.execute(''' UPDATE promos SET date = %s, name = %s, discount = %s, area = %s, end_date = %s, status = %s WHERE id = %s''', (dates, promo_label, promo_rate, ",".join(new_areas), duration, status, id))
                         promo_updated = cursor.rowcount > 0
 
                         # 2️⃣ Update accommodation prices (FROM BASE RATE)
@@ -178,9 +179,9 @@ class RevenueMgmt:
                         cursor.execute('''
                               SELECT booking_id, accomodations, check_in, check_out
                               FROM bookings
-                              WHERE status NOT IN ('Checked-out', 'Cancelled')
-                              AND check_out >= %s
-                        ''', (promo_start,))
+                              WHERE status NOT IN ('Cancelled')
+                              AND check_in >= %s and check_in < %s
+                        ''', (promo_start, promo_end))
 
                         bookings = cursor.fetchall()
 
@@ -193,7 +194,7 @@ class RevenueMgmt:
 
                         for area in booking_areas:
                               area_name = area.split(' ')[0].strip()
-                              if area_name in areas:
+                              if area_name in new_areas:
                                     affected.append(area)
 
                         if affected:

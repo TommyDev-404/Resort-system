@@ -286,9 +286,17 @@ async function renderDataToUpdatePromo(e){
       const end = formatDate(new Date(data.end_date));
       const area_affected = data.area;
 
-      // start filling the form
       const isChecked = (value) => {
-            return area_affected.split(',').map(area => area.trim().split(' ')[0]).includes(value) ? true : false;
+            const areas = area_affected
+                  .split(',')
+                  .map(a => a.trim().split(' ')[0]);
+            
+                  if (value === 'Hall') {
+                  return ['Pavillion', 'Mariposa', 'Minicon']
+                        .every(a => areas.includes(a));
+                  }
+            
+                  return areas.includes(value);
       };
 
       const all_area = {
@@ -300,7 +308,9 @@ async function renderDataToUpdatePromo(e){
             'Cabana': 'Cabana Cottage',
             'Small': 'Small Cottage',
             'Big': 'Big Cottage',
-            'Hall': 'Hall'
+            "Pavillion": "Pavillion Hall",
+            "Mariposa": "Mariposa Hall",
+            "Minicon": "Minicon Hall"
       }
 
       const areas_under_promo = area_affected.split(',').map(a => a.trim()); // promo areas as array
