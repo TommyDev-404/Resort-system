@@ -328,16 +328,16 @@ class Reservation:
                         sql = base_sql.format(date_column=date_column)
 
                         # Add category-specific filters
-                        if category == 'check_out-data':
-                              sql += ' AND status = "Checked-out"'
+                        if category == 'overnight-data':
+                              sql += ' AND booking_type = "Check-in" '
                         elif category == 'check_in-data':
-                              sql += ' AND status = "Checked-in"'
+                              sql += ' AND status = "Checked-in" '
                         elif category == 'reserved-data':
-                              sql += ' AND status = "Reserved"'
+                              sql += ' AND status = "Reserved" '
                         elif category == 'cancelled-reservation-data':
-                              sql += ' AND status = "Cancelled"'
+                              sql += ' AND status = "Cancelled" '
                         elif category == 'day-guest':
-                              sql += ' AND booking_type = "Day Guest"'
+                              sql += ' AND booking_type = "Day Guest" '
                         elif category == 'not_paid-data':
                               sql += ' AND status <> "Reserved" AND payment = "Pending"'
 
@@ -406,23 +406,22 @@ class Reservation:
                         cursor.execute('''
                               SELECT
                               -- Check-Ins today
-                              COUNT(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
-                              SUM(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkin,
-                                    
-                              -- Total Guests (all guests checked in today)
-                              SUM(CASE WHEN status IN ('Checked-in') AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS total_guests,
+                              COUNT(CASE WHEN booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
+                              SUM(CASE WHEN booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS guests_checkin,
 
                               -- Overnight today
-                              COUNT(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_overnight,
-                              SUM(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_overnight,
+                              COUNT(CASE WHEN booking_type IN ('Check-in') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_overnight,
+                              SUM(CASE WHEN booking_type IN ('Check-in') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_overnight,
 
                               -- Check-Outs today
-                              COUNT(CASE WHEN status IN ('Checked-out') AND check_out = CURRENT_DATE THEN 1 END) AS bookings_checkout,
-                              SUM(CASE WHEN status IN ('Checked-out') AND check_out = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkout,
-
+                              SUM(CASE WHEN status IN ('Checked-out') AND check_out = CURRENT_DATE THEN total_guest ELSE 0 END) AS today_checkout_guests,
+                              SUM(CASE WHEN booking_type = 'Reservation' and DATE(check_out) = CURRENT_DATE() AND status = 'Checked-out' THEN 1 ELSE 0 END) AS reservation,
+                              SUM(CASE WHEN booking_type = 'Day Guest' and DATE(check_out) = CURRENT_DATE() AND status = 'Checked-out' THEN 1 ELSE 0 END)     AS day_guest,
+                              SUM(CASE WHEN booking_type = 'Check-in' and DATE(check_out) = CURRENT_DATE() AND status = 'Checked-out' THEN 1 ELSE 0 END)     AS overnight,
+                              
                               -- Day Guests today
-                              COUNT(CASE WHEN booking_type IN ('Day Guest') AND status IN ('Checked-in') AND check_in = CURRENT_DATE THEN 1 END) AS bookings_day,
-                              SUM(CASE WHEN booking_type IN ('Day Guest') AND status IN ('Checked-in') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_day,
+                              COUNT(CASE WHEN booking_type IN ('Day Guest') AND check_in = CURRENT_DATE THEN 1 END) AS bookings_day,
+                              SUM(CASE WHEN booking_type IN ('Day Guest') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_day,
 
                               -- Upcoming Arrivals (future reservations)
                               COUNT(CASE WHEN status IN ('Reserved') AND check_in > CURRENT_DATE THEN 1 END) AS bookings_upcoming,
@@ -437,7 +436,6 @@ class Reservation:
                                     THEN total_guest ELSE 0 END) AS guests_cancelled
 
                               FROM bookings;
-
                         ''')
                         data = cursor.fetchone()
 
@@ -749,17 +747,11 @@ class Reservation:
                               WHERE check_in >= %s AND check_in <= %s
                               AND status = 'Reserved'
                         ),
-                        c_checkout AS (
-                              SELECT COUNT(*) AS total_checkout
+                        c_overnight AS (
+                              SELECT COUNT(*) AS total_overnight
                               FROM bookings
                               WHERE check_out >= %s AND check_out <= %s
-                              AND status = 'Checked-out'
-                        ),
-                        c_paid AS (
-                              SELECT COUNT(*) AS total_paid
-                              FROM bookings
-                              WHERE check_in >= %s AND check_in <= %s
-                              AND payment NOT IN ('Refunded', 'Pending')
+                              AND booking_type = 'Check-in'
                         ),
                         c_dayguest AS (
                               SELECT COUNT(*) AS total_dayguest
@@ -788,30 +780,27 @@ class Reservation:
                         SELECT 
                               ci.total_checkin,
                               r.total_reserved,
+                              o.total_overnight,
                               dg.total_dayguest,
-                              co.total_checkout,
-                              p.total_paid,
                               np.total_npaid,
                               cn.total_cancel,
                               a.total_all
                         FROM c_checkin ci,
                               c_reserved r,
                               c_dayguest dg,
-                              c_checkout co,
-                              c_paid p,
+                              c_overnight o,
                               c_not_paid np,
                               c_cancelled cn,
                               c_all a;
-                        """, (start_month, end_month) * 8)  # repeat start/end 9 times for placeholders
+                        """, (start_month, end_month) * 7)  # repeat start/end 9 times for placeholders
 
                         data = cursor.fetchone()
                         return {
                         'success': bool(data),
                         'checkin': data.get('total_checkin'),
                         'cancelled': data.get('total_cancel'),
-                        'checkout': data.get('total_checkout'),
+                        'overnight': data.get('total_overnight'),
                         'reserved': data.get('total_reserved'),
-                        'paid': data.get('total_paid'),
                         'not_paid': data.get('total_npaid'),
                         'day_guest': data.get('total_dayguest'),
                         'all': data.get('total_all')

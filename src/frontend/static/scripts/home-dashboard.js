@@ -436,7 +436,7 @@ async function mostBookedArea() {
       try{
             const response = await fetch('/top-booked-area');
             const res = await response.json();
-            console.log(res);
+
             if (res.success){
                   res.data.forEach(data => {
                         createMostBookedArea(data.area_name, data.percentage);
@@ -466,14 +466,16 @@ async function bookingOverviewCardsData() {
       document.getElementById('total-checkin').textContent = data.today_checkin_count;
       document.getElementById('total-checkin-guests').textContent = data.today_checkin_guests;
 
-      document.getElementById('total-checkout').textContent = data.today_checkout_count;
-      document.getElementById('total-checkout-guests').textContent = data.today_checkout_guests;
-
       document.getElementById('total-dayguest').textContent = data.day_guest_count;
       document.getElementById('total-dayguest-guests').textContent = data.day_guest_guests;
       
       document.getElementById('total-reservations').textContent = data.reservation_count;
       document.getElementById('total-reservations-guests').textContent = data.reservation_guests;
+
+      document.getElementById('checkout-reservation').textContent = data.reservation;
+      document.getElementById('checkout-day-guest').textContent = data.day_guest;
+      document.getElementById('checkout-overnight').textContent = data.overnight;
+      document.getElementById('total-checkout-guests').textContent = data.today_checkout_guests;
 }
 
 async function upcomingCheckouts() {
@@ -585,8 +587,7 @@ async function roomsData() {
 
       const response = await fetch('/availables', {method: "GET"});
       const res = await response.json();
-      console.log(res);
-
+      
       const totalHallRooms =
             Number(res.data[4].total_rooms) +
             Number(res.data[5].total_rooms) +

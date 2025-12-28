@@ -1103,15 +1103,11 @@ async function summaryCardsDatas(){
       
       if (result.success){
             const data = result.data;
-            console.log(data);
             document.getElementById('total_guest_checkin_today').textContent = Number(data.guests_checkin) !== 0 ? `${data.guests_checkin}` : `0`;
             document.getElementById('checkin_count_today').textContent = data.bookings_checkin;
 
             document.getElementById('guest-checkin').textContent = Number(data.guests_overnight) !== 0 ? `(${data.guests_overnight} guests)` : `(No guests)`;
             document.getElementById('total_checkin').textContent = data.bookings_overnight;
-            
-            document.getElementById('guest-checkout').textContent = Number(data.guests_checkout) !== 0 ? `(${data.guests_checkout} guests)` : `(No guests)`;
-            document.getElementById('total_checkout').textContent = data.bookings_checkout;
 
             document.getElementById('guest-day-guest').textContent = Number(data.guests_day) !== 0 ? `(${data.guests_day} guests)` : `(No guests)`;
             document.getElementById('day_guests_today').textContent = data.bookings_day; 
@@ -1121,6 +1117,11 @@ async function summaryCardsDatas(){
 
             document.getElementById('guest-cancel').textContent = Number(data.guests_cancelled) !== 0 ? `(${data.guests_cancelled} guests)` : `(No guests)`;
             document.getElementById('cancelled').textContent = data.bookings_cancelled;
+            
+            document.getElementById('checkout-reservation2').textContent = data.reservation;
+            document.getElementById('checkout-day-guest2').textContent = data.day_guest;
+            document.getElementById('checkout-overnight2').textContent = data.overnight;
+            document.getElementById('total-checkout-guests2').textContent = data.today_checkout_guests;
       }
 }
 
@@ -1134,10 +1135,9 @@ async function getTotalsCountData() {
       if (result.success){
             updateBadge('all-data', result.all);
             updateBadge('reserved-data', result.reserved);
-            //updateBadge('day-guest', result.day_guest);
-            updateBadge('check_out-data', result.checkout);
+            updateBadge('day-guest', result.day_guest);
+            updateBadge('overnight-data', result.overnight);
             updateBadge('check_in-data', result.checkin);
-            //updateBadge('paid-data', result.paid);
             updateBadge('not_paid-data', result.not_paid);
             updateBadge('cancelled-reservation-data', result.cancelled);
       }else{

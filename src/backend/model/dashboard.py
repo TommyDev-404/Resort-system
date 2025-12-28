@@ -18,18 +18,18 @@ class Dashboard:
                         SELECT
                         -- Total bookings in-house today
                         COUNT(DISTINCT CASE WHEN DATE(check_in) <= CURRENT_DATE() 
-                                                AND DATE(check_out) >= CURRENT_DATE() 
-                                                THEN booking_id END) AS today_bookings,
+                        AND DATE(check_out) >= CURRENT_DATE() 
+                        THEN booking_id END) AS today_bookings,
                         
                         -- Total guests in-house today
                         COALESCE(SUM(CASE WHEN DATE(check_in) <= CURRENT_DATE() 
-                                          AND DATE(check_out) >= CURRENT_DATE() 
-                                          THEN total_guest END), 0) AS today_guests,
+                        AND DATE(check_out) >= CURRENT_DATE() 
+                        THEN total_guest END), 0) AS today_guests,
 
                         -- Previous in-house guests (exclude new arrivals today)
                         COALESCE(SUM(CASE WHEN DATE(check_in) < CURRENT_DATE() 
-                                          AND DATE(check_out) >= CURRENT_DATE() 
-                                          THEN total_guest END), 0) AS prev_guests,
+                        AND DATE(check_out) >= CURRENT_DATE() 
+                        THEN total_guest END), 0) AS prev_guests,
 
                         -- Change rate = (current - previous) / previous * 100, capped at 100%
                         CASE
@@ -86,7 +86,7 @@ class Dashboard:
                         ), guest AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS guests
                               FROM bookings
-                              WHERE check_in = CURDATE() AND status IN ('Checked-in', 'Day Guest')
+                              WHERE check_in = CURDATE() AND booking_type IN ('Check-in', 'Day Guest')
                         )
                         SELECT 
                         today.today_checkin AS today_data,
@@ -299,68 +299,68 @@ class Dashboard:
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute('''               
-                        WITH  
+                        WITH
                         this_month AS (
-                              SELECT 
-                                    COUNT(booking_id) AS all_books,
-                                    COALESCE(SUM(total_guest), 0) AS book_guests
-                              FROM bookings
-                              WHERE date_book >= DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01')
+                        SELECT
+                              COUNT(booking_id) AS month_books,
+                              COALESCE(SUM(total_guest), 0) AS month_guests
+                        FROM bookings
+                        WHERE date_book >= DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01')
                               AND date_book <  DATE_ADD(DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01'), INTERVAL 1 MONTH)
-                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation') and status <> 'Cancelled'
+                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
+                              AND status <> 'Cancelled'
                         ),
-                        
                         this_year AS (
-                              SELECT
-                                    COUNT(booking_id) AS all_books,
-                                    COALESCE(SUM(total_guest), 0) AS book_guests
-                              FROM bookings
-                              WHERE date_book >= DATE_FORMAT(CURRENT_DATE(), '%Y-01-01') 
+                        SELECT
+                              COUNT(booking_id) AS year_books,
+                              COALESCE(SUM(total_guest), 0) AS year_guests
+                        FROM bookings
+                        WHERE date_book >= DATE_FORMAT(CURRENT_DATE(), '%Y-01-01')
                               AND date_book <  DATE_ADD(DATE_FORMAT(CURRENT_DATE(), '%Y-01-01'), INTERVAL 1 YEAR)
-                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation') and status <> 'Cancelled'
+                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
+                              AND status <> 'Cancelled'
                         ),
-
                         this_week AS (
-                              SELECT 
-                                    COUNT(booking_id) AS all_books,
-                                    COALESCE(SUM(total_guest), 0) AS book_guests
-                              FROM bookings
-                              WHERE date_book >= DATE_SUB(CURRENT_DATE(), INTERVAL WEEKDAY(CURRENT_DATE()) DAY)
-                              AND date_book <  DATE_ADD( DATE_SUB(CURRENT_DATE(), INTERVAL WEEKDAY(CURRENT_DATE()) DAY), INTERVAL 7 DAY)
-                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation') and status <> 'Cancelled'
+                        SELECT
+                              COUNT(booking_id) AS week_books,
+                              COALESCE(SUM(total_guest), 0) AS week_guests
+                        FROM bookings
+                        WHERE date_book >= DATE_SUB(CURRENT_DATE(), INTERVAL WEEKDAY(CURRENT_DATE()) DAY)
+                              AND date_book <  DATE_ADD(
+                                    DATE_SUB(CURRENT_DATE(), INTERVAL WEEKDAY(CURRENT_DATE()) DAY),
+                                    INTERVAL 7 DAY
+                              )
+                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
+                              AND status <> 'Cancelled'
                         ),
-                  
                         today_checkin AS (
-                        SELECT 
+                        SELECT
                               COUNT(booking_id) AS today_checkin_count,
                               COALESCE(SUM(total_guest), 0) AS today_checkin_guests
                         FROM bookings
                         WHERE DATE(check_in) = CURRENT_DATE()
-                              AND booking_type IN ('Check-in')
-                              AND status = 'Checked-in'
+                              AND booking_type = 'Check-in'
                         ),
-
                         today_checkout AS (
-                        SELECT 
-                              COUNT(booking_id) AS today_checkout_count,
+                        SELECT
+                              SUM(CASE WHEN booking_type = 'Reservation' THEN 1 ELSE 0 END) AS reservation,
+                              SUM(CASE WHEN booking_type = 'Day Guest' THEN 1 ELSE 0 END)     AS day_guest,
+                              SUM(CASE WHEN booking_type = 'Check-in' THEN 1 ELSE 0 END)     AS overnight,
                               COALESCE(SUM(total_guest), 0) AS today_checkout_guests
                         FROM bookings
                         WHERE DATE(check_out) = CURRENT_DATE()
                               AND status = 'Checked-out'
                         ),
-
-                        day_guest AS (
-                        SELECT 
+                        today_day_guest AS (
+                        SELECT
                               COUNT(booking_id) AS day_guest_count,
                               COALESCE(SUM(total_guest), 0) AS day_guest_guests
                         FROM bookings
                         WHERE DATE(check_in) = CURRENT_DATE()
                               AND booking_type = 'Day Guest'
-                              AND status = 'Checked-in'
                         ),
-
-                        reservation AS (
-                        SELECT 
+                        active_reservation AS (
+                        SELECT
                               COUNT(booking_id) AS reservation_count,
                               COALESCE(SUM(total_guest), 0) AS reservation_guests
                         FROM bookings
@@ -368,36 +368,37 @@ class Dashboard:
                               AND booking_type = 'Reservation'
                               AND status = 'Reserved'
                         )
+                        SELECT
+                        this_month.month_books,
+                        this_month.month_guests,
 
-                        SELECT 
-                        this_month.all_books       AS month_books,
-                        this_month.book_guests     AS month_guests,
-                              
-                        this_year.all_books       AS year_books,
-                        this_year.book_guests     AS year_guests,
+                        this_year.year_books,
+                        this_year.year_guests,
 
-                        this_week.all_books        AS week_books,
-                        this_week.book_guests      AS week_guests,
+                        this_week.week_books,
+                        this_week.week_guests,
 
                         today_checkin.today_checkin_count,
                         today_checkin.today_checkin_guests,
 
-                        today_checkout.today_checkout_count,
+                        today_checkout.reservation,
+                        today_checkout.day_guest,
+                        today_checkout.overnight,
                         today_checkout.today_checkout_guests,
 
-                        day_guest.day_guest_count,
-                        day_guest.day_guest_guests,
+                        today_day_guest.day_guest_count,
+                        today_day_guest.day_guest_guests,
 
-                        reservation.reservation_count,
-                        reservation.reservation_guests
-                        FROM 
+                        active_reservation.reservation_count,
+                        active_reservation.reservation_guests
+                        FROM
                         this_month,
                         this_year,
                         this_week,
                         today_checkin,
                         today_checkout,
-                        day_guest,
-                        reservation;
+                        today_day_guest,
+                        active_reservation;
 
                   ''')
                   data = cursor.fetchone()
