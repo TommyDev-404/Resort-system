@@ -406,8 +406,8 @@ class Reservation:
                         cursor.execute('''
                               SELECT
                               -- Check-Ins today
-                              COUNT(CASE WHEN booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
-                              SUM(CASE WHEN booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS guests_checkin,
+                              COUNT(CASE WHEN booking_type IN ('Check-in', 'Day Guest', 'Reservation') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
+                              SUM(CASE WHEN booking_type IN ('Check-in', 'Day Guest', 'Reservation') AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS guests_checkin,
 
                               -- Overnight today
                               COUNT(CASE WHEN booking_type IN ('Check-in') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_overnight,
@@ -424,8 +424,8 @@ class Reservation:
                               SUM(CASE WHEN booking_type IN ('Day Guest') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_day,
 
                               -- Upcoming Arrivals (future reservations)
-                              COUNT(CASE WHEN status IN ('Reserved') AND check_in > CURRENT_DATE THEN 1 END) AS bookings_upcoming,
-                              SUM(CASE WHEN status IN ('Reserved') AND check_in > CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_upcoming,
+                              COUNT(CASE WHEN booking_type IN ("Reservation") AND date_book = CURRENT_DATE THEN 1 END) AS bookings_upcoming,
+                              SUM(CASE WHEN booking_type IN ("Reservation") AND date_book =  CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_upcoming,
 
                               -- Cancelled Bookings (this month)
                               COUNT(CASE WHEN status = 'Cancelled' AND check_in >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') 
@@ -640,9 +640,10 @@ class Reservation:
 
                                           day += timedelta(days=1)
                               else:
-                                    if promo_end >= new_checkin:
-                                          new_amount += promo_rate / 2
-                                          revenue_per_area += promo_rate / 2
+                                    if promo_end:
+                                          if promo_end >= new_checkin:
+                                                new_amount += promo_rate / 2
+                                                revenue_per_area += promo_rate / 2
                                     else:
                                           new_amount += orig_rate / 2
                                           revenue_per_area += orig_rate / 2
@@ -747,6 +748,12 @@ class Reservation:
                               WHERE check_in >= %s AND check_in <= %s
                               AND status = 'Reserved'
                         ),
+                        c_reservation AS (
+                              SELECT COUNT(*) AS total_reservation
+                              FROM bookings
+                              WHERE check_in >= %s AND check_in <= %s
+                              and booking_type = 'Reservation'
+                        ),
                         c_overnight AS (
                               SELECT COUNT(*) AS total_overnight
                               FROM bookings
@@ -780,6 +787,7 @@ class Reservation:
                         SELECT 
                               ci.total_checkin,
                               r.total_reserved,
+                              rs.total_reservation,
                               o.total_overnight,
                               dg.total_dayguest,
                               np.total_npaid,
@@ -787,12 +795,13 @@ class Reservation:
                               a.total_all
                         FROM c_checkin ci,
                               c_reserved r,
+                              c_reservation rs,
                               c_dayguest dg,
                               c_overnight o,
                               c_not_paid np,
                               c_cancelled cn,
                               c_all a;
-                        """, (start_month, end_month) * 7)  # repeat start/end 9 times for placeholders
+                        """, (start_month, end_month) * 8)  # repeat start/end 9 times for placeholders
 
                         data = cursor.fetchone()
                         return {
@@ -801,6 +810,7 @@ class Reservation:
                         'cancelled': data.get('total_cancel'),
                         'overnight': data.get('total_overnight'),
                         'reserved': data.get('total_reserved'),
+                        'reservation': data.get('total_reservation'),
                         'not_paid': data.get('total_npaid'),
                         'day_guest': data.get('total_dayguest'),
                         'all': data.get('total_all')

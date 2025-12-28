@@ -76,7 +76,7 @@ class Dashboard:
                               SELECT COUNT(booking_id) AS today_checkin
                               FROM bookings
                               WHERE check_in = CURRENT_DATE()
-                              AND booking_type IN ('Check-in', 'Day Guest')
+                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
                         ),
                         yesterday AS (
                               SELECT COUNT(booking_id) AS yesterday_checkin
@@ -86,7 +86,7 @@ class Dashboard:
                         ), guest AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS guests
                               FROM bookings
-                              WHERE check_in = CURDATE() AND booking_type IN ('Check-in', 'Day Guest')
+                              WHERE check_in = CURDATE() AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
                         )
                         SELECT 
                         today.today_checkin AS today_data,
@@ -333,6 +333,7 @@ class Dashboard:
                               AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
                               AND status <> 'Cancelled'
                         ),
+                        
                         today_checkin AS (
                         SELECT
                               COUNT(booking_id) AS today_checkin_count,
@@ -341,6 +342,7 @@ class Dashboard:
                         WHERE DATE(check_in) = CURRENT_DATE()
                               AND booking_type = 'Check-in'
                         ),
+                        
                         today_checkout AS (
                         SELECT
                               SUM(CASE WHEN booking_type = 'Reservation' THEN 1 ELSE 0 END) AS reservation,
@@ -351,6 +353,7 @@ class Dashboard:
                         WHERE DATE(check_out) = CURRENT_DATE()
                               AND status = 'Checked-out'
                         ),
+                              
                         today_day_guest AS (
                         SELECT
                               COUNT(booking_id) AS day_guest_count,
@@ -366,7 +369,6 @@ class Dashboard:
                         FROM bookings
                         WHERE DATE(check_in) >= CURRENT_DATE()
                               AND booking_type = 'Reservation'
-                              AND status = 'Reserved'
                         )
                         SELECT
                         this_month.month_books,

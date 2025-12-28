@@ -97,7 +97,7 @@ function createTable(id, guest_name, date_book, checkin, checkout, stay_count, a
                   
                   <td class="px-3 py-4">
                         <div class="w-[90px] truncate text-center mx-auto">
-                              <span>${booking_type === 'Check-in' ? 'Overnight' : booking_type}</span>
+                              <span>${booking_type === 'Check-in' ? 'Room Stay' : booking_type}</span>
                         </div>
                   </td>
 
@@ -887,7 +887,7 @@ async function renderViewReservationDetails(id){
                                           <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Booking Info</h3>
                                           <div>
                                                 <p class="text-gray-600 dark:text-gray-400 font-normal">Booking Type</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.booking_type === 'Check-in' ? 'Overnight' : result.data.booking_type}</div>
+                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.booking_type === 'Check-in' ? 'Room Stay' : result.data.booking_type}</div>
                                           </div>
                                           <div>
                                                 <p class="text-gray-600 dark:text-gray-400 font-normal">Status</p>
@@ -1135,6 +1135,7 @@ async function getTotalsCountData() {
       if (result.success){
             updateBadge('all-data', result.all);
             updateBadge('reserved-data', result.reserved);
+            updateBadge('reservation-datas', result.reservation);
             updateBadge('day-guest', result.day_guest);
             updateBadge('overnight-data', result.overnight);
             updateBadge('check_in-data', result.checkin);

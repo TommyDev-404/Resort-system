@@ -587,7 +587,7 @@ async function roomsData() {
 
       const response = await fetch('/availables', {method: "GET"});
       const res = await response.json();
-      
+
       const totalHallRooms =
             Number(res.data[4].total_rooms) +
             Number(res.data[5].total_rooms) +
@@ -779,7 +779,7 @@ async function drawBookingTypeDistribution() {
       bookingTypeChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                  labels: ["Overnight", "Day Guest", "Reservation"],
+                  labels: ["Room Stay", "Day Guest", "Reservation"],
                   datasets: [{
                         data: [res.data.checkin_total, res.data.day_guest_total, res.data.reservation_total],
                         backgroundColor: ["#3b82f6", "#eab308", "#22c55e"]
