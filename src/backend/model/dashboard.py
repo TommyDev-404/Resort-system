@@ -15,42 +15,53 @@ class Dashboard:
                   cursor = con.cursor()
 
                   cursor.execute('''
-                        WITH inhouse_raw AS (
                         SELECT
-                              CASE
-                                    WHEN DATE(check_in) <= CURRENT_DATE()
-                                    AND DATE(check_out) >= CURRENT_DATE()
-                                    THEN 'today'
-                                    WHEN DATE(check_in) <= CURRENT_DATE() - INTERVAL 1 DAY
-                                    AND DATE(check_out) >= CURRENT_DATE() - INTERVAL 1 DAY
-                                    THEN 'yesterday'
-                              END AS day_group,
-                              booking_id,
-                              total_guest
-                        FROM bookings
-                        WHERE
-                              status = 'Checked-in'
-                              AND booking_type IN ('Check-in', 'Day Guest')
-                        )
-                        SELECT
-                        COUNT(DISTINCT CASE WHEN day_group = 'today' THEN booking_id END) AS today_bookings,
-                        COALESCE(SUM(CASE WHEN day_group = 'today' THEN total_guest END), 0) AS today_guests,
-                        COALESCE(SUM(CASE WHEN day_group = 'yesterday' THEN total_guest END), 0) AS yesterday_guests,
+                        -- Total bookings in-house today
+                        COUNT(DISTINCT CASE WHEN DATE(check_in) <= CURRENT_DATE() 
+                                                AND DATE(check_out) >= CURRENT_DATE() 
+                                                THEN booking_id END) AS today_bookings,
+                        
+                        -- Total guests in-house today
+                        COALESCE(SUM(CASE WHEN DATE(check_in) <= CURRENT_DATE() 
+                                          AND DATE(check_out) >= CURRENT_DATE() 
+                                          THEN total_guest END), 0) AS today_guests,
+
+                        -- Previous in-house guests (exclude new arrivals today)
+                        COALESCE(SUM(CASE WHEN DATE(check_in) < CURRENT_DATE() 
+                                          AND DATE(check_out) >= CURRENT_DATE() 
+                                          THEN total_guest END), 0) AS prev_guests,
+
+                        -- Change rate = (current - previous) / previous * 100, capped at 100%
                         CASE
-                              WHEN COALESCE(SUM(CASE WHEN day_group = 'yesterday' THEN total_guest END), 0) = 0
+                              WHEN COALESCE(SUM(CASE WHEN DATE(check_in) < CURRENT_DATE() 
+                                                      AND DATE(check_out) >= CURRENT_DATE() 
+                                                      THEN total_guest END), 0) = 0
                               THEN 0
-                              ELSE ROUND(
+                              ELSE LEAST(
+                                    100,
+                                    ROUND(
                                     (
-                                    COALESCE(SUM(CASE WHEN day_group = 'today' THEN total_guest END), 0)
-                                    -
-                                    COALESCE(SUM(CASE WHEN day_group = 'yesterday' THEN total_guest END), 0)
+                                          COALESCE(SUM(CASE WHEN DATE(check_in) <= CURRENT_DATE() 
+                                                            AND DATE(check_out) >= CURRENT_DATE() 
+                                                            THEN total_guest END), 0)
+                                          -
+                                          COALESCE(SUM(CASE WHEN DATE(check_in) < CURRENT_DATE() 
+                                                            AND DATE(check_out) >= CURRENT_DATE() 
+                                                            THEN total_guest END), 0)
                                     )
                                     /
-                                    COALESCE(SUM(CASE WHEN day_group = 'yesterday' THEN total_guest END), 0)
-                                    * 100,
-                              2)
+                                    COALESCE(SUM(CASE WHEN DATE(check_in) < CURRENT_DATE() 
+                                                      AND DATE(check_out) >= CURRENT_DATE() 
+                                                      THEN total_guest END), 0)
+                                    * 100
+                                    , 2)
+                              )
                         END AS change_rate_percent
-                        FROM inhouse_raw;
+
+                        FROM bookings
+                        WHERE status = 'Checked-in'
+                        AND booking_type IN ('Check-in', 'Day Guest');
+
                   ''')
                   data = cursor.fetchone()
 
