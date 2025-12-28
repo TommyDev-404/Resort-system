@@ -912,6 +912,7 @@ document.addEventListener('click', (e) => {
 // Initial load: ensure the default content is shown and charts are drawn
 export async function initPageDashboard() {
       allNotifications.length = 0;
+      notifications();
       mostBookedArea();
       totalGuestInHouse('today');
       totalOccupied();

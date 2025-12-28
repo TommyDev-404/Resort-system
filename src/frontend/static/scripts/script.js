@@ -67,7 +67,6 @@ async function switchContent(sectionId) {
       try {
             // Dynamically import module if exists
             if (sectionControllerMap[sectionId]) {
-                  notifications();
                   const module = await sectionControllerMap[sectionId]();
                   const initFunc = Object.values(module)[0];
                   if (initFunc) await initFunc(); // wait if async

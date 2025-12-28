@@ -367,8 +367,7 @@ async function removePromo(e){
       const tr = e.target.closest('li');
       const id = tr.getAttribute('data-id');
       const area = tr.getAttribute('data-area');
-      console.log(area);
-      
+
       let area_affected = null;
       if (area === 'All Areas'){
             area_affected = 'Premium Villa Room, Standard Villa Room, Family Room, Barkada Room, Garden View Room, Cabana Cottage, Small Cottage, Big Cottage, Hall';
@@ -412,4 +411,5 @@ document.addEventListener("change", (e) => {
 
 export async function initPageRevenueMgmt(){
       getAllPromo();
+      notifications();
 }

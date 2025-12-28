@@ -1296,4 +1296,5 @@ export function initPageReservation(){
       resetDropDown();
       resetButtonAndCheckBox();
       summaryCardsDatas();
+      notifications();
 }
