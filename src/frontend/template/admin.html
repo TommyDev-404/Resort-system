@@ -210,79 +210,139 @@
 				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-33px]">Quick overview of today's key metrics, bookings overview, and room overview.</p>
             
                         <!-- Metrics Cards Section -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                              <!-- Total Bookings -->
-                              <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-200 transform hover:scale-103">
-                                    <!-- Header -->
-                                    <div class="flex items-center justify-between">
-                                          <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2"><span data-lucide="calendar-plus" class="w-5 h-5 text-blue-500 dark:text-blue-400"></span>All Bookings</p>
-                                          <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">(Today)</span>
-                                    </div>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="bookings-data">--</p>
-                                    <div class="mt-2 flex items-center gap-2 text-sm">
-                                          <div class="flex items-center gap-1">
-                                                <span data-lucide="arrow-up-right" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-rate-bookings-icon"></span>
-                                                <span class="font-semibold text-green-500 dark:text-green-400" id="change-rate-bookings">+0%</span>
-                                          </div>
-                                          <span class="text-gray-500 dark:text-gray-400 font-medium">vs Yesterday</span>
-                                    </div>
-                              </div>
-                        
-                              <!-- Total Guests -->
-                              <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-200 transform hover:scale-103">
-                                    <div class="flex items-center justify-between">
-                                    <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                                    <span data-lucide="user-check" class="w-5 h-5 text-purple-500 dark:text-purple-400"></span>
-                                    Total Guests
-                                    </p>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">(Today)</span>
-                                    </div>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="today-guest">--</p>
-                                    <div class="mt-2 flex items-center gap-2 text-sm">
-                                    <div class="flex items-center gap-1">
-                                    <span data-lucide="arrow-up-right" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-rate-today-guest-icon"></span>
-                                    <span class="font-semibold text-green-500 dark:text-green-400" id="change-rate-today-guest">+0%</span>
-                                    </div>
-                                    <span class="text-gray-500 dark:text-gray-400 font-medium">vs Yesterday</span>
-                                    </div>
-                              </div>
-                              
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                               <!-- Guests In-House -->
-                              <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-200 transform hover:scale-103">
-                                    <div class="flex items-center justify-between">
-                                    <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                                    <span data-lucide="users" class="w-5 h-5 text-teal-500 dark:text-teal-400"></span>
-                                    Total Guest In-House
-                                    </p>
+                              <div class="col-span-3 ">
+                                    <div class="grid grid-cols-3 gap-4">
+                                          <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-200 transform hover:scale-103 flex flex-col justify-between">
+                                                <div class="flex items-center justify-between">
+                                                      <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                            <span data-lucide="users" class="w-5 h-5 text-teal-500 dark:text-teal-400"></span> Guests In-House
+                                                      </p>
+                                                </div>
+                                                <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-3" id="total-guest-in-house">12 </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                      Bookings: <span class="font-semibold dark:text-teal-400" id="guest-house-bookings">5</span>
+                                                </p>
+                                                <div class="mt-3 flex justify-end items-center gap-1 text-sm">
+                                                      <span data-lucide="arrow-up" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-rate-guest-icon"></span>
+                                                      <span class="font-semibold text-green-500 dark:text-green-400" id="change-rate-guest">+--</span>
+                                                      <span class="text-gray-500 dark:text-gray-400 font-medium ml-1">vs Yesterday</span>
+                                                </div>
+                                          </div>
+                                    
+                                          <!-- Today’s Check-Ins -->
+                                          <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-200 transform hover:scale-103 flex flex-col justify-between">
+                                                <div class="flex items-center justify-between">
+                                                      <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                            <span data-lucide="log-in" class="w-5 h-5 text-blue-500 dark:text-blue-400"></span> Today’s Check-Ins
+                                                      </p>
+                                                </div>
+                                                <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-3" id="today-checkin-guest">8</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                      Bookings: <span class="font-semibold dark:text-blue-400" id="today-checkin-bookings">4</span>
+                                                </p>
+                                                <div class="mt-3 flex justify-end items-center gap-1 text-sm">
+                                                      <span data-lucide="arrow-up" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-rate-checkin-icon"></span>
+                                                      <span class="font-semibold text-green-500 dark:text-green-400" id="change-rate-checkin">+5%</span>
+                                                      <span class="text-gray-500 dark:text-gray-400 font-medium ml-1">vs Yesterday</span>
+                                                </div>
+                                          </div>
+                                    
+                                          <!-- Current Revenue -->
+                                          <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-200 transform hover:scale-103 flex flex-col justify-between">
+                                                <div class="flex items-center justify-between">
+                                                      <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                            <span data-lucide="dollar-sign" class="w-5 h-5 text-emerald-500 dark:text-emerald-400"></span> Current Revenue
+                                                      </p>
+                                                </div>
+                                                <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-3" id="total-revenue">$1,200</p>
+                                                <div class="mt-3 flex justify-end items-center gap-1 text-sm">
+                                                      <span data-lucide="arrow-up" class="w-4 h-4 text-green-500 dark:text-green-400" id="target-revenue-icon"></span>
+                                                      <span class="font-semibold text-green-500 dark:text-green-400" id="change-rate-revenue">+8%</span>
+                                                      <span class="text-gray-500 dark:text-gray-400 font-medium ml-1">vs Yesterday</span>
+                                                </div>
+                                          </div>
+                                          
                                     </div>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-guest-in-house">--</p>
-                                    <div class="mt-2 flex items-center gap-2 text-sm">
-                                    <div class="flex items-center gap-1">
-                                    <span data-lucide="arrow-up-right" class="w-4 h-4 text-green-500 dark:text-green-400" id="change-rate-guest-icon"></span>
-                                    <span class="font-semibold text-green-500 dark:text-green-400" id="change-rate-guest">+0%</span>
-                                    </div>
-                                    <span class="text-gray-500 dark:text-gray-400 font-medium">vs Yesterday</span>
+                                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-5">
+                                          <!-- Total Reservations -->
+                                          <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
+                                                <div class="flex items-center justify-between gap-3">
+                                                      <div class="flex items-center gap-3">
+                                                      <div class="w-8 h-8 bg-green-100 dark:bg-green-500 rounded-full flex items-center justify-center">
+                                                      <span data-lucide="calendar-days" class="w-5 h-5 text-green-500 dark:text-white"></span>
+                                                      </div>
+                                                      <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Total Reservations</p>
+                                                      </div>
+                                                </div>
+                                                <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-reservations">--</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                      Guests: <span id="total-reservations-guests" class="font-semibold dark:text-emerald-400">--</span>
+                                                </p>
+                                          </div>
+                                    
+                                          <!-- Total Check-In -->
+                                          <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
+                                                <div class="flex items-center gap-3">
+                                                      <div class="w-8 h-8 bg-blue-100 dark:bg-blue-500 rounded-full flex items-center justify-center">
+                                                      <span data-lucide="log-in" class="w-5 h-5 text-blue-500 dark:text-white"></span>
+                                                      </div>
+                                                      <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Today's Overnight</p>
+                                                </div>
+                                                <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-checkin">--</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                      Guests: <span id="total-checkin-guests" class="font-semibold dark:text-blue-400">--</span>
+                                                </p>
+                                          </div>
+                                    
+                                          <!-- Day Guests -->
+                                          <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
+                                                <div class="flex items-center gap-3">
+                                                      <div class="w-8 h-8 bg-amber-100 dark:bg-amber-600 rounded-full flex items-center justify-center">
+                                                      <span data-lucide="sun" class="w-5 h-5 text-amber-500 dark:text-white"></span>
+                                                      </div>
+                                                      <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Today's Day Guests</p>
+                                                </div>
+                                                <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-dayguest">--</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                      Guests: <span id="total-dayguest-guests" class="font-semibold dark:text-amber-400">--</span>
+                                                </p>
+                                          </div>
+
+                                          <!-- Total Check-Out -->
+                                          <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
+                                                <div class="flex items-center gap-3">
+                                                      <div class="w-8 h-8 bg-red-100 dark:bg-red-500 rounded-full flex items-center justify-center">
+                                                      <span data-lucide="log-out" class="w-5 h-5 text-red-500 dark:text-white"></span>
+                                                      </div>
+                                                      <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Today's Check-Out</p>
+                                                </div>
+                                                <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-checkout">--</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                      Guests: <span id="total-checkout-guests" class="font-semibold dark:text-red-400">--</span>
+                                                </p>
+                                          </div>
+
                                     </div>
                               </div>
-                              
-                              <!-- Projected Revenue -->
-                              <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform duration-200 transform hover:scale-103">
-                                    <div class="flex items-center justify-between">
-                                    <p class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                                    <span data-lucide="dollar-sign" class="w-5 h-5 text-emerald-500 dark:text-emerald-400"></span>
-                                    Current Revenue
-                                    </p>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">(Today)</span>
+
+                              <!-- Occupancy Rate -->
+                                    <div class="col-span-1 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg hover:shadow-2xl flex flex-col items-center border border-gray-300 dark:border-gray-700 transition-all hover:scale-103 duration-200 ease-in-out">
+                                          <div class="flex items-center justify-between w-full mb-3">
+                                                <p class="text-sm font-semibold dark:text-gray-200 text-gray-800">Current Occupancy</p>
+                                                <span data-lucide="bar-chart-2" class="w-6 h-6 dark:text-yellow-400 text-yellow-600 bg-yellow-100 dark:bg-gray-800 p-1 rounded-full"></span>
+                                          </div>
+
+                                          <div class="relative w-full h-48 flex justify-center">
+                                                <canvas id="occupancyChart" class="w-full h-full"></canvas>
+                                          </div>
+
+                                          <div class="flex items-center text-xs dark:text-gray-200 text-gray-800 space-x-1 mt-3">
+                                                <span data-lucide="hotel" class="w-4 h-4"></span>
+                                                <span>Available Areas: <span id="total-avl-rooms" class="font-medium dark:text-white text-black">220</span></span>
+                                          </div>
                                     </div>
-                                    <p class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-revenue">--</p>
-                                    <div class="mt-2 flex items-center gap-2 text-sm">
-                                    <div class="flex items-center gap-1">
-                                    <span data-lucide="arrow-up-right" class="w-4 h-4 text-green-500 dark:text-green-400" id="target-revenue-icon"></span>
-                                    <span class="font-semibold text-green-500 dark:text-green-400" id="change-rate-revenue">+0%</span>
-                                    </div>
-                                    <span class="text-gray-500 dark:text-gray-400 font-medium">vs Yesterday</span>
-                                    </div>
-                              </div>
                         </div>
                         
                         <!-- Main Grid -->
@@ -295,6 +355,20 @@
                                           </div>
                                           <!-- TIME-BASED BOOKINGS -->
                                           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                                                <!-- This Month Bookings -->
+                                                <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
+                                                      <div class="flex items-center gap-3">
+                                                            <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-400 rounded-full flex items-center justify-center">
+                                                                  <span data-lucide="trending-up" class="w-5 h-5 text-emerald-600 dark:text-white"></span>
+                                                            </div>
+                                                            <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">This Year Bookings</p>
+                                                      </div>
+                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="this-year">--</p>
+                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                            Guests: <span id="this-year-guests" class="font-semibold dark:text-blue-400">--</span>
+                                                      </p>
+                                                </div>
+
                                                 <!-- This Month Bookings -->
                                                 <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
                                                       <div class="flex items-center gap-3">
@@ -323,68 +397,8 @@
                                                       </p>
                                                 </div>
                                           
-                                                <!-- Total Reservations -->
-                                                <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
-                                                      <div class="flex items-center justify-between gap-3">
-                                                            <div class="flex items-center gap-3">
-                                                            <div class="w-8 h-8 bg-green-100 dark:bg-green-500 rounded-full flex items-center justify-center">
-                                                            <span data-lucide="calendar-days" class="w-5 h-5 text-green-500 dark:text-white"></span>
-                                                            </div>
-                                                            <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Total Reservations</p>
-                                                            </div>
-                                                            <span class="text-xs text-gray-600 dark:text-gray-400">(All Reservations)</span>
-                                                      </div>
-                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-reservations">--</p>
-                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                            Guests: <span id="total-reservations-guests" class="font-semibold dark:text-emerald-400">--</span>
-                                                      </p>
-                                                </div>
                                           </div>
                                     
-                                          <!-- STATUS-BASED BOOKINGS -->
-                                          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                                                <!-- Total Check-In -->
-                                                <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
-                                                      <div class="flex items-center gap-3">
-                                                            <div class="w-8 h-8 bg-blue-100 dark:bg-blue-500 rounded-full flex items-center justify-center">
-                                                            <span data-lucide="log-in" class="w-5 h-5 text-blue-500 dark:text-white"></span>
-                                                            </div>
-                                                            <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Today's Check-In</p>
-                                                      </div>
-                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-checkin">--</p>
-                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                            Guests: <span id="total-checkin-guests" class="font-semibold dark:text-blue-400">--</span>
-                                                      </p>
-                                                </div>
-                                          
-                                                <!-- Total Check-Out -->
-                                                <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
-                                                      <div class="flex items-center gap-3">
-                                                            <div class="w-8 h-8 bg-red-100 dark:bg-red-500 rounded-full flex items-center justify-center">
-                                                            <span data-lucide="log-out" class="w-5 h-5 text-red-500 dark:text-white"></span>
-                                                            </div>
-                                                            <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Today's Check-Out</p>
-                                                      </div>
-                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-checkout">--</p>
-                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                            Guests: <span id="total-checkout-guests" class="font-semibold dark:text-red-400">--</span>
-                                                      </p>
-                                                </div>
-                                          
-                                                <!-- Day Guests -->
-                                                <div class="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-103">
-                                                      <div class="flex items-center gap-3">
-                                                            <div class="w-8 h-8 bg-amber-100 dark:bg-amber-600 rounded-full flex items-center justify-center">
-                                                            <span data-lucide="sun" class="w-5 h-5 text-amber-500 dark:text-white"></span>
-                                                            </div>
-                                                            <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Today's Day Guests</p>
-                                                      </div>
-                                                      <p class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2" id="total-dayguest">--</p>
-                                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                            Guests: <span id="total-dayguest-guests" class="font-semibold dark:text-amber-400">--</span>
-                                                      </p>
-                                                </div>
-                                          </div>
                                           
                                           <!-- Upcoming -->
                                           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
@@ -513,50 +527,34 @@
                               
                                     <!-- Room Cards Grid -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-8 flex-1" id="rooms-data"></div>
-                        </div>
+                              </div>
 
-                        <!-- RIGHT PANEL -->
-                        <div class="col-span-5 flex flex-col gap-3">
-                              <div class="grid grid-cols-2 gap-6 h-full">
-                                    <!-- Occupancy Gauge -->
-                                    <div class="col-span-1 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg hover:shadow-2xl flex flex-col items-center border border-gray-300 dark:border-gray-700 transition-all hover:scale-103 duration-200 ease-in-out">
-                                          <div class="flex items-center justify-between w-full mb-3">
-                                                <p class="text-sm font-semibold dark:text-gray-200 text-gray-800">Current Occupancy</p>
-                                                <span data-lucide="bar-chart-2" class="w-6 h-6 dark:text-yellow-400 text-yellow-600 bg-yellow-100 dark:bg-gray-800 p-1 rounded-full"></span>
-                                          </div>
-
-                                          <div class="relative w-full h-48 flex justify-center">
-                                                <canvas id="occupancyChart" class="w-full h-full"></canvas>
-                                          </div>
-
-                                          <div class="flex items-center text-xs dark:text-gray-200 text-gray-800 space-x-1 mt-3">
-                                                <span data-lucide="hotel" class="w-4 h-4"></span>
-                                                <span>Available Areas: <span id="total-avl-rooms" class="font-medium dark:text-white text-black">220</span></span>
+                              <!-- RIGHT PANEL -->
+                              <div class="col-span-5 flex flex-col gap-3">
+                                    <div class="grid grid-cols-2 gap-6 h-full">
+                                    
+                                          <!-- Booking Type Distribution Pie Chart -->
+                                          <div class="col-span-2 bg-purple-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 p-6 rounded-md shadow-md hover:shadow-xl transition-all hover:scale-103 duration-200 ease-in-out">
+                                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3 flex items-center gap-2">
+                                                      <span data-lucide="pie-chart" class="w-5 h-5 text-purple-600 dark:text-purple-400"></span>Booking Type Distribution
+                                                </h3>
+                                                <div class="flex justify-center h-60 ">
+                                                      <canvas id="bookingTypeChart"></canvas>
+                                                </div>
                                           </div>
                                     </div>
                                     
-                                    <!-- Booking Type Distribution Pie Chart -->
-                                    <div class="col-span-1 bg-purple-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 p-6 rounded-md shadow-md hover:shadow-xl transition-all hover:scale-103 duration-200 ease-in-out">
-                                          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3 flex items-center gap-2">
-                                                <span data-lucide="pie-chart" class="w-5 h-5 text-purple-600 dark:text-purple-400"></span>Booking Type Distribution
-                                          </h3>
-                                          <div class="flex justify-center h-60 ">
-                                                <canvas id="bookingTypeChart"></canvas>
+                                    <!-- Revenue Trend Line Chart -->
+                                    <div class="col-span-4 bg-blue-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 p-6 rounded-md shadow-md hover:shadow-xl transition h-100 hover:scale-103 duration-200 ease-in-out">
+                                          <div class="flex justify-between items-center mb-3">
+                                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200 flex items-center gap-2">
+                                                <span data-lucide="trending-up" class="w-5 h-5 text-blue-600 dark:text-blue-400"></span>Revenue Trend
+                                                </h3>
+                                                <label class="text-gray-600 dark:text-gray-400 text-xs font-medium">(This Week)</label>
                                           </div>
+                                          <canvas id="revenueChart" class="h-full mb-5"></canvas>
                                     </div>
                               </div>
-                              
-                              <!-- Revenue Trend Line Chart -->
-                              <div class="col-span-4 bg-blue-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 p-6 rounded-md shadow-md hover:shadow-xl transition h-100 hover:scale-103 duration-200 ease-in-out">
-                                    <div class="flex justify-between items-center mb-3">
-                                          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200 flex items-center gap-2">
-                                          <span data-lucide="trending-up" class="w-5 h-5 text-blue-600 dark:text-blue-400"></span>Revenue Trend
-                                          </h3>
-                                          <label class="text-gray-600 dark:text-gray-400 text-xs font-medium">(This Week)</label>
-                                    </div>
-                                    <canvas id="revenueChart" class="h-full mb-5"></canvas>
-                              </div>
-                        </div>
                         </div>
 			</section>
 			
@@ -760,18 +758,52 @@
                         <!-- Metric Cards -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
                               <!-- Card 1: Total Guests -->
-                              <div class="col-span-1 bg-white dark:bg-gray-900 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 transition-transform duration-300 hover:scale-103 hover:shadow-lg">
-                                    <div class="flex justify-between items-center mb-4">
-                                          <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200">Total Guests</h3>
-                                          <span class="bg-amber-100 dark:bg-amber-700 p-2 rounded-full inline-flex items-center justify-center">
-                                          <i data-lucide="users" class="w-6 h-6 text-amber-600 dark:text-amber-200"></i>
-                                          </span>
+                              <div class="col-span-1 bg-white dark:bg-gray-900 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+
+                                    <!-- Header -->
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                            Today’s Check-ins
+                                        </h3>
+                                
+                                        <span class="bg-emerald-100 dark:bg-emerald-400 p-3 rounded-full inline-flex items-center justify-center">
+                                            <i data-lucide="user-check" class="w-6 h-6 text-emerald-600 dark:text-white"></i>
+                                        </span>
                                     </div>
-                                    <div class="text-center mt-2">
-                                          <span class="text-4xl font-extrabold text-gray-800 dark:text-white" id="total_guest_today">--</span>
-                                          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Guests checked in today</p>
+                                
+                                    <!-- Main Stats -->
+                                    <div class="mt-6 grid grid-cols-2 gap-4 text-center">
+                                
+                                        <!-- Check-in Count -->
+                                        <div>
+                                            <span 
+                                                class="text-3xl font-extrabold text-gray-800 dark:text-white"
+                                                id="checkin_count_today"
+                                            >
+                                                --
+                                            </span>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                Check-ins
+                                            </p>
+                                        </div>
+                                
+                                        <!-- Total Guests -->
+                                        <div>
+                                            <span 
+                                                class="text-3xl font-extrabold text-gray-800 dark:text-white"
+                                                id="total_guest_checkin_today"
+                                            >
+                                                --
+                                            </span>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                Guests
+                                            </p>
+                                        </div>
+                                
                                     </div>
-                              </div>
+                                
+                                </div>
+                                
                               
                               <!-- Card 2: Bookings Overview -->
                               <div class="col-span-2 bg-white dark:bg-gray-900 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 transition-transform duration-300 hover:scale-103 hover:shadow-lg">
@@ -784,7 +816,7 @@
                                     <div class="grid grid-cols-3 gap-4 text-center">
                                           <!-- Check-Ins -->
                                           <div>
-                                          <span class="text-gray-600 dark:text-gray-200">Check-Ins</span>
+                                          <span class="text-gray-600 dark:text-gray-200">Overnights</span>
                                           <p class="text-xs text-gray-400 dark:text-gray-500" id="guest-checkin">(-- guests)</p>
                                           <span class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2 block" id="total_checkin">--</span>
                                           </div>

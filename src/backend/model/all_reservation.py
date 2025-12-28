@@ -405,12 +405,16 @@ class Reservation:
                         cursor = con.cursor()
                         cursor.execute('''
                               SELECT
+                              -- Check-Ins today
+                              COUNT(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
+                              SUM(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkin,
+                                    
                               -- Total Guests (all guests checked in today)
                               SUM(CASE WHEN status IN ('Checked-in') AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS total_guests,
 
-                              -- Check-Ins today
-                              COUNT(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in', 'Reservation') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
-                              SUM(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in', 'Reservation') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_checkin,
+                              -- Overnight today
+                              COUNT(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_overnight,
+                              SUM(CASE WHEN status IN ('Checked-in') AND booking_type IN ('Check-in') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_overnight,
 
                               -- Check-Outs today
                               COUNT(CASE WHEN status IN ('Checked-out') AND check_out = CURRENT_DATE THEN 1 END) AS bookings_checkout,

@@ -19,7 +19,7 @@ def add_header(response):
       return response
 
 # Create DB object once here
-db = Database( host="localhost", user="grandsight", password="123456", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
+db = Database( host="localhost", user="tommy", password="2006", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
 
 # create instances of classes
 admin = Admin(db)
@@ -107,10 +107,6 @@ def change_password():
 @app.route('/total-guest-in-house', methods=['GET'])
 def total_guest_in_house():
       return jsonify(dashboard.get_total_guest_house())
-
-@app.route('/today-guest', methods=['GET'])
-def today_guest():
-      return jsonify(dashboard.today_guest())
 
 @app.route('/bookings-overview-data', methods=['GET'])
 def checkin():
@@ -479,3 +475,8 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
+
+
+if __name__ == '__main__':
+      app.run(debug=True)
+

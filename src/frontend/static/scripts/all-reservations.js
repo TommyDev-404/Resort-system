@@ -50,7 +50,7 @@ function failedMessageCard4(message){
 }
 
 function createTable(id, guest_name, date_book, checkin, checkout, stay_count, accomodations, booking_type, status, payment_status){
-      console.log(booking_type);
+      
       const row = `
             <tr class="text-[16px] hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}" data-type="${booking_type}">
                   <!-- SELECT -->
@@ -97,7 +97,7 @@ function createTable(id, guest_name, date_book, checkin, checkout, stay_count, a
                   
                   <td class="px-3 py-4">
                         <div class="w-[90px] truncate text-center mx-auto">
-                              <span>${booking_type}</span>
+                              <span>${booking_type === 'Check-in' ? 'Overnight' : booking_type}</span>
                         </div>
                   </td>
 
@@ -167,7 +167,7 @@ function renderAddBookingModal(){
                                           <select id="booking_type" name="booking_type" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                                 <option class="text-black" value="" disabled selected hidden>Select Booking Type</option>
                                                 <option class="text-black" value="Reservation">Reservation (Advance Booking)</option>
-                                                <option class=" text-black" value="Check-in">Check-In (Room Stay)</option>
+                                                <option class=" text-black" value="Check-in">Overnight (Room Stay)</option>
                                                 <option class=" text-black" value="Day Guest">Day Guest (No Room Stay)</option>
                                           </select>
                                           <select id="payment" name="payment" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
@@ -887,7 +887,7 @@ async function renderViewReservationDetails(id){
                                           <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Booking Info</h3>
                                           <div>
                                                 <p class="text-gray-600 dark:text-gray-400 font-normal">Booking Type</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.booking_type}</div>
+                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.booking_type === 'Check-in' ? 'Overnight' : result.data.booking_type}</div>
                                           </div>
                                           <div>
                                                 <p class="text-gray-600 dark:text-gray-400 font-normal">Status</p>
@@ -1103,11 +1103,12 @@ async function summaryCardsDatas(){
       
       if (result.success){
             const data = result.data;
+            console.log(data);
+            document.getElementById('total_guest_checkin_today').textContent = Number(data.guests_checkin) !== 0 ? `${data.guests_checkin}` : `0`;
+            document.getElementById('checkin_count_today').textContent = data.bookings_checkin;
 
-            document.getElementById('total_guest_today').textContent = data.total_guests;
-
-            document.getElementById('guest-checkin').textContent = Number(data.guests_checkin) !== 0 ? `(${data.guests_checkin} guests)` : `(No guests)`;
-            document.getElementById('total_checkin').textContent = data.bookings_checkin;
+            document.getElementById('guest-checkin').textContent = Number(data.guests_overnight) !== 0 ? `(${data.guests_overnight} guests)` : `(No guests)`;
+            document.getElementById('total_checkin').textContent = data.bookings_overnight;
             
             document.getElementById('guest-checkout').textContent = Number(data.guests_checkout) !== 0 ? `(${data.guests_checkout} guests)` : `(No guests)`;
             document.getElementById('total_checkout').textContent = data.bookings_checkout;

@@ -181,10 +181,11 @@ function viewAllNotifications(){
       lucide.createIcons(); 
 }
 
-function updateMetric(valueId, rateId, iconId, value, change) {
+function updateMetric(valueId, rateId, iconId, value, change, bookId=null, bookVal=null, ) {
       document.getElementById(valueId).textContent = value;
       document.getElementById(rateId).textContent = change > 0 ? `+${change}%` : `${change}%`;
-
+      
+      if (bookId) document.getElementById(bookId).textContent = bookVal;
       const rateEl = document.getElementById(rateId);
       const iconEl = document.getElementById(iconId);
 
@@ -227,11 +228,13 @@ async function todaysBookings() {
       const res = await response.json();
 
       updateMetric(
-            'bookings-data',
-            'change-rate-bookings',
-            'change-rate-bookings-icon',
-            res.check_in,
-            Number(res.change)
+            'today-checkin-guest',
+            'change-rate-checkin',
+            'change-rate-checkin-icon',
+            res.guests,
+            Number(res.change),     
+            'today-checkin-bookings',
+            res.check_in
       );
 }
 
@@ -244,20 +247,9 @@ async function totalGuestInHouse(label) {
             'change-rate-guest',
             'change-rate-guest-icon',
             res.today,
-            Number(res.change)
-      );
-}
-
-async function todayGuest() {
-      const response = await fetch('/today-guest');
-      const res = await response.json();
-
-      updateMetric(
-            'today-guest',
-            'change-rate-today-guest',
-            'change-rate-today-guest-icon',
-            res.today_guest,
-            Number(res.change)
+            Number(res.change), 
+            'guest-house-bookings',
+            res.bookings
       );
 }
 
@@ -462,6 +454,9 @@ async function bookingOverviewCardsData() {
       const res = await response.json();
 
       const data = res.data;
+      document.getElementById('this-year').textContent = data.year_books;
+      document.getElementById('this-year-guests').textContent = data.year_guests;
+      
       document.getElementById('this-month').textContent = data.month_books;
       document.getElementById('this-month-guests').textContent = data.month_guests;
       
@@ -783,10 +778,10 @@ async function drawBookingTypeDistribution() {
       bookingTypeChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                  labels: ["Check-In", "Day Guest", "Cancelled"],
+                  labels: ["Overnight", "Day Guest", "Reservation"],
                   datasets: [{
-                        data: [res.data.checkin_total, res.data.day_guest_total, res.data.cancelled_total],
-                        backgroundColor: ["#3b82f6", "#eab308", "#ef4444"]
+                        data: [res.data.checkin_total, res.data.day_guest_total, res.data.reservation_total],
+                        backgroundColor: ["#3b82f6", "#eab308", "#22c55e"]
                   }]
             },
             options: {
@@ -918,7 +913,6 @@ document.addEventListener('click', (e) => {
 export async function initPageDashboard() {
       allNotifications.length = 0;
       mostBookedArea();
-      todayGuest();
       totalGuestInHouse('today');
       totalOccupied();
       roomsData();
