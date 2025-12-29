@@ -79,7 +79,7 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def add_booking(self, name, total_guest, booking_type, payment, accomodations_selected, checkin, checkout, book_date=None, date_paid_add=None):
+      def add_booking(self, name, total_guest, booking_status, booking_type, payment, accomodations_selected, checkin, checkout, book_date=None, date_paid_add=None):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -90,11 +90,6 @@ class Reservation:
                         counts = Counter(rooms)
 
                         result_list = []
-
-                        status = None
-                        if booking_type == 'Reservation': status = 'Reserved'
-                        if booking_type == 'Check-in': status = 'Checked-in'
-                        if booking_type == 'Day Guest': status = 'Checked-in'
                         
                         new_checkin = datetime.strptime(checkin, "%Y-%m-%d").date()
                         new_checkout = datetime.strptime(checkout, "%Y-%m-%d").date()
@@ -173,7 +168,7 @@ class Reservation:
                         
                         cursor.execute(''' INSERT INTO bookings (name, date_book, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, paid_date, promo, promo_area) 
                         VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-                        ''', (name, book_date if book_date != None else checkin, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
+                        ''', (name, book_date if book_date != None else checkin, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, booking_status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
                         
                         if cursor.rowcount != 0: result_list.append(True)
 
@@ -197,7 +192,7 @@ class Reservation:
                         if cursor.rowcount != 0: result_list.append(True)
 
                         for room, number in set(zip(rooms, room_no)):
-                              if booking_type == 'Check-in' or booking_type == 'Day Guest':
+                              if booking_status == 'Checked-in':
                                     cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("occupied", room.capitalize(), number))
                               else:
                                     cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("reserved", room.capitalize(), number))
@@ -245,18 +240,12 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Error: {str(e)}'}
 
-      def recent_bookings(self, year, month):
+      def recent_bookings(self, year, month, day):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        start_date = date(int(year), int(month), 1)
-
-                        # Compute first day of the next month
-                        if int(month) == 12:
-                              end_date = date(int(year) + 1, 1, 1)
-                        else:
-                              end_date = date(int(year), int(month) + 1, 1)
-
+                        start_date = date(int(year), int(month), int(day))
+                        
                         cursor.execute('''
                         SELECT 
                               booking_id,
@@ -270,10 +259,9 @@ class Reservation:
                               payment,
                               DATEDIFF(check_out, check_in) AS stay_gap
                         FROM bookings
-                        WHERE check_in >= %s
-                              AND check_in < %s
+                        WHERE check_in = %s
                         ORDER BY check_in DESC;
-                        ''', (start_date, end_date))
+                        ''', (start_date))
 
                         data = cursor.fetchall()
                         new_data = []
@@ -290,17 +278,13 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def booking_category(self, year, month, category):
+      def booking_category(self, year, month, day, category):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
 
                         # Compute start and end dates for the month
-                        start_date = date(int(year), int(month), 1)
-                        if int(month) == 12:
-                              end_date = date(int(year) + 1, 1, 1)
-                        else:
-                              end_date = date(int(year), int(month) + 1, 1)
+                        start_date = date(int(year), int(month), int(day))
 
                         base_sql = '''
                         SELECT 
@@ -315,35 +299,29 @@ class Reservation:
                               payment,
                               DATEDIFF(check_out, check_in) AS stay_gap
                         FROM bookings
-                        WHERE {date_column} >= %s
-                              AND {date_column} < %s
+                        WHERE check_in = %s
                         '''
-
-                        # Determine which date column to filter on
-                        if category == 'check_out-data':
-                              date_column = 'check_out'
-                        else:
-                              date_column = 'check_in'
-
-                        sql = base_sql.format(date_column=date_column)
+                        sql = base_sql
 
                         # Add category-specific filters
                         if category == 'overnight-data':
-                              sql += ' AND booking_type = "Check-in" '
+                              sql += ' AND booking_type = "Check-in" and status in ("Checked-in", "Checked-out") '
                         elif category == 'check_in-data':
                               sql += ' AND status = "Checked-in" '
+                        elif category == 'check_out-data':
+                              sql += ' AND status = "Checked-out" '
                         elif category == 'reserved-data':
                               sql += ' AND status = "Reserved" '
                         elif category == 'cancelled-reservation-data':
                               sql += ' AND status = "Cancelled" '
                         elif category == 'day-guest':
-                              sql += ' AND booking_type = "Day Guest" '
+                              sql += ' AND booking_type = "Day Guest" and status in ("Checked-in", "Checked-out") '
                         elif category == 'not_paid-data':
                               sql += ' AND status <> "Reserved" AND payment = "Pending"'
 
                         sql += ' ORDER BY check_in DESC'
 
-                        cursor.execute(sql, (start_date, end_date))
+                        cursor.execute(sql, (start_date))
                         data = cursor.fetchall()
                         new_data = []
 
@@ -406,12 +384,12 @@ class Reservation:
                         cursor.execute('''
                               SELECT
                               -- Check-Ins today
-                              COUNT(CASE WHEN booking_type IN ('Check-in', 'Day Guest', 'Reservation') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
-                              SUM(CASE WHEN booking_type IN ('Check-in', 'Day Guest', 'Reservation') AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS guests_checkin,
+                              COUNT(CASE WHEN booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_checkin,
+                              SUM(CASE WHEN booking_type IN ('Check-in', 'Day Guest') AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS guests_checkin,
 
                               -- Overnight today
                               COUNT(CASE WHEN booking_type IN ('Check-in') AND check_in = CURRENT_DATE() THEN 1 END) AS bookings_overnight,
-                              SUM(CASE WHEN booking_type IN ('Check-in') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_overnight,
+                              SUM(CASE WHEN booking_type IN ('Check-in') AND check_in = CURRENT_DATE() THEN total_guest ELSE 0 END) AS guests_overnight,
 
                               -- Check-Outs today
                               SUM(CASE WHEN status IN ('Checked-out') AND check_out = CURRENT_DATE THEN total_guest ELSE 0 END) AS today_checkout_guests,
@@ -424,8 +402,8 @@ class Reservation:
                               SUM(CASE WHEN booking_type IN ('Day Guest') AND check_in = CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_day,
 
                               -- Upcoming Arrivals (future reservations)
-                              COUNT(CASE WHEN booking_type IN ("Reservation") AND date_book = CURRENT_DATE THEN 1 END) AS bookings_upcoming,
-                              SUM(CASE WHEN booking_type IN ("Reservation") AND date_book =  CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_upcoming,
+                              COUNT(CASE WHEN status IN ("Reserved") AND date_book = CURRENT_DATE THEN 1 END) AS bookings_upcoming,
+                              SUM(CASE WHEN status IN ("Reserved") AND date_book =  CURRENT_DATE THEN total_guest ELSE 0 END) AS guests_upcoming,
 
                               -- Cancelled Bookings (this month)
                               COUNT(CASE WHEN status = 'Cancelled' AND check_in >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') 
@@ -509,12 +487,14 @@ class Reservation:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def mark_paid(self, payment, id):
+            print(payment, id)
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         
-                        query = f" UPDATE bookings SET payment = '{payment}', paid_date = '{date.today()}', total_amount = {'total_amount - (total_amount * 0.05)' if payment == 'ZUZU (Online Payment)' else 'total_amount'} where booking_id = {id} and paid_date IS NULL"
+                        query = f"UPDATE bookings SET payment = '{payment}', paid_date = '{date.today()}', total_amount = {'total_amount - (total_amount * 0.05)' if payment == 'ZUZU (Online Payment)' else 'total_amount'} where booking_id = {id} and paid_date IS NULL"
                         cursor.execute(query)
+                        print(query)
                         con.commit()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
@@ -723,71 +703,67 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
-      def totals(self, month, year):
+      def totals(self, month, year, day):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
 
                         # Compute start and end dates for the month
-                        start_month = date(int(year), int(month), 1)
-                        if int(month) == 12:
-                              end_month = date(int(year) + 1, 1, 1)
-                        else:
-                              end_month = date(int(year), int(month) + 1, 1)
-
+                        start_month = date(int(year), int(month), int(day))
+                        
                         cursor.execute("""
                         WITH c_checkin AS (
                               SELECT COUNT(*) AS total_checkin
                               FROM bookings
-                              WHERE check_in >= %s AND check_in <= %s
+                              WHERE check_in = %s
                               AND status = 'Checked-in'
                         ),
                         c_reserved AS (
                               SELECT COUNT(*) AS total_reserved
                               FROM bookings
-                              WHERE check_in >= %s AND check_in <= %s
+                              WHERE check_in = %s
                               AND status = 'Reserved'
                         ),
-                        c_reservation AS (
-                              SELECT COUNT(*) AS total_reservation
+                        c_checkout AS (
+                              SELECT COUNT(*) AS total_checkout
                               FROM bookings
-                              WHERE check_in >= %s AND check_in <= %s
-                              and booking_type = 'Reservation'
+                              WHERE check_in = %s
+                              and status = 'Checked-out'
                         ),
                         c_overnight AS (
                               SELECT COUNT(*) AS total_overnight
                               FROM bookings
-                              WHERE check_out >= %s AND check_out <= %s
-                              AND booking_type = 'Check-in'
+                              WHERE check_in = %s 
+                              AND booking_type = 'Check-in' and status in ("Checked-in", "Checked-out")
                         ),
                         c_dayguest AS (
                               SELECT COUNT(*) AS total_dayguest
                               FROM bookings
-                              WHERE check_in >= %s AND check_in <= %s
-                              AND booking_type = 'Day Guest'
+                              WHERE check_in = %s
+                              AND booking_type = 'Day Guest' and status in ("Checked-in", "Checked-out")
                         ),
                         c_not_paid AS (
                               SELECT COUNT(*) AS total_npaid
                               FROM bookings
-                              WHERE check_in >= %s AND check_in <= %s
+                              WHERE check_in = %s 
                               AND status <> 'Reserved'
                               AND payment = 'Pending'
                         ),
                         c_cancelled AS (
                               SELECT COUNT(*) AS total_cancel
                               FROM bookings
-                              WHERE check_in >= %s AND check_in <= %s
+                              WHERE check_in = %s
                               AND status = 'Cancelled'
                         ),
                         c_all AS (
                               SELECT COUNT(*) AS total_all
                               FROM bookings
-                              WHERE check_in >= %s AND check_in <= %s
+                              WHERE check_in = %s
                         )
                         SELECT 
                               ci.total_checkin,
                               r.total_reserved,
-                              rs.total_reservation,
+                              ch.total_checkout,
                               o.total_overnight,
                               dg.total_dayguest,
                               np.total_npaid,
@@ -795,13 +771,13 @@ class Reservation:
                               a.total_all
                         FROM c_checkin ci,
                               c_reserved r,
-                              c_reservation rs,
+                              c_checkout ch,
                               c_dayguest dg,
                               c_overnight o,
                               c_not_paid np,
                               c_cancelled cn,
                               c_all a;
-                        """, (start_month, end_month) * 8)  # repeat start/end 9 times for placeholders
+                        """, (start_month, start_month, start_month, start_month, start_month, start_month, start_month, start_month))  # repeat start/end 9 times for placeholders
 
                         data = cursor.fetchone()
                         return {
@@ -810,7 +786,7 @@ class Reservation:
                         'cancelled': data.get('total_cancel'),
                         'overnight': data.get('total_overnight'),
                         'reserved': data.get('total_reserved'),
-                        'reservation': data.get('total_reservation'),
+                        'checkout': data.get('total_checkout'),
                         'not_paid': data.get('total_npaid'),
                         'day_guest': data.get('total_dayguest'),
                         'all': data.get('total_all')
@@ -820,26 +796,21 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Failed: {e}'}
 
-      def search_guest(self, guest_name, year, month, category):
+      def search_guest(self, guest_name, year, month, day, category):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
 
                         # Compute first and last day of the month
-                        start_date = date(int(year), int(month), 1)
-                        if int(month) == 12:
-                              end_date = date(int(year) + 1, 1, 1)
-                        else:
-                              end_date = date(int(year), int(month) + 1, 1)
+                        start_date = date(int(year), int(month), int(day))
 
                         # Base query with range (index-friendly)
                         sql = """
                         SELECT * FROM bookings 
                         WHERE name LIKE %s COLLATE utf8mb4_general_ci
-                              AND check_in >= %s
-                              AND check_in <= %s
+                              AND check_in = %s
                         """
-                        params = [guest_name + "%", start_date, end_date]
+                        params = [guest_name + "%", start_date]
 
                         # Add category filters
                         if category != 'all-data':

@@ -472,7 +472,6 @@ async function bookingOverviewCardsData() {
       document.getElementById('total-reservations').textContent = data.reservation_count;
       document.getElementById('total-reservations-guests').textContent = data.reservation_guests;
 
-      document.getElementById('checkout-reservation').textContent = data.reservation;
       document.getElementById('checkout-day-guest').textContent = data.day_guest;
       document.getElementById('checkout-overnight').textContent = data.overnight;
       document.getElementById('total-checkout-guests').textContent = data.today_checkout_guests;
@@ -779,10 +778,10 @@ async function drawBookingTypeDistribution() {
       bookingTypeChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                  labels: ["Room Stay", "Day Guest", "Reservation"],
+                  labels: ["Room Stay", "Day Guest"],
                   datasets: [{
-                        data: [res.data.checkin_total, res.data.day_guest_total, res.data.reservation_total],
-                        backgroundColor: ["#3b82f6", "#eab308", "#22c55e"]
+                        data: [res.data.checkin_total, res.data.day_guest_total],
+                        backgroundColor: ["#3b82f6", "#eab308"]
                   }]
             },
             options: {

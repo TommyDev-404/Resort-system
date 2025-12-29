@@ -76,7 +76,7 @@ class Dashboard:
                               SELECT COUNT(booking_id) AS today_checkin
                               FROM bookings
                               WHERE check_in = CURRENT_DATE()
-                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
+                              AND booking_type IN ('Check-in', 'Day Guest')
                         ),
                         yesterday AS (
                               SELECT COUNT(booking_id) AS yesterday_checkin
@@ -86,7 +86,7 @@ class Dashboard:
                         ), guest AS (
                               SELECT COALESCE(SUM(total_guest), 0) AS guests
                               FROM bookings
-                              WHERE check_in = CURDATE() AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
+                              WHERE check_in = CURDATE() AND booking_type IN ('Check-in', 'Day Guest') 
                         )
                         SELECT 
                         today.today_checkin AS today_data,
@@ -307,7 +307,7 @@ class Dashboard:
                         FROM bookings
                         WHERE date_book >= DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01')
                               AND date_book <  DATE_ADD(DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01'), INTERVAL 1 MONTH)
-                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
+                              AND booking_type IN ('Check-in', 'Day Guest')
                               AND status <> 'Cancelled'
                         ),
                         this_year AS (
@@ -317,29 +317,29 @@ class Dashboard:
                         FROM bookings
                         WHERE date_book >= DATE_FORMAT(CURRENT_DATE(), '%Y-01-01')
                               AND date_book <  DATE_ADD(DATE_FORMAT(CURRENT_DATE(), '%Y-01-01'), INTERVAL 1 YEAR)
-                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
+                              AND booking_type IN ('Check-in', 'Day Guest')
                               AND status <> 'Cancelled'
                         ),
                         this_week AS (
-                        SELECT
-                              COUNT(booking_id) AS week_books,
-                              COALESCE(SUM(total_guest), 0) AS week_guests
-                        FROM bookings
-                        WHERE date_book >= DATE_SUB(CURRENT_DATE(), INTERVAL WEEKDAY(CURRENT_DATE()) DAY)
+                              SELECT
+                                    COUNT(booking_id) AS week_books,
+                                    COALESCE(SUM(total_guest), 0) AS week_guests
+                              FROM bookings
+                              WHERE date_book >= DATE_SUB(CURRENT_DATE(), INTERVAL WEEKDAY(CURRENT_DATE()) DAY)
                               AND date_book <  DATE_ADD(
                                     DATE_SUB(CURRENT_DATE(), INTERVAL WEEKDAY(CURRENT_DATE()) DAY),
                                     INTERVAL 7 DAY
                               )
-                              AND booking_type IN ('Check-in', 'Day Guest', 'Reservation')
+                              AND booking_type IN ('Check-in', 'Day Guest')
                               AND status <> 'Cancelled'
                         ),
                         
                         today_checkin AS (
-                        SELECT
-                              COUNT(booking_id) AS today_checkin_count,
-                              COALESCE(SUM(total_guest), 0) AS today_checkin_guests
-                        FROM bookings
-                        WHERE DATE(check_in) = CURRENT_DATE()
+                              SELECT
+                                    COUNT(booking_id) AS today_checkin_count,
+                                    COALESCE(SUM(total_guest), 0) AS today_checkin_guests
+                              FROM bookings
+                              WHERE DATE(check_in) = CURRENT_DATE()
                               AND booking_type = 'Check-in'
                         ),
                         
@@ -368,7 +368,7 @@ class Dashboard:
                               COALESCE(SUM(total_guest), 0) AS reservation_guests
                         FROM bookings
                         WHERE DATE(check_in) >= CURRENT_DATE()
-                              AND booking_type = 'Reservation'
+                              AND status = 'Reserved'
                         )
                         SELECT
                         this_month.month_books,
@@ -497,18 +497,12 @@ class Dashboard:
                               WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
                               AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
                               AND booking_type IN ('Day Guest')
-                        ), reservation as (
-                              SELECT COUNT(booking_id) as total from bookings 
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
-                              AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
-                              AND booking_type IN ('Reservation')
-                        ) 
+                        )
                         SELECT 
                               checkin.total as checkin_total,
-                              day_guest.total as day_guest_total,
-                              reservation.total as reservation_total
+                              day_guest.total as day_guest_total
                         FROM 
-                        checkin, day_guest, reservation
+                        checkin, day_guest
                   ''')
             data = cursor.fetchone()
 

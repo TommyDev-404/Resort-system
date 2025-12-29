@@ -151,23 +151,18 @@ function renderAddBookingModal(){
                         </div>
 
                         <form id="addBookingForm" class="flex flex-col gap-4">
-                              <!-- Personal Info -->
-                              <section>
-                                    <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2"><i data-lucide="user" class="lucide w-4 h-4"></i> Guest Info</h3>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                          <input type="text" name="name" placeholder="Guest Name" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
-                                          <input type="number" name="total_guest" placeholder="Total Guests" min="1" class="border dark:text-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
-                                    </div>
-                              </section>
-
-                              <!-- Booking Info -->
+                        <!-- Booking Info -->
                               <section>
                                     <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="lucide w-4 h-4"></i> Booking Info</h3>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                          <select id="booking_status" name="booking_status" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
+                                                <option class="text-black" value="" disabled selected hidden>Select Booking Status</option>
+                                                <option class=" text-black" value="Checked-in">Checked-in</option>
+                                                <option class=" text-black" value="Reserved">Reservation</option>
+                                          </select>
                                           <select id="booking_type" name="booking_type" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                                 <option class="text-black" value="" disabled selected hidden>Select Booking Type</option>
-                                                <option class="text-black" value="Reservation">Reservation (Advance Booking)</option>
-                                                <option class=" text-black" value="Check-in">Overnight (Room Stay)</option>
+                                                <option class=" text-black" value="Check-in">Room Stay (Overnight)</option>
                                                 <option class=" text-black" value="Day Guest">Day Guest (No Room Stay)</option>
                                           </select>
                                           <select id="payment" name="payment" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
@@ -192,13 +187,22 @@ function renderAddBookingModal(){
                                                 <input type="date" name="checkin" class="w-full border date-icon border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                           </div>
                                           <div>
-                                                <label class="text-gray-600 dark:text-gray-200 text-xs mb-1 block">Check-Out Date</label>
+                                                <label class="checkout_label text-gray-600 dark:text-gray-200 text-xs mb-1 block">Check-Out Date</label>
                                                 <input type="date" name="checkout" class="w-full border date-icon border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                           </div>
                                           <div>
                                                 <label  class="date_paid_label text-gray-600 dark:text-gray-200 text-xs mb-1 block">Date Paid</label>
                                                 <input type="date" name="date_paid_add" class="w-full border date-icon border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                           </div>
+                                    </div>
+                              </section>
+                              
+                              <!-- Personal Info -->
+                              <section>
+                                    <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2"><i data-lucide="user" class="lucide w-4 h-4"></i> Guest Info</h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                          <input type="text" name="name" placeholder="Guest Name" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
+                                          <input type="number" name="total_guest" placeholder="Total Guests" min="1" class="border dark:text-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                     </div>
                               </section>
                               
@@ -373,6 +377,7 @@ function closeAccomodationRoom(){
 function resetDropDown(){
       document.getElementById('yearSelect').value = new Date().getFullYear();
       document.getElementById('monthSelect').value = new Date().getMonth() + 1;
+      document.getElementById('daySelect3').value = new Date().getDate();
       recentBookings(); 
 }
 
@@ -440,7 +445,7 @@ function enableActionBtns(e){
             const status = tr.querySelectorAll('td')[6].textContent.trim();
             const payment = tr.querySelectorAll('td')[7].textContent.trim();
             const booking_type = tr.getAttribute('data-type');
-            console.log(booking_type, payment, status);
+            
             // --- Apply your conditions
             allBtns.forEach(btn => {
                   const date = tr.querySelectorAll('td')[3].textContent.split('-');
@@ -448,83 +453,93 @@ function enableActionBtns(e){
                   const reservationDate = new Date(`${date[0]}${year}`);
                   const checkoutDate = new Date(`${date[1]}${year}`);
                   const todayDate = new Date();
-
+                  console.log(booking_type);
                   // Paid
                   if (payment !== 'Pending') {
                         if (booking_type === 'Day Guest'){
-                              if (status === 'Checked-in' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
+                              if (status === 'Checked-in' ) {
+                                    if (checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
+
+                                    if (checkoutDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
+                                    
+                              }else if (status === 'Reserved'){
+                                    if (reservationDate <= todayDate && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
+                                    else if (reservationDate > todayDate && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkin') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
                               }
                               
-                        }else if (booking_type === 'Reservation'){
+                        }else if (booking_type === 'Check-in'){
                               // enable change date, checkin,  & cancel reservation btns
-                              if (status === 'Reserved' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
+                              if (status === 'Reserved'){
+                                    if (reservationDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
+
+                                    if (reservationDate <= todayDate && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
                               }
 
-                              if (status === 'Checked-in' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
+                              if (status === 'Checked-in'){
+                                    if (checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }else if (checkoutDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' &&  btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
                               }
-                        }else{
-                              // enable check-out btn only
-                              if (status === 'Checked-in' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
-                              }
-                              
-                              if (status === 'Checked-in' && checkoutDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
-                              }
-                              
                         }
-                        
                   } else { // Not Paid
                         if (booking_type === 'Day Guest'){
                               if (status === 'Checked-in' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
                                     btn.style.opacity = '1';
                                     btn.style.pointerEvents = 'auto';
+                              }else if (status === 'Reserved' ){
+                                    console.log('here2');
+                                    if (reservationDate <= todayDate&& btn.getAttribute('id') !== 'mark-checkout') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
+                                    else if (reservationDate > todayDate&& btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
                               }
-                        }else if (booking_type === 'Reservation'){
+                        }else if (booking_type === 'Check-in'){
                               // enable change date, checkin,  & cancel reservation btns
-                              if (status === 'Reserved' && reservationDate > todayDate && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
+                              if (status === 'Reserved'){
+                                    if (reservationDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-checkout') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
+                                    else if (reservationDate <= todayDate && btn.getAttribute('id') !== 'mark-checkout') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
                               }
 
-                              if (status === 'Reserved' && reservationDate <= todayDate && btn.getAttribute('id') !== 'mark-checkout') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
-                              }
-
-                              if (status === 'Checked-in' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
-                              }
-
-                              if (status === 'Checked-in' && checkoutDate > todayDate &&  btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
-                              }
-                              
-                              if (status === 'Checked-out' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'update-reservation-date') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
-                              }
-                        }else{
-                              // past checkout and not paid
-                              if (status === 'Checked-in' && checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings' && btn.getAttribute('id') !== 'mark-checkout') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
-                              }
-
-                              // future checkout
-                              if (status === 'Checked-in' && checkoutDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
-                                    btn.style.opacity = '1';
-                                    btn.style.pointerEvents = 'auto';
+                              if (status === 'Checked-in'){
+                                    if (checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }else if (checkoutDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' &&  btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                          btn.style.opacity = '1';
+                                          btn.style.pointerEvents = 'auto';
+                                    }
                               }
                         }
                   }
@@ -631,7 +646,7 @@ function showBookingDate(e){
       const dateInput = document.querySelector('input[name="book_date"]'); // select the input
       const dateLabel = document.querySelector('.book_date_label');
 
-      if (selectedBookingType !== 'Reservation') {
+      if (selectedBookingType !== 'Reserved') {
             dateInput.disabled = true; // disables the input
             dateInput.classList.add('opacity-20', 'cursor-not-allowed'); // optional styling
             dateLabel.classList.remove('text-gray-600', 'dark:text-gray-200');
@@ -695,6 +710,7 @@ async function addBooking(e){
       e.preventDefault();      
       const form = new FormData(e.target);
       showLoader('data', 'Adding guest...');
+      
       try{
             const response = await fetch('/add-booking', {
                   method: 'POST', 
@@ -721,6 +737,7 @@ async function addBooking(e){
             console.log(err);
       }
       hideLoader();
+      
 }
 
 async function markAsCheckout(){
@@ -1042,9 +1059,10 @@ async function recentBookings(){
       showLoader('table');
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
+      const day = document.getElementById('daySelect3').value;
       getTotalsCountData();
 
-      const response = await fetch(`/recent-bookings?year=${year ? year : new Date().getFullYear()}&month=${month}`);
+      const response = await fetch(`/recent-bookings?year=${year ? year : new Date().getFullYear()}&month=${month}&day=${day}`);
       const result = await response.json();
       
       if (result.success){
@@ -1084,16 +1102,37 @@ function getMonths(){
       const monthSelect = document.getElementById("monthSelect");
       const currentDate = new Date();
       const currentYear = currentDate.getFullYear();
-      
+
       for (let i = 0; i < 12; i++) {
             const date = new Date(currentYear, i, 1);
             const monthName = date.toLocaleString("default", { month: "long" });
             const option = document.createElement("option");
             option.value = i + 1;
             option.textContent = monthName;
-            
+
             if (i === currentDate.getMonth()) option.selected = true;
             monthSelect.appendChild(option);
+      }
+}
+
+function getDays2(){
+      document.querySelectorAll('#daySelect3 option').forEach(opt => opt.remove());
+      const daySelect = document.getElementById("daySelect3");
+      const year = document.getElementById('yearSelect').value;
+      const month = document.getElementById('monthSelect').value;
+      const currentDay = new Date().getDate();
+      console.log(year, month);
+      // Get number of days in the current month
+      const monthDays = new Date(year, month, 0).getDate();
+      console.log(monthDays);
+      for (let day = 1; day <= monthDays; day++) {
+            const option = document.createElement("option");
+            option.value = day;
+            option.textContent = day;
+
+            if (day === Number(currentDay)) option.selected = true;
+
+            daySelect.appendChild(option);
       }
 }
 
@@ -1118,7 +1157,6 @@ async function summaryCardsDatas(){
             document.getElementById('guest-cancel').textContent = Number(data.guests_cancelled) !== 0 ? `(${data.guests_cancelled} guests)` : `(No guests)`;
             document.getElementById('cancelled').textContent = data.bookings_cancelled;
             
-            document.getElementById('checkout-reservation2').textContent = data.reservation;
             document.getElementById('checkout-day-guest2').textContent = data.day_guest;
             document.getElementById('checkout-overnight2').textContent = data.overnight;
             document.getElementById('total-checkout-guests2').textContent = data.today_checkout_guests;
@@ -1128,17 +1166,18 @@ async function summaryCardsDatas(){
 async function getTotalsCountData() {
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
+      const day = document.getElementById('daySelect3').value;
 
-      const response = await fetch(`/totals?month=${month}&year=${year ? year : new Date().getFullYear()}`);
+      const response = await fetch(`/totals?month=${month}&year=${year ? year : new Date().getFullYear()}&day=${day}`);
       const result = await response.json();
-
+            console.log(result);
       if (result.success){
             updateBadge('all-data', result.all);
             updateBadge('reserved-data', result.reserved);
-            updateBadge('reservation-datas', result.reservation);
             updateBadge('day-guest', result.day_guest);
             updateBadge('overnight-data', result.overnight);
             updateBadge('check_in-data', result.checkin);
+            updateBadge('check_out-data', result.checkout);
             updateBadge('not_paid-data', result.not_paid);
             updateBadge('cancelled-reservation-data', result.cancelled);
       }else{
@@ -1161,9 +1200,10 @@ async function bookingsCategories(e){
       const category = tabItem.getAttribute('id'); // now this always works
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
+      const day = document.getElementById('daySelect3').value;
       category_data = category;
       showLoader('table');
-      const response = await fetch(`/category-bookings?year=${year}&month=${month}&category=${category}`);
+      const response = await fetch(`/category-bookings?year=${year}&month=${month}&category=${category}&day=${day}`);
       const result = await response.json();
 
       if (result.success){
@@ -1187,8 +1227,9 @@ async function searchGuest(e){
       const name = e.target.value;
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
+      const day = document.getElementById('daySelect3').value;
       showLoader('table');
-      const response = await fetch(`/search-guest?name=${name}&year=${year}&month=${month}&category=${category_data}`);
+      const response = await fetch(`/search-guest?name=${name}&year=${year}&month=${month}&category=${category_data}&day=${day}`);
       const result = await response.json();
 
       document.querySelectorAll('tbody tr').forEach(row => row.remove());      
@@ -1250,8 +1291,9 @@ document.addEventListener('submit', async(e) => {
 
 // select tags  
 document.addEventListener('change', (e) => {
-      if (e.target.matches('#yearSelect')) recentBookings();
-      if (e.target.matches('#monthSelect')) recentBookings();
+      if (e.target.matches('#yearSelect')) (recentBookings(), getDays2());
+      if (e.target.matches('#monthSelect')) (recentBookings(), getDays2());
+      if (e.target.matches('#daySelect3')) recentBookings();
       if (e.target.matches('input[name="select"]')) enableActionBtns(e);
       if (e.target.matches('input[name="select"]')) {
             const checkbox = e.target;
@@ -1280,7 +1322,7 @@ document.addEventListener('change', (e) => {
 
       if (e.target.closest('#booking_type'))  showAccomodationBasedOnBookingType(e);
       if (e.target.closest('#payment'))  showPaymentDate(e);
-      if (e.target.closest('#booking_type'))  showBookingDate(e);
+      if (e.target.closest('#booking_status'))  showBookingDate(e);
 });
 
 document.addEventListener('input', (e) => {
@@ -1291,6 +1333,7 @@ document.addEventListener('input', (e) => {
 switchTabs();
 getYears();
 getMonths();
+getDays2();
 
 export function initPageReservation(){
       getTotalsCountData();

@@ -231,7 +231,7 @@ def avl_rooms_all():
 
 @app.route('/totals', methods=['GET'])
 def totals():
-      return jsonify(reserve.totals(request.args.get('month'), request.args.get('year')))
+      return jsonify(reserve.totals(request.args.get('month'), request.args.get('year'), request.args.get('day')))
 
 @app.route('/add-booking', methods=['POST'])
 def add_booking():
@@ -239,11 +239,11 @@ def add_booking():
 
 @app.route('/recent-bookings', methods=['GET'])
 def recent_bookings():
-      return jsonify(reserve.recent_bookings(request.args.get('year'), request.args.get('month')))
+      return jsonify(reserve.recent_bookings(request.args.get('year'), request.args.get('month'), request.args.get('day')))
 
 @app.route('/category-bookings', methods=['GET'])
 def category_bookings():
-      return jsonify(reserve.booking_category(request.args.get('year'), request.args.get('month'), request.args.get('category')))
+      return jsonify(reserve.booking_category(request.args.get('year'), request.args.get('month'), request.args.get('day'), request.args.get('category')))
 
 @app.route('/get-years', methods=['GET'])
 def get_years():
@@ -283,7 +283,7 @@ def get_data_to_update():
 
 @app.route('/search-guest', methods=['GET'])
 def search_guest():
-      return jsonify(reserve.search_guest(request.args.get('name'), request.args.get('year'), request.args.get('month'), request.args.get('category')))
+      return jsonify(reserve.search_guest(request.args.get('name'), request.args.get('year'), request.args.get('month'), request.args.get('day'), request.args.get('category')))
 
 
 #--------------- HOUSEKEEPING ------------------#
