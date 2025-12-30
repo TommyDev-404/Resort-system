@@ -19,7 +19,7 @@ def add_header(response):
       return response
 
 # Create DB object once here
-db = Database( host="localhost", user="grandsight", password="123456", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
+db = Database( host="localhost", user="tommy", password="2006", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
 
 # create instances of classes
 admin = Admin(db)
@@ -480,3 +480,6 @@ def logout():
       session.clear()
       return redirect(url_for('login_page'))
 
+
+if __name__ == '__main__':
+      app.run(debug=True)
