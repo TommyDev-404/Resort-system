@@ -138,11 +138,15 @@ def top_booked_area():
 
 @app.route('/upcoming-checkout', methods=['GET'])
 def upcoming_checkout():
-      return jsonify(dashboard.upcoming_checkouts())
+      return jsonify(dashboard.upcoming_checkouts(request.args.get('day')))
 
 @app.route('/upcoming-arrival', methods=['GET'])
 def upcoming_arrival():
-      return jsonify(dashboard.upcoming_arrival())
+      return jsonify(dashboard.upcoming_arrival(request.args.get('day')))
+
+@app.route('/upcoming-count', methods=['GET'])
+def upcoming_count():
+      return jsonify(dashboard.upcoming_count())
 
 @app.route('/occupied-room', methods=['GET'])
 def occupied_room():
@@ -475,3 +479,4 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
+

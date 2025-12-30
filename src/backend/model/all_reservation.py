@@ -867,3 +867,5 @@ class Reservation:
                   data = cursor.fetchone()
 
                   return data.get('rate')
+
+      

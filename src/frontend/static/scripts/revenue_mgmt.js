@@ -409,6 +409,14 @@ document.addEventListener("change", (e) => {
       if (e.target.closest('#selectAllCheckbox')) selectAllAreas(e);
 });
 
+document.addEventListener('input', (e) => {
+      if (e.target.matches('input[name="promo_name"]')){
+            e.target.value = e.target.value.split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+      }
+});
+
 export async function initPageRevenueMgmt(){
       getAllPromo();
       notifications();

@@ -407,12 +407,12 @@ class Dashboard:
 
                   return {'data': data}
 
-      def upcoming_checkouts(self):
+      def upcoming_checkouts(self, day):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' 
-                              SELECT check_out, name, accomodations, total_guest FROM bookings WHERE check_out = CURRENT_DATE() + INTERVAL 1 DAY AND status NOT IN ('Cancelled', 'Reserved');
+                        cursor.execute(f''' 
+                              SELECT check_in, check_out, name, booking_type, total_guest FROM bookings WHERE check_out = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status NOT IN ('Cancelled', 'Reserved', 'Checked-out');
                         ''')
                         data = cursor.fetchall()
 
@@ -420,13 +420,13 @@ class Dashboard:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
-      def upcoming_arrival(self):
+
+      def upcoming_arrival(self, day):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' 
-                              SELECT check_in, name, accomodations, total_guest FROM bookings WHERE check_in >= CURRENT_DATE() AND status IN ('Reserved') 
+                        cursor.execute(f''' 
+                              SELECT check_out, check_in, name, booking_type, total_guest FROM bookings WHERE check_in = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status IN ('Reserved') 
                         ''')
                         data = cursor.fetchall()
 
@@ -435,6 +435,35 @@ class Dashboard:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
+      def upcoming_count(self):
+            try:
+                  with self.db.connect() as con:
+                        cursor = con.cursor()
+                        cursor.execute(f''' 
+                              WITH upcoming_arrivals AS (
+                                    SELECT COUNT(*) AS total 
+                                    FROM bookings 
+                                    WHERE check_in >= CURRENT_DATE() 
+                                    AND status IN ('Reserved')
+                              ), 
+                              upcoming_checkouts AS ( 
+                                    SELECT COUNT(*) AS total 
+                                    FROM bookings 
+                                    WHERE check_out >= CURRENT_DATE()
+                                    AND check_out < CURRENT_DATE() + INTERVAL 2 DAY 
+                                    AND status NOT IN ('Cancelled', 'Reserved', 'Checked-out')
+                              )
+                              SELECT 
+                                    (SELECT total FROM upcoming_checkouts) AS checkouts,
+                                    (SELECT total FROM upcoming_arrivals) AS arrivals;
+                        ''')
+                        
+                        data = cursor.fetchone()
+                        return {'success': bool(data), 'data':data}
+            except Exception as e:
+                  con.rollback()
+                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
+
       # Room Overview
       def occupied_room(self):
             with self.db.connect() as con:

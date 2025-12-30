@@ -583,7 +583,7 @@ function updateBadge(id, value) {
       const badge = document.getElementById(id).querySelector("span");
 
       if (value > 0) {
-            badge.textContent = `+${value}`;
+            badge.textContent = `${value}`;
             badge.classList.remove("hidden");
       } else {
             badge.textContent = "";
@@ -705,6 +705,50 @@ function clearCache(cache) {
       }
 }
 
+async function viewUpcomingModal(title, type){
+      const modal = `
+      <div id="view-upcoming-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <!-- Modal Container -->
+            <div class="relative w-full max-w-3xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[50vh]">
+                  <!-- Close Button -->
+                  <span id="close-view-upcoming-modal" class="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white text-xl font-semibold transition">&times;</span>
+            
+                  <!-- Header -->
+                  <div class="flex justify-between items-center mb-4 mt-3">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">${title}</h3>
+
+                        <select id="upcoming-day" data-section=${type} class="px-3 py-2 text-xs rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-100 focus:ring-2 focus:ring-red-500 outline-none transition">
+                              <option value="today">Today</option>
+                              <option value="tomorrow">Tomorrow</option>
+                        </select>
+                  </div>
+            
+                  <!-- Table Wrapper -->
+                  <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <!-- Scroll Area -->
+                        <div class="max-h-[37vh] overflow-y-auto">
+                              <table class="w-full text-sm text-left text-gray-800 dark:text-gray-100">
+                                    <thead class="sticky top-0 z-50 bg-gray-100 dark:bg-gray-800 text-xs uppercase text-gray-600 dark:text-gray-300">
+                                          <tr>
+                                                <th class="px-4 py-3 text-center">Guest Name</th>
+                                                <th class="px-4 py-3 text-center">Booking Type</th>
+                                                <th class="px-4 py-3 text-center">Check-In</th>
+                                                <th class="px-4 py-3 text-center">Check-Out</th>
+                                                <th class="px-4 py-3 text-center">Guests</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody id="upcoming-table2" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                              </table>
+                        </div>
+                  </div>
+            </div>
+      </div>
+      `;
+      
+      document.getElementById('reservationPortal').innerHTML += modal;
+      upcomingData(type, 'today');
+}
+
 // --------------- POST DATA Fetching -------------- //
 async function addBooking(e){
       e.preventDefault();      
@@ -753,6 +797,7 @@ async function markAsCheckout(){
 
       if (result.success){
             notifications();
+            upcomingCount();
             successMessageCard4(result.message);
             recentBookings();
             summaryCardsDatas();
@@ -778,6 +823,7 @@ async function markAsCheckin(){
       if (result.success){
             successMessageCard4(result.message);
             notifications();
+            upcomingCount();
             summaryCardsDatas();
             recentBookings();
             resetButtonAndCheckBox();
@@ -802,6 +848,7 @@ async function cancelBooking(){
       if (result.success){
             successMessageCard4(result.message);
             notifications();
+            upcomingCount();
             recentBookings();
             summaryCardsDatas();
             resetButtonAndCheckBox();
@@ -851,6 +898,7 @@ async function updateReservationDate(e){
       if (result.success){
             successMessageCard4(result.message);
             notifications();
+            upcomingCount();
             document.querySelector('#update-reservation-overlay').remove();
             recentBookings();
             resetButtonAndCheckBox();
@@ -1250,6 +1298,87 @@ async function searchGuest(e){
       hideLoader();
 }
 
+async function upcomingData(type, day_type) {
+      document.querySelector('#upcoming-table2').querySelectorAll('tbody tr').forEach(row => row.remove());
+      let url = null;
+      if (type === 'checkout'){
+            url = `/upcoming-checkout?day=${day_type}`;
+      }else{
+            url = `/upcoming-arrival?day=${day_type}`;
+      }
+      const response = await fetch(url);
+      const res = await response.json();
+
+      if (res.success){
+            let row_list = [];
+            res.data.forEach(guest => {
+                  const date = new Date(guest.check_out).toISOString().split('T')[0];
+                  const date2 = new Date(guest.check_in).toISOString().split('T')[0];
+                  const check_out = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  const check_in = new Date(date2).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  
+                  const row = `
+                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
+                              <td class="px-3 py-2 text-center">
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
+                                          ${guest.name}
+                                    </div>
+                              </td> 
+                              <td class="px-3 py-2 text-center">
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
+                                          ${guest.booking_type === 'Check-in' ? 'Room Stay' : guest.booking_type}
+                                    </div>
+                              </td>
+                              <td class="px-3 py-2 text-center">
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
+                                          ${check_in}
+                                    </div>
+                              </td>
+                              <td class="px-3 py-2 text-center ">
+                                    <div class="whitespace-nowrap">    
+                                          ${check_out}
+                                    </div>
+                              </td>
+                              <td class="px-3 py-2 text-center">${guest.total_guest}</td>
+                        </tr>
+                  `;
+                  
+                  document.querySelector('#upcoming-table2').innerHTML += row;
+            });
+      }else{
+            const empty_row = `
+                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                        <td colspan="5" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
+                  </tr>
+            `;
+
+            document.querySelector('#upcoming-table2').innerHTML += empty_row;
+      }
+}
+
+async function upcomingCount() {
+      const response = await fetch('/upcoming-count');
+      const result = await response.json();
+      console.log(result)
+      if (result.success){
+            if (Number(result.data.checkouts) != 0){
+                  document.getElementById('upcoming-checkout-count').classList.add('min-w-[1.25rem]',  'h-5',  'px-1');
+                  document.getElementById('upcoming-checkout-count').textContent = `${result.data.checkouts}` ;
+            }else{
+                  document.getElementById('upcoming-checkout-count').classList.remove('min-w-[1.25rem]',  'h-5',  'px-1');
+                  document.getElementById('upcoming-checkout-count').textContent = '';
+            }
+
+            if (Number(result.data.arrivals) != 0){
+                  document.getElementById('upcoming-arrival-count').classList.add('min-w-[1.25rem]',  'h-5',  'px-1');
+                  document.getElementById('upcoming-arrival-count').textContent = `${result.data.arrivals}` ;
+            }else{
+                  document.getElementById('upcoming-arrival-countt').classList.remove('min-w-[1.25rem]',  'h-5',  'px-1');
+                  document.getElementById('upcoming-arrival-count').textContent = '';
+            }
+      }
+}
+
 // ---------- Event Listeners ----------------- //
 document.addEventListener('click', (e) => {
       // btn click
@@ -1277,9 +1406,12 @@ document.addEventListener('click', (e) => {
             if (e.target.closest('#close-accomodation-avl')) closeAccomodationRoom();
             if (e.target.closest('#close-reservation-overlay')) document.querySelector('#update-reservation-overlay').remove();
             if (e.target.closest('.remove-btn')) removeAccomodation(e);
+            if (e.target.closest('#close-view-upcoming-modal')) document.querySelector('#view-upcoming-modal').remove();
       }
 
       if (e.target.closest('#select-all-areas')) selectAllRooms();
+      if (e.target.closest('#view-upcoming-checkout')) viewUpcomingModal('Upcoming Checkouts', 'checkout');
+      if (e.target.closest('#view-upcoming-arrival')) viewUpcomingModal('Upcoming Arrivals', 'arrival');
 });
 
 // submit
@@ -1323,10 +1455,16 @@ document.addEventListener('change', (e) => {
       if (e.target.closest('#booking_type'))  showAccomodationBasedOnBookingType(e);
       if (e.target.closest('#payment'))  showPaymentDate(e);
       if (e.target.closest('#booking_status'))  showBookingDate(e);
+      if (e.target.closest('#upcoming-day'))  upcomingData(e.target.getAttribute('data-section'), e.target.value);
 });
 
 document.addEventListener('input', (e) => {
       if (e.target.matches('input[name="guest-name"]')) debouncedSearch(e);
+      if (e.target.matches('input[name="name"]')){
+            e.target.value = e.target.value.split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+      }
 });
 
 // -------------- Initialiaze when loaded -----------
@@ -1341,4 +1479,5 @@ export function initPageReservation(){
       resetButtonAndCheckBox();
       summaryCardsDatas();
       notifications();
+      upcomingCount();
 }

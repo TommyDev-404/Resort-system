@@ -222,6 +222,11 @@ function updateMetric(valueId, rateId, iconId, value, change, bookId=null, bookV
       lucide.createIcons();
 }
 
+function resetDropdown(){
+      document.getElementById('checkout-day').value = 'today';
+      document.getElementById('checkin-day').value = 'today';
+}
+
 // Metric card
 async function todaysBookings() {
       const response = await fetch('/today-bookings');
@@ -238,8 +243,8 @@ async function todaysBookings() {
       );
 }
 
-async function totalGuestInHouse(label) {
-      const response = await fetch(`/total-guest-in-house?label=${label}`);
+async function totalGuestInHouse() {
+      const response = await fetch(`/total-guest-in-house`);
       const res = await response.json();
 
       updateMetric(
@@ -275,10 +280,10 @@ export async function notifications() {
       const res = await response.json();
       
       if (Number(res.count) != 0){
-            document.getElementById('notification-count').classList.add('px-1.5', 'py-0.5');
-            document.getElementById('notification-count').textContent = `${res.count} +` ;
+            document.getElementById('notification-count').classList.add('min-w-[1.25rem]',  'h-5',  'px-1');
+            document.getElementById('notification-count').textContent = `${res.count}` ;
       }else{
-            document.getElementById('notification-count').classList.remove('px-1.5', 'py-0.5');
+            document.getElementById('notification-count').classList.remove('min-w-[1.25rem]',  'h-5',  'px-1');
             document.getElementById('notification-count').textContent = '';
       }
 
@@ -477,35 +482,38 @@ async function bookingOverviewCardsData() {
       document.getElementById('total-checkout-guests').textContent = data.today_checkout_guests;
 }
 
-async function upcomingCheckouts() {
-      const response = await fetch('/upcoming-checkout', {method: "GET"});
+async function upcomingCheckouts(type) {
+      document.getElementById('upcoming-checkout-table').querySelectorAll('tbody tr').forEach(row => row.remove());
+      const response = await fetch(`/upcoming-checkout?day=${type}`, {method: "GET"});
       const res = await response.json();
       
-      document.getElementById('upcoming-checkout-table').querySelectorAll('tbody tr').forEach(row => row.remove());
       if (res.success){
             res.data.forEach(guest => {
                   const date = new Date(guest.check_out).toISOString().split('T')[0];
-                  const formattedDate = new Date(date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                  });
+                  const date2 = new Date(guest.check_in).toISOString().split('T')[0];
+                  const check_out = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  const check_in = new Date(date2).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
                   const row = `
                         <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
                               <td class="px-3 py-2 text-center">
-                                    <div class="w-[150px] overflow-x-auto thin-scroll whitespace-nowrap">    
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
                                           ${guest.name}
+                                    </div>
+                              </td> 
+                              <td class="px-3 py-2 text-center">
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
+                                          ${guest.booking_type === 'Check-in' ? 'Room Stay' : guest.booking_type}
                                     </div>
                               </td>
                               <td class="px-3 py-2 text-center">
-                                    <div class="w-[340px] truncate whitespace-nowrap">    
-                                          ${guest.accomodations.split(',').map(accs => accs.trim()).join(', ')}
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
+                                          ${check_in}
                                     </div>
                               </td>
                               <td class="px-3 py-2 text-center ">
-                                    <div class="w-[100px] whitespace-nowrap">    
-                                          ${formattedDate}
+                                    <div class="whitespace-nowrap">    
+                                          ${check_out}
                                     </div>
                               </td>
                               <td class="px-3 py-2 text-center">${guest.total_guest}</td>
@@ -525,41 +533,44 @@ async function upcomingCheckouts() {
       }
 }
 
-async function upcomingArrivals() {
-      const response = await fetch('/upcoming-arrival', {method: "GET"});
+async function upcomingArrivals(type) {
+      document.getElementById('upcoming-arrival-table').querySelectorAll('tbody tr').forEach(row => row.remove());
+      const response = await fetch(`/upcoming-arrival?day=${type}`, {method: "GET"});
       const res = await response.json();
 
-      document.getElementById('upcoming-arrival-table').querySelectorAll('tbody tr').forEach(row => row.remove());
       if (res.success){
             res.data.forEach(guest => {
-                  const date = new Date(guest.check_in).toISOString().split('T')[0];
-                  const formattedDate = new Date(date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                  });
-
+                  const date = new Date(guest.check_out).toISOString().split('T')[0];
+                  const date2 = new Date(guest.check_in).toISOString().split('T')[0];
+                  const check_out = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  const check_in = new Date(date2).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  
                   const row = `
                         <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
                               <td class="px-3 py-2 text-center">
-                                    <div class="w-[150px] overflow-x-auto thin-scroll whitespace-nowrap">    
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
                                           ${guest.name}
+                                    </div>
+                              </td> 
+                              <td class="px-3 py-2 text-center">
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
+                                          ${guest.booking_type === 'Check-in' ? 'Room Stay' : guest.booking_type}
                                     </div>
                               </td>
                               <td class="px-3 py-2 text-center">
-                                    <div class="w-[340px] truncate whitespace-nowrap">    
-                                          ${guest.accomodations.split(',').map(accs => accs.trim()).join(', ')}
+                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
+                                          ${check_in}
                                     </div>
                               </td>
                               <td class="px-3 py-2 text-center ">
-                                    <div class="w-[100px] whitespace-nowrap">    
-                                          ${formattedDate}
+                                    <div class="whitespace-nowrap">    
+                                          ${check_out}
                                     </div>
                               </td>
                               <td class="px-3 py-2 text-center">${guest.total_guest}</td>
                         </tr>
                   `;
-
+                  
                   document.getElementById('upcoming-arrival-table').innerHTML += row;
             });
       }else{
@@ -909,12 +920,19 @@ document.addEventListener('click', (e) => {
       if (e.target.matches('#last_month')) filteredDashboard('last_month');
 });
 
+// select tags  
+document.addEventListener('change', (e) => {
+      if (e.target.closest('#checkout-day'))  upcomingCheckouts(e.target.value);
+      if (e.target.closest('#checkin-day'))  upcomingArrivals(e.target.value);
+});
+
 // Initial load: ensure the default content is shown and charts are drawn
 export async function initPageDashboard() {
       allNotifications.length = 0;
       notifications();
+      resetDropdown();
       mostBookedArea();
-      totalGuestInHouse('today');
+      totalGuestInHouse();
       totalOccupied();
       roomsData();
       upcomingArrivals();

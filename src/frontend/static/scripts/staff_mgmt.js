@@ -1223,9 +1223,19 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('input', (e) => {
-      if (e.target.matches('input[name="search-staff"]')) searchStaff(e.target.value);
+      if (e.target.matches('input[name="search-staff"]')){
+            e.target.value = e.target.value.split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+            searchStaff(e.target.value);
+      }
+      if (e.target.matches('input[name="staff_name"]')){
+            e.target.value = e.target.value.split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+      }
 });
-
+      
 document.addEventListener('change', (e) => {
       if (e.target.closest('#monthSelect2')) sortAttendanceData();
       if (e.target.closest('#daySelect')) sortAttendanceData();
