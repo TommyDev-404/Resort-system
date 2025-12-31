@@ -717,7 +717,7 @@ async function viewUpcomingModal(title, type){
                   <div class="flex justify-between items-center mb-4 mt-3">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">${title}</h3>
 
-                        <select id="upcoming-day" data-section=${type} class="px-3 py-2 text-xs rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-100 focus:ring-2 focus:ring-red-500 outline-none transition">
+                        <select id="upcoming-day" data-section=${type}  class="px-3 py-2 text-xs rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-100 focus:ring-2 focus:ring-red-500 outline-none transition">
                               <option value="today">Today</option>
                               <option value="tomorrow">Tomorrow</option>
                         </select>
@@ -915,7 +915,7 @@ async function renderViewReservationDetails(id){
       showLoader('data', 'Retrieving booking details...');
       const response = await fetch(`/view-details/${id}`);
       const result = await response.json();
-
+      console.log(result);
       if (result.success){
             const check_in = new Date(result.data.check_in).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'});
             const check_out = new Date(result.data.check_out).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'});
@@ -1130,6 +1130,7 @@ async function recentBookings(){
 }
 
 async function getYears(){
+      document.querySelectorAll('#yearSelect option').forEach(opt => opt.remove());
       const response = await fetch('/get-years');
       const result = await response.json();
 
@@ -1163,22 +1164,29 @@ function getMonths(){
       }
 }
 
-function getDays2(){
+function getDays2() {
       document.querySelectorAll('#daySelect3 option').forEach(opt => opt.remove());
+
       const daySelect = document.getElementById("daySelect3");
-      const year = document.getElementById('yearSelect').value;
-      const month = document.getElementById('monthSelect').value;
-      const currentDay = new Date().getDate();
-      console.log(year, month);
-      // Get number of days in the current month
+      const year = Number(document.getElementById('yearSelect').value);
+      const month = Number(document.getElementById('monthSelect').value);
+
+      const now = new Date();
+      const isCurrentMonth =
+            year === now.getFullYear() &&
+            month === now.getMonth() + 1;
+
+      const selectedDay = isCurrentMonth ? now.getDate() : 1;
+
+      // Number of days in selected month
       const monthDays = new Date(year, month, 0).getDate();
-      console.log(monthDays);
+
       for (let day = 1; day <= monthDays; day++) {
             const option = document.createElement("option");
             option.value = day;
             option.textContent = day;
 
-            if (day === Number(currentDay)) option.selected = true;
+            if (day === selectedDay) option.selected = true;
 
             daySelect.appendChild(option);
       }
@@ -1310,7 +1318,6 @@ async function upcomingData(type, day_type) {
       const res = await response.json();
 
       if (res.success){
-            let row_list = [];
             res.data.forEach(guest => {
                   const date = new Date(guest.check_out).toISOString().split('T')[0];
                   const date2 = new Date(guest.check_in).toISOString().split('T')[0];
@@ -1359,7 +1366,7 @@ async function upcomingData(type, day_type) {
 async function upcomingCount() {
       const response = await fetch('/upcoming-count');
       const result = await response.json();
-      console.log(result)
+
       if (result.success){
             if (Number(result.data.checkouts) != 0){
                   document.getElementById('upcoming-checkout-count').classList.add('min-w-[1.25rem]',  'h-5',  'px-1');
@@ -1373,7 +1380,7 @@ async function upcomingCount() {
                   document.getElementById('upcoming-arrival-count').classList.add('min-w-[1.25rem]',  'h-5',  'px-1');
                   document.getElementById('upcoming-arrival-count').textContent = `${result.data.arrivals}` ;
             }else{
-                  document.getElementById('upcoming-arrival-countt').classList.remove('min-w-[1.25rem]',  'h-5',  'px-1');
+                  document.getElementById('upcoming-arrival-count').classList.remove('min-w-[1.25rem]',  'h-5',  'px-1');
                   document.getElementById('upcoming-arrival-count').textContent = '';
             }
       }
@@ -1423,11 +1430,11 @@ document.addEventListener('submit', async(e) => {
 
 // select tags  
 document.addEventListener('change', (e) => {
-      if (e.target.matches('#yearSelect')) (recentBookings(), getDays2());
-      if (e.target.matches('#monthSelect')) (recentBookings(), getDays2());
-      if (e.target.matches('#daySelect3')) recentBookings();
-      if (e.target.matches('input[name="select"]')) enableActionBtns(e);
-      if (e.target.matches('input[name="select"]')) {
+      if (e.target.closest('#yearSelect')) ( getDays2(), recentBookings());
+      if (e.target.closest('#monthSelect')) ( getDays2(), recentBookings());
+      if (e.target.closest('#daySelect3')) recentBookings();
+      if (e.target.closest('input[name="select"]')) enableActionBtns(e);
+      if (e.target.closest('input[name="select"]')) {
             const checkbox = e.target;
             document.querySelectorAll('input[name="select"]').forEach(cb => {
                   if (cb !== checkbox) {
@@ -1469,11 +1476,11 @@ document.addEventListener('input', (e) => {
 
 // -------------- Initialiaze when loaded -----------
 switchTabs();
-getYears();
-getMonths();
-getDays2();
 
 export function initPageReservation(){
+      getYears();
+      getMonths();
+      getDays2();
       getTotalsCountData();
       resetDropDown();
       resetButtonAndCheckBox();
