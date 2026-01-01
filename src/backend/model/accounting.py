@@ -1,11 +1,13 @@
 from backend.forecast import Forecast
 from datetime import date
+from backend.extensions import cache
 
 class Accounting:
       def __init__(self, db):
             self.db = db
             self.revenue_forecast = Forecast()
 
+      @cache.cached(timeout=300, key_prefix='payment_data_{year}')
       def get_payment_data(self, year):
             try:
                   with self.db.connect() as con:
@@ -49,6 +51,7 @@ class Accounting:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
+      @cache.cached(timeout=300, key_prefix='current_payment_data')
       def get_current_payment_data(self):
             try:
                   with self.db.connect() as con:

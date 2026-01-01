@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from .all_reservation import Reservation
+from backend.extensions import cache
 
 class RevenueMgmt:
       def __init__(self, db):
@@ -107,6 +108,7 @@ class RevenueMgmt:
                         'message': f'Promo application failed: {e}'
                   }
 
+      @cache.cached(timeout=300, key_prefix='get_promo_data')
       def get_promo_data(self, id=None):
             try:
                   with self.db.connect() as con:

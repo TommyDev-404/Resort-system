@@ -1,15 +1,13 @@
 from backend.forecast import Forecast
 from datetime import date
+from backend.extensions import cache
 
 class Analytics:
       def __init__(self, db):
             self.db = db
             self.revenue_forecast = Forecast()
       
-      #---------------- HELPERS ----------------#
-      def _response(self, success, message=None, data=None, **kwargs):
-            return {'success': success, 'message': message, 'data': data, **kwargs}
-
+      @cache.cached(timeout=300, key_prefix='occupancy_data')
       def get_occupancy(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -110,6 +108,7 @@ class Analytics:
                   
                   return {'current': data.get('current_mtd_occupancy') , 'prev': data.get('previous_mtd_occupancy'), 'change': data.get('change_rate') if data.get('current_mtd_occupancy') > 0 else '0'}
 
+      @cache.cached(timeout=300, key_prefix='daily_revenue')
       def daily_revenue(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -220,6 +219,7 @@ class Analytics:
 
                   return {'current': data.get('revenue_today'), 'change': data.get('change_rate_percent')}
 
+      @cache.cached(timeout=300, key_prefix='monthly_revenue')
       def monthly_revenue(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -265,6 +265,7 @@ class Analytics:
 
                   return {'monthly': data.get('revenue'), 'change': change_rate}
 
+      @cache.cached(timeout=300, key_prefix='forecast_checkin')
       def forecast_checkin(self, type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -307,6 +308,7 @@ class Analytics:
 
                   return self.revenue_forecast.forecast_checkin(dates, values)
 
+      @cache.cached(timeout=300, key_prefix='forecasted_revenue')
       def forecasted_revenue(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -353,9 +355,10 @@ class Analytics:
       
             dates = [row.get('ds') for row in data]
             values = [row.get('y') for row in data]
-
+            
             return self.revenue_forecast.forecast_revenue(dates, values)
-      
+
+      @cache.cached(timeout=300, key_prefix='forecast_occupancy')
       def forecast_occupancy(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -377,6 +380,7 @@ class Analytics:
 
             return self.revenue_forecast.forecast_occupancy(dates, values)
       
+      @cache.cached(timeout=300, key_prefix='target_revenue')
       def  get_target_revenue(self, accomodation_type=None):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -419,7 +423,8 @@ class Analytics:
                         data = cursor.fetchone()
                         
                         return {'target': data.get('target_revenue')}
-                              
+
+      @cache.cached(timeout=300, key_prefix='accomodation_data_{query}')
       def accomodation_data(self, query):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -440,6 +445,7 @@ class Analytics:
                   
                   return data.get('rate')
 
+      @cache.cached(timeout=300, key_prefix='accomodation_count_{area_name}')
       def accomodation_count (self, area_name):
             with self.db.connect() as con:
                   cursor = con.cursor()

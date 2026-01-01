@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import date, timedelta
+from backend.extensions import cache
 
 class Staff_Management: 
       def __init__(self, db):
@@ -42,6 +43,7 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='all_staff')
       def all_staff(self):
             try:
                   with self.db.connect() as con:
@@ -53,7 +55,8 @@ class Staff_Management:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
+
+      @cache.cached(timeout=300, key_prefix='staff_list')
       def staff_list(self, day, month):
             try:
                   with self.db.connect() as con:
@@ -232,6 +235,7 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='all_staff_attendance')
       def all_staff_attendance(self, day, month):
             try:
                   with self.db.connect() as con:
@@ -249,6 +253,7 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
+      @cache.cached(timeout=300, key_prefix='all_present_staff')
       def all_present_staff(self, day, month):
             try:
                   with self.db.connect() as con:
@@ -377,6 +382,7 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
+      @cache.cached(timeout=300, key_prefix='staff_summary_cards')
       def staff_summary_cards(self, month, day):
             try:
                   with self.db.connect() as con:
@@ -420,6 +426,7 @@ class Staff_Management:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
+      @cache.cached(timeout=300, key_prefix='this_week_onleave')
       def this_week_onleave(self):
             try:
                   with self.db.connect() as con:

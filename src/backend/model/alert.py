@@ -1,11 +1,13 @@
 from backend.forecast import Forecast
 from datetime import datetime, timedelta, date, timezone
+from backend.extensions import cache      
 
 class Alerts:
       def __init__(self, db):
             self.db = db
             self.revenue_forecast = Forecast()
             
+      @cache.cached(timeout=300, key_prefix='occupancy_alert')
       def occupancy_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -68,6 +70,7 @@ class Alerts:
                   else:
                         return {'message': None}
 
+      @cache.cached(timeout=300, key_prefix='housekeeping_alert')
       def housekeeping_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -78,6 +81,7 @@ class Alerts:
 
             return {'success': bool(data), 'data': data} 
 
+      @cache.cached(timeout=300, key_prefix='generate_alerts')
       def generate_alerts(self):
             alerts = [
                   {
@@ -166,6 +170,7 @@ class Alerts:
 
                   self.auto_cancell_7d()
 
+      @cache.cached(timeout=300, key_prefix='bookings_alert')
       def bookings_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -176,6 +181,7 @@ class Alerts:
 
             return {'success': bool(data), 'data': data} 
 
+      @cache.cached(timeout=300, key_prefix='notification_count')
       def notification_count(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -205,7 +211,7 @@ class Alerts:
                               return {'count': int(data.get('count')) - 1}
                   else:
                         return {'count': data.get('count')}
-                  
+            
       def cron_jobs(self):
             with self.db.connect() as conn:
                   cursor = conn.cursor()

@@ -164,6 +164,7 @@
 							<path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a2 2 0 002-2H8a2 2 0 002 2z"/>
 						</svg>
 					</button>
+                              <audio id="notifSound" src="/sounds/notification.mp3" preload="auto"></audio>
 					<span id="notification-count" class="absolute -top-2 -right-2 flex items-center justify-center text-[10px] font-bold text-white bg-red-500 rounded-full border border-white shadow-sm dark:border-gray-900"></span>
 
 					<!-- Notification Modal -->
@@ -500,7 +501,7 @@
                                                       <span data-lucide="trending-up" class="w-6 h-6 dark:text-green-400 text-green-600"></span>
                                                       <p class="text-sm font-semibold dark:text-gray-200 text-gray-900 flex gap-8 items-center">
                                                             Top 5 Most Booked
-                                                            <span class="text-xs font-medium text-gray-800 dark:text-gray-400">(This Year)</span>
+                                                            <span class="text-xs font-medium text-gray-800 dark:text-gray-400">(Historical)</span>
                                                       </p>
                                                 </div>
 
@@ -561,7 +562,7 @@
                                           <!-- Booking Type Distribution Pie Chart -->
                                           <div class="col-span-2 bg-purple-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 p-6 rounded-md shadow-md hover:shadow-xl transition-all hover:scale-103 duration-200 ease-in-out">
                                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3 flex items-center gap-2">
-                                                      <span data-lucide="pie-chart" class="w-5 h-5 text-purple-600 dark:text-purple-400"></span>Booking Type Distribution
+                                                      <span data-lucide="pie-chart" class="w-5 h-5 text-purple-600 dark:text-purple-400"></span>Booking Type Distribution (Historical)
                                                 </h3>
                                                 <div class="flex justify-center h-60 ">
                                                       <canvas id="bookingTypeChart"></canvas>

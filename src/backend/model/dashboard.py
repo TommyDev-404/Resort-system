@@ -1,4 +1,5 @@
 from backend.forecast import Forecast
+from backend.extensions import cache
 
 class Dashboard:
       def __init__(self, db, target):
@@ -6,10 +7,7 @@ class Dashboard:
             self.revenue_forecast = Forecast()
             self.analytics = target
       
-      #---------------- HELPERS ----------------#
-      def _response(self, success, message=None, data=None, **kwargs):
-            return {'success': success, 'message': message, 'data': data, **kwargs}
-      
+      @cache.cached(timeout=300, key_prefix='total_guest_house')
       def get_total_guest_house(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -67,6 +65,7 @@ class Dashboard:
 
                   return {'today': data.get('today_guests') , 'bookings': data.get('today_bookings'), 'change': data.get('change_rate_percent')}
 
+      @cache.cached(timeout=300, key_prefix='today_bookings')
       def today_bookings(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -103,6 +102,7 @@ class Dashboard:
 
                   return {'check_in': data.get('today_data'), 'guests': data.get('today_guest'), 'change': data.get('change_rate_percent')}
 
+      @cache.cached(timeout=300, key_prefix='occupancy')
       def occupancy(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -120,6 +120,7 @@ class Dashboard:
 
             return {'occupancy': data.get('y'), 'total_room': 54 - int(data.get('total_room'))}
       
+      @cache.cached(timeout=300, key_prefix='revenue_today')
       def revenue_today(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -157,6 +158,7 @@ class Dashboard:
 
                   return {'current_revenue': data.get('today_revenue'), 'change': data.get('achievement_percent')}
 
+      @cache.cached(timeout=300, key_prefix='heavy_guest_month')
       def heavy_guest_month(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -178,7 +180,8 @@ class Dashboard:
                         value.append(int(d.get('total_guest')))
 
                   return {'month': month, 'value': value}
-            
+      
+      @cache.cached(timeout=300, key_prefix='most_booked_area')
       def most_booked_area(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -208,81 +211,60 @@ class Dashboard:
                         'hall': data.get('hall')
                         }
 
+      @cache.cached(timeout=300, key_prefix='top_most_booked_area')
       def top_most_booked_area(self):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' 
                               SELECT 
-                                    area_name,
-                                    total_bookings,
-                                    ROUND((CAST(total_bookings AS DECIMAL(10,2)) / CAST(yearly_total AS DECIMAL(10,2))) * 100, 2) AS percentage
+                              area_name,
+                              total_bookings,
+                              ROUND((CAST(total_bookings AS DECIMAL(10,2)) / CAST(yearly_total AS DECIMAL(10,2))) * 100, 2) AS percentage
                               FROM (
                               SELECT 'premium' AS area_name, SUM(premium) AS total_bookings
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'standard', SUM(standard)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'garden', SUM(garden)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'barkada', SUM(barkada)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'cabana', SUM(cabana)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'small', SUM(small)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'big', SUM(big)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'pavillion', SUM(pavillion)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'mariposa', SUM(mariposa)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
 
                               UNION ALL
                               SELECT 'minicon', SUM(minicon)
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
                               ) AS summary
                               CROSS JOIN (
                               SELECT 
                                     SUM(premium + standard + garden + barkada + cabana + small + big + pavillion + mariposa + minicon) AS yearly_total
                               FROM accomodation_data
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()), 1)
-                                    AND check_in <  MAKEDATE(YEAR(CURDATE()) + 1, 1)
                               ) AS total_table
                               ORDER BY total_bookings DESC
                               LIMIT 5;
@@ -295,6 +277,7 @@ class Dashboard:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
       # Bookings Overview
+      @cache.cached(timeout=300, key_prefix='bookings_overview_cards_data')
       def bookings_overview_cards_data(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -407,6 +390,7 @@ class Dashboard:
 
                   return {'data': data}
 
+      @cache.cached(timeout=300, key_prefix='upcoming_checkouts')
       def upcoming_checkouts(self, day):
             try:
                   with self.db.connect() as con:
@@ -421,6 +405,7 @@ class Dashboard:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='upcoming_arrivals')
       def upcoming_arrival(self, day):
             try:
                   with self.db.connect() as con:
@@ -435,6 +420,7 @@ class Dashboard:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
+      @cache.cached(timeout=300, key_prefix='upcoming_count')
       def upcoming_count(self):
             try:
                   with self.db.connect() as con:
@@ -465,6 +451,7 @@ class Dashboard:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       # Room Overview
+      @cache.cached(timeout=300, key_prefix='occupied_room')
       def occupied_room(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -480,6 +467,7 @@ class Dashboard:
 
             return {'occupied': int(data.get('total_occupied'))}
       
+      @cache.cached(timeout=300, key_prefix='monthly_bookings_data')
       def monthly_bookings_data(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -511,32 +499,34 @@ class Dashboard:
 
                   return {'data': data}
       
+      @cache.cached(timeout=300, key_prefix='booking_type_distro')
       def booking_type_distro(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute(''' 
-                        with 
-                        checkin as (
-                              SELECT COUNT(booking_id) as total from bookings 
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
-                              AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
-                              AND booking_type IN ('Check-in')
-                        ), day_guest as (
-                              SELECT COUNT(booking_id) as total from bookings 
-                              WHERE check_in >= MAKEDATE(YEAR(CURDATE()),1) 
-                              AND check_in <  MAKEDATE(YEAR(CURDATE())+1,1)
-                              AND booking_type IN ('Day Guest')
+                        WITH 
+                        checkin AS (
+                        SELECT COUNT(booking_id) AS total
+                        FROM bookings
+                        WHERE booking_type = 'Check-in'
+                        ), 
+                        day_guest AS (
+                        SELECT COUNT(booking_id) AS total
+                        FROM bookings
+                        WHERE booking_type = 'Day Guest'
                         )
                         SELECT 
-                              checkin.total as checkin_total,
-                              day_guest.total as day_guest_total
+                        checkin.total AS checkin_total,
+                        day_guest.total AS day_guest_total
                         FROM 
-                        checkin, day_guest
+                        checkin, day_guest;
+
                   ''')
             data = cursor.fetchone()
 
             return {'data': data}
 
+      @cache.cached(timeout=300, key_prefix='revenue_guest_trend_data')
       def revenue_guest_trend_data(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -564,3 +554,34 @@ class Dashboard:
 
                   return {'data' : data}
 
+      def dashboard_cache_rebuild(self):
+            # Bookings Overview
+            self.bookings_overview_cards_data()
+            self.upcoming_checkouts('today')
+            self.upcoming_checkouts('tomorrow')
+            self.upcoming_arrival('today')
+            self.upcoming_arrival('tomorrow')
+            self.upcoming_count()
+
+            # Room Overview
+            self.occupied_room()
+
+            # Dashboard Charts
+            self.monthly_bookings_data()
+            self.booking_type_distro()
+            self.revenue_guest_trend_data()
+      
+      def clear_dashboard_cache(self):
+            # Bookings Overview
+            cache.delete('bookings_overview_cards_data')
+            cache.delete('upcoming_checkouts')
+            cache.delete('upcoming_arrivals')
+            cache.delete('upcoming_count')
+
+            # Room Overview
+            cache.delete('occupied_room')
+
+            # Dashboard Charts
+            cache.delete('monthly_bookings_data')
+            cache.delete('booking_type_distro')
+            cache.delete('revenue_guest_trend_data')

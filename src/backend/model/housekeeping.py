@@ -1,10 +1,12 @@
 from collections import Counter
 from datetime import date
+from backend.extensions import cache
 
 class Housekeeping:
       def __init__(self, db):
             self.db = db
       
+      @cache.cached(timeout=300, key_prefix='total_area_data')
       def total_area_data(self):
             try:
                   with self.db.connect() as con:
@@ -28,6 +30,7 @@ class Housekeeping:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='total_data')
       def total_data(self):
             try:
                   with self.db.connect() as con:
@@ -107,7 +110,8 @@ class Housekeeping:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
+      
+      @cache.cached(timeout=300, key_prefix='staff_cleaners')
       def staff_cleaners(self):
             try:
                   with self.db.connect() as con:
@@ -126,7 +130,8 @@ class Housekeeping:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
+      
+      @cache.cached(timeout=300, key_prefix='room_assigned_history')
       def room_assigned_history(self, room):
             try:
                   with self.db.connect() as con:
@@ -141,6 +146,7 @@ class Housekeeping:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             from datetime import date
 
+      @cache.cached(timeout=300, key_prefix='cleaning_history')
       def cleaning_history(self, month, day):
             try:
                   with self.db.connect() as con:

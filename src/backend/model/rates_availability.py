@@ -1,10 +1,12 @@
 from collections import Counter
 from datetime import date
+from backend.extensions import cache
 
 class RatesAndAvailability:
       def __init__(self, db):
             self.db = db
       
+      @cache.cached(timeout=300, key_prefix='rates_availability')
       def availables(self):
             try:
                   with self.db.connect() as con:
@@ -215,7 +217,8 @@ class RatesAndAvailability:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
+
+      @cache.cached(timeout=300, key_prefix='update_price')
       def update_price(self, price, name):
             try:
                   with self.db.connect() as con:

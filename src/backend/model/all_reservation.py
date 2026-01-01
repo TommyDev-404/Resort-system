@@ -1,14 +1,18 @@
 from collections import Counter
 from .alert import Alerts
+from .dashboard import Dashboard
 from datetime import datetime, timezone, timedelta, date
 from calendar import monthrange
+from backend.extensions import cache
 
 
 class Reservation:
       def __init__(self, db):
             self.db = db
             self.alert = Alerts(db)
+            self.dashboard = Dashboard(db)
       
+      @cache.cached(timeout=300, key_prefix='available_spaces_{accomodation_type}')
       def get_avl_spaces(self, accomodation_type=None):
             try:
                   with self.db.connect() as con:
@@ -62,6 +66,7 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='available_rooms')
       def get_avl_room(self):
             try:
                   with self.db.connect() as con:
@@ -229,6 +234,8 @@ class Reservation:
                         con.commit()
                         # show notifications
                         self.alert.generate_alerts()
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
 
                         success = True
                         for result in range(len(result_list)):
@@ -240,6 +247,7 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Error: {str(e)}'}
 
+      @cache.cached(timeout=300, key_prefix='recent_bookings_{year}_{month}_{day}')
       def recent_bookings(self, year, month, day):
             try:
                   with self.db.connect() as con:
@@ -278,6 +286,7 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='booking_category_{year}_{month}_{day}_{category}')
       def booking_category(self, year, month, day, category):
             try:
                   with self.db.connect() as con:
@@ -349,6 +358,7 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='arrivals')
       def arrivals(self):
             try:
                   with self.db.connect() as con:
@@ -361,6 +371,7 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='year_data')
       def get_year_data(self):
             try:
                   with self.db.connect() as con:
@@ -377,6 +388,7 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='summary_cards_data')
       def summaryCardsData(self):
             try:
                   with self.db.connect() as con:
@@ -534,7 +546,7 @@ class Reservation:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
+      
       def view_details(self, id):
             try:
                   with self.db.connect() as con:
@@ -546,7 +558,7 @@ class Reservation:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
+      
       def get_reservation_date(self, id):
             try:
                   with self.db.connect() as con:
@@ -702,7 +714,8 @@ class Reservation:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
+
+      @cache.cached(timeout=300, key_prefix='totals_{month}_{year}_{day}')
       def totals(self, month, year, day):
             try:
                   with self.db.connect() as con:
@@ -860,6 +873,7 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Search failed: {e}'}
 
+      @cache.cached(timeout=300, key_prefix='accomodation_data_{query}')
       def accomodation_data(self, query):
             with self.db.connect() as con:
                   cursor = con.cursor()

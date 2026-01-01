@@ -60,7 +60,7 @@ async function drawCheckinForecastChart(type=null) {
                   labels: displayLabels,
                   datasets: [
                         {
-                              label: 'Historical Check-in (%)',
+                              label: 'Historical Check-in',
                               data: historicalValues,
                               borderColor: '#0bda0bff',
                               backgroundColor: '#18e411a8',
@@ -71,7 +71,7 @@ async function drawCheckinForecastChart(type=null) {
                               fill: true
                         },
                         {
-                              label: 'Forecasted Check-in (%)',
+                              label: 'Forecasted Check-in',
                               data: forecastValues,
                               borderColor: '#0a33ebff',
                               backgroundColor: '#0e24eb8e',
@@ -93,7 +93,7 @@ async function drawCheckinForecastChart(type=null) {
                               max: 50,
                               title: { 
                                     display: true, 
-                                    text: 'Occupancy %', 
+                                    text: 'Checkin % ', 
                                     color: isDarkMode ? '#E5E7EB' : '#111827' // light gray for dark mode, black for light
                               },
                               ticks: { 
@@ -131,7 +131,7 @@ async function drawCheckinForecastChart(type=null) {
                               bodyFont: { size: 25 },
                               callbacks: {
                                     label: function (context) {
-                                          return `${context.dataset.label}: ${context.parsed.y ?? '-'}%`;
+                                          return `${context.dataset.label}: ${context.parsed.y ?? '-'} Check-ins`;
                                     }
                               }
                         }
@@ -255,7 +255,7 @@ async function drawRevenueChart(type=null) {
       const url = type ? `/revenue-forecast-type?accomodation_type=${type}` : '/revenue-forecast-all';
       const response = await fetch(url);
       const result = await response.json();
-
+      console.log(result);
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       const latestRevenue = Array(12).fill(null);
       const forecastedRevenue = Array(12).fill(null);
