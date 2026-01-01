@@ -232,5 +232,5 @@ document.addEventListener('submit', (e) =>{
 
 // Load default category
 export async function initPageRatesAndAvailability(){
-      await renderTable();
+      renderTable();
 }
