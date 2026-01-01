@@ -206,12 +206,24 @@ async function updatePrice(e){
             successMessageCard8(result.message);
             e.target.reset();
             document.getElementById('update-area-modal').remove();
-            renderTable();
+            refreshRatesTable();
       }else {
             failedMessageCard8(result.message);
       }
       hideLoader();
 }
+let isRendering = false;
+
+async function refreshRatesTable() {
+      if (isRendering) return;   // prevents overlap
+      isRendering = true;
+
+      showLoader('table');
+      await renderTable();
+      
+      isRendering = false;
+}
+
 
 // --------------  EVENT LISTENERS --------------- //
 document.addEventListener('click', (e) => {
@@ -232,5 +244,5 @@ document.addEventListener('submit', (e) =>{
 
 // Load default category
 export async function initPageRatesAndAvailability(){
-      renderTable();
+      refreshRatesTable();
 }
