@@ -86,7 +86,7 @@ function loadingAnimation0(){
             </div>
       `;      
 
-      document.getElementById('loadingAccountingPortal').innerHTML += load;
+      document.getElementById('ratesAvailabilityPortal').innerHTML += load;
 }
 
 function loadingAnimationAdd(message){
@@ -102,7 +102,7 @@ function loadingAnimationAdd(message){
 
 function showLoader(type, message=null) {
       if (type === 'table'){
-            loadingAnimation0(); // adds #loading inside #loadingPortal
+            loadingAnimation0(); // adds #loading inside loadingPortal
       }else{
             loadingAnimationAdd(message)
       }
