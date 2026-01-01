@@ -2,7 +2,7 @@ from backend.forecast import Forecast
 from backend.extensions import cache
 
 class Dashboard:
-      def __init__(self, db, target):
+      def __init__(self, db, target=None):
             self.db = db
             self.revenue_forecast = Forecast()
             self.analytics = target
