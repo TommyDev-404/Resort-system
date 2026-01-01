@@ -1112,7 +1112,7 @@ async function recentBookings(){
 
       const response = await fetch(`/recent-bookings?year=${year ? year : new Date().getFullYear()}&month=${month}&day=${day}`);
       const result = await response.json();
-      
+      console.log(result);
       if (result.success){
             result.data.forEach(row => {
                   createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);

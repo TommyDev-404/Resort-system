@@ -336,7 +336,7 @@ async function accomodationData(){
 
             document.getElementById('room-status-tbody').innerHTML += empty_row;
       }
-      //hideLoader();
+      hideLoader();
 }
 
 async function historyData(){

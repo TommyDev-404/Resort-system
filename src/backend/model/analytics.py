@@ -7,8 +7,12 @@ class Analytics:
             self.db = db
             self.revenue_forecast = Forecast()
       
-      @cache.cached(timeout=300, key_prefix='occupancy_data')
       def get_occupancy(self, accomodation_type=None):
+            cache_key = f"occupancy_data_{accomodation_type}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+            
             with self.db.connect() as con:
                   cursor = con.cursor()
                   if accomodation_type:
@@ -105,11 +109,21 @@ class Analytics:
                         ''')
 
                   data = cursor.fetchone()
-                  
-                  return {'current': data.get('current_mtd_occupancy') , 'prev': data.get('previous_mtd_occupancy'), 'change': data.get('change_rate') if data.get('current_mtd_occupancy') > 0 else '0'}
 
-      @cache.cached(timeout=300, key_prefix='daily_revenue')
+                  result = {'current': data.get('current_mtd_occupancy') , 'prev': data.get('previous_mtd_occupancy'), 'change': data.get('change_rate') if data.get('current_mtd_occupancy') > 0 else '0'}
+                  cache.set(cache_key, result, timeout=300)
+
+                  key_index = cache.get("occupancy_keys") or set()
+                  key_index.add(cache_key)
+                  cache.set("occupancy_keys", key_index, timeout=None)  # never expire
+                  return result
+
       def daily_revenue(self, accomodation_type=None):
+            cache_key = f"daily_revenue_{accomodation_type}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+            
             with self.db.connect() as con:
                   cursor = con.cursor()
 
@@ -217,10 +231,20 @@ class Analytics:
                         cursor.execute(query)
                   data = cursor.fetchone()
 
-                  return {'current': data.get('revenue_today'), 'change': data.get('change_rate_percent')}
+                  result = {'current': data.get('revenue_today'), 'change': data.get('change_rate_percent')}
+                  cache.set(cache_key, result, timeout=300)
 
-      @cache.cached(timeout=300, key_prefix='monthly_revenue')
+                  key_index = cache.get("revenue_keys") or set()
+                  key_index.add(cache_key)
+                  cache.set("revenue_keys", key_index, timeout=None)  # never expire
+
+                  return result
+
       def monthly_revenue(self, accomodation_type=None):
+            cache_key = f"monthly_revenue_{accomodation_type}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
             with self.db.connect() as con:
                   cursor = con.cursor()
 
@@ -263,10 +287,21 @@ class Analytics:
 
                   change_rate = round((revenue_value / target_value) * 100, 2)
 
-                  return {'monthly': data.get('revenue'), 'change': change_rate}
+                  result =  {'monthly': data.get('revenue'), 'change': change_rate}
+                  cache.set(cache_key, result, timeout=300)
 
-      @cache.cached(timeout=300, key_prefix='forecast_checkin')
+                  key_index = cache.get("monthly_revenue_keys") or set()
+                  key_index.add(cache_key)
+                  cache.set("monthly_revenue_keys", key_index, timeout=None)  # never expire
+
+                  return result
+
       def forecast_checkin(self, type=None):
+            cache_key = f"forecast_checkin_{type}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+            
             with self.db.connect() as con:
                   cursor = con.cursor()
 
@@ -306,10 +341,20 @@ class Analytics:
                   dates = [row.get('ds') for row in data]
                   values = [row.get('y') for row in data]
 
-                  return self.revenue_forecast.forecast_checkin(dates, values)
+                  result = self.revenue_forecast.forecast_checkin(dates, values)
+                  cache.set(cache_key, result, timeout=300)
 
-      @cache.cached(timeout=300, key_prefix='forecasted_revenue')
+                  key_index = cache.get("forecast_checkin_keys") or set()
+                  key_index.add(cache_key)
+                  cache.set("forecast_checkin_keys", key_index, timeout=None)  # never expire
+
+                  return result
+
       def forecasted_revenue(self, accomodation_type=None):
+            cache_key = f"forecasted_revenue_{accomodation_type}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
             with self.db.connect() as con:
                   cursor = con.cursor()
 
@@ -355,9 +400,16 @@ class Analytics:
       
             dates = [row.get('ds') for row in data]
             values = [row.get('y') for row in data]
-            
-            return self.revenue_forecast.forecast_revenue(dates, values)
 
+            result = self.revenue_forecast.forecast_revenue(dates, values)
+            cache.set(cache_key, result, timeout=300)
+
+            key_index = cache.get("forecast_revenue_keys") or set()
+            key_index.add(cache_key)
+            cache.set("forecast_revenue_keys", key_index, timeout=None)  # never expire
+
+            return result
+      
       @cache.cached(timeout=300, key_prefix='forecast_occupancy')
       def forecast_occupancy(self):
             with self.db.connect() as con:
@@ -380,8 +432,12 @@ class Analytics:
 
             return self.revenue_forecast.forecast_occupancy(dates, values)
       
-      @cache.cached(timeout=300, key_prefix='target_revenue')
       def  get_target_revenue(self, accomodation_type=None):
+            cache_key = f"get_target_revenue_{accomodation_type}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+            
             with self.db.connect() as con:
                   cursor = con.cursor()
                   
@@ -421,10 +477,16 @@ class Analytics:
                         ''')     
 
                         data = cursor.fetchone()
-                        
-                        return {'target': data.get('target_revenue')}
+                                    
+                        result = {'target': data.get('target_revenue')}
+                        cache.set(cache_key, result, timeout=300)
 
-      @cache.cached(timeout=300, key_prefix='accomodation_data_{query}')
+                        key_index = cache.get("target_revenue_keys") or set()
+                        key_index.add(cache_key)
+                        cache.set("target_revenue_keys", key_index, timeout=None)  # never expire
+
+                        return result
+
       def accomodation_data(self, query):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -445,7 +507,6 @@ class Analytics:
                   
                   return data.get('rate')
 
-      @cache.cached(timeout=300, key_prefix='accomodation_count_{area_name}')
       def accomodation_count (self, area_name):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -458,3 +519,41 @@ class Analytics:
                   data = cursor.fetchone()
 
                   return data.get('count')
+      
+      def rebuild_analytics_cache(self):
+            self.get_occupancy()
+            self.daily_revenue()
+            self.monthly_revenue()
+            self.forecast_checkin()
+            self.forecasted_revenue()
+            self.forecast_occupancy()
+            self.get_target_revenue()
+      
+      def clear_analytics_cache(self):
+            cache.delete('forecast_occupancy')
+            key_index = cache.get("occupancy_keys") or set()
+            for key in key_index:
+                  cache.delete(key)
+
+            key_index = cache.get("revenue_keys") or set()
+            for key in key_index:
+                  cache.delete(key)
+
+            key_index = cache.get("monthly_revenue_keys") or set()
+            for key in key_index:
+                  cache.delete(key)
+
+            key_index = cache.get("forecast_revenue_keys") or set()
+            for key in key_index:
+                  cache.delete(key)
+
+            key_index = cache.get("forecast_checkin_keys") or set()
+            for key in key_index:
+                  cache.delete(key)
+
+            key_index = cache.get("target_revenue_keys") or set()
+            for key in key_index:
+                  cache.delete(key)
+            
+            
+            

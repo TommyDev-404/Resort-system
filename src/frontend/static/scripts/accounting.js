@@ -85,7 +85,7 @@ async function loadBookingRevenue(year) {
       }else {
             alert('Failed to fetch data.');
       }
-      //hideLoader();
+      hideLoader();
 }
 
 document.addEventListener('change', (e) => {

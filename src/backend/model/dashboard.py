@@ -390,8 +390,12 @@ class Dashboard:
 
                   return {'data': data}
 
-      @cache.cached(timeout=300, key_prefix='upcoming_checkouts')
       def upcoming_checkouts(self, day):
+            cache_key = f"upcoming_checkouts_{day}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -399,14 +403,18 @@ class Dashboard:
                               SELECT check_in, check_out, name, booking_type, total_guest FROM bookings WHERE check_out = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status NOT IN ('Cancelled', 'Reserved', 'Checked-out');
                         ''')
                         data = cursor.fetchall()
-
+                        cache.set(cache_key, {'success': bool(data), 'data':data}, timeout=300)
                         return {'success': bool(data), 'data':data}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-
-      @cache.cached(timeout=300, key_prefix='upcoming_arrivals')
+            
       def upcoming_arrival(self, day):
+            cache_key = f"upcoming_arrivals_{day}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -414,7 +422,7 @@ class Dashboard:
                               SELECT check_out, check_in, name, booking_type, total_guest FROM bookings WHERE check_in = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status IN ('Reserved') 
                         ''')
                         data = cursor.fetchall()
-
+                        cache.set(cache_key, {'success': bool(data), 'data':data}, timeout=300)
                         return {'success': bool(data), 'data':data}
             except Exception as e:
                   con.rollback()
@@ -556,11 +564,18 @@ class Dashboard:
 
       def dashboard_cache_rebuild(self):
             # Bookings Overview
+            self.get_total_guest_house()
+            self.today_bookings()
+            self.occupancy()
+            self.revenue_today()
+            self.heavy_guest_month()
+            self.most_booked_area()
+            self.top_most_booked_area()
             self.bookings_overview_cards_data()
             self.upcoming_checkouts('today')
             self.upcoming_checkouts('tomorrow')
-            self.upcoming_arrival('today')
-            self.upcoming_arrival('tomorrow')
+            self.upcoming_checkouts('today')
+            self.upcoming_checkouts('tomorrow')
             self.upcoming_count()
 
             # Room Overview
@@ -573,9 +588,18 @@ class Dashboard:
       
       def clear_dashboard_cache(self):
             # Bookings Overview
+            cache.delete('total_guest_house')
+            cache.delete('today_bookings')
+            cache.delete('occupancy')
+            cache.delete('revenue_today')
+            cache.delete('heavy_guest_month')
+            cache.delete('most_booked_area')
+            cache.delete('top_most_booked_area')
             cache.delete('bookings_overview_cards_data')
-            cache.delete('upcoming_checkouts')
-            cache.delete('upcoming_arrivals')
+            cache.delete('upcoming_checkouts_today')
+            cache.delete('upcoming_checkouts_tomorrow')
+            cache.delete('upcoming_arrivals_today')
+            cache.delete('upcoming_arrivals_tomorrow')
             cache.delete('upcoming_count')
 
             # Room Overview

@@ -935,8 +935,8 @@ export async function initPageDashboard() {
       totalGuestInHouse();
       totalOccupied();
       roomsData();
-      upcomingArrivals();
-      upcomingCheckouts();
+      upcomingArrivals('today');
+      upcomingCheckouts('today');
       todaysBookings();
       todayProjectedRevenue();
       bookingOverviewCardsData();

@@ -1,8 +1,8 @@
 from collections import Counter
 from .alert import Alerts
 from .dashboard import Dashboard
+from .analytics import Analytics
 from datetime import datetime, timezone, timedelta, date
-from calendar import monthrange
 from backend.extensions import cache
 
 
@@ -11,9 +11,10 @@ class Reservation:
             self.db = db
             self.alert = Alerts(db)
             self.dashboard = Dashboard(db)
+            self.analytics = Analytics(db)
       
-      @cache.cached(timeout=300, key_prefix='available_spaces_{accomodation_type}')
-      def get_avl_spaces(self, accomodation_type=None):
+      @cache.cached(timeout=300, key_prefix='available_spaces')
+      def get_avl_spaces(self):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -236,6 +237,8 @@ class Reservation:
                         self.alert.generate_alerts()
                         self.dashboard.clear_dashboard_cache()
                         self.dashboard.dashboard_cache_rebuild()
+                        self.clear_reservation_cache_key()
+                        self.rebuild_reservation_cache_key()
 
                         success = True
                         for result in range(len(result_list)):
@@ -247,8 +250,13 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Error: {str(e)}'}
 
-      @cache.cached(timeout=300, key_prefix='recent_bookings_{year}_{month}_{day}')
       def recent_bookings(self, year, month, day):
+            cache_key = f"recent_bookings_{year}_{month}_{day}"
+            cached = cache.get(cache_key)
+            if cached:
+                  print('from cache')
+                  return cached
+
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -280,14 +288,25 @@ class Reservation:
                               formatted_date  = d.get('date_book').strftime("%b %d").lstrip("0") if d.get('date_book') else '--'
 
                               new_data.append({'id': d.get('booking_id'), 'name': d.get('name'),  'date_book': formatted_date , 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
-                              
-                        return {'success': bool(data), 'data': new_data}
+                        
+                        result = {'success': bool(data), 'data': new_data}
+                        cache.set(cache_key, result, timeout=300)
+
+                        key_index = cache.get("recent_bookings_keys") or set()
+                        key_index.add(cache_key)
+                        cache.set("recent_bookings_keys", key_index, timeout=None)  # never expire
+
+                        return result
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='booking_category_{year}_{month}_{day}_{category}')
       def booking_category(self, year, month, day, category):
+            cache_key = f"booking_category_{year}_{month}_{day}_{category}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -352,7 +371,14 @@ class Reservation:
                                     'payment': d.get('payment')
                               })
 
-                        return {'success': bool(data), 'data': new_data}
+                        result = {'success': bool(data), 'data': new_data}
+                        cache.set(cache_key, result, timeout=300)
+                        
+                        key_index = cache.get("booking_category_keys") or set()
+                        key_index.add(cache_key)
+                        cache.set("booking_category_keys", key_index, timeout=None)  # never expire
+
+                        return result
 
             except Exception as e:
                   con.rollback()
@@ -377,8 +403,15 @@ class Reservation:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute('''
+                              SELECT year
+                              FROM (
                               SELECT DISTINCT YEAR(check_in) AS year
                               FROM accomodation_data
+
+                              UNION
+
+                              SELECT YEAR(CURDATE()) AS year
+                              ) AS years
                               ORDER BY year DESC;
                         ''')
                         data = cursor.fetchall()
@@ -451,6 +484,12 @@ class Reservation:
                         con.commit()
                         
                         self.alert.generate_alerts()
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
+                        self.clear_reservation_cache_key()
+                        self.rebuild_reservation_cache_key()
+                        self.analytics.clear_analytics_cache()
+                        self.analytics.rebuild_analytics_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -465,7 +504,7 @@ class Reservation:
                         
                         parts = accomodation.split(',')
                         room_dict = {}
-                        print(parts)
+
                         for part in parts:
                               tokens = part.split(' ')  # split by space
                               room_type = tokens[0].lower()  # "Premium", "Garden", ...
@@ -492,6 +531,12 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
+                        self.clear_reservation_cache_key()
+                        self.rebuild_reservation_cache_key()
+                        self.analytics.clear_analytics_cache()
+                        self.analytics.rebuild_analytics_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -499,15 +544,20 @@ class Reservation:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def mark_paid(self, payment, id):
-            print(payment, id)
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         
                         query = f"UPDATE bookings SET payment = '{payment}', paid_date = '{date.today()}', total_amount = {'total_amount - (total_amount * 0.05)' if payment == 'ZUZU (Online Payment)' else 'total_amount'} where booking_id = {id} and paid_date IS NULL"
                         cursor.execute(query)
-                        print(query)
                         con.commit()
+
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
+                        self.clear_reservation_cache_key()
+                        self.rebuild_reservation_cache_key()
+                        self.analytics.clear_analytics_cache()
+                        self.analytics.rebuild_analytics_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -541,6 +591,13 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
+                        self.clear_reservation_cache_key()
+                        self.rebuild_reservation_cache_key()
+                        self.analytics.clear_analytics_cache()
+                        self.analytics.rebuild_analytics_cache()
+
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Cancelled successfully!' if cursor.rowcount > 0 else 'Failed!'}
 
             except Exception as e:
@@ -548,25 +605,47 @@ class Reservation:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
       def view_details(self, id):
+            cache_key = f"view_details_{id}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' SELECT * FROM bookings where booking_id = %s ''', (id,))
                         data = cursor.fetchone()
 
-                        return {'success': bool(cursor.rowcount != 0), 'data': data}
+                        result = {'success': bool(data), 'data': data}
+                        cache.set(cache_key, result, timeout=300)
+                        
+                        key_index = cache.get("view_details_keys") or set()
+                        key_index.add(cache_key)
+                        cache.set("view_details_keys", key_index, timeout=None)  # never expire
+                        return {'success': bool(data), 'data': data}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
       def get_reservation_date(self, id):
+            cache_key = f"reservation_date_{id}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' SELECT check_in, check_out, booking_type FROM bookings where booking_id = %s ''', (id,))
                         data = cursor.fetchone()
+                        
+                        result = {'check_in': data.get('check_in'), 'check_out': data.get('check_out'), 'booking_type': data.get('booking_type')}
+                        cache.set(cache_key, result, timeout=300)
 
-                        return {'check_in': data.get('check_in'), 'check_out': data.get('check_out'), 'booking_type': data.get('booking_type')}
+                        key_index = cache.get("reservation_date_keys") or set()
+                        key_index.add(cache_key)
+                        cache.set("reservation_date_keys", key_index, timeout=None)  # never expire
+
+                        return result
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
@@ -697,6 +776,12 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
+                        self.clear_reservation_cache_key()
+                        self.rebuild_reservation_cache_key()
+                        self.analytics.clear_analytics_cache()
+                        self.analytics.rebuild_analytics_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': "Updated successfully!" if cursor.rowcount > 0 else 'Failed to update.'}
             except Exception as e:
@@ -715,8 +800,12 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='totals_{month}_{year}_{day}')
       def totals(self, month, year, day):
+            cache_key = f"totals_{month}_{year}_{day}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -793,17 +882,25 @@ class Reservation:
                         """, (start_month, start_month, start_month, start_month, start_month, start_month, start_month, start_month))  # repeat start/end 9 times for placeholders
 
                         data = cursor.fetchone()
-                        return {
-                        'success': bool(data),
-                        'checkin': data.get('total_checkin'),
-                        'cancelled': data.get('total_cancel'),
-                        'overnight': data.get('total_overnight'),
-                        'reserved': data.get('total_reserved'),
-                        'checkout': data.get('total_checkout'),
-                        'not_paid': data.get('total_npaid'),
-                        'day_guest': data.get('total_dayguest'),
-                        'all': data.get('total_all')
+
+                        result = {
+                              'success': bool(data),
+                              'checkin': data.get('total_checkin'),
+                              'cancelled': data.get('total_cancel'),
+                              'overnight': data.get('total_overnight'),
+                              'reserved': data.get('total_reserved'),
+                              'checkout': data.get('total_checkout'),
+                              'not_paid': data.get('total_npaid'),
+                              'day_guest': data.get('total_dayguest'),
+                              'all': data.get('total_all')
                         }
+                        cache.set(cache_key, result, timeout=300)
+
+                        key_index = cache.get("totals_keys") or set()
+                        key_index.add(cache_key)
+                        cache.set("totals_keys", key_index, timeout=None)  # never expire
+
+                        return result
 
             except Exception as e:
                   con.rollback()
@@ -873,7 +970,6 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Search failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='accomodation_data_{query}')
       def accomodation_data(self, query):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -882,4 +978,42 @@ class Reservation:
 
                   return data.get('rate')
 
-      
+      def rebuild_reservation_cache_key(self):
+            self.recent_bookings(datetime.now().year, datetime.now().month, datetime.now().day)
+            self.booking_category(datetime.now().year, datetime.now().month, datetime.now().day, 'all-data')
+            self.arrivals()
+            self.get_year_data()
+            self.summaryCardsData()
+            self.totals(datetime.now().month, datetime.now().year, datetime.now().day)
+            
+      def clear_reservation_cache_key(self):
+            cache.delete('available_spaces')
+            cache.delete('available_rooms')
+            cache.delete('arrivals')
+            cache.delete('year_data')
+            cache.delete('summary_cards_data')
+            
+            key_index = cache.get("recent_bookings_keys") or set()
+            for k in key_index:
+                  cache.delete(k)
+                  cache.delete("recent_bookings_keys")
+            
+            key_index2 = cache.get("booking_category_keys") or set()
+            for k in key_index2:
+                  cache.delete(k)
+                  cache.delete("booking_category_keys")
+
+            key_index3 = cache.get("view_details_keys") or set()
+            for k in key_index3:
+                  cache.delete(k)
+                  cache.delete("view_details_keys")
+
+            key_index4 = cache.get("reservation_date_keys") or set()
+            for k in key_index4:          
+                  cache.delete(k)
+                  cache.delete("reservation_date_keys")
+
+            key_index5 = cache.get("totals_keys") or set()
+            for k in key_index5:      
+                  cache.delete(k)
+                  cache.delete("totals_keys")
