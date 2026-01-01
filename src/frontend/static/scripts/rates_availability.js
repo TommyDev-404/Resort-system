@@ -80,13 +80,13 @@ function openUpdateAreaModal(e) {
 
 function loadingAnimation0(){
       const load = `
-            <div id="loading" class="absolute top-60 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
+            <div id="loading" class="absolute top-67 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-30 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
             </div>
       `;      
 
-      document.getElementById('ratesAvailabilityPortal').innerHTML += load;
+      document.getElementById('loadingRatesPortal').innerHTML += load;
 }
 
 function loadingAnimationAdd(message){
@@ -114,6 +114,7 @@ function hideLoader() {
 }
 
 async function renderTable() {
+      console.log("Rendering Rates and Availability Table...");
       showLoader('table');
       // Fetch data from backend
       let rows = [];
@@ -121,12 +122,14 @@ async function renderTable() {
             const response = await fetch('/availables');
             const res = await response.json();
             
+            hideLoader();
             res.data.forEach(data => {
                   rows.push(data);
             });
       } catch (err) {
             console.error("Failed to fetch data:", err);
       }
+      
       
       // Render body
       const bodyHtml = rows.map(row => {
@@ -160,7 +163,6 @@ async function renderTable() {
 
       document.getElementById('table2-body').innerHTML = bodyHtml;
       lucide.createIcons();
-      hideLoader();
 }
 
 function areaTypeInfo(area){
@@ -206,24 +208,12 @@ async function updatePrice(e){
             successMessageCard8(result.message);
             e.target.reset();
             document.getElementById('update-area-modal').remove();
-            refreshRatesTable();
+            renderTable();
       }else {
             failedMessageCard8(result.message);
       }
       hideLoader();
 }
-let isRendering = false;
-
-async function refreshRatesTable() {
-      if (isRendering) return;   // prevents overlap
-      isRendering = true;
-
-      showLoader('table');
-      await renderTable();
-      
-      isRendering = false;
-}
-
 
 // --------------  EVENT LISTENERS --------------- //
 document.addEventListener('click', (e) => {
@@ -244,5 +234,5 @@ document.addEventListener('submit', (e) =>{
 
 // Load default category
 export async function initPageRatesAndAvailability(){
-      refreshRatesTable();
+      renderTable();
 }

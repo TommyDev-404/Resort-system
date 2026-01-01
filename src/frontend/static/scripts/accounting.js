@@ -30,9 +30,9 @@ function formatPesoShort1(num) {
 
 function loadingAnimation0(){
       const load = `
-            <div id="loading" class="absolute top-50 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
+            <div id="loading" class="absolute top-45 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse">Loading data...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
             </div>
       `;      
 
@@ -85,7 +85,7 @@ async function loadBookingRevenue(year) {
       }else {
             alert('Failed to fetch data.');
       }
-      hideLoader();
+      //hideLoader();
 }
 
 document.addEventListener('change', (e) => {
