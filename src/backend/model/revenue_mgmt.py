@@ -113,11 +113,6 @@ class RevenueMgmt:
                   }
 
       def get_promo_data(self, id=None):
-            cache_key = f"promo_data_{id}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -130,11 +125,6 @@ class RevenueMgmt:
                               promos = cursor.fetchall()
 
                         result = {'success': bool(promos), 'data': promos}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("promo_data_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("promo_data_keys", key_index, timeout=None)  # never expire
 
                         return result
             except Exception as e:
