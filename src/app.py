@@ -3,7 +3,6 @@ from datetime import date, timedelta
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
 from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
 
-
 app = Flask(__name__, template_folder='frontend/template', static_folder='frontend/static')
 app.secret_key = 'i_love_u'  # secret key
 
@@ -57,25 +56,6 @@ def system_page():
       alert.occupancy_alert()
       alert.generate_alerts()
       alert.cron_jobs()
-
-      alert.clear_alert_cache()
-      alert.rebuild_alert_cache()
-      dashboard.clear_dashboard_cache()
-      dashboard.dashboard_cache_rebuild()
-      analytics.clear_analytics_cache()
-      analytics.rebuild_analytics_cache()
-      reserve.clear_reservation_cache_key()
-      reserve.rebuild_reservation_cache_key()
-      house.clear_housekeeping_cache()
-      house.rebuild_housekeeping_cache()
-      avl.clear_rates_cache()
-      avl.rebuild_rates_cache()
-      staff.clear_staff_cache()
-      staff.rebuild_staff_cache
-      acc.clear_accounting_cache()
-      acc.rebuild_accounting_cache()
-      rev.clear_revenue_cache()
-      rev.rebuild_revenue_cache()
 
       return render_template('admin.html')
 
