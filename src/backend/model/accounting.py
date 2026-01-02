@@ -8,11 +8,6 @@ class Accounting:
             self.revenue_forecast = Forecast()
 
       def get_payment_data(self, year):
-            cache_key = f"payment_data_{year}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -51,12 +46,6 @@ class Accounting:
                         data = cursor.fetchall()
 
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("payment_data_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("payment_data_keys", key_index, timeout=None)  # never expire
-
                         return result
             except Exception as e:
                   con.rollback()
