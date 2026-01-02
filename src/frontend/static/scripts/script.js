@@ -32,11 +32,31 @@ function loadingAnimation0(){
       document.getElementById('loadingPortal').innerHTML += load;
 }
 
+function loadingAnimationLogout(){
+      const load = `
+            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center justify-center h-screen inset-0 bg-black/20 text-white space-y-2 backdrop-blur-[2px] z-50">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Logging out...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingDataPortal').innerHTML += load;
+}
+
 function showLoader(sectionId) {
       // Hide all sections
       contentSections.forEach(section => section.classList.add('hidden'));
 
-      loadingAnimation0(); // adds #loading inside #loadingPortal
+            loadingAnimation0(); // adds #loading inside #loadingPortal
+}
+
+function showLoaderLogout() {
+      loadingAnimationLogout(); // adds #loading inside #loadingDataPortal
+}
+
+function hideLoaderLogout() {
+      const loader = document.querySelector('#loading');
+      if (loader) loader.remove();
 }
 
 function hideLoader(sectionId) {
@@ -81,7 +101,6 @@ async function switchContent(sectionId) {
 
 function logout(){
       logoutCard();
-                  
       // cancel
       document.querySelector('#cancelLogout').addEventListener('click', (e) => {
             document.querySelector('#logoutModal').remove();
@@ -89,14 +108,16 @@ function logout(){
 
       // logout
       document.querySelector('#confirmLogout').addEventListener('click', async (e) => {
+            showLoaderLogout();
             try {
                   const response = await fetch('/logout', { method: 'POST' });
                   if (response.ok) {
-                        successMessageCard6('You have been logged out.', '/login');
+                        successMessageCard6('Log out successfully', '/login');
                   }
             } catch (err) {
                   failedMessageCard6(`Logout failed: ${err}`);
             }
+            hideLoaderLogout();
       });
 }
 

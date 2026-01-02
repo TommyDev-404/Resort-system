@@ -29,20 +29,6 @@ backToLogin.addEventListener('click', () => {
       }, 300);
 });
 
-// remove password icon & show eye icon
-input.addEventListener('input', (e) => {
-      const img = document.querySelector('.passField img');
-      
-      if (e.target.value != ''){
-            img.src = 'static/assets/eye.webp';
-            img.setAttribute('id', 'show');
-      }else {
-            e.target.setAttribute('type', 'password');
-            img.src = 'static/assets/forgot.webp';
-            img.setAttribute('id', 'ps-icon');
-      }
-});
-
 // toggle view password with dynamic icon
 document.addEventListener('click', (e) => {
       if (e.target.matches('#show')){
