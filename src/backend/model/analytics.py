@@ -218,9 +218,6 @@ class Analytics:
                   data = cursor.fetchone()
 
                   result = {'current': data.get('revenue_today'), 'change': data.get('change_rate_percent')}
-
-                  cache.set("revenue_keys", key_index, timeout=None)  # never expire
-
                   return result
 
       def monthly_revenue(self, accomodation_type=None):
@@ -270,7 +267,6 @@ class Analytics:
                   return result
 
       def forecast_checkin(self, type=None):
-
             with self.db.connect() as con:
                   cursor = con.cursor()
 
@@ -311,8 +307,6 @@ class Analytics:
                   values = [row.get('y') for row in data]
 
                   result = self.revenue_forecast.forecast_checkin(dates, values)
-                  cache.set("forecast_checkin_keys", key_index, timeout=None)  # never expire
-
                   return result
 
       def forecasted_revenue(self, accomodation_type=None):
