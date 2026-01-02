@@ -100,19 +100,6 @@ class RevenueMgmt:
                                                 str(ba['check_out'])
                                           )
 
-                        self.rebuild_revenue_cache()
-                        self.clear_revenue_cache()
-                        self.reservation_model.clear_reservation_cache_key()
-                        self.reservation_model.rebuild_reservation_cache_key()
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
-                        self.accounting.clear_accounting_cache()
-                        self.accounting.rebuild_accounting_cache()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-
                         return {
                               'success': True,
                               'message': 'Promotion applied successfully'
@@ -253,19 +240,6 @@ class RevenueMgmt:
                                           str(ba['check_out'])
                                     )
 
-                        self.rebuild_revenue_cache()
-                        self.clear_revenue_cache()
-                        self.reservation_model.clear_reservation_cache_key()
-                        self.reservation_model.rebuild_reservation_cache_key()
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
-                        self.accounting.clear_accounting_cache()
-                        self.accounting.rebuild_accounting_cache()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-
                         return {
                               'success': promo_updated,
                               'message': "Promotions updated successfully" if promo_updated else "No changes were made to the promotion."
@@ -321,19 +295,6 @@ class RevenueMgmt:
                         cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
                         con.commit()
 
-                        self.rebuild_revenue_cache()
-                        self.clear_revenue_cache()
-                        self.reservation_model.clear_reservation_cache_key()
-                        self.reservation_model.rebuild_reservation_cache_key()
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
-                        self.accounting.clear_accounting_cache()
-                        self.accounting.rebuild_accounting_cache()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-
                         return {'success': bool(cursor.rowcount != 0), 'message': "Promotions remove successfully" if bool(cursor.rowcount != 0) else "Failed to remove promotions."}
             except Exception as e:
                   con.rollback()
@@ -352,11 +313,3 @@ class RevenueMgmt:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
-      def rebuild_revenue_cache(self):
-            self.get_promo_data()
-
-      def clear_revenue_cache(self):
-            key_index = cache.get("promo_data_keys") or set()
-            for k in key_index:
-                  cache.delete(k)
-            

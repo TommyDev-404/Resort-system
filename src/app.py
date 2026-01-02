@@ -1,6 +1,5 @@
 import pymysql
 from datetime import date, timedelta
-from backend.extensions import cache
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
 from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
 
@@ -10,11 +9,6 @@ app.secret_key = 'i_love_u'  # secret key
 
 # Set session lifetime
 app.permanent_session_lifetime = timedelta(minutes=30)  # 30 minutes
-
-# Configure cache
-app.config['CACHE_TYPE'] = 'SimpleCache'
-app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # 5 minutes
-cache.init_app(app)
 
 # prevent going back to homepage after logout or going direct on home page without authentication
 @app.after_request

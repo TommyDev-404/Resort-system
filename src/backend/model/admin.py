@@ -14,7 +14,6 @@ class Admin:
             self.code = None
 
       def changePass(self, email, current_password, new_password, confirm_password):
-            print(email, current_password, new_password, confirm_password)
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()

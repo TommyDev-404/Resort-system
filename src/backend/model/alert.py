@@ -7,7 +7,6 @@ class Alerts:
             self.db = db
             self.revenue_forecast = Forecast()
             
-      @cache.cached(timeout=300, key_prefix='occupancy_alert')
       def occupancy_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -70,7 +69,6 @@ class Alerts:
                   else:
                         return {'message': None}
 
-      @cache.cached(timeout=300, key_prefix='housekeeping_alert')
       def housekeeping_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -81,7 +79,6 @@ class Alerts:
 
             return {'success': bool(data), 'data': data} 
 
-      @cache.cached(timeout=300, key_prefix='generate_alerts')
       def generate_alerts(self):
             alerts = [
                   {
@@ -170,7 +167,6 @@ class Alerts:
 
                   self.auto_cancell_7d()
 
-      @cache.cached(timeout=300, key_prefix='bookings_alert')
       def bookings_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -181,7 +177,6 @@ class Alerts:
 
             return {'success': bool(data), 'data': data} 
 
-      @cache.cached(timeout=300, key_prefix='notification_count')
       def notification_count(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -361,14 +356,6 @@ class Alerts:
 
                   con.commit()
 
-      def rebuild_alert_cache(self):
-            self.occupancy_alert()
-            self.housekeeping_alert()
-            self.bookings_alert()
-            self.notification_count()
-            self.generate_alerts()
-      
-      def clear_alert_cache(self):
             cache.delete('occupancy_alert')
             cache.delete('housekeeping_alert')
             cache.delete('bookings_alert')

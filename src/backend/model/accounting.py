@@ -7,7 +7,6 @@ class Accounting:
             self.db = db
             self.revenue_forecast = Forecast()
 
-      @cache.cached(timeout=300, key_prefix='payment_data_{year}')
       def get_payment_data(self, year):
             cache_key = f"payment_data_{year}"
             cached = cache.get(cache_key)
@@ -63,7 +62,6 @@ class Accounting:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
-      @cache.cached(timeout=300, key_prefix='current_payment_data')
       def get_current_payment_data(self):
             try:
                   with self.db.connect() as con:
@@ -83,11 +81,6 @@ class Accounting:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
-      def rebuild_accounting_cache(self):
-            self.get_payment_data(datetime.now().year)
-            self.get_current_payment_data()
-
-      def clear_accounting_cache(self):
             cache.delete('current_payment_data')
             
             key_index = cache.get('current_payment_data') or set()

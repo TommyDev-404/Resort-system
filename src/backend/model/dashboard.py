@@ -7,7 +7,6 @@ class Dashboard:
             self.revenue_forecast = Forecast()
             self.analytics = target
       
-      @cache.cached(timeout=300, key_prefix='total_guest_house')
       def get_total_guest_house(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -65,7 +64,6 @@ class Dashboard:
 
                   return {'today': data.get('today_guests') , 'bookings': data.get('today_bookings'), 'change': data.get('change_rate_percent')}
 
-      @cache.cached(timeout=300, key_prefix='today_bookings')
       def today_bookings(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -102,7 +100,6 @@ class Dashboard:
 
                   return {'check_in': data.get('today_data'), 'guests': data.get('today_guest'), 'change': data.get('change_rate_percent')}
 
-      @cache.cached(timeout=300, key_prefix='occupancy')
       def occupancy(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -120,7 +117,6 @@ class Dashboard:
 
             return {'occupancy': data.get('y'), 'total_room': 54 - int(data.get('total_room'))}
       
-      @cache.cached(timeout=300, key_prefix='revenue_today')
       def revenue_today(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -158,7 +154,6 @@ class Dashboard:
 
                   return {'current_revenue': data.get('today_revenue'), 'change': data.get('achievement_percent')}
 
-      @cache.cached(timeout=300, key_prefix='heavy_guest_month')
       def heavy_guest_month(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -181,7 +176,6 @@ class Dashboard:
 
                   return {'month': month, 'value': value}
       
-      @cache.cached(timeout=300, key_prefix='most_booked_area')
       def most_booked_area(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -211,7 +205,6 @@ class Dashboard:
                         'hall': data.get('hall')
                         }
 
-      @cache.cached(timeout=300, key_prefix='top_most_booked_area')
       def top_most_booked_area(self):
             try:
                   with self.db.connect() as con:
@@ -277,7 +270,6 @@ class Dashboard:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
       # Bookings Overview
-      @cache.cached(timeout=300, key_prefix='bookings_overview_cards_data')
       def bookings_overview_cards_data(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -391,11 +383,6 @@ class Dashboard:
                   return {'data': data}
 
       def upcoming_checkouts(self, day):
-            cache_key = f"upcoming_checkouts_{day}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -403,18 +390,12 @@ class Dashboard:
                               SELECT date_book, check_in, check_out, name, booking_type, total_guest FROM bookings WHERE check_out = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status NOT IN ('Cancelled', 'Reserved', 'Checked-out');
                         ''')
                         data = cursor.fetchall()
-                        cache.set(cache_key, {'success': bool(data), 'data':data}, timeout=300)
                         return {'success': bool(data), 'data':data}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
       def upcoming_arrival(self, day):
-            cache_key = f"upcoming_arrivals_{day}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -422,13 +403,11 @@ class Dashboard:
                               SELECT date_book, check_out, check_in, name, booking_type, total_guest FROM bookings WHERE check_in = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status IN ('Reserved') 
                         ''')
                         data = cursor.fetchall()
-                        cache.set(cache_key, {'success': bool(data), 'data':data}, timeout=300)
                         return {'success': bool(data), 'data':data}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
-      @cache.cached(timeout=300, key_prefix='upcoming_count')
       def upcoming_count(self):
             try:
                   with self.db.connect() as con:
@@ -459,7 +438,6 @@ class Dashboard:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       # Room Overview
-      @cache.cached(timeout=300, key_prefix='occupied_room')
       def occupied_room(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -475,7 +453,6 @@ class Dashboard:
 
             return {'occupied': int(data.get('total_occupied'))}
       
-      @cache.cached(timeout=300, key_prefix='monthly_bookings_data')
       def monthly_bookings_data(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -507,7 +484,6 @@ class Dashboard:
 
                   return {'data': data}
       
-      @cache.cached(timeout=300, key_prefix='booking_type_distro')
       def booking_type_distro(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -534,7 +510,6 @@ class Dashboard:
 
             return {'data': data}
 
-      @cache.cached(timeout=300, key_prefix='revenue_guest_trend_data')
       def revenue_guest_trend_data(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -561,51 +536,3 @@ class Dashboard:
                   data = cursor.fetchall()
 
                   return {'data' : data}
-
-      def dashboard_cache_rebuild(self):
-            # Bookings Overview
-            self.get_total_guest_house()
-            self.today_bookings()
-            self.occupancy()
-            self.revenue_today()
-            self.heavy_guest_month()
-            self.most_booked_area()
-            self.top_most_booked_area()
-            self.bookings_overview_cards_data()
-            self.upcoming_checkouts('today')
-            self.upcoming_checkouts('tomorrow')
-            self.upcoming_checkouts('today')
-            self.upcoming_checkouts('tomorrow')
-            self.upcoming_count()
-
-            # Room Overview
-            self.occupied_room()
-
-            # Dashboard Charts
-            self.monthly_bookings_data()
-            self.booking_type_distro()
-            self.revenue_guest_trend_data()
-      
-      def clear_dashboard_cache(self):
-            # Bookings Overview
-            cache.delete('total_guest_house')
-            cache.delete('today_bookings')
-            cache.delete('occupancy')
-            cache.delete('revenue_today')
-            cache.delete('heavy_guest_month')
-            cache.delete('most_booked_area')
-            cache.delete('top_most_booked_area')
-            cache.delete('bookings_overview_cards_data')
-            cache.delete('upcoming_checkouts_today')
-            cache.delete('upcoming_checkouts_tomorrow')
-            cache.delete('upcoming_arrivals_today')
-            cache.delete('upcoming_arrivals_tomorrow')
-            cache.delete('upcoming_count')
-
-            # Room Overview
-            cache.delete('occupied_room')
-
-            # Dashboard Charts
-            cache.delete('monthly_bookings_data')
-            cache.delete('booking_type_distro')
-            cache.delete('revenue_guest_trend_data')

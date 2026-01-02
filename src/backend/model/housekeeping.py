@@ -9,7 +9,6 @@ class Housekeeping:
             self.reserve = reserve
             self.rate = rate
 
-      @cache.cached(timeout=300, key_prefix='total_area_data')
       def total_area_data(self):
             try:
                   with self.db.connect() as con:
@@ -33,7 +32,6 @@ class Housekeeping:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='total_data')
       def total_data(self):
             try:
                   with self.db.connect() as con:
@@ -56,11 +54,6 @@ class Housekeeping:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def get_area_data(self, accomodation):
-            cache_key = f"get_area_data_{accomodation}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -72,11 +65,6 @@ class Housekeeping:
                         data = cursor.fetchall()
 
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("area_data_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("area_data_keys", key_index, timeout=None)  # never expire
 
                         return result
             except Exception as e:
@@ -102,15 +90,6 @@ class Housekeeping:
                         ''', (area_name.split(' ')[0].lower(), room_no))
                         
                         con.commit()
-                        
-                        self.clear_housekeeping_cache()
-                        self.rebuild_housekeeping_cache()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-                        self.reserve.clear_reservation_cache_key()
-                        self.reserve.rebuild_reservation_cache_key()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Assigned successfully!' if bool(cursor.rowcount > 0) else 'Failed inserting data!'}
             except Exception as e:
@@ -130,21 +109,11 @@ class Housekeeping:
 
                         con.commit()
                         
-                        self.clear_housekeeping_cache()
-                        self.rebuild_housekeeping_cache()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-                        self.reserve.clear_reservation_cache_key()
-                        self.reserve.rebuild_reservation_cache_key()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
-
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Marked ready successfully!' if bool(cursor.rowcount > 0) else 'Failed inserting data!'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
-      @cache.cached(timeout=300, key_prefix='staff_cleaners')
       def staff_cleaners(self):
             try:
                   with self.db.connect() as con:
@@ -165,11 +134,6 @@ class Housekeeping:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
       def room_assigned_history(self, room):
-            cache_key = f"room_assigned_history_{room}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -178,10 +142,6 @@ class Housekeeping:
                         data = cursor.fetchall()
 
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("room_assigned_history_keys") or set()
-                        key_index.add(cache_key)
                         cache.set("room_assigned_history_keys", key_index, timeout=None)  # never expire
 
                         return result
@@ -223,15 +183,6 @@ class Housekeeping:
                   con.rollback()
                   return {'success': False, 'message': f'Query failed: {e}'}
 
-      def rebuild_housekeeping_cache(self):
-            self.total_area_data()
-            self.total_data()
-            self.staff_cleaners()
-            self.room_assigned_history('Premium')
-            self.cleaning_history(datetime.now().month, datetime.now().day)
-            self.get_area_data('Premium')
-
-      def clear_housekeeping_cache(self):
             cache.delete('total_area_data')
             cache.delete('total_data')
             cache.delete('staff_cleaners')

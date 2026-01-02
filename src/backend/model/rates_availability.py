@@ -6,7 +6,6 @@ class RatesAndAvailability:
       def __init__(self, db):
             self.db = db
       
-      @cache.cached(timeout=300, key_prefix='rates_availability')
       def availables(self):
             try:
                   with self.db.connect() as con:
@@ -230,8 +229,4 @@ class RatesAndAvailability:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
-      def rebuild_rates_cache(self):
-            self.availables()
-      
-      def clear_rates_cache(self):
             cache.delete('rates_availability')

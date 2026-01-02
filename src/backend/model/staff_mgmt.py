@@ -20,11 +20,6 @@ class Staff_Management:
                         (staff_name, date_started, daily_salary, 0, 0,  weekly, monthly, position, avl_leave, status, 0, 0, date.today()))
                         
                         con.commit()
-                        self.clear_staff_cache()
-                        self.rebuild_staff_cache()
-                        self.house.clear_housekeeping_cache()
-                        self.house.rebuild_housekeeping_cache()
-
                         return {'success': True, 'message': 'Added successfully!'}
             except Exception as e:
                   con.rollback()
@@ -42,17 +37,11 @@ class Staff_Management:
                               cursor.execute(''' INSERT INTO staff_leaves_data (staff_id, name, position, date) VALUES (%s, %s, %s, %s) ''', (staff_id, staff_name, position, date.today()))
                         
                         con.commit()
-                        self.clear_staff_cache()
-                        self.rebuild_staff_cache()
-                        self.house.clear_housekeeping_cache()
-                        self.house.rebuild_housekeeping_cache()
-
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if bool(cursor.rowcount != 0) else 'Failed! Either data not changed or something went wrong.'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='all_staff')
       def all_staff(self):
             try:
                   with self.db.connect() as con:
@@ -66,11 +55,6 @@ class Staff_Management:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def staff_list(self, day, month):
-            cache_key = f"staff_list_{day}_{month}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -93,11 +77,6 @@ class Staff_Management:
                         data = cursor.fetchall()
                         
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("staff_list_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("staff_list_keys", key_index, timeout=None)  # never expire
 
                         return result
             except Exception as e:
@@ -105,10 +84,6 @@ class Staff_Management:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
       def view_staff_info(self, id):
-            cache_key = f"staff_info_{id}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -116,11 +91,6 @@ class Staff_Management:
                         data = cursor.fetchone()
 
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("staff_info_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("staff_info_keys", key_index, timeout=None)  # never expire
 
                         return result
             except Exception as e:
@@ -163,11 +133,6 @@ class Staff_Management:
                                           cursor.execute(''' UPDATE staff_details SET absent = absent + 1 WHERE id = %s ''', (staff_id,))
 
                         con.commit()
-                        self.clear_staff_cache()
-                        self.rebuild_staff_cache()
-                        self.house.clear_housekeeping_cache()
-                        self.house.rebuild_housekeeping_cache()
-
                         return {'success': True, 'message': 'Added successfully!'}
             except Exception as e:
                   con.rollback()
@@ -265,23 +230,12 @@ class Staff_Management:
 
                               con.commit()
 
-                        
-                        self.clear_staff_cache()
-                        self.rebuild_staff_cache()
-                        self.house.clear_housekeeping_cache()
-                        self.house.rebuild_housekeeping_cache()
-                        
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if bool(cursor.rowcount != 0) else 'Failed'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def all_staff_attendance(self, day, month):
-            cache_key = f"all_staff_attendance_{day}_{month}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor() 
@@ -294,23 +248,12 @@ class Staff_Management:
                         data = cursor.fetchall()
 
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("all_staff_attendance_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("all_staff_attendance_keys", key_index, timeout=None)  # never expire
-
                         return result
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
       def all_present_staff(self, day, month):
-            cache_key = f"all_present_staff_{day}_{month}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -324,12 +267,6 @@ class Staff_Management:
                         data = cursor.fetchall()
 
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("all_present_staff_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("all_present_staff_keys", key_index, timeout=None)  # never expire
-
                         return result
 
             except Exception as e:
@@ -337,11 +274,6 @@ class Staff_Management:
                   return {'success': False, 'message': f'Query failed: {e}'}
 
       def individual_staff_attendance(self, id):
-            cache_key = f"individual_staff_attendance_{id}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -349,12 +281,6 @@ class Staff_Management:
                         data = cursor.fetchall()
 
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("individual_staff_attendance_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("individual_staff_attendance_keys", key_index, timeout=None)  # never expire
-
                         return result
             except Exception as e:
                   con.rollback()
@@ -384,10 +310,6 @@ class Staff_Management:
                         con.commit()
                         success = (del_staff + del_staff_attendance) > 0
 
-                        self.clear_staff_cache()
-                        self.rebuild_staff_cache()
-                        self.house.clear_housekeeping_cache()
-                        self.house.rebuild_housekeeping_cache()
                         return {'success': True if success > 0 else False, 'message': 'Removed successfully!' if success > 0 else 'Failed'}
             except Exception as e:
                   con.rollback()
@@ -455,22 +377,12 @@ class Staff_Management:
                               cursor.execute(''' UPDATE staff_details SET status = %s WHERE id = %s ''', ('Active', id))
                               
                         con.commit()
-
-                        self.clear_staff_cache()
-                        self.rebuild_staff_cache()
-                        self.house.clear_housekeeping_cache()
-                        self.house.rebuild_housekeeping_cache()
                         return {'success': bool(del_attendance), 'message': 'Removed successfully!' if bool(del_attendance) else 'Failed'}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
       def staff_summary_cards(self, month, day):
-            cache_key = f"staff_summarry_cards_{month}_{day}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -509,18 +421,11 @@ class Staff_Management:
 
 
                         result = {'success': bool(stats), 'data': stats}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("staff_summarry_cards_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("staff_summarry_cards_keys", key_index, timeout=None)  # never expire
-
                         return result
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-      
-      @cache.cached(timeout=300, key_prefix='this_week_onleave')
+            
       def this_week_onleave(self):
             try:
                   with self.db.connect() as con:
@@ -546,49 +451,5 @@ class Staff_Management:
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
-            
-      def rebuild_staff_cache(self):
-            self.all_staff()
-            self.staff_list(datetime.now().day, datetime.now().month)
-            self.view_staff_info('12')
-            self.individual_staff_attendance('12')
-            self.this_week_onleave()
-            self.staff_summary_cards(datetime.now().month, datetime.now().day)
-            self.all_staff_attendance(datetime.now().day, datetime.now().month)
-            self.all_present_staff(datetime.now().day, datetime.now().month)
-
-      def clear_staff_cache(self):
-            cache.delete('this_week_onleave')
-            cache.delete('all_staff')
-
-            key_index = cache.get("staff_list_keys") or set()
-            for k in key_index:
-                  cache.delete(k)
-                  cache.delete("staff_list_keys")
-
-            key_index2 = cache.get("staff_info_keys") or set()
-            for k in key_index2:
-                  cache.delete(k)
-                  cache.delete("staff_info_keys")
-
-            key_index3 = cache.get("all_staff_attendance_keys") or set()
-            for k in key_index3:
-                  cache.delete(k)
-                  cache.delete("all_staff_attendance_keys")
-
-            key_index = cache.get("all_present_staff_keys") or set()
-            for k in key_index:
-                  cache.delete(k)
-                  cache.delete("all_present_staff_keys")
-
-            key_index = cache.get("individual_staff_attendance_keys") or set()
-            for k in key_index:
-                  cache.delete(k)
-                  cache.delete("individual_staff_attendance_keys")
-
-            key_index = cache.get("staff_summarry_cards_keys") or set()
-            for k in key_index:
-                  cache.delete(k)
-                  cache.delete("staff_summarry_cards_keys")
             
             

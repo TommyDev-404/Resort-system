@@ -13,7 +13,6 @@ class Reservation:
             self.accounting = accounting
             self.housekeeping = Housekeeping(db, alert, self, rate)
       
-      @cache.cached(timeout=300, key_prefix='available_spaces')
       def get_avl_spaces(self):
             try:
                   with self.db.connect() as con:
@@ -67,7 +66,6 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='available_rooms')
       def get_avl_room(self):
             try:
                   with self.db.connect() as con:
@@ -235,18 +233,6 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.clear_reservation_cache_key()
-                        self.rebuild_reservation_cache_key()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
-                        self.accounting.clear_accounting_cache()
-                        self.accounting.rebuild_accounting_cache()
-                        self.housekeeping.clear_housekeeping_cache()
-                        self.housekeeping.rebuild_housekeeping_cache()
 
                         success = True
                         for result in range(len(result_list)):
@@ -259,11 +245,6 @@ class Reservation:
                   return {'success': False, 'message': f'Error: {str(e)}'}
 
       def recent_bookings(self, year, month, day):
-            cache_key = f"recent_bookings_{year}_{month}_{day}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -297,23 +278,12 @@ class Reservation:
                               new_data.append({'id': d.get('booking_id'), 'name': d.get('name'),  'date_book': formatted_date , 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
                         
                         result = {'success': bool(data), 'data': new_data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("recent_bookings_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("recent_bookings_keys", key_index, timeout=None)  # never expire
-
                         return result
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def booking_category(self, year, month, day, category):
-            cache_key = f"booking_category_{year}_{month}_{day}_{category}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -379,11 +349,6 @@ class Reservation:
                               })
 
                         result = {'success': bool(data), 'data': new_data}
-                        cache.set(cache_key, result, timeout=300)
-                        
-                        key_index = cache.get("booking_category_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("booking_category_keys", key_index, timeout=None)  # never expire
 
                         return result
 
@@ -391,7 +356,6 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Cancellation failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='arrivals')
       def arrivals(self):
             try:
                   with self.db.connect() as con:
@@ -404,7 +368,6 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='year_data')
       def get_year_data(self):
             try:
                   with self.db.connect() as con:
@@ -428,7 +391,6 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      @cache.cached(timeout=300, key_prefix='summary_cards_data')
       def summaryCardsData(self):
             try:
                   with self.db.connect() as con:
@@ -491,18 +453,6 @@ class Reservation:
                         con.commit()
                         
                         self.alert.generate_alerts()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.clear_reservation_cache_key()
-                        self.rebuild_reservation_cache_key()
-                        self.analytics.clear_analytics_cache()
-                        self.analytics.rebuild_analytics_cache()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
-                        self.housekeeping.clear_housekeeping_cache()
-                        self.housekeeping.rebuild_housekeeping_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -545,18 +495,6 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.clear_reservation_cache_key()
-                        self.rebuild_reservation_cache_key()
-                        self.analytics.clear_analytics_cache()
-                        self.analytics.rebuild_analytics_cache()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
-                        self.housekeeping.clear_housekeeping_cache()
-                        self.housekeeping.rebuild_housekeeping_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -571,15 +509,6 @@ class Reservation:
                         query = f"UPDATE bookings SET payment = '{payment}', paid_date = '{date.today()}', total_amount = {'total_amount - (total_amount * 0.05)' if payment == 'ZUZU (Online Payment)' else 'total_amount'} where booking_id = {id} and paid_date IS NULL"
                         cursor.execute(query)
                         con.commit()
-
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.clear_reservation_cache_key()
-                        self.rebuild_reservation_cache_key()
-                        self.analytics.clear_analytics_cache()
-                        self.analytics.rebuild_analytics_cache()
-                        self.accounting.clear_accounting_cache()
-                        self.accounting.rebuild_accounting_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -613,19 +542,6 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.clear_reservation_cache_key()
-                        self.rebuild_reservation_cache_key()
-                        self.analytics.clear_analytics_cache()
-                        self.analytics.rebuild_analytics_cache()
-                        self.accounting.clear_accounting_cache()
-                        self.accounting.rebuild_accounting_cache()
-                        self.housekeeping.clear_housekeeping_cache()
-                        self.housekeeping.rebuild_housekeeping_cache()
-
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Cancelled successfully!' if cursor.rowcount > 0 else 'Failed!'}
 
             except Exception as e:
@@ -633,11 +549,6 @@ class Reservation:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
       def view_details(self, id):
-            cache_key = f"view_details_{id}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -645,11 +556,6 @@ class Reservation:
                         data = cursor.fetchone()
 
                         result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-                        
-                        key_index = cache.get("view_details_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("view_details_keys", key_index, timeout=None)  # never expire
                         return {'success': bool(data), 'data': data}
             except Exception as e:
                   con.rollback()
@@ -794,20 +700,6 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
-                        self.alert.clear_alert_cache()
-                        self.alert.rebuild_alert_cache()
-                        self.dashboard.clear_dashboard_cache()
-                        self.dashboard.dashboard_cache_rebuild()
-                        self.clear_reservation_cache_key()
-                        self.rebuild_reservation_cache_key()
-                        self.analytics.clear_analytics_cache()
-                        self.analytics.rebuild_analytics_cache()
-                        self.rate.clear_rates_cache()
-                        self.rate.rebuild_rates_cache()
-                        self.accounting.clear_accounting_cache()
-                        self.accounting.rebuild_accounting_cache()
-                        self.housekeeping.clear_housekeeping_cache()
-                        self.housekeeping.rebuild_housekeeping_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': "Updated successfully!" if cursor.rowcount > 0 else 'Failed to update.'}
             except Exception as e:
@@ -827,11 +719,6 @@ class Reservation:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
       def totals(self, month, year, day):
-            cache_key = f"totals_{month}_{year}_{day}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -895,12 +782,6 @@ class Reservation:
                               'day_guest': data.get('total_dayguest'),
                               'all': data.get('total_all')
                         }
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("totals_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("totals_keys", key_index, timeout=None)  # never expire
-
                         return result
 
             except Exception as e:
@@ -979,18 +860,7 @@ class Reservation:
 
                   return data.get('rate')
 
-      def rebuild_reservation_cache_key(self):
-            self.recent_bookings(datetime.now().year, datetime.now().month, datetime.now().day)
-            self.booking_category(datetime.now().year, datetime.now().month, datetime.now().day, 'all-data')
-            self.arrivals()
-            self.get_year_data()
-            self.summaryCardsData()
-            self.totals(datetime.now().month, datetime.now().year, datetime.now().day)
-            self.get_avl_spaces()
-            self.get_avl_room()
-            self.view_details('12')
-
-      def clear_reservation_cache_key(self):
+    
             cache.delete('available_spaces')
             cache.delete('available_rooms')
             cache.delete('arrivals')
