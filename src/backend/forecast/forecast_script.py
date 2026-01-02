@@ -97,13 +97,7 @@ class Forecast:
                         forecast = forecast[~forecast['ds'].isin(historical['ds'])]
 
                   # Replace 0, negative, or very small forecasted values with realistic random numbers
-                  historical_avg = historical['value'].mean() if not historical.empty else 3
-                  forecast['value'] = forecast['value'].apply(
-                        lambda x: x if x > 1 else np.random.randint(
-                        max(1, int(historical_avg * 0.5)),
-                        max(2, int(historical_avg * 1.5))
-                        )
-                  )
+                  forecast['value'] = forecast['value'].apply(lambda x: x if x >= 1 else np.random.randint(1, 7))
 
                   forecast_dates = forecast['ds'].dt.strftime('%Y-%m-%d').to_list()
                   forecast_values = forecast['value'].round().tolist()

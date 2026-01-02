@@ -375,7 +375,7 @@ async function removePromo(e){
             area_affected = area;
       }
       
-      showLoader('Remobing promo');
+      showLoader('Removing promo');
       const response = await fetch(`/remove-promo?id=${id}&area_promos=${area_affected}`, {
             method: 'DELETE'
       });
@@ -418,6 +418,7 @@ document.addEventListener('input', (e) => {
 });
 
 export async function initPageRevenueMgmt(){
+      resetToAddPromoForm();
       getAllPromo();
       notifications();
 }

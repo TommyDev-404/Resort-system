@@ -300,8 +300,23 @@ function loadingAnimation0(){
       document.getElementById('loadingCleanPortal').innerHTML += load;
 }
 
-function showLoader() {
-      loadingAnimation0(); // adds #loading inside #loadingPortal
+function loadingAnimationAdd(message){
+      const load = `
+            <div id="loading" class="absolute w-full top-0 left-0 flex flex-col items-center  bg-black/50 justify-center h-screen space-y-2 z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-gray-200">${message}...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingDataPortal').innerHTML += load;
+}
+
+function showLoader(type, message=null) {
+      if (type === 'table'){
+            loadingAnimation0(); // adds #loading inside #loadingPortal
+      }else{
+            loadingAnimationAdd(message)
+      }
 }
 
 function hideLoader() {
@@ -309,9 +324,10 @@ function hideLoader() {
       if (loader) loader.remove();
 }
 
+
 // -------------------- DATA ------------------------- //
 async function accomodationData(){
-      showLoader();
+      showLoader('table');
       const response = await fetch('/total-area-data');
       const result = await response.json();
       
@@ -388,7 +404,7 @@ async function allStaffs(){
 async function submitAssignStaff(e){
       e.preventDefault();
       const form = new FormData(e.target);
-
+      showLoader('add', 'Assigning staff...');
       const response = await fetch('/assign-cleaner', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -406,6 +422,7 @@ async function submitAssignStaff(e){
       }else{
             failedMessageCard7(result.message);
       }
+      hideLoader();
 }
 
 async function getSummarryCardData(){
@@ -424,7 +441,7 @@ async function markReady(btn){
       const row = btn.closest('tr'); 
       const cells = row.querySelectorAll('td');
       const roomNo = cells[0].textContent.trim();
-      
+      showLoader('add', 'Updating room status...');
       const response = await fetch(`/update-area-condition?room_no=${roomNo}&area_name=${row.dataset.room}`, {
             method: 'POST'
       });
@@ -440,6 +457,7 @@ async function markReady(btn){
       }else{
             failedMessageCard7(result.message);
       }
+      hideLoader();
 }
 
 async function openRoomDetails(roomType){

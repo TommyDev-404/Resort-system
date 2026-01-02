@@ -26,19 +26,19 @@ def add_header(response):
 
 
 # Create DB object once here
-db = Database( host="localhost", user="tommy", password="2006", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
+db = Database( host="localhost", user="grandsight", password="123456", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
 
-# create instances of classes
+# create instances of classesdb = Database()
 admin = Admin(db)
 analytics = Analytics(db)
-dashboard = Dashboard(db, analytics.get_target_revenue().get('target'))
 alert = Alerts(db)
-reserve = Reservation(db)
-house = Housekeeping(db)
 avl = RatesAndAvailability(db)
 acc = Accounting(db)
-rev = RevenueMgmt(db)
-staff = Staff_Management(db)
+dashboard = Dashboard(db, analytics.get_target_revenue().get("target"))
+reserve = Reservation(db, alert, dashboard, analytics, avl, acc)
+house = Housekeeping(db, alert, reserve, avl)
+rev = RevenueMgmt(db, avl, dashboard, analytics, reserve, acc, alert)
+staff = Staff_Management(db, house)
 login = Login(db)
 
 
@@ -63,6 +63,25 @@ def system_page():
       alert.occupancy_alert()
       alert.generate_alerts()
       alert.cron_jobs()
+
+      alert.clear_alert_cache()
+      alert.rebuild_alert_cache()
+      dashboard.clear_dashboard_cache()
+      dashboard.dashboard_cache_rebuild()
+      analytics.clear_analytics_cache()
+      analytics.rebuild_analytics_cache()
+      reserve.clear_reservation_cache_key()
+      reserve.rebuild_reservation_cache_key()
+      house.clear_housekeeping_cache()
+      house.rebuild_housekeeping_cache()
+      avl.clear_rates_cache()
+      avl.rebuild_rates_cache()
+      staff.clear_staff_cache()
+      staff.rebuild_staff_cache
+      acc.clear_accounting_cache()
+      acc.rebuild_accounting_cache()
+      rev.clear_revenue_cache()
+      rev.rebuild_revenue_cache()
 
       return render_template('admin.html')
 
@@ -486,6 +505,3 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
-
-if __name__ == '__main__':
-      app.run(debug=True)

@@ -709,7 +709,7 @@ async function viewUpcomingModal(title, type){
       const modal = `
       <div id="view-upcoming-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <!-- Modal Container -->
-            <div class="relative w-full max-w-3xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[50vh]">
+            <div class="relative w-full max-w-5xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[50vh]">
                   <!-- Close Button -->
                   <span id="close-view-upcoming-modal" class="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white text-xl font-semibold transition">&times;</span>
             
@@ -734,7 +734,7 @@ async function viewUpcomingModal(title, type){
                                                 <th class="px-4 py-3 text-center">Booking Type</th>
                                                 <th class="px-4 py-3 text-center">Check-In</th>
                                                 <th class="px-4 py-3 text-center">Check-Out</th>
-                                                <th class="px-4 py-3 text-center">Guests</th>
+                                                <th class="px-4 py-3 text-center">Total Guests</th>
                                           </tr>
                                     </thead>
                                     <tbody id="upcoming-table2" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
@@ -770,6 +770,7 @@ async function addBooking(e){
                   document.querySelector('#booking-overlay').remove();
                   recentBookings();
                   summaryCardsDatas();
+                  upcomingCount();
                   savedAccomodations.length =  0; // empty the array
             }else{
                   failedMessageCard4(result.message);
@@ -1029,7 +1030,7 @@ async function getReservationDate(){
       showLoader('data', 'Retrieving booking schedule...');
       const response = await fetch(`/get-reservation-date?id=${id}`);
       const result = await response.json();
-      console.log(result);
+      
       const formatCheckin = new Date(result.check_in).toISOString().split('T')[0];
       const formatCheckout = new Date(result.check_out).toISOString().split('T')[0];
 
@@ -1233,9 +1234,6 @@ async function getTotalsCountData() {
             updateBadge('day-guest', result.day_guest);
             updateBadge('overnight-data', result.overnight);
             updateBadge('check_in-data', result.checkin);
-            updateBadge('check_out-data', result.checkout);
-            updateBadge('not_paid-data', result.not_paid);
-            updateBadge('cancelled-reservation-data', result.cancelled);
       }else{
             ('Failed');
       }
@@ -1292,7 +1290,7 @@ async function searchGuest(e){
       
       if (result.success){
             result.data.forEach(row => {
-                  createTable(row['id'], row['date_book'], row['name'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
+                  createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             const empty_row = `
@@ -1319,11 +1317,10 @@ async function upcomingData(type, day_type) {
 
       if (res.success){
             res.data.forEach(guest => {
-                  const date = new Date(guest.check_out).toISOString().split('T')[0];
-                  const date2 = new Date(guest.check_in).toISOString().split('T')[0];
-                  const check_out = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                  const check_in = new Date(date2).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                  
+                  const check_out = new Date(guest.check_out).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  const check_in = new Date(guest.check_in).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  const date_book = new Date(guest.date_book).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
                   const row = `
                         <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
                               <td class="px-3 py-2 text-center">
@@ -1355,7 +1352,7 @@ async function upcomingData(type, day_type) {
       }else{
             const empty_row = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="5" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
+                        <td colspan="6" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
                   </tr>
             `;
 
@@ -1430,9 +1427,9 @@ document.addEventListener('submit', async(e) => {
 
 // select tags  
 document.addEventListener('change', (e) => {
-      if (e.target.closest('#yearSelect')) ( getDays2(), recentBookings());
-      if (e.target.closest('#monthSelect')) ( getDays2(), recentBookings());
-      if (e.target.closest('#daySelect3')) recentBookings();
+      if (e.target.closest('#yearSelect')) ( getDays2(), recentBookings(), resetButtonAndCheckBox());
+      if (e.target.closest('#monthSelect')) ( getDays2(), recentBookings(), resetButtonAndCheckBox());
+      if (e.target.closest('#daySelect3')) (recentBookings(), resetButtonAndCheckBox());
       if (e.target.closest('input[name="select"]')) enableActionBtns(e);
       if (e.target.closest('input[name="select"]')) {
             const checkbox = e.target;
@@ -1481,7 +1478,6 @@ export function initPageReservation(){
       getYears();
       getMonths();
       getDays2();
-      getTotalsCountData();
       resetDropDown();
       resetButtonAndCheckBox();
       summaryCardsDatas();

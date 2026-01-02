@@ -1,17 +1,17 @@
 from collections import Counter
-from .alert import Alerts
-from .dashboard import Dashboard
-from .analytics import Analytics
 from datetime import datetime, timezone, timedelta, date
 from backend.extensions import cache
-
+from .housekeeping import Housekeeping
 
 class Reservation:
-      def __init__(self, db):
+      def __init__(self, db, alert, dashboard, analytics, rate, accounting):
             self.db = db
-            self.alert = Alerts(db)
-            self.dashboard = Dashboard(db)
-            self.analytics = Analytics(db)
+            self.alert = alert
+            self.dashboard = dashboard
+            self.analytics = analytics
+            self.rate = rate
+            self.accounting = accounting
+            self.housekeeping = Housekeeping(db, alert, self, rate)
       
       @cache.cached(timeout=300, key_prefix='available_spaces')
       def get_avl_spaces(self):
@@ -233,12 +233,20 @@ class Reservation:
                         ))
 
                         con.commit()
-                        # show notifications
+
                         self.alert.generate_alerts()
+                        self.alert.clear_alert_cache()
+                        self.alert.rebuild_alert_cache()
                         self.dashboard.clear_dashboard_cache()
                         self.dashboard.dashboard_cache_rebuild()
                         self.clear_reservation_cache_key()
                         self.rebuild_reservation_cache_key()
+                        self.rate.clear_rates_cache()
+                        self.rate.rebuild_rates_cache()
+                        self.accounting.clear_accounting_cache()
+                        self.accounting.rebuild_accounting_cache()
+                        self.housekeeping.clear_housekeeping_cache()
+                        self.housekeeping.rebuild_housekeeping_cache()
 
                         success = True
                         for result in range(len(result_list)):
@@ -254,7 +262,6 @@ class Reservation:
             cache_key = f"recent_bookings_{year}_{month}_{day}"
             cached = cache.get(cache_key)
             if cached:
-                  print('from cache')
                   return cached
 
             try:
@@ -484,12 +491,18 @@ class Reservation:
                         con.commit()
                         
                         self.alert.generate_alerts()
+                        self.alert.clear_alert_cache()
+                        self.alert.rebuild_alert_cache()
                         self.dashboard.clear_dashboard_cache()
                         self.dashboard.dashboard_cache_rebuild()
                         self.clear_reservation_cache_key()
                         self.rebuild_reservation_cache_key()
                         self.analytics.clear_analytics_cache()
                         self.analytics.rebuild_analytics_cache()
+                        self.rate.clear_rates_cache()
+                        self.rate.rebuild_rates_cache()
+                        self.housekeeping.clear_housekeeping_cache()
+                        self.housekeeping.rebuild_housekeeping_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -520,23 +533,30 @@ class Reservation:
 
                         if check_out < date.today():
                               for room, number in set(zip(rooms, room_no)):
-                                    if room.strip() not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
-                                          cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("avl", room.capitalize(), number))
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("avl", room.capitalize(), number))
                         else:
                               for room, number in set(zip(rooms, room_no)):
                                     if room.strip() not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
                                           cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("need-clean", room.capitalize(), number))
                                           cursor.execute(''' INSERT INTO notifications(name, date, room_name, room_no, alert_type) VALUES(%s, %s, %s, %s, %s) ''', (f'Housekeeping requested for {room_dict.get(room)}', now, room, number, 'housekeeping'))
-                              
+                                    else:
+                                          cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("avl", room.capitalize(), number))
+
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.alert.clear_alert_cache()
+                        self.alert.rebuild_alert_cache()
                         self.dashboard.clear_dashboard_cache()
                         self.dashboard.dashboard_cache_rebuild()
                         self.clear_reservation_cache_key()
                         self.rebuild_reservation_cache_key()
                         self.analytics.clear_analytics_cache()
                         self.analytics.rebuild_analytics_cache()
+                        self.rate.clear_rates_cache()
+                        self.rate.rebuild_rates_cache()
+                        self.housekeeping.clear_housekeeping_cache()
+                        self.housekeeping.rebuild_housekeeping_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -558,6 +578,8 @@ class Reservation:
                         self.rebuild_reservation_cache_key()
                         self.analytics.clear_analytics_cache()
                         self.analytics.rebuild_analytics_cache()
+                        self.accounting.clear_accounting_cache()
+                        self.accounting.rebuild_accounting_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -591,12 +613,18 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.alert.clear_alert_cache()
+                        self.alert.rebuild_alert_cache()
                         self.dashboard.clear_dashboard_cache()
                         self.dashboard.dashboard_cache_rebuild()
                         self.clear_reservation_cache_key()
                         self.rebuild_reservation_cache_key()
                         self.analytics.clear_analytics_cache()
                         self.analytics.rebuild_analytics_cache()
+                        self.accounting.clear_accounting_cache()
+                        self.accounting.rebuild_accounting_cache()
+                        self.housekeeping.clear_housekeeping_cache()
+                        self.housekeeping.rebuild_housekeeping_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Cancelled successfully!' if cursor.rowcount > 0 else 'Failed!'}
 
@@ -628,24 +656,14 @@ class Reservation:
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
       def get_reservation_date(self, id):
-            cache_key = f"reservation_date_{id}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' SELECT check_in, check_out, booking_type FROM bookings where booking_id = %s ''', (id,))
                         data = cursor.fetchone()
                         
-                        result = {'check_in': data.get('check_in'), 'check_out': data.get('check_out'), 'booking_type': data.get('booking_type')}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("reservation_date_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("reservation_date_keys", key_index, timeout=None)  # never expire
-
-                        return result
+                        return {'check_in': data.get('check_in'), 'check_out': data.get('check_out'), 'booking_type': data.get('booking_type')}
+                  
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
@@ -776,12 +794,20 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.alert.clear_alert_cache()
+                        self.alert.rebuild_alert_cache()
                         self.dashboard.clear_dashboard_cache()
                         self.dashboard.dashboard_cache_rebuild()
                         self.clear_reservation_cache_key()
                         self.rebuild_reservation_cache_key()
                         self.analytics.clear_analytics_cache()
                         self.analytics.rebuild_analytics_cache()
+                        self.rate.clear_rates_cache()
+                        self.rate.rebuild_rates_cache()
+                        self.accounting.clear_accounting_cache()
+                        self.accounting.rebuild_accounting_cache()
+                        self.housekeeping.clear_housekeeping_cache()
+                        self.housekeeping.rebuild_housekeeping_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': "Updated successfully!" if cursor.rowcount > 0 else 'Failed to update.'}
             except Exception as e:
@@ -826,12 +852,6 @@ class Reservation:
                               WHERE check_in = %s
                               AND status = 'Reserved'
                         ),
-                        c_checkout AS (
-                              SELECT COUNT(*) AS total_checkout
-                              FROM bookings
-                              WHERE check_in = %s
-                              and status = 'Checked-out'
-                        ),
                         c_overnight AS (
                               SELECT COUNT(*) AS total_overnight
                               FROM bookings
@@ -844,42 +864,23 @@ class Reservation:
                               WHERE check_in = %s
                               AND booking_type = 'Day Guest' and status in ("Checked-in", "Checked-out")
                         ),
-                        c_not_paid AS (
-                              SELECT COUNT(*) AS total_npaid
-                              FROM bookings
-                              WHERE check_in = %s 
-                              AND status <> 'Reserved'
-                              AND payment = 'Pending'
-                        ),
-                        c_cancelled AS (
-                              SELECT COUNT(*) AS total_cancel
-                              FROM bookings
-                              WHERE check_in = %s
-                              AND status = 'Cancelled'
-                        ),
                         c_all AS (
                               SELECT COUNT(*) AS total_all
                               FROM bookings
-                              WHERE check_in = %s
+                              WHERE check_in = %s 
                         )
                         SELECT 
                               ci.total_checkin,
                               r.total_reserved,
-                              ch.total_checkout,
                               o.total_overnight,
                               dg.total_dayguest,
-                              np.total_npaid,
-                              cn.total_cancel,
                               a.total_all
                         FROM c_checkin ci,
                               c_reserved r,
-                              c_checkout ch,
                               c_dayguest dg,
                               c_overnight o,
-                              c_not_paid np,
-                              c_cancelled cn,
                               c_all a;
-                        """, (start_month, start_month, start_month, start_month, start_month, start_month, start_month, start_month))  # repeat start/end 9 times for placeholders
+                        """, (start_month, start_month, start_month, start_month, start_month))  # repeat start/end 9 times for placeholders
 
                         data = cursor.fetchone()
 
@@ -918,7 +919,7 @@ class Reservation:
                         sql = """
                         SELECT * FROM bookings 
                         WHERE name LIKE %s COLLATE utf8mb4_general_ci
-                              AND check_in = %s
+                        AND date_book = %s
                         """
                         params = [guest_name + "%", start_date]
 
@@ -932,12 +933,12 @@ class Reservation:
                                     sql += ' AND status = "Reserved"'
                               elif category == 'cancelled-reservation-data':
                                     sql += ' AND status = "Cancelled"'
-                              elif category == 'paid-data':
-                                    sql += ' AND payment != "Pending"'
+                              elif category == 'overnight-data':
+                                    sql += ' AND status = "Checked-in" AND booking_type = "Check-in"'
                               elif category == 'not_paid-data':
-                                    sql += ' AND payment = "Pending"'
-                              elif category == 'day_guest':
-                                    sql += ' AND booking_type = "Day Guest"'
+                                    sql += ' AND payment = "Pending" '
+                              elif category == 'day-guest':
+                                    sql += ' AND booking_type = "Day Guest" and status = "Checked-in" '
 
                         # Always order by check_in descending
                         sql += ' ORDER BY check_in DESC'
@@ -985,7 +986,10 @@ class Reservation:
             self.get_year_data()
             self.summaryCardsData()
             self.totals(datetime.now().month, datetime.now().year, datetime.now().day)
-            
+            self.get_avl_spaces()
+            self.get_avl_room()
+            self.view_details('12')
+
       def clear_reservation_cache_key(self):
             cache.delete('available_spaces')
             cache.delete('available_rooms')
@@ -1007,11 +1011,6 @@ class Reservation:
             for k in key_index3:
                   cache.delete(k)
                   cache.delete("view_details_keys")
-
-            key_index4 = cache.get("reservation_date_keys") or set()
-            for k in key_index4:          
-                  cache.delete(k)
-                  cache.delete("reservation_date_keys")
 
             key_index5 = cache.get("totals_keys") or set()
             for k in key_index5:      

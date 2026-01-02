@@ -90,11 +90,11 @@ class Alerts:
                                     COUNT(booking_id) as count,
                                     COALESCE(SUM(total_guest), 0) as total_guest
                               FROM bookings
-                              WHERE check_out = CURRENT_DATE() AND status = 'Checked-in';
+                              WHERE check_out = CURRENT_DATE() AND status = 'Checked-in' and booking_type = 'Check-in';
                         ''',
                         'type': 'bookings',
                         'classification': 'checkout-today',
-                        'template': "Checkout Reminder: {count} booking(s) with a total of {total_guest} guest(s) are scheduled to leave today. Please process their checkout accordingly."
+                        'template': "Room Stay - Checkout Reminder: {count} booking(s) with a total of {total_guest} guest(s) are scheduled to leave today. Please process their checkout accordingly."
                   },
                   {
                         'query': '''
@@ -114,7 +114,7 @@ class Alerts:
                                     COUNT(booking_id) as count,
                                     COALESCE(SUM(total_guest), 0) as total_guest
                               FROM bookings
-                              WHERE check_in = CURRENT_DATE() AND status = 'Reserved' AND booking_type = 'Reservation';
+                              WHERE check_in = CURRENT_DATE() AND status = 'Reserved' ;
                         ''',
                         'type': 'bookings',
                         'classification': 'check-in-reservation-today',
@@ -126,7 +126,7 @@ class Alerts:
                                     COUNT(booking_id) as count,
                                     COALESCE(SUM(total_guest), 0) as total_guest
                               FROM bookings
-                              WHERE check_in = CURRENT_DATE() + INTERVAL 1 DAY AND status = 'Reserved' AND booking_type = 'Reservation';
+                              WHERE check_in = CURRENT_DATE() + INTERVAL 1 DAY AND status = 'Reserved';
                         ''',
                         'type': 'bookings',
                         'classification': 'reservation-tommorow',
@@ -360,3 +360,17 @@ class Alerts:
                   ''')
 
                   con.commit()
+
+      def rebuild_alert_cache(self):
+            self.occupancy_alert()
+            self.housekeeping_alert()
+            self.bookings_alert()
+            self.notification_count()
+            self.generate_alerts()
+      
+      def clear_alert_cache(self):
+            cache.delete('occupancy_alert')
+            cache.delete('housekeeping_alert')
+            cache.delete('bookings_alert')
+            cache.delete('notification_count')
+            cache.delete('generate_alerts')

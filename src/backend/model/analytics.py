@@ -135,7 +135,7 @@ class Analytics:
                                     FROM area_revenue AS a
                                     JOIN bookings AS b
                                           ON a.booking_id = b.booking_id
-                                    WHERE DATE(b.paid_date) = CURDATE()
+                                    WHERE DATE(b.paid_date) = CURRENT_DATE()
                                           AND b.payment NOT IN ('Pending')
                                     ),
                                     yesterday AS (
@@ -143,7 +143,7 @@ class Analytics:
                                     FROM area_revenue AS a
                                     JOIN bookings AS b
                                           ON a.booking_id = b.booking_id
-                                    WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
+                                    WHERE DATE(b.paid_date) = CURRENT_DATE() - INTERVAL 1 DAY
                                           AND b.payment NOT IN ('Pending')
                                     )
                                     SELECT 
@@ -168,7 +168,7 @@ class Analytics:
                                     FROM area_revenue AS a
                                     JOIN bookings AS b
                                           ON a.booking_id = b.booking_id
-                                    WHERE DATE(b.paid_date) = CURDATE()
+                                    WHERE DATE(b.paid_date) = CURRENT_DATE()
                                           AND b.payment NOT IN ('Pending')
                                     ),
                                     yesterday AS (
@@ -176,7 +176,7 @@ class Analytics:
                                     FROM area_revenue AS a
                                     JOIN bookings AS b
                                           ON a.booking_id = b.booking_id
-                                    WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
+                                    WHERE DATE(b.paid_date) = CURRENT_DATE() - INTERVAL 1 DAY
                                           AND b.payment NOT IN ('Pending')
                                     )
                                     SELECT 
@@ -202,7 +202,7 @@ class Analytics:
                               FROM area_revenue AS a
                               JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
-                              WHERE DATE(b.paid_date) = CURDATE()
+                              WHERE DATE(b.paid_date) = CURRENT_DATE()
                                     AND b.payment <> 'Pending'
                               ),
                               yesterday AS (
@@ -210,7 +210,7 @@ class Analytics:
                               FROM area_revenue AS a
                               JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
-                              WHERE DATE(b.paid_date) = CURDATE() - INTERVAL 1 DAY
+                              WHERE DATE(b.paid_date) = CURRENT_DATE() - INTERVAL 1 DAY
                                     AND b.payment <> 'Pending'
                               )
                               SELECT 
@@ -255,7 +255,7 @@ class Analytics:
                               FROM area_revenue AS a
                               JOIN bookings AS b
                               ON a.booking_id = b.booking_id
-                              WHERE MONTH(b.paid_date) = MONTH(CURDATE())
+                              WHERE MONTH(b.paid_date) = MONTH(CURRENT_DATE())
                               AND b.payment NOT IN ('Pending')
                         '''
                         else:
@@ -264,7 +264,7 @@ class Analytics:
                                     FROM area_revenue AS a
                                     JOIN bookings AS b
                                     ON a.booking_id = b.booking_id
-                                    WHERE MONTH(b.paid_date) = MONTH(CURDATE())
+                                    WHERE MONTH(b.paid_date) = MONTH(CURRENT_DATE())
                                     AND b.payment NOT IN ('Pending')
                               """
                         cursor.execute(query)
@@ -274,7 +274,7 @@ class Analytics:
                               FROM area_revenue AS a
                               JOIN bookings AS b
                               ON a.booking_id = b.booking_id
-                              WHERE MONTH(b.paid_date) = MONTH(CURDATE())
+                              WHERE MONTH(b.paid_date) = MONTH(CURRENT_DATE())
                               AND b.payment NOT IN ('Pending')
                         '''
                         cursor.execute(query)
@@ -300,6 +300,7 @@ class Analytics:
             cache_key = f"forecast_checkin_{type}"
             cached = cache.get(cache_key)
             if cached:
+                  print('from cache')
                   return cached
             
             with self.db.connect() as con:
@@ -354,6 +355,7 @@ class Analytics:
             cache_key = f"forecasted_revenue_{accomodation_type}"
             cached = cache.get(cache_key)
             if cached:
+                  print('from cache')
                   return cached
             with self.db.connect() as con:
                   cursor = con.cursor()

@@ -1,5 +1,5 @@
 from backend.forecast import Forecast
-from datetime import date
+from datetime import date, datetime
 from backend.extensions import cache
 
 class Accounting:
@@ -9,6 +9,11 @@ class Accounting:
 
       @cache.cached(timeout=300, key_prefix='payment_data_{year}')
       def get_payment_data(self, year):
+            cache_key = f"payment_data_{year}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -46,7 +51,14 @@ class Accounting:
                         """)
                         data = cursor.fetchall()
 
-                        return {'success': bool(data), 'data' : data}
+                        result = {'success': bool(data), 'data': data}
+                        cache.set(cache_key, result, timeout=300)
+
+                        key_index = cache.get("payment_data_keys") or set()
+                        key_index.add(cache_key)
+                        cache.set("payment_data_keys", key_index, timeout=None)  # never expire
+
+                        return result
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
@@ -71,3 +83,13 @@ class Accounting:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
             
+      def rebuild_accounting_cache(self):
+            self.get_payment_data(datetime.now().year)
+            self.get_current_payment_data()
+
+      def clear_accounting_cache(self):
+            cache.delete('current_payment_data')
+            
+            key_index = cache.get('current_payment_data') or set()
+            for k in key_index:
+                  cache.delete(k)

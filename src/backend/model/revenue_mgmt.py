@@ -1,11 +1,15 @@
 from datetime import date, datetime
-from .all_reservation import Reservation
 from backend.extensions import cache
 
 class RevenueMgmt:
-      def __init__(self, db):
+      def __init__(self, db, rate, dashboard, analytics, reservation_model, accounting, alert):
             self.db = db
-            self.reservation_model = Reservation(db)
+            self.rate = rate
+            self.dashboard = dashboard
+            self.analytics = analytics
+            self.reservation_model = reservation_model
+            self.accounting = accounting
+            self.alert = alert
 
       def apply_promo(self, dates, promo_name, duration, promo_rate, areas_promo):
             try:
@@ -74,7 +78,7 @@ class RevenueMgmt:
                                     area_name = area.split(' ')[0].strip()
                                     if area_name in new_areas:
                                           affected.append(area)
-                              print(affected)
+
                               if affected:
                                     for ba in bookings:
                                           cursor.execute('''
@@ -96,6 +100,19 @@ class RevenueMgmt:
                                                 str(ba['check_out'])
                                           )
 
+                        self.rebuild_revenue_cache()
+                        self.clear_revenue_cache()
+                        self.reservation_model.clear_reservation_cache_key()
+                        self.reservation_model.rebuild_reservation_cache_key()
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
+                        self.rate.clear_rates_cache()
+                        self.rate.rebuild_rates_cache()
+                        self.accounting.clear_accounting_cache()
+                        self.accounting.rebuild_accounting_cache()
+                        self.alert.clear_alert_cache()
+                        self.alert.rebuild_alert_cache()
+
                         return {
                               'success': True,
                               'message': 'Promotion applied successfully'
@@ -108,8 +125,12 @@ class RevenueMgmt:
                         'message': f'Promo application failed: {e}'
                   }
 
-      @cache.cached(timeout=300, key_prefix='get_promo_data')
       def get_promo_data(self, id=None):
+            cache_key = f"promo_data_{id}"
+            cached = cache.get(cache_key)
+            if cached:
+                  return cached
+            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -121,7 +142,14 @@ class RevenueMgmt:
                               cursor.execute("SELECT * FROM promos ORDER BY date DESC;")
                               promos = cursor.fetchall()
 
-                        return {'success': bool(promos), 'data': promos}
+                        result = {'success': bool(promos), 'data': promos}
+                        cache.set(cache_key, result, timeout=300)
+
+                        key_index = cache.get("promo_data_keys") or set()
+                        key_index.add(cache_key)
+                        cache.set("promo_data_keys", key_index, timeout=None)  # never expire
+
+                        return result
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
@@ -187,35 +215,36 @@ class RevenueMgmt:
                               AND check_in >= %s and check_in < %s
                         ''', (promo_start, promo_end))
                         bookings = cursor.fetchall()
-                        
+
                         booking_areas  = []
                         for b in bookings:
                               for a in b['accomodations'].split(','):
                                     booking_areas.append(a.strip())
-                        
+
                         for b in bookings:
                               cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', ('No promo.', 'No accomodations under promo.', b['booking_id']))
-                              con.commit()
+                        con.commit()
 
                         affected = []
                         for area in booking_areas:
                               area_name = area.split(' ')[0].strip()
                               if area_name in new_areas:
                                     affected.append(area)
-
+                                    
                         if affected:
                               for ba in bookings:
-                                    cursor.execute('''
-                                          UPDATE bookings
-                                          SET promo = %s,
-                                          promo_area = %s
-                                          WHERE booking_id = %s
-                                    ''', (
-                                          f"{promo_label} discount",
-                                          ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
-                                          ba['booking_id']
-                                    ))
-                                    con.commit()
+                                    if ba['accomodations'].split(',') == affected:
+                                          cursor.execute('''
+                                                UPDATE bookings
+                                                SET promo = %s,
+                                                promo_area = %s
+                                                WHERE booking_id = %s
+                                          ''', (
+                                                f"{promo_label} discount",
+                                                ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
+                                                ba['booking_id']
+                                          ))
+                                          con.commit()
 
                                     # Recalculate booking totals safely
                                     self.reservation_model.update_reservation_date(
@@ -223,6 +252,19 @@ class RevenueMgmt:
                                           str(ba['check_in']),
                                           str(ba['check_out'])
                                     )
+
+                        self.rebuild_revenue_cache()
+                        self.clear_revenue_cache()
+                        self.reservation_model.clear_reservation_cache_key()
+                        self.reservation_model.rebuild_reservation_cache_key()
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
+                        self.rate.clear_rates_cache()
+                        self.rate.rebuild_rates_cache()
+                        self.accounting.clear_accounting_cache()
+                        self.accounting.rebuild_accounting_cache()
+                        self.alert.clear_alert_cache()
+                        self.alert.rebuild_alert_cache()
 
                         return {
                               'success': promo_updated,
@@ -256,7 +298,7 @@ class RevenueMgmt:
 
                               cursor.execute(''' SELECT booking_id, accomodations, check_in, check_out FROM bookings WHERE check_out >= %s AND promo NOT IN ('No promo.') ''', (promo_data.get('date'),))
                               booking_data = cursor.fetchall()
-
+                              print(booking_data)
                               for data in booking_data:
                                     accomodations = data.get('accomodations').split(',')
                                     bid = data.get('booking_id')
@@ -279,6 +321,19 @@ class RevenueMgmt:
                         cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
                         con.commit()
 
+                        self.rebuild_revenue_cache()
+                        self.clear_revenue_cache()
+                        self.reservation_model.clear_reservation_cache_key()
+                        self.reservation_model.rebuild_reservation_cache_key()
+                        self.dashboard.clear_dashboard_cache()
+                        self.dashboard.dashboard_cache_rebuild()
+                        self.rate.clear_rates_cache()
+                        self.rate.rebuild_rates_cache()
+                        self.accounting.clear_accounting_cache()
+                        self.accounting.rebuild_accounting_cache()
+                        self.alert.clear_alert_cache()
+                        self.alert.rebuild_alert_cache()
+
                         return {'success': bool(cursor.rowcount != 0), 'message': "Promotions remove successfully" if bool(cursor.rowcount != 0) else "Failed to remove promotions."}
             except Exception as e:
                   con.rollback()
@@ -297,3 +352,11 @@ class RevenueMgmt:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
       
+      def rebuild_revenue_cache(self):
+            self.get_promo_data()
+
+      def clear_revenue_cache(self):
+            key_index = cache.get("promo_data_keys") or set()
+            for k in key_index:
+                  cache.delete(k)
+            

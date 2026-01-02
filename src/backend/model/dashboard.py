@@ -400,7 +400,7 @@ class Dashboard:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(f''' 
-                              SELECT check_in, check_out, name, booking_type, total_guest FROM bookings WHERE check_out = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status NOT IN ('Cancelled', 'Reserved', 'Checked-out');
+                              SELECT date_book, check_in, check_out, name, booking_type, total_guest FROM bookings WHERE check_out = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status NOT IN ('Cancelled', 'Reserved', 'Checked-out');
                         ''')
                         data = cursor.fetchall()
                         cache.set(cache_key, {'success': bool(data), 'data':data}, timeout=300)
@@ -419,7 +419,7 @@ class Dashboard:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(f''' 
-                              SELECT check_out, check_in, name, booking_type, total_guest FROM bookings WHERE check_in = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status IN ('Reserved') 
+                              SELECT date_book, check_out, check_in, name, booking_type, total_guest FROM bookings WHERE check_in = {'CURRENT_DATE() + INTERVAL 1 DAY' if day == 'tomorrow' else 'CURRENT_DATE()'} AND status IN ('Reserved') 
                         ''')
                         data = cursor.fetchall()
                         cache.set(cache_key, {'success': bool(data), 'data':data}, timeout=300)
@@ -437,7 +437,7 @@ class Dashboard:
                               WITH upcoming_arrivals AS (
                                     SELECT COUNT(*) AS total 
                                     FROM bookings 
-                                    WHERE check_in >= CURRENT_DATE() 
+                                    WHERE check_in >= CURRENT_DATE() and check_in < CURRENT_DATE() + INTERVAL 2 DAY
                                     AND status IN ('Reserved')
                               ), 
                               upcoming_checkouts AS ( 
