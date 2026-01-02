@@ -1,6 +1,5 @@
 from backend.forecast import Forecast
 from datetime import datetime, timedelta, date, timezone
-from backend.extensions import cache      
 
 class Alerts:
       def __init__(self, db):
@@ -355,9 +354,3 @@ class Alerts:
                   ''')
 
                   con.commit()
-
-            cache.delete('occupancy_alert')
-            cache.delete('housekeeping_alert')
-            cache.delete('bookings_alert')
-            cache.delete('notification_count')
-            cache.delete('generate_alerts')
