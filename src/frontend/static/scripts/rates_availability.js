@@ -205,14 +205,15 @@ async function updatePrice(e){
       const result = await response.json();
 
       if (result.success){
+            hideLoader();
             successMessageCard8(result.message);
             e.target.reset();
             document.getElementById('update-area-modal').remove();
             renderTable();
       }else {
+            hideLoader();
             failedMessageCard8(result.message);
       }
-      hideLoader();
 }
 
 // --------------  EVENT LISTENERS --------------- //

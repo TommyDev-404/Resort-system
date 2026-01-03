@@ -332,6 +332,7 @@ async function accomodationData(){
       const result = await response.json();
       
       if (result.success){
+            hideLoader();
             document.querySelectorAll('#room-status-tbody tr').forEach(row => row.remove());
             const areaNames = {
                   "Barkada": "Barkada Room",
@@ -344,6 +345,7 @@ async function accomodationData(){
                   createRowData(areaNames[data.name], data.total_room, data.need_clean, data.on_clean, data.ready, data.occupied, data.reserved);
             });
       }else{
+            hideLoader();
             const empty_row = `
                   <tr class="text-sm bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="7" class="text-center p-4">No data.</td>
@@ -352,7 +354,6 @@ async function accomodationData(){
 
             document.getElementById('room-status-tbody').innerHTML += empty_row;
       }
-      hideLoader();
 }
 
 async function historyData(){
@@ -413,16 +414,17 @@ async function submitAssignStaff(e){
       const result = await response.json();
 
       if(result.success){
+            await notifications();
+            hideLoader();
             successMessageCard7(result.message);
-            notifications();
             document.getElementById('assign-staff-modal').remove();
             openRoomDetails(form.get('area_name'));
             getSummarryCardData();
             accomodationData();
       }else{
+            hideLoader();
             failedMessageCard7(result.message);
       }
-      hideLoader();
 }
 
 async function getSummarryCardData(){
@@ -448,16 +450,17 @@ async function markReady(btn){
       const result = await response.json();
 
       if(result.success){
-            notifications();
+            await notifications();
+            hideLoader();
             successMessageCard7(result.message);
             openRoomDetails(row.dataset.room);
             getSummarryCardData();
             accomodationData();
             document.querySelector('#roomDetailsModal').remove();
       }else{
+            hideLoader();
             failedMessageCard7(result.message);
       }
-      hideLoader();
 }
 
 async function openRoomDetails(roomType){

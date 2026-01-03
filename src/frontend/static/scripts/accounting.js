@@ -78,6 +78,7 @@ async function loadBookingRevenue(year) {
       const result = await response.json();
 
       if (result.success){
+            hideLoader();
             removePrevRow();
             result.data.forEach(data => {
                   createRow(data.month_name, data.direct, data.online, data.total);
@@ -85,7 +86,6 @@ async function loadBookingRevenue(year) {
       }else {
             alert('Failed to fetch data.');
       }
-      hideLoader();
 }
 
 document.addEventListener('change', (e) => {

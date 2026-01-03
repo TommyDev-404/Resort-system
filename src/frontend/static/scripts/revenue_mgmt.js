@@ -127,14 +127,15 @@ async function applyPromo(e) {
       const res = await response.json();
 
       if (res.success){
+            hideLoader();
             successMessageCard5(res.message);
             e.target.reset();
             getAllPromo();
-            notifications();
+            await notifications();
       }else{
+            hideLoader();
             failedMessageCard5(res.message);
       }
-      hideLoader();
 }
 
 async function updatePromo(e) {
@@ -154,15 +155,16 @@ async function updatePromo(e) {
       const res = await response.json();
 
       if (res.success){
+            hideLoader();
             successMessageCard5(res.message);
             e.target.reset();
             resetToAddPromoForm();
             getAllPromo();
-            notifications();
+            await notifications();
       }else{
+            hideLoader();
             failedMessageCard5(res.message);
       }
-      hideLoader();
 }
 
 async function getAllPromo() {
@@ -382,13 +384,14 @@ async function removePromo(e){
       const result = await response.json();
 
       if (result.success){
+            hideLoader();
             successMessageCard5(result.message);
             getAllPromo();
-            notifications();
+            await notifications();
       }else{
+            hideLoader();
             failedMessageCard5(result.message);
       }      
-      hideLoader();
 }
 
 // submit

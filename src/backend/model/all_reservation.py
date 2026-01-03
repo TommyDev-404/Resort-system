@@ -229,7 +229,6 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
-                        self.alert.rebuild_alert_cache()
 
                         success = True
                         for result in range(len(result_list)):
@@ -450,7 +449,6 @@ class Reservation:
                         con.commit()
                         
                         self.alert.generate_alerts()
-                        self.alert.rebuild_alert_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -493,7 +491,6 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
-                        self.alert.rebuild_alert_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -554,7 +551,6 @@ class Reservation:
                         cursor.execute(''' SELECT * FROM bookings where booking_id = %s ''', (id,))
                         data = cursor.fetchone()
 
-                        result = {'success': bool(data), 'data': data}
                         return {'success': bool(data), 'data': data}
             except Exception as e:
                   con.rollback()
@@ -699,7 +695,6 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
-                        self.alert.rebuild_alert_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': "Updated successfully!" if cursor.rowcount > 0 else 'Failed to update.'}
             except Exception as e:

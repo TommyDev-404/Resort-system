@@ -778,14 +778,16 @@ async function addBooking(e){
 
             if (result.success){
                   e.target.reset();
+                  hideLoader();
+                  await notifications();
                   successMessageCard4(result.message);
-                  notifications();
                   document.querySelector('#booking-overlay').remove();
                   recentBookings();
                   summaryCardsDatas();
                   upcomingCount();
                   savedAccomodations.length =  0; // empty the array
             }else{
+                  hideLoader();
                   failedMessageCard4(result.message);
                   recentBookings();
             }
@@ -794,7 +796,6 @@ async function addBooking(e){
       }catch(err){
             console.log(err);
       }
-      hideLoader();
       
 }
 
@@ -810,16 +811,17 @@ async function markAsCheckout(){
       const result = await response.json();
 
       if (result.success){
-            notifications();
+            await notifications();
             upcomingCount();
+            hideLoader();
             successMessageCard4(result.message);
             recentBookings();
             summaryCardsDatas();
             resetButtonAndCheckBox();
       }else{
+            hideLoader();
             failedMessageCard4(result.message);
       }
-      hideLoader();
       getTotalsCountData();
 }
 
@@ -835,16 +837,17 @@ async function markAsCheckin(){
       const result = await response.json();
 
       if (result.success){
+            await notifications();
+            hideLoader();
             successMessageCard4(result.message);
-            notifications();
             upcomingCount();
             summaryCardsDatas();
             recentBookings();
             resetButtonAndCheckBox();
       }else{
+            hideLoader();
             failedMessageCard4(result.message);
       }
-      hideLoader();
       getTotalsCountData();
 }
 
@@ -860,16 +863,17 @@ async function cancelBooking(){
       const result = await response.json();
 
       if (result.success){
+            await notifications();
+            hideLoader();
             successMessageCard4(result.message);
-            notifications();
             upcomingCount();
             recentBookings();
             summaryCardsDatas();
             resetButtonAndCheckBox();
       }else{
+            hideLoader();
             failedMessageCard4(result.message);
       }
-      hideLoader();
       getTotalsCountData();
 }
 
@@ -886,14 +890,15 @@ async function submitPayment(e){
       const result = await response.json();
 
       if (result.success){
+            hideLoader();
             successMessageCard4(result.message);
             document.querySelector('#mark-paid-overlay').remove();
             recentBookings();
             resetButtonAndCheckBox();
       }else{
+            hideLoader();
             failedMessageCard4(result.message);
       }
-      hideLoader();
       getTotalsCountData();
 }
 
@@ -910,17 +915,18 @@ async function updateReservationDate(e){
       const result = await response.json();
 
       if (result.success){
+            await notifications();
+            hideLoader();
             successMessageCard4(result.message);
-            notifications();
             upcomingCount();
             document.querySelector('#update-reservation-overlay').remove();
             recentBookings();
             resetButtonAndCheckBox();
       }else {
+            hideLoader();
             failedMessageCard4(result.message);
             document.querySelector('#update-reservation-overlay').remove();
       }
-      hideLoader();
       getTotalsCountData();
 }
 
@@ -1126,12 +1132,14 @@ async function recentBookings(){
 
       const response = await fetch(`/recent-bookings?year=${year ? year : new Date().getFullYear()}&month=${month}&day=${day}`);
       const result = await response.json();
-      console.log(result);
+
       if (result.success){
+            hideLoader();
             result.data.forEach(row => {
                   createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
+            hideLoader();
             const empty_row = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="9" class="text-center text-gray-800 py-6 dark:text-white">No data.</td>
@@ -1140,7 +1148,6 @@ async function recentBookings(){
             
             tbody.innerHTML += empty_row;
       }
-      hideLoader();
 }
 
 async function getYears(){
@@ -1240,7 +1247,7 @@ async function getTotalsCountData() {
 
       const response = await fetch(`/totals?month=${month}&year=${year ? year : new Date().getFullYear()}&day=${day}`);
       const result = await response.json();
-            console.log(result);
+
       if (result.success){
             updateBadge('all-data', result.all);
             updateBadge('reserved-data', result.reserved);
@@ -1274,11 +1281,13 @@ async function bookingsCategories(e){
       const result = await response.json();
 
       if (result.success){
+            hideLoader();
             result.data.forEach(row => {
                   createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
+            hideLoader();
             const empty_row = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="9" class="text-center text-gray-800 py-6 dark:text-white">No data.</td>
@@ -1287,7 +1296,6 @@ async function bookingsCategories(e){
             
             tbody.innerHTML += empty_row;
       }
-      hideLoader();
 }
 
 async function searchGuest(e){ 
@@ -1302,10 +1310,12 @@ async function searchGuest(e){
       document.querySelectorAll('tbody tr').forEach(row => row.remove());      
       
       if (result.success){
+            hideLoader();
             result.data.forEach(row => {
                   createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
+            hideLoader();
             const empty_row = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="9" class="text-center text-gray-800 py-6 dark:text-white">No data.</td>
@@ -1314,7 +1324,6 @@ async function searchGuest(e){
             
             tbody.innerHTML += empty_row;
       }
-      hideLoader();
 }
 
 async function upcomingData(type, day_type) {
@@ -1330,6 +1339,7 @@ async function upcomingData(type, day_type) {
       const res = await response.json();
 
       if (res.success){
+            hideLoader();
             res.data.forEach(guest => {
                   const check_out = new Date(guest.check_out).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
                   const check_in = new Date(guest.check_in).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -1364,6 +1374,7 @@ async function upcomingData(type, day_type) {
                   document.querySelector('#upcoming-table2').innerHTML += row;
             });
       }else{
+            hideLoader();
             const empty_row = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up py-2">
                         <td colspan="6" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
@@ -1372,7 +1383,6 @@ async function upcomingData(type, day_type) {
 
             document.querySelector('#upcoming-table2').innerHTML += empty_row;
       }
-      hideLoader();
 }
 
 async function upcomingCount() {

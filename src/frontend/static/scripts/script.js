@@ -47,7 +47,7 @@ function showLoader(sectionId) {
       // Hide all sections
       contentSections.forEach(section => section.classList.add('hidden'));
 
-            loadingAnimation0(); // adds #loading inside #loadingPortal
+      loadingAnimation0(); // adds #loading inside #loadingPortal
 }
 
 function showLoaderLogout() {
@@ -112,12 +112,13 @@ function logout(){
             try {
                   const response = await fetch('/logout', { method: 'POST' });
                   if (response.ok) {
+                        hideLoaderLogout();
                         successMessageCard6('Log out successfully', '/login');
                   }
             } catch (err) {
+                  hideLoaderLogout();
                   failedMessageCard6(`Logout failed: ${err}`);
             }
-            hideLoaderLogout();
       });
 }
 
@@ -202,13 +203,15 @@ document.addEventListener('click', (e) => {
 });
 
 /*---------------- INITIAL LOAD ----------------*/
-window.addEventListener('DOMContentLoaded', () => {
-      notifications();
+window.addEventListener('DOMContentLoaded', async() => {
+      showLoader('home-dashboard');
+      await notifications();
       switchContent('home-dashboard'); // Show default section
       
       // remember darkmode on load with its icon
       localStorage.getItem('theme') === 'dark' ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark');
       localStorage.getItem('theme') === 'dark' ? document.querySelector('#lightIcon').classList.toggle('hidden') : document.querySelector('#darkIcon').classList.toggle('hidden');
+      hideLoader();
 });
 
 function logoutCard(){

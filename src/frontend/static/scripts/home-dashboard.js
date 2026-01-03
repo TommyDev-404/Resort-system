@@ -479,6 +479,7 @@ async function upcomingCheckouts(type) {
       const res = await response.json();
       
       if (res.success){
+            hideLoader();
             res.data.forEach(guest => {
                   const date = new Date(guest.check_out).toISOString().split('T')[0];
                   const date2 = new Date(guest.check_in).toISOString().split('T')[0];
@@ -514,6 +515,7 @@ async function upcomingCheckouts(type) {
                   document.getElementById('upcoming-checkout-table').innerHTML += row;
             });
       }else{
+            hideLoader();
             const empty_row = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="8" class="text-center text-gray-800 py-2 dark:text-white">No data.</td>
@@ -522,7 +524,6 @@ async function upcomingCheckouts(type) {
                   
             document.getElementById('upcoming-checkout-table').innerHTML += empty_row;
       }
-      hideLoader();
 }
 
 async function upcomingArrivals(type) {
@@ -533,6 +534,7 @@ async function upcomingArrivals(type) {
       const res = await response.json();
 
       if (res.success){
+            hideLoader();
             res.data.forEach(guest => {
                   const date = new Date(guest.check_out).toISOString().split('T')[0];
                   const date2 = new Date(guest.check_in).toISOString().split('T')[0];
@@ -568,6 +570,7 @@ async function upcomingArrivals(type) {
                   document.getElementById('upcoming-arrival-table').innerHTML += row;
             });
       }else{
+            hideLoader();
             const empty_row = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="8" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
@@ -576,7 +579,6 @@ async function upcomingArrivals(type) {
                   
             document.getElementById('upcoming-arrival-table').innerHTML += empty_row;
       }
-      hideLoader();
 }
 
 // Room Overview

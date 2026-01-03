@@ -88,8 +88,6 @@ class Housekeeping:
                         ''', (area_name.split(' ')[0].lower(), room_no))
                         
                         con.commit()
-                        
-                        self.alert.rebuild_alert_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Assigned successfully!' if bool(cursor.rowcount > 0) else 'Failed inserting data!'}
             except Exception as e:
@@ -109,7 +107,6 @@ class Housekeeping:
 
                         con.commit()
                         
-                        self.alert.rebuild_alert_cache()
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Marked ready successfully!' if bool(cursor.rowcount > 0) else 'Failed inserting data!'}
             except Exception as e:
                   con.rollback()

@@ -96,8 +96,6 @@ class RevenueMgmt:
                                                 str(ba['check_out'])
                                           )
 
-                        self.alert.rebuild_alert_cache()
-
                         return {
                               'success': True,
                               'message': 'Promotion applied successfully'
@@ -228,7 +226,6 @@ class RevenueMgmt:
                                           str(ba['check_out'])
                                     )
 
-                        self.alert.rebuild_alert_cache()
                         return {
                               'success': promo_updated,
                               'message': "Promotions updated successfully" if promo_updated else "No changes were made to the promotion."
@@ -283,8 +280,7 @@ class RevenueMgmt:
 
                         cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
                         con.commit()
-                        self.alert
-                        self.alert.rebuild_alert_cache()
+
                         return {'success': bool(cursor.rowcount != 0), 'message': "Promotions remove successfully" if bool(cursor.rowcount != 0) else "Failed to remove promotions."}
             except Exception as e:
                   con.rollback()

@@ -623,17 +623,18 @@ async function addStaff(e){
             const result = await response.json();
 
             if (result.success){
+                  hideLoader();
                   successMessageCard3(result.message);
                   document.querySelector('#addStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
             }else{
+                  hideLoader();
                   failedMessageCard3(result.message);
             }
       }catch(err){
             console.error(err);
       }
-      hideLoader();
 }
 
 async function viewStaffInfo(id){
@@ -871,12 +872,14 @@ async function addStaffAttendance(e){
             const result = await response.json();
 
             if (result.success){
+                  hideLoader();
                   successMessageCard3(result.message);
                   document.querySelector('#bulkAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
                   showAllStaff();
             }else{
+                  hideLoader();
                   failedMessageCard3(result.message);
                   document.querySelector('#bulkAttendanceModal').remove();
                   allStaffAttendance();
@@ -886,7 +889,6 @@ async function addStaffAttendance(e){
       }catch(err){
             console.error(err);
       } 
-      hideLoader();
 }
 
 async function updateStaffAttendance(e){
@@ -919,11 +921,13 @@ async function updateStaffAttendance(e){
             const result = await response.json();
 
             if (result.success){
+                  hideLoader();
                   successMessageCard3(result.message);
                   document.querySelector('#updateAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
             }else{
+                  hideLoader();
                   failedMessageCard3(result.message);
                   document.querySelector('#updateAttendanceModal').remove();
                   allStaffAttendance();
@@ -933,7 +937,6 @@ async function updateStaffAttendance(e){
             console.error(err);
       } 
 
-      hideLoader();
 }
 
 async function updateStaffInfo(e){
@@ -950,11 +953,13 @@ async function updateStaffInfo(e){
             const result = await response.json();
 
             if (result.success){
+                  hideLoader();
                   successMessageCard3(result.message);
                   document.querySelector('#updateStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
             }else{
+                  hideLoader();
                   failedMessageCard3(result.message);
                   document.querySelector('#updateStaffModal').remove();
                   showAllStaff();
@@ -963,7 +968,6 @@ async function updateStaffInfo(e){
       }catch(err){
             console.error(err);
       } 
-      hideLoader();
 }
 
 async function allStaffAttendance(){
@@ -1133,17 +1137,18 @@ async function removeStaff(id){
             const result = await response.json();
 
             if (result.success){
+                  hideLoader();
                   successMessageCard3(result.message);
                   showAllStaff();
                   sumarryCards();
             }else{
+                  hideLoader();
                   failedMessageCard3(result.message);
             }
 
       }catch(err){
             console.error(err);
       }
-      hideLoader();
 }
 
 async function removeStaffAttendance(e){
@@ -1161,18 +1166,19 @@ async function removeStaffAttendance(e){
             const result = await response.json();
 
             if (result.success){
+                  hideLoader();
                   successMessageCard3(result.message);
                   allStaffAttendance();
                   sumarryCards();
                   showAllStaff();
             }else{
+                  hideLoader();
                   failedMessageCard3(result.message);
             }
 
       }catch(err){
             console.error(err);
       }
-      hideLoader();
 }
 
 async function sumarryCards(){
