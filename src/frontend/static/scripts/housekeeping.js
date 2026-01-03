@@ -289,15 +289,15 @@ function getMonthsAndDays(){
       }
 }
 
-function loadingAnimation0(){
+function loadingAnimation0(type=null){
       const load = `
-            <div id="loading" class="absolute top-45 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
+            <div id="loading" class="fixed top-[70%] left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse text-black">Fetcing data...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
             </div>
       `;      
 
-      document.getElementById('loadingCleanPortal').innerHTML += load;
+      type ? document.getElementById('loadingCleanPortal2').innerHTML += load : document.getElementById('loadingCleanPortal').innerHTML += load;
 }
 
 function loadingAnimationAdd(message){
@@ -314,6 +314,8 @@ function loadingAnimationAdd(message){
 function showLoader(type, message=null) {
       if (type === 'table'){
             loadingAnimation0(); // adds #loading inside #loadingPortal
+      }else if (type === 'table2'){
+                  loadingAnimation0(type); // adds #loading inside #loadingPortal
       }else{
             loadingAnimationAdd(message)
       }
@@ -359,16 +361,19 @@ async function accomodationData(){
 async function historyData(){
       const month = document.getElementById('monthSelect3').value;
       const day = document.getElementById('daySelect2').value;
-
+      
+      showLoader('table2');
       const response = await fetch(`/cleaning-history?month=${month}&day=${day}`);
       const result = await response.json();
 
       document.querySelectorAll('#clean-history-tbody tr').forEach(row => row.remove());
       if (result.success){
+            hideLoader();
             result.data.forEach(data => {
                   createRowDataHistory(data.room, data.name, data.date, data.status);
             });
       }else{
+            hideLoader();
             const empty_row = `
                   <tr class="text-sm bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
                         <td colspan="4" class="text-center p-4">No data.</td>

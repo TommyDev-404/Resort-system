@@ -32,11 +32,11 @@ function loadingAnimation0(){
       document.getElementById('loadingPortal').innerHTML += load;
 }
 
-function loadingAnimationLogout(){
+function loadingAnimationLogout(message){
       const load = `
             <div id="loading" class="absolute top-0 left-0 flex flex-col items-center justify-center h-screen inset-0 bg-black/20 text-white space-y-2 backdrop-blur-[2px] z-50">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Logging out...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">${message}</p>
             </div>
       `;      
 
@@ -48,10 +48,6 @@ function showLoader(sectionId) {
       contentSections.forEach(section => section.classList.add('hidden'));
 
       loadingAnimation0(); // adds #loading inside #loadingPortal
-}
-
-function showLoaderLogout() {
-      loadingAnimationLogout(); // adds #loading inside #loadingDataPortal
 }
 
 function hideLoaderLogout() {
@@ -108,7 +104,7 @@ function logout(){
 
       // logout
       document.querySelector('#confirmLogout').addEventListener('click', async (e) => {
-            showLoaderLogout();
+            loadingAnimationLogout('Processing...')
             try {
                   const response = await fetch('/logout', { method: 'POST' });
                   if (response.ok) {
@@ -249,8 +245,13 @@ function successMessageCard6(message, redirect = null) {
       document.getElementById("close-message").addEventListener("click", () =>  {
             const box = document.getElementById("success-message");
             box.remove();
-
-            if (redirect)  window.location.href = redirect;
+            
+            if (redirect) {
+                  loadingAnimationLogout('Logging out...');
+                  setTimeout(() => {
+                        window.location.href = redirect;
+                }, 600); // short delay so spinner appears
+            }
       });
 }
 

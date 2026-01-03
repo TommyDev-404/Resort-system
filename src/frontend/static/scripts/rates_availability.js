@@ -80,7 +80,7 @@ function openUpdateAreaModal(e) {
 
 function loadingAnimation0(){
       const load = `
-            <div id="loading" class="absolute top-67 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-30 ">
+            <div id="loading" class="fixed top-[55%] left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
                   <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
             </div>

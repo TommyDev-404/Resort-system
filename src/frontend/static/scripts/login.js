@@ -43,7 +43,6 @@ document.addEventListener('click', (e) => {
       if (e.target.matches('#change-pass')) changePassword();
       if(e.target.matches('#open-login')) loginOverlay.classList.remove('hidden');
       if(e.target.matches('#close-login')) loginOverlay.classList.add('hidden');
-      if (e.target.matches('#close-failed-message')) document.querySelector('#failed-message').remove();
 });
 
 // show password
@@ -63,11 +62,11 @@ window.addEventListener('load', () => {
 });
 
 // ----------------- HELPERS ---------------- //
-function loadingAnimation1(){
+function loadingAnimation1(message){
       const load = `
             <div id="loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse">Loading, please wait...</p>
+                  <p class="text-[15px] font-medium animate-pulse">${message}</p>
             </div>
       `;      
 
@@ -100,7 +99,7 @@ function successMessageCard1(message, redirect = null) {
             box.remove();
 
             if (redirect) {
-                  showLoader();
+                  showLoader('Logging in...');
                   setTimeout(() => {
                         window.location.href = redirect;
                 }, 600); // short delay so spinner appears
@@ -127,8 +126,8 @@ function failedMessageCard1(message){
       });
 }
 
-function showLoader() {
-      loadingAnimation1(); // adds #loading
+function showLoader(message) {
+      loadingAnimation1(message); // adds #loading
 }
 
 function hideLoader() {
@@ -143,7 +142,7 @@ async function loginAdmin(e) {
 
       try {
           // Show loader before fetch
-            showLoader();
+            showLoader('Validating...');
             
             const response = await fetch('/login/auth', {
                   method: 'POST',
@@ -172,7 +171,7 @@ async function forgotPassword() {
 
       if (email === '') return failedMessageCard1('Empty input! Please fill in before getting code.')
       try {
-            showLoader();
+            showLoader('Sending code...');
             const response = await fetch(`/forgot-password`, {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -224,7 +223,7 @@ async function changePassword() {
       const new_password = document.querySelector('input[name="new_password"]').value;
       
       try {
-            showLoader();
+            showLoader('Updating password...');
 
             const response = await fetch(`/change-password`, {
                   method: 'POST',
