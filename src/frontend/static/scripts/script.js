@@ -162,10 +162,6 @@ document.addEventListener('click', (e) => {
             adminMenu.classList.toggle('hidden');
             return;
       }
-      
-      // open notif & admin
-      if (e.target.closest('#notification')) notificationModal.classList.toggle('hidden');
-      if (e.target.closest('#adminButton')) adminMenu.classList.toggle('hidden');
 
       // --- Handle outside click ---
       if (!isInsideNotification && !isInsideAdmin) {
@@ -207,6 +203,7 @@ document.addEventListener('click', (e) => {
 
 /*---------------- INITIAL LOAD ----------------*/
 window.addEventListener('DOMContentLoaded', () => {
+      notifications();
       switchContent('home-dashboard'); // Show default section
       
       // remember darkmode on load with its icon

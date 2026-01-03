@@ -383,6 +383,7 @@ async function removePromo(e){
 
       if (result.success){
             successMessageCard5(result.message);
+            document.getElementById('notifSound').play();
             getAllPromo();
             notifications();
       }else{
@@ -420,5 +421,4 @@ document.addEventListener('input', (e) => {
 export async function initPageRevenueMgmt(){
       resetToAddPromoForm();
       getAllPromo();
-      notifications();
 }

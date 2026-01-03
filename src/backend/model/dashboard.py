@@ -2,10 +2,9 @@ from backend.forecast import Forecast
 from backend.extensions import cache
 
 class Dashboard:
-      def __init__(self, db, target=None):
+      def __init__(self, db):
             self.db = db
             self.revenue_forecast = Forecast()
-            self.analytics = target
       
       def get_total_guest_house(self):
             with self.db.connect() as con:
@@ -154,6 +153,7 @@ class Dashboard:
 
                   return {'current_revenue': data.get('today_revenue'), 'change': data.get('achievement_percent')}
 
+      @cache.cached(timeout=300, key_prefix='heavy_guest_month')
       def heavy_guest_month(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -175,7 +175,7 @@ class Dashboard:
                         value.append(int(d.get('total_guest')))
 
                   return {'month': month, 'value': value}
-      
+
       def most_booked_area(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -205,6 +205,7 @@ class Dashboard:
                         'hall': data.get('hall')
                         }
 
+      @cache.cached(timeout=300, key_prefix='top_most_booked_area')
       def top_most_booked_area(self):
             try:
                   with self.db.connect() as con:
@@ -484,6 +485,7 @@ class Dashboard:
 
                   return {'data': data}
       
+      @cache.cached(timeout=300, key_prefix='booking_type_distro')
       def booking_type_distro(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -536,3 +538,12 @@ class Dashboard:
                   data = cursor.fetchall()
 
                   return {'data' : data}
+
+      def rebuild_dashboard_cache(self):
+            cache.delete('heavy_guest_month')
+            cache.delete('top_most_booked_area')
+            cache.delete('booking_type_distro')
+
+            self.heavy_guest_month()
+            self.top_most_booked_area()
+            self.booking_type_distro()

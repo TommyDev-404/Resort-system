@@ -4,14 +4,10 @@ from backend.extensions import cache
 from .housekeeping import Housekeeping
 
 class Reservation:
-      def __init__(self, db, alert, dashboard, analytics, rate, accounting):
+      def __init__(self, db, alert, dashboard):
             self.db = db
             self.alert = alert
             self.dashboard = dashboard
-            self.analytics = analytics
-            self.rate = rate
-            self.accounting = accounting
-            self.housekeeping = Housekeeping(db, alert, self, rate)
       
       def get_avl_spaces(self):
             try:
@@ -233,6 +229,7 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.alert.rebuild_alert_cache()
 
                         success = True
                         for result in range(len(result_list)):
@@ -453,6 +450,7 @@ class Reservation:
                         con.commit()
                         
                         self.alert.generate_alerts()
+                        self.alert.rebuild_alert_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -495,6 +493,7 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.alert.rebuild_alert_cache()
 
                         return {'success': bool(cursor.rowcount != 0), 'message': 'Updated successfully!' if cursor.rowcount != 0 else 'Failed!'}
             except Exception as e:
@@ -700,6 +699,7 @@ class Reservation:
                         con.commit()
 
                         self.alert.generate_alerts()
+                        self.alert.rebuild_alert_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': "Updated successfully!" if cursor.rowcount > 0 else 'Failed to update.'}
             except Exception as e:

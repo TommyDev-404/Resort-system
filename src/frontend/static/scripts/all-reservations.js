@@ -675,6 +675,17 @@ function loadingAnimation0(){
       document.getElementById('loadingTablePortal').innerHTML += load;
 }
 
+function loadingAnimationUpcoming(){
+      const load = `
+            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center justify-center h-[40vh] inset-0 bg-black/5 text-white space-y-2 backdrop-blur-[2px] z-10">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Fetching data...</p>
+            </div>
+      `;      
+
+      document.getElementById('upcoming-loading-data2').innerHTML += load ;
+}
+
 function loadingAnimationAdd(message){
       const load = `
             <div id="loading" class="absolute w-full top-0 left-0 flex flex-col items-center  bg-black/50 justify-center h-screen space-y-2 z-50 ">
@@ -709,7 +720,7 @@ async function viewUpcomingModal(title, type){
       const modal = `
       <div id="view-upcoming-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <!-- Modal Container -->
-            <div class="relative w-full max-w-5xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[50vh]">
+            <div class="relative w-full max-w-5xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[60vh]">
                   <!-- Close Button -->
                   <span id="close-view-upcoming-modal" class="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white text-xl font-semibold transition">&times;</span>
             
@@ -726,7 +737,7 @@ async function viewUpcomingModal(title, type){
                   <!-- Table Wrapper -->
                   <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <!-- Scroll Area -->
-                        <div class="max-h-[37vh] overflow-y-auto">
+                        <div class="h-[40vh] overflow-y-auto">
                               <table class="w-full text-sm text-left text-gray-800 dark:text-gray-100">
                                     <thead class="sticky top-0 z-50 bg-gray-100 dark:bg-gray-800 text-xs uppercase text-gray-600 dark:text-gray-300">
                                           <tr>
@@ -737,7 +748,9 @@ async function viewUpcomingModal(title, type){
                                                 <th class="px-4 py-3 text-center">Total Guests</th>
                                           </tr>
                                     </thead>
-                                    <tbody id="upcoming-table2" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                                    <tbody id="upcoming-table2" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                          <div id="upcoming-loading-data2" class="relative">
+                                    </tbody>
                               </table>
                         </div>
                   </div>
@@ -1306,6 +1319,7 @@ async function searchGuest(e){
 
 async function upcomingData(type, day_type) {
       document.querySelector('#upcoming-table2').querySelectorAll('tbody tr').forEach(row => row.remove());
+      loadingAnimationUpcoming();
       let url = null;
       if (type === 'checkout'){
             url = `/upcoming-checkout?day=${day_type}`;
@@ -1322,7 +1336,7 @@ async function upcomingData(type, day_type) {
                   const date_book = new Date(guest.date_book).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
                   const row = `
-                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
+                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition py-2">
                               <td class="px-3 py-2 text-center">
                                     <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
                                           ${guest.name}
@@ -1351,13 +1365,14 @@ async function upcomingData(type, day_type) {
             });
       }else{
             const empty_row = `
-                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
+                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up py-2">
                         <td colspan="6" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
                   </tr>
             `;
 
             document.querySelector('#upcoming-table2').innerHTML += empty_row;
       }
+      hideLoader();
 }
 
 async function upcomingCount() {
@@ -1481,6 +1496,5 @@ export function initPageReservation(){
       resetDropDown();
       resetButtonAndCheckBox();
       summaryCardsDatas();
-      notifications();
       upcomingCount();
 }

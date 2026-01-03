@@ -1,12 +1,15 @@
 from backend.forecast import Forecast
 from datetime import datetime, timedelta, date, timezone
+from backend.extensions import cache
 
 class Alerts:
       def __init__(self, db):
             self.db = db
             self.revenue_forecast = Forecast()
             
+      @cache.cached(timeout=300, key_prefix='occupancy_alert')
       def occupancy_alert(self):
+            print('from db')
             with self.db.connect() as con:
                   cursor = con.cursor()
                   cursor.execute('''
@@ -68,6 +71,7 @@ class Alerts:
                   else:
                         return {'message': None}
 
+      @cache.cached(timeout=300, key_prefix='housekeeping_alert')
       def housekeeping_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -166,6 +170,7 @@ class Alerts:
 
                   self.auto_cancell_7d()
 
+      @cache.cached(timeout=300, key_prefix='bookings_alert')
       def bookings_alert(self):
             with self.db.connect() as con:
                   cursor = con.cursor()
@@ -354,3 +359,12 @@ class Alerts:
                   ''')
 
                   con.commit()
+
+      def rebuild_alert_cache(self):
+            cache.delete('occupancy_alert')
+            cache.delete('housekeeping_alert')
+            cache.delete('bookings_alert')
+
+            self.occupancy_alert()
+            self.housekeeping_alert()
+            self.bookings_alert()

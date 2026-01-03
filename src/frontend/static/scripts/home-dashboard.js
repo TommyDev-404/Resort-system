@@ -102,39 +102,24 @@ function formatPesoShort2(num) {
       return "₱" + num.toLocaleString("en-PH");
 }
 
-function loadingAnimation2(){
+function loadingAnimation0(type){
       const load = `
-            <div id="loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2">
+            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center justify-center h-[20vh] inset-0 bg-black/5 text-white space-y-2 backdrop-blur-[2px] z-10">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse">Loading, please wait...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Fetching data...</p>
             </div>
       `;      
 
-      document.getElementById('adminModalPortal').innerHTML += load;
+      type === 'checkout' ? document.getElementById('upcoming-checkout-loading').innerHTML += load : document.getElementById('upcoming-arrival-loading').innerHTML += load ;
 }
 
-function loadingAnimation0(){
-      const load = `
-            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center justify-center h-screen inset-0 bg-black/5 text-white space-y-2 backdrop-blur-[2px]">
-                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Loading data...</p>
-            </div>
-      `;      
-
-      document.getElementById('loadingPortal').innerHTML += load;
+function showLoader(type) {
+      loadingAnimation0(type); // adds #loading inside #loadingPortal
 }
 
-function showLoader() {
-      loadingAnimation0(); // adds #loading inside #loadingPortal
-}
-
-function hideLoader(sectionId) {
+function hideLoader() {
       const loader = document.querySelector('#loading');
       if (loader) loader.remove();
-      
-      // Show target section
-      const targetSection = document.getElementById(sectionId);
-      if (targetSection) targetSection.classList.remove('hidden');
 }
 
 function timeAgo(inputTime) {
@@ -320,6 +305,8 @@ export async function notifications() {
             allNotifications.push(occupancy_notif);
             document.getElementById('notif-modal').innerHTML += occupancy_notif;
             lucide.createIcons(); 
+            document.getElementById('notifSound').play()
+
       }
 
       if (res2.success){
@@ -342,6 +329,8 @@ export async function notifications() {
                   document.getElementById('notif-modal').innerHTML += housekeeping_notif;
                   lucide.createIcons(); 
             });
+            document.getElementById('notifSound').play()
+
       }
 
       if (res3.success){
@@ -377,6 +366,8 @@ export async function notifications() {
                   document.getElementById('notif-modal').innerHTML += bookings_notif;
                   lucide.createIcons(); 
             });
+            document.getElementById('notifSound').play()
+
       }
       
       if (have_notifications.length == 0){
@@ -484,6 +475,7 @@ async function bookingOverviewCardsData() {
 
 async function upcomingCheckouts(type) {
       document.getElementById('upcoming-checkout-table').querySelectorAll('tbody tr').forEach(row => row.remove());
+      showLoader('checkout');
       const response = await fetch(`/upcoming-checkout?day=${type}`, {method: "GET"});
       const res = await response.json();
       
@@ -531,10 +523,13 @@ async function upcomingCheckouts(type) {
                   
             document.getElementById('upcoming-checkout-table').innerHTML += empty_row;
       }
+      hideLoader();
 }
 
 async function upcomingArrivals(type) {
       document.getElementById('upcoming-arrival-table').querySelectorAll('tbody tr').forEach(row => row.remove());
+
+      showLoader('arrival');
       const response = await fetch(`/upcoming-arrival?day=${type}`, {method: "GET"});
       const res = await response.json();
 
@@ -582,6 +577,7 @@ async function upcomingArrivals(type) {
                   
             document.getElementById('upcoming-arrival-table').innerHTML += empty_row;
       }
+      hideLoader();
 }
 
 // Room Overview
@@ -929,7 +925,6 @@ document.addEventListener('change', (e) => {
 // Initial load: ensure the default content is shown and charts are drawn
 export async function initPageDashboard() {
       allNotifications.length = 0;
-      notifications();
       resetDropdown();
       mostBookedArea();
       totalGuestInHouse();

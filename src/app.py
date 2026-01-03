@@ -2,12 +2,18 @@ import pymysql
 from datetime import date, timedelta
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
 from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
+from backend.extensions import cache
 
 app = Flask(__name__, template_folder='frontend/template', static_folder='frontend/static')
 app.secret_key = 'i_love_u'  # secret key
 
 # Set session lifetime
 app.permanent_session_lifetime = timedelta(minutes=30)  # 30 minutes
+
+# Configure cache
+app.config['CACHE_TYPE'] = 'SimpleCache'
+app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # 5 minutes
+cache.init_app(app)
 
 # prevent going back to homepage after logout or going direct on home page without authentication
 @app.after_request
@@ -27,10 +33,10 @@ analytics = Analytics(db)
 alert = Alerts(db)
 avl = RatesAndAvailability(db)
 acc = Accounting(db)
-dashboard = Dashboard(db, analytics.get_target_revenue().get("target"))
-reserve = Reservation(db, alert, dashboard, analytics, avl, acc)
-house = Housekeeping(db, alert, reserve, avl)
-rev = RevenueMgmt(db, avl, dashboard, analytics, reserve, acc, alert)
+dashboard = Dashboard(db)
+reserve = Reservation(db, alert, dashboard)
+house = Housekeeping(db, alert)
+rev = RevenueMgmt(db, alert, reserve)
 staff = Staff_Management(db, house)
 login = Login(db)
 

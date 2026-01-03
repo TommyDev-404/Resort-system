@@ -96,5 +96,5 @@ getYearNow();
 
 export function initPageAccounting(){
       getSummaryData();
-      loadBookingRevenue('2025');
+      loadBookingRevenue(new Date().getFullYear());
 }

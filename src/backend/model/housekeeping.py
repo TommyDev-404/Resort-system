@@ -3,11 +3,9 @@ from datetime import date, datetime
 from backend.extensions import cache
 
 class Housekeeping:
-      def __init__(self, db, alert, reserve, rate):
+      def __init__(self, db, alert):
             self.db = db
             self.alert = alert
-            self.reserve = reserve
-            self.rate = rate
 
       def total_area_data(self):
             try:
@@ -90,6 +88,8 @@ class Housekeeping:
                         ''', (area_name.split(' ')[0].lower(), room_no))
                         
                         con.commit()
+                        
+                        self.alert.rebuild_alert_cache()
 
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Assigned successfully!' if bool(cursor.rowcount > 0) else 'Failed inserting data!'}
             except Exception as e:
@@ -109,6 +109,7 @@ class Housekeeping:
 
                         con.commit()
                         
+                        self.alert.rebuild_alert_cache()
                         return {'success': bool(cursor.rowcount > 0), 'message': 'Marked ready successfully!' if bool(cursor.rowcount > 0) else 'Failed inserting data!'}
             except Exception as e:
                   con.rollback()

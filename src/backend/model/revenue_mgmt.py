@@ -2,14 +2,10 @@ from datetime import date, datetime
 from backend.extensions import cache
 
 class RevenueMgmt:
-      def __init__(self, db, rate, dashboard, analytics, reservation_model, accounting, alert):
+      def __init__(self, db, alert, reserve):
             self.db = db
-            self.rate = rate
-            self.dashboard = dashboard
-            self.analytics = analytics
-            self.reservation_model = reservation_model
-            self.accounting = accounting
             self.alert = alert
+            self.reservation_model = reserve
 
       def apply_promo(self, dates, promo_name, duration, promo_rate, areas_promo):
             try:
@@ -99,6 +95,8 @@ class RevenueMgmt:
                                                 str(ba['check_in']),
                                                 str(ba['check_out'])
                                           )
+
+                        self.alert.rebuild_alert_cache()
 
                         return {
                               'success': True,
@@ -230,6 +228,7 @@ class RevenueMgmt:
                                           str(ba['check_out'])
                                     )
 
+                        self.alert.rebuild_alert_cache()
                         return {
                               'success': promo_updated,
                               'message': "Promotions updated successfully" if promo_updated else "No changes were made to the promotion."
@@ -285,6 +284,7 @@ class RevenueMgmt:
                         cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
                         con.commit()
 
+                        self.alert.rebuild_alert_cache()
                         return {'success': bool(cursor.rowcount != 0), 'message': "Promotions remove successfully" if bool(cursor.rowcount != 0) else "Failed to remove promotions."}
             except Exception as e:
                   con.rollback()

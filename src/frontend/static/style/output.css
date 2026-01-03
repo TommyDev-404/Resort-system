@@ -338,9 +338,6 @@
   .top-3 {
     top: calc(var(--spacing) * 3);
   }
-  .top-3\.5 {
-    top: calc(var(--spacing) * 3.5);
-  }
   .top-4 {
     top: calc(var(--spacing) * 4);
   }
@@ -367,9 +364,6 @@
   }
   .right-3 {
     right: calc(var(--spacing) * 3);
-  }
-  .right-3\.5 {
-    right: calc(var(--spacing) * 3.5);
   }
   .right-4 {
     right: calc(var(--spacing) * 4);
@@ -596,14 +590,14 @@
   .h-\[45vh\] {
     height: 45vh;
   }
-  .h-\[50vh\] {
-    height: 50vh;
-  }
   .h-\[55vh\] {
     height: 55vh;
   }
   .h-\[57vh\] {
     height: 57vh;
+  }
+  .h-\[60vh\] {
+    height: 60vh;
   }
   .h-\[65vh\] {
     height: 65vh;
@@ -637,9 +631,6 @@
   }
   .max-h-80 {
     max-height: calc(var(--spacing) * 80);
-  }
-  .max-h-\[37vh\] {
-    max-height: 37vh;
   }
   .max-h-\[40vh\] {
     max-height: 40vh;

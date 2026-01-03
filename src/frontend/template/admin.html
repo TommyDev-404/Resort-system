@@ -164,6 +164,10 @@
 							<path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a2 2 0 002-2H8a2 2 0 002 2z"/>
 						</svg>
 					</button>
+                              <audio id="notifSound" preload="auto"
+                                          src="{{ url_for('static', filename='assets/notif-sound.mp3') }}">
+                              </audio>
+                              
 					<span id="notification-count" class="absolute -top-2 -right-2 flex items-center justify-center text-[10px] font-bold text-white bg-red-500 rounded-full border border-white shadow-sm dark:border-gray-900"></span>
 
 					<!-- Notification Modal -->
@@ -442,7 +446,9 @@
                                                                   <th class="px-3 py-2 text-center">Guests</th>
                                                             </tr>
                                                       </thead>
-                                                      <tbody id="upcoming-checkout-table"></tbody>
+                                                      <tbody id="upcoming-checkout-table">
+                                                            <div id="upcoming-checkout-loading" class="relative"></div>
+                                                      </tbody>
                                                       </table>
                                                 </div>
                                           </div>
@@ -469,7 +475,9 @@
                                                                   <th class="px-3 py-2 text-center">Guests</th>
                                                             </tr>
                                                       </thead>
-                                                      <tbody id="upcoming-arrival-table"></tbody>
+                                                      <tbody id="upcoming-arrival-table">
+                                                            <div id="upcoming-arrival-loading" class="relative"></div>
+                                                      </tbody>
                                                       </table>
                                                 </div>
                                           </div>
@@ -686,7 +694,7 @@
                                     </div>
 
                                     <div class="relative w-full flex-grow rounded-lg bg-green-100 dark:bg-gray-800 flex items-center justify-center overflow-visible">
-                                          <canvas id="checkin-forecast-chart" width="800" height="150" class="w-full h-full"></canvas>
+                                          <canvas id="checkin-forecast-chart" width="800" height="120" class="w-full h-auto"></canvas>
                                           <div class="absolute inset-0 opacity-[0.05] bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/dot-grid.png')] bg-repeat pointer-events-none"></div>
                                           <div class="absolute inset-0 pointer-events-none rounded-lg"></div>
                                     </div>

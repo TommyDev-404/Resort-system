@@ -557,5 +557,4 @@ getMonthsAndDays();
 export function initPageHousekeeping(){
       getSummarryCardData();
       switchRoomStatus(document.querySelector('#room-status-btn'));
-      notifications();
 }
