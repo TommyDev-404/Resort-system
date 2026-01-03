@@ -589,7 +589,7 @@ function getMonthsAndDays(){
       }
 }
 
-function loadingAnimation0(type=null){
+function loadingAnimation0(){
       const load = `
             <div id="loading" class="absolute top-35 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
@@ -597,7 +597,18 @@ function loadingAnimation0(type=null){
             </div>
       `;      
 
-      type ? document.getElementById('loadingTable2Portal').innerHTML += load : document.getElementById('loadingStaffListPortal').innerHTML += load;
+      document.getElementById('loadingStaffListPortal').innerHTML += load;
+}
+
+function loadingAnimation2(){
+      const load = `
+            <div id="loading" class="absolute top-35 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingTable2Portal').innerHTML += load;
 }
 
 function loadingAnimationAdd(message){
@@ -990,7 +1001,7 @@ async function allStaffAttendance(){
       
       const day = document.getElementById('daySelect').value;
       const month = document.getElementById('monthSelect2').value;
-      loadingAnimation0('wow');
+      loadingAnimation2();
       try{
             const response = await fetch(`/all-staff-attendance?day=${day || new Date().getDate()}&month=${month || new Date().getMonth() + 1}`, {});
             const result = await response.json();
