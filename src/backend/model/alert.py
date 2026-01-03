@@ -364,7 +364,3 @@ class Alerts:
             cache.delete('occupancy_alert')
             cache.delete('housekeeping_alert')
             cache.delete('bookings_alert')
-
-            self.occupancy_alert()
-            self.housekeeping_alert()
-            self.bookings_alert()

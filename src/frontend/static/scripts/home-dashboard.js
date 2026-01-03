@@ -285,7 +285,7 @@ export async function notifications() {
       // housekeeping alert
       const response3 = await fetch('/bookings-alert', {method: "GET"});
       const res3 = await response3.json();
-
+      console.log(res1);
       if (res1.success){
             have_notifications.push(true);
             const data = res1.data;
@@ -301,12 +301,11 @@ export async function notifications() {
                         </div>
                   </div>
             `;
-
+            console.log(occupancy_notif);
             allNotifications.push(occupancy_notif);
             document.getElementById('notif-modal').innerHTML += occupancy_notif;
             lucide.createIcons(); 
             document.getElementById('notifSound').play()
-
       }
 
       if (res2.success){

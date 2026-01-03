@@ -261,7 +261,7 @@ class RevenueMgmt:
 
                               cursor.execute(''' SELECT booking_id, accomodations, check_in, check_out FROM bookings WHERE check_out >= %s AND promo NOT IN ('No promo.') ''', (promo_data.get('date'),))
                               booking_data = cursor.fetchall()
-                              print(booking_data)
+
                               for data in booking_data:
                                     accomodations = data.get('accomodations').split(',')
                                     bid = data.get('booking_id')
@@ -283,7 +283,7 @@ class RevenueMgmt:
 
                         cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
                         con.commit()
-
+                        self.alert
                         self.alert.rebuild_alert_cache()
                         return {'success': bool(cursor.rowcount != 0), 'message': "Promotions remove successfully" if bool(cursor.rowcount != 0) else "Failed to remove promotions."}
             except Exception as e:

@@ -383,7 +383,6 @@ async function removePromo(e){
 
       if (result.success){
             successMessageCard5(result.message);
-            document.getElementById('notifSound').play();
             getAllPromo();
             notifications();
       }else{

@@ -543,7 +543,3 @@ class Dashboard:
             cache.delete('heavy_guest_month')
             cache.delete('top_most_booked_area')
             cache.delete('booking_type_distro')
-
-            self.heavy_guest_month()
-            self.top_most_booked_area()
-            self.booking_type_distro()
