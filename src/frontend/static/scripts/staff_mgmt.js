@@ -589,9 +589,20 @@ function getMonthsAndDays(){
       }
 }
 
+function loadingAnimation0(type=null){
+      const load = `
+            <div id="loading" class="absolute top-35 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
+            </div>
+      `;      
+
+      type ? document.getElementById('loadingTable2Portal').innerHTML += load : document.getElementById('loadingStaffListPortal').innerHTML += load;
+}
+
 function loadingAnimationAdd(message){
       const load = `
-            <div id="loading2" class="absolute top-0 left-0 flex flex-col items-center w-full bg-black/50 justify-center h-screen space-y-2 z-50 ">
+            <div id="loading" class="absolute top-0 left-0 flex flex-col items-center w-full bg-black/50 justify-center h-screen space-y-2 z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
                   <p class="text-[15px] font-medium animate-pulse text-gray-200">${message}...</p>
             </div>
@@ -605,7 +616,7 @@ function showLoader(type, message=null) {
 }
 
 function hideLoader() {
-      const loader = document.querySelector('#loading2');
+      const loader = document.querySelector('#loading');
       if (loader) loader.remove();
 }
 
@@ -669,12 +680,14 @@ async function showAllStaff(){
       try{
             const response = await fetch('/all-staff', {});
             const result = await response.json();
-
+            loadingAnimation0();
             if (result.success){
+                  hideLoader();
                   result.data.forEach(staff => {
                         createStaffListRow(staff.id, staff.staff_name, staff.job_position, staff.status);
                   });
             }else{
+                  hideLoader();
                   const empty_row = `
                         <li class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800 shadow-lg flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:scale-101">
                               <div>
@@ -798,7 +811,8 @@ async function thisWeekOnLeave(){
             if (result.success){
                   let count = 1;
                   let staff_list = [];
-
+                  
+                  hideLoader();
                   result.data.forEach(staff => {
                         const date = new Date(staff.date).toISOString().split('T')[0];
                         const formattedDate = new Date(date).toLocaleDateString('en-US', {
@@ -821,6 +835,7 @@ async function thisWeekOnLeave(){
                   
                   return staff_list.join('\n');
             }else{
+                  hideLoader();
                   const empty_row = `
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                               <td colspan="4" class="p-3 text-center dark:text-gray-100 text-gray-800">No staff on leave this week.</td>
@@ -975,12 +990,13 @@ async function allStaffAttendance(){
       
       const day = document.getElementById('daySelect').value;
       const month = document.getElementById('monthSelect2').value;
-
+      loadingAnimation0('wow');
       try{
             const response = await fetch(`/all-staff-attendance?day=${day || new Date().getDate()}&month=${month || new Date().getMonth() + 1}`, {});
             const result = await response.json();
 
             if (result.success){ 
+                  hideLoader();
                   isAttendanceNotEmpty = false;
                   result.data.forEach(staff => {
                         const date = new Date(staff.date).toISOString().split('T')[0];
@@ -994,6 +1010,7 @@ async function allStaffAttendance(){
                   });
                   
             }else{
+                  hideLoader();
                   isAttendanceNotEmpty = true;
                   const empty_row = `
                         <tr class="bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 ease-in-out">

@@ -74,7 +74,6 @@ async function getSummaryData() {
 
 async function loadBookingRevenue(year) {
       document.querySelectorAll('#accounting-tbody tr').forEach(row => row.remove());
-      console.log('rendering accounting table...')
       showLoader();
       const response = await fetch(`/load-revenue?year=${year}`);
       const result = await response.json();

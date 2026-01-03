@@ -430,7 +430,7 @@ async function mostBookedArea() {
       try{
             const response = await fetch('/top-booked-area');
             const res = await response.json();
-            console.log(res);
+            
             if (res.success){
                   res.data.forEach(data => {
                         createMostBookedArea(data.area_name, data.percentage);

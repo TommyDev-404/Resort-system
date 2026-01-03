@@ -91,6 +91,17 @@ function resetToAddPromoForm() {
       promoForm.reset();      
 }
 
+function loadingAnimation0(){
+      const load = `
+            <div id="loading" class="absolute top-68 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-50 ">
+                  <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
+            </div>
+      `;      
+
+      document.getElementById('loadingRevenuePortal').innerHTML += load;
+}
+
 function loadingAnimationAdd(message){
       const load = `
             <div id="loading" class="absolute  w-full top-0 left-0 flex flex-col items-center  bg-black/50 justify-center h-screen space-y-2 z-50 ">
@@ -170,9 +181,10 @@ async function updatePromo(e) {
 async function getAllPromo() {
       const response = await fetch('/get-all-promo');
       const res = await response.json();
-      
+      loadingAnimation0();
       document.querySelectorAll('ul li').forEach(row => row.remove());      
       if (res.success){
+            hideLoader();
             res.data.forEach(row => {
                   const start = new Date(row.date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
                   const end = new Date(row.end_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
@@ -181,6 +193,7 @@ async function getAllPromo() {
                   createpromoListRow(row.id, discount[0], start, end, row.area);
             });
       }else{
+            hideLoader();
             const empty_row = `
                   <li class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800 shadow-lg flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:scale-101">
                         <div>
