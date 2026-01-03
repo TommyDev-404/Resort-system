@@ -260,18 +260,6 @@ export async function notifications() {
       document.querySelectorAll('.notif-item').forEach(item => item.remove());
       document.querySelector('.view-notif-btn').classList.remove('hidden');
       
-      // notif count
-      const response = await fetch('/notification-count', {method: "GET"});
-      const res = await response.json();
-      
-      if (Number(res.count) != 0){
-            document.getElementById('notification-count').classList.add('min-w-[1.25rem]',  'h-5',  'px-1');
-            document.getElementById('notification-count').textContent = `${res.count}` ;
-      }else{
-            document.getElementById('notification-count').classList.remove('min-w-[1.25rem]',  'h-5',  'px-1');
-            document.getElementById('notification-count').textContent = '';
-      }
-
       let have_notifications = [];
 
       // occupancy alert
@@ -285,7 +273,7 @@ export async function notifications() {
       // housekeeping alert
       const response3 = await fetch('/bookings-alert', {method: "GET"});
       const res3 = await response3.json();
-      console.log(res1);
+
       if (res1.success){
             have_notifications.push(true);
             const data = res1.data;
@@ -301,7 +289,7 @@ export async function notifications() {
                         </div>
                   </div>
             `;
-            console.log(occupancy_notif);
+
             allNotifications.push(occupancy_notif);
             document.getElementById('notif-modal').innerHTML += occupancy_notif;
             lucide.createIcons(); 
@@ -329,7 +317,6 @@ export async function notifications() {
                   lucide.createIcons(); 
             });
             document.getElementById('notifSound').play()
-
       }
 
       if (res3.success){
@@ -366,7 +353,6 @@ export async function notifications() {
                   lucide.createIcons(); 
             });
             document.getElementById('notifSound').play()
-
       }
       
       if (have_notifications.length == 0){
@@ -381,6 +367,19 @@ export async function notifications() {
             document.querySelector('.view-notif-btn').classList.add('hidden');
             document.getElementById('notif-modal').innerHTML += empty_row;
       }
+      
+      // notif count
+      const response = await fetch('/notification-count', {method: "GET"});
+      const res = await response.json();
+      
+      if (Number(res.count) != 0){
+            document.getElementById('notification-count').classList.add('min-w-[1.25rem]',  'h-5',  'px-1');
+            document.getElementById('notification-count').textContent = `${res.count}` ;
+      }else{
+            document.getElementById('notification-count').classList.remove('min-w-[1.25rem]',  'h-5',  'px-1');
+            document.getElementById('notification-count').textContent = '';
+      }
+
 }
 
 function createMostBookedArea(area_name, percentage){
