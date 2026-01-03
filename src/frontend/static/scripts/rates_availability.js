@@ -114,6 +114,7 @@ function hideLoader() {
 }
 
 async function renderTable() {
+      document.querySelectorAll('#table2-body tr').forEach(row => row.remove());
       console.log("Rendering Rates and Availability Table...");
       showLoader('table');
       // Fetch data from backend

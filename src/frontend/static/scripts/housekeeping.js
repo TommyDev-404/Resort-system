@@ -329,6 +329,7 @@ function hideLoader() {
 
 // -------------------- DATA ------------------------- //
 async function accomodationData(){
+      document.querySelectorAll('#room-status-tbody tr').forEach(row => row.remove());
       showLoader('table');
       const response = await fetch('/total-area-data');
       const result = await response.json();
