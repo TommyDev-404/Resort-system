@@ -127,11 +127,11 @@ async function applyPromo(e) {
       const res = await response.json();
 
       if (res.success){
+            await notifications();
             hideLoader();
             successMessageCard5(res.message);
             e.target.reset();
             getAllPromo();
-            await notifications();
       }else{
             hideLoader();
             failedMessageCard5(res.message);
@@ -155,12 +155,12 @@ async function updatePromo(e) {
       const res = await response.json();
 
       if (res.success){
+            await notifications();
             hideLoader();
             successMessageCard5(res.message);
             e.target.reset();
             resetToAddPromoForm();
             getAllPromo();
-            await notifications();
       }else{
             hideLoader();
             failedMessageCard5(res.message);
@@ -384,10 +384,10 @@ async function removePromo(e){
       const result = await response.json();
 
       if (result.success){
+            await notifications();
             hideLoader();
             successMessageCard5(result.message);
             getAllPromo();
-            await notifications();
       }else{
             hideLoader();
             failedMessageCard5(result.message);
