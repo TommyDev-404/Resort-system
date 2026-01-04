@@ -1,4 +1,4 @@
-import { successToastRedirect, successToast, failedToast } from './helper.js';
+import { successToast, failedToast } from './helper.js';
 
 lucide.createIcons();
 
@@ -64,7 +64,52 @@ window.addEventListener('load', () => {
 });
 
 // ----------------- HELPERS ---------------- //
-function loadingAnimation1(message){
+function showPassword() {
+      const input = document.querySelector('#changePasswordForm input[name="new_password"]');
+      const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+      input.setAttribute('type', type);
+}
+
+function successToastRedirect(message, redirect = null, duration = 3000) {
+      const toast = `
+            <div class="fixed top-4 left-1/2 z-50 flex items-center gap-4 bg-white border border-gray-200 shadow-[0_10px_25px_rgba(0,0,0,0.15)] rounded-xl px-5 py-4 text-gray-800 transform -translate-x-1/2 -translate-y-full scale-95 opacity-0 transition-all duration-300 ease-out" data-toast>
+
+                  <!-- Icon -->
+                  <div class="flex items-center justify-center w-9 h-9 rounded-full bg-green-50">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                  </div>
+
+                  <!-- Message -->
+                  <span class="text-sm font-medium leading-tight">
+                        ${message}
+                  </span>
+            </div>
+      `;
+      console.log(redirect);
+      const portal = document.getElementById('messagePortal');
+      portal.insertAdjacentHTML('beforeend', toast);
+      lucide.createIcons();
+
+      const toastEl = portal.querySelector('[data-toast]:last-child');
+
+      // trigger slide-in
+      requestAnimationFrame(() => {
+            toastEl.classList.remove('-translate-y-full', 'opacity-0');
+      });
+
+      // auto remove (slide out)
+      setTimeout(() => {
+            toastEl.classList.add('-translate-y-full', 'opacity-0');
+            setTimeout(() => toastEl.remove(), 300);
+      }, duration);
+      
+      if (redirect) {
+            showLoader('Logging in...');
+            window.location.href = redirect;
+      }
+}
+
+function showLoader(message) {
       const load = `
             <div id="loading" class="absolute top-0 left-0 z-50 flex flex-col items-center justify-center h-screen inset-0 bg-black/50 text-white space-y-2">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
@@ -73,16 +118,6 @@ function loadingAnimation1(message){
       `;      
 
       document.getElementById('loadingPortal').innerHTML += load;
-}
-
-function showPassword() {
-      const input = document.querySelector('#changePasswordForm input[name="new_password"]');
-      const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-      input.setAttribute('type', type);
-}
-
-function showLoader(message) {
-      loadingAnimation1(message); // adds #loading
 }
 
 function hideLoader() {
@@ -124,7 +159,7 @@ async function loginAdmin(e) {
 async function forgotPassword() {
       const email = document.querySelector('input[name="email"]').value;
 
-      if (email === '') return failedMessageCard1('Empty input! Please fill in before getting code.')
+      if (email === '') return failedToast('Empty input! Please fill in before getting code.')
       try {
             showLoader('Sending code...');
             const response = await fetch(`/forgot-password`, {
@@ -139,12 +174,12 @@ async function forgotPassword() {
                   successToast(result.message);
             }else{
                   hideLoader();
-                  failedToast('Failed! Something went wrong.');
+                  failedToast('Invalid email! ');
             }
       
       } catch (error) {
             console.error('Error:', error);
-            failedMessageCard1('Something went wrong. Please try again.');
+            failedToast('Something went wrong. Please try again.');
       }
 }
 
@@ -189,7 +224,7 @@ async function changePassword() {
       
             if (result.success){
                   hideLoader();
-                  successMessageCard1(result.message);
+                  successToast(result.message);
                   changePasswordForm.classList.remove('opacity-100');
                   setTimeout(() => {
                         changePasswordForm.classList.add('hidden');

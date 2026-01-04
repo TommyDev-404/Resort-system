@@ -255,7 +255,7 @@ async function drawRevenueChart(type=null) {
       const url = type ? `/revenue-forecast-type?accomodation_type=${type}` : '/revenue-forecast-all';
       const response = await fetch(url);
       const result = await response.json();
-      console.log(result);
+
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       const latestRevenue = Array(12).fill(null);
       const forecastedRevenue = Array(12).fill(null);
