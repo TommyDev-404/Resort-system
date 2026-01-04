@@ -609,54 +609,54 @@ async function roomsData() {
       const hallPercentage = (availableHallRooms / totalHallRooms) * 100;
 
       const rooms = `
-            <div class="p-3 bg-blue-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Premium Villa</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[7].total_rooms - Number(res.data[7].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Occupied</span></p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3 ">${res.data[7].total_rooms - Number(res.data[7].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[7].today_avail}</span></p>
                   <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
                         <div class="bg-blue-500 h-2 rounded-full" style="width:${(Number(res.data[7].today_avail) / Number(res.data[7].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-violet-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Standard Villa</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[9].total_rooms - Number(res.data[9].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[9].total_rooms - Number(res.data[9].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[9].today_avail}</span></p>
                   <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
                         <div class="bg-purple-500 h-2 rounded-full" style="width:${(Number(res.data[9].today_avail) / Number(res.data[9].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-teal-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Cabana Cottage</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[2].total_rooms - Number(res.data[2].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Occupied</span></p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[2].total_rooms - Number(res.data[2].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[2].today_avail}</span></p>
                   <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
                         <div class="bg-teal-500 h-2 rounded-full" style="width:${(Number(res.data[2].today_avail) / Number(res.data[2].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-green-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Garden View Room</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[3].total_rooms - Number(res.data[3].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[3].total_rooms - Number(res.data[3].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[3].today_avail}</span></p>
                   <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
                         <div class="bg-green-500 h-2 rounded-full" style="width:${(Number(res.data[3].today_avail) / Number(res.data[3].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-orange-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Barkada Room</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[0].total_rooms - Number(res.data[0].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[0].total_rooms - Number(res.data[0].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[0].today_avail}</span></p>
                   <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
                         <div class="bg-red-500 h-2 rounded-full" style="width:${(Number(res.data[0].today_avail) / Number(res.data[0].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
-            <div class="p-3 bg-indigo-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Small Cottage</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[8].total_rooms - Number(res.data[8].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[8].total_rooms - Number(res.data[8].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[8].today_avail}</span></p>
                   <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
                         <div class="bg-indigo-500 h-2 rounded-full" style="width:${(Number(res.data[8].today_avail) / Number(res.data[8].total_rooms)*100)}%"></div>
@@ -664,19 +664,18 @@ async function roomsData() {
             </div>
 
             <div class="grid grid-cols-2 col-span-3 gap-3">
-                  <div class="col-span-1 p-3 bg-orange-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+                  <div class="col-span-1 p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700 ">
                         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Big Cottage</p>
-                        <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[1].total_rooms - Number(res.data[1].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[1].total_rooms - Number(res.data[1].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
                         <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[1].today_avail}</span></p>
                         <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
                               <div class="bg-orange-500 h-2 rounded-full" style="width:${(Number(res.data[1].today_avail) / Number(res.data[1].total_rooms)*100)}%"></div>
                         </div>
                   </div>
                   
-                  <div class="col-span-1 p-3 bg-pink-100 dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-400 dark:border-gray-700">
+                  <div class="col-span-1 p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Hall</p>
-
-                        <p class="text-xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
                               ${occupiedHallRooms}
                               <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span>
                         </p>

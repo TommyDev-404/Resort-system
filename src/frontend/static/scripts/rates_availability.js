@@ -1,47 +1,7 @@
+import { successToast, failedToast } from "./helper.js";
+
 
 // ----------------- HELPERS ----------------- //
-function successMessageCard8(message, redirect = null) {
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      // Append message popup
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-
-      document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.querySelector("#success-message");
-            box.remove();
-
-            if (redirect)  window.location.href = redirect;
-      });
-}
-
-function failedMessageCard8(message){
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up ">
-                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-      document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.querySelector("#failed-message");
-            box.remove();
-      });
-}
-
 function openUpdateAreaModal(e) {
       const row = e.target.closest('tr'); // get the row
       const cells = row.querySelectorAll('td'); // get all td in that row
@@ -155,7 +115,7 @@ async function renderTable() {
                         <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-red-500">${row.today_avail}</span></td>
                         <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-green-500">${row.tomorrow_avail}</span></td>
                         <td class="px-6 py-4 min-w-[100px] whitespace-nowrap">
-                              <button class="update-btn text-sm text-white bg-teal-500 py-2 px-4 rounded-sm flex gap-2 items-center justify-center hover:bg-teal-600 transition-colors" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update</button>
+                              <button class="update-btn text-sm text-white bg-blue-500 py-2 px-4 rounded-sm flex gap-2 items-center justify-center hover:bg-blue-600 transition-colors" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update</button>
                         </td>
             </tr>
             `;
@@ -206,13 +166,13 @@ async function updatePrice(e){
 
       if (result.success){
             hideLoader();
-            successMessageCard8(result.message);
+            successToast(result.message);
             e.target.reset();
             document.getElementById('update-area-modal').remove();
             renderTable();
       }else {
             hideLoader();
-            failedMessageCard8(result.message);
+            failedToast('Failed! Something went wrong.');
       }
 }
 

@@ -105,7 +105,7 @@ class Dashboard:
                   cursor.execute(''' 
                         SELECT
                               CURRENT_DATE() AS ds,
-                              COALESCE(ROUND(SUM(total) / 54 * 100, 2), 0) AS y,
+                              COALESCE(ROUND(SUM(total) / 45 * 100, 2), 0) AS y,
                               COALESCE(SUM(total), 0) AS total_room
                         FROM accomodation_data a
                         JOIN bookings b
@@ -114,7 +114,7 @@ class Dashboard:
                   ''')
             data = cursor.fetchone()
 
-            return {'occupancy': data.get('y'), 'total_room': 54 - int(data.get('total_room'))}
+            return {'occupancy': data.get('y'), 'total_room': 45 - int(data.get('total_room'))}
       
       def revenue_today(self):
             with self.db.connect() as con:

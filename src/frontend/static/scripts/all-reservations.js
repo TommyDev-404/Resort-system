@@ -1,4 +1,5 @@
 import { notifications} from "./home-dashboard.js";
+import { successToast, failedToast, promoDateWarningMessageCard } from "./helper.js";
 
 const tbody = document.getElementById('tbody');
 let savedAccomodations = [];
@@ -7,48 +8,6 @@ let roomCache = {};
 let searchTimeout;
 
 // ---------------- RENDER HELPERS ------------------
-function successMessageCard4(message, redirect = null) {
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      // Append message popup
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-
-      document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.getElementById("success-message");
-            box.remove();
-
-            if (redirect)  window.location.href = redirect;
-      });
-}
-
-function failedMessageCard4(message){
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-      document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.getElementById("failed-message");
-            box.remove();
-      });
-}
-
 function createTable(id, guest_name, date_book, checkin, checkout, stay_count, accomodations, booking_type, status, payment_status){
       
       const row = `
@@ -126,7 +85,7 @@ function createTable(id, guest_name, date_book, checkin, checkout, stay_count, a
                   <!-- ACTION -->
                   <td class="px-3 py-4 w-full flex items-center justify-center">
                         <button id="view-full-info" 
-                              class="text-[14px] bg-purple-700 dark:bg-purple-500 hover:bg-purple-600 p-2 rounded-lg text-white flex items-center justify-center gap-1 cursor-pointer">
+                              class="text-[14px] bg-blue-700 dark:bg-blue-500 hover:bg-blue-600 p-2 rounded-lg text-white flex items-center justify-center gap-1 cursor-pointer">
                               <i data-lucide="eye" class="w-5 h-5"></i>
                         </button>
                   </td>
@@ -141,7 +100,7 @@ function renderAddBookingModal(){
       avl_spaces();
       const form = `
             <div id="booking-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
-                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-3xl relative px-6 py-4 fade-in-up text-sm">
+                  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[900px] relative px-6 py-4 fade-in-up text-sm">
                         <!-- Close Button -->
                         <span id="close-add-booking" class="absolute top-4 right-4 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 text-2xl cursor-pointer">&times;</span>
                         <!-- Header -->
@@ -155,17 +114,17 @@ function renderAddBookingModal(){
                               <section>
                                     <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="lucide w-4 h-4"></i> Booking Info</h3>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                          <select id="booking_status" name="booking_status" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
+                                          <select id="booking_status" name="booking_status" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                                 <option class="text-black" value="" disabled selected hidden>Select Booking Status</option>
                                                 <option class=" text-black" value="Checked-in">Checked-in</option>
                                                 <option class=" text-black" value="Reserved">Reservation</option>
                                           </select>
-                                          <select id="booking_type" name="booking_type" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
+                                          <select id="booking_type" name="booking_type" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                                 <option class="text-black" value="" disabled selected hidden>Select Booking Type</option>
                                                 <option class=" text-black" value="Check-in">Room Stay (Overnight)</option>
                                                 <option class=" text-black" value="Day Guest">Day Guest (No Room Stay)</option>
                                           </select>
-                                          <select id="payment" name="payment" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
+                                          <select id="payment" name="payment" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                                 <option class=" text-black" value="" disabled selected hidden>Select Payment Type</option>
                                                 <option class=" text-black" value="Direct Payment">Direct Payment</option>
                                                 <option class=" text-black" value="ZUZU (Online Payment)">ZUZU (Online Payment)</option>
@@ -201,8 +160,8 @@ function renderAddBookingModal(){
                               <section>
                                     <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2"><i data-lucide="user" class="lucide w-4 h-4"></i> Guest Info</h3>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                          <input type="text" name="name" placeholder="Guest Name" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
-                                          <input type="number" name="total_guest" placeholder="Total Guests" min="1" class="border dark:text-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
+                                          <input type="text" name="name" placeholder="Guest Name" class="border border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
+                                          <input type="number" name="total_guest" placeholder="Total Guests" min="1" class="border dark:text-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-3 rounded-md transition-all" required>
                                     </div>
                               </section>
                               
@@ -259,7 +218,7 @@ function renderAddBookingModal(){
                               </section>
 
                               <!-- Submit Button -->
-                              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition-all mt-2 flex justify-center items-center gap-2"><i data-lucide="check-circle" class="lucide w-4 h-4"></i> Submit</button>
+                              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-all mt-2 flex justify-center items-center gap-2"><i data-lucide="check-circle" class="lucide w-4 h-4"></i> Submit</button>
                         </form>
                   </div>
 
@@ -835,6 +794,12 @@ function parseOrReturn(value) {
 async function addBooking(e){
       e.preventDefault();      
       const form = new FormData(e.target);
+
+      if (form.get('checkout') < form.get('checkin')){
+            promoDateWarningMessageCard('Warning: Check-out date must be greater than Check-in date!');
+            return;
+      }
+
       showLoader('data', 'Adding guest...');
       
       try{
@@ -849,7 +814,7 @@ async function addBooking(e){
                   e.target.reset();
                   hideLoader();
                   await notifications();
-                  successMessageCard4(result.message);
+                  successToast('Added successfully!');
                   document.querySelector('#booking-overlay').remove();
                   recentBookings();
                   summaryCardsDatas();
@@ -857,7 +822,7 @@ async function addBooking(e){
                   savedAccomodations.length =  0; // empty the array
             }else{
                   hideLoader();
-                  failedMessageCard4(result.message);
+                  failedToast('Failed to add!');
                   recentBookings();
             }
             
@@ -883,13 +848,13 @@ async function markAsCheckout(){
             await notifications();
             upcomingCount();
             hideLoader();
-            successMessageCard4(result.message);
+            successToast('Checked-out successfully!');
             recentBookings();
             summaryCardsDatas();
             resetButtonAndCheckBox();
       }else{
             hideLoader();
-            failedMessageCard4(result.message);
+            failedToast('Failed! Something went wrong.');
       }
       getTotalsCountData(getFilterStatus());
 }
@@ -908,14 +873,14 @@ async function markAsCheckin(){
       if (result.success){
             await notifications();
             hideLoader();
-            successMessageCard4(result.message);
+            successToast('Checked-in successfully!');
             upcomingCount();
             summaryCardsDatas();
             recentBookings();
             resetButtonAndCheckBox();
       }else{
             hideLoader();
-            failedMessageCard4(result.message);
+            failedToast('Failed! Something went wrong.');
       }
       getTotalsCountData(getFilterStatus());
 }
@@ -934,14 +899,14 @@ async function cancelBooking(){
       if (result.success){
             await notifications();
             hideLoader();
-            successMessageCard4(result.message);
+            successToast('Cancelled successfully!');
             upcomingCount();
             recentBookings();
             summaryCardsDatas();
             resetButtonAndCheckBox();
       }else{
             hideLoader();
-            failedMessageCard4(result.message);
+            failedToast('Failed! Something went wrong.');
       }
       getTotalsCountData(getFilterStatus());
 }
@@ -960,13 +925,13 @@ async function submitPayment(e){
 
       if (result.success){
             hideLoader();
-            successMessageCard4(result.message);
+            successToast('Successfully paid!');
             document.querySelector('#mark-paid-overlay').remove();
             recentBookings();
             resetButtonAndCheckBox();
       }else{
             hideLoader();
-            failedMessageCard4(result.message);
+            failedToast('Failed! Something went wrong.');
       }
       getTotalsCountData(getFilterStatus());
 }
@@ -986,14 +951,14 @@ async function updateReservationDate(e){
       if (result.success){
             await notifications();
             hideLoader();
-            successMessageCard4(result.message);
+            successToast('Updated successfully!');
             upcomingCount();
             document.querySelector('#update-reservation-overlay').remove();
             recentBookings();
             resetButtonAndCheckBox();
       }else {
             hideLoader();
-            failedMessageCard4(result.message);
+            failedToast('Failed! Something went wrong.');
             document.querySelector('#update-reservation-overlay').remove();
       }
       getTotalsCountData(getFilterStatus());

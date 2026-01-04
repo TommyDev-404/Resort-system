@@ -20,8 +20,19 @@ class Housekeeping:
                                     SUM(CASE WHEN status IN ("avl") THEN 1 ELSE 0 END) AS ready,
                                     SUM(CASE WHEN status IN ("on-clean") THEN 1 ELSE 0 END) AS on_clean,
                                     SUM(CASE WHEN status IN ("reserved") THEN 1 ELSE 0 END) AS reserved
-                              FROM accomodation_spaces WHERE name IN ("Premium", "Standard", "Garden", "Barkada", "Family")
-                              GROUP BY name;
+                              FROM accomodation_spaces WHERE name IN ("Premium", "Standard", "Garden", "Barkada", "Small", "Big", "Cabana", "Pavillion", "Mariposa", "Minicon")
+                              GROUP BY name 
+                              ORDER BY
+                                    CASE
+                                          -- ROOMS
+                                          WHEN name IN ('Premium', 'Standard', 'Garden', 'Barkada') THEN 1
+                                          -- COTTAGES
+                                          WHEN name IN ('Small', 'Big', 'Cabana') THEN 2
+                                          -- HALLS
+                                          WHEN name IN ('Pavillion',  'Mariposa', 'Minicon') THEN 3
+                                          ELSE 4
+                                    END,
+                              name;
                         ''')
                         data = cursor.fetchall()
 
@@ -42,7 +53,7 @@ class Housekeeping:
                                     SUM(CASE WHEN status IN ('on-clean') THEN 1 ELSE 0 END) AS total_on_clean,
                                     SUM(CASE WHEN status IN ('reserved') THEN 1 ELSE 0 END) AS reserved,
                                     SUM(CASE WHEN status IN ('occupied') THEN 1 ELSE 0 END) AS total_occupied
-                              FROM accomodation_spaces WHERE name IN ('Premium', 'Standard', 'Garden', 'Barkada', 'Family');
+                              FROM accomodation_spaces WHERE name IN ('Premium', 'Standard', 'Garden', 'Barkada', "Small", "Big", "Cabana", "Pavillion", "Mariposa", "Minicon");
                         ''')
                         data = cursor.fetchone()
 
@@ -139,10 +150,7 @@ class Housekeeping:
                         cursor.execute(''' SELECT date, name FROM room_assign_history WHERE room = %s ORDER BY date DESC''', (room,))
                         data = cursor.fetchall()
 
-                        result = {'success': bool(data), 'data': data}
-                        cache.set("room_assigned_history_keys", key_index, timeout=None)  # never expire
-
-                        return result
+                        return {'success': bool(data), 'data': data}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}

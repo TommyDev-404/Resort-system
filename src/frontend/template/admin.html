@@ -11,7 +11,6 @@
       <script src="https://unpkg.com/lucide@latest" defer></script>
 
 	<style>
-                        
             /* Light mode (default) = black icon */
             .date-icon::-webkit-calendar-picker-indicator {
                   filter: invert(0);
@@ -135,15 +134,6 @@
                               <i data-lucide="user" class="w-5 h-5 ml-3"></i>
                               <span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Admin Profile<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
                         </div>
-      
-                        <!-- Divider -->
-                        <div class="border-t border-black/10 dark:border-white/10"></div>
-                  </div>			
-                  
-			<div id="nav-logout" data-section="logout"  class="sidebar-item flex items-center gap-3 cursor-pointer transition-all text-gray-900 hover:bg-black/7 dark:text-gray-200 dark:hover:bg-white/10 rounded-sm px-3 py-4 duration-300 ease-in-out mb-4">
-				<i data-lucide="log-out" class="w-5 h-5 ml-3"></i>
-				<span id="dashboardText" class="sidebar-text flex justify-between items-center overflow-hidden transition-all duration-500 ease-in-out max-w-0 opacity-0 whitespace-nowrap w-full">Log Out<i data-lucide="chevron-right" class="w-4 h-4"></i></span>
-			</div>
 		</nav>
 	</aside>
 
@@ -543,7 +533,7 @@
                                                       </div>
                                                       <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">Total Area</p>
                                                 </div>
-                                                <p class="text-2xl font-extrabold text-gray-900 dark:text-white" id="total-rooms">54</p>
+                                                <p class="text-2xl font-extrabold text-gray-900 dark:text-white" id="total-rooms">45</p>
                                           </div>
                                           
                                           <!-- Total Occupied -->
@@ -559,7 +549,7 @@
                                     </div>
                               
                                     <!-- Room Cards Grid -->
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-8 flex-1" id="rooms-data"></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-8 flex-1" id="rooms-data"></div>
                               </div>
 
                               <!-- RIGHT PANEL -->
@@ -1297,8 +1287,8 @@
 				</div>
 				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-8xl leading-relaxed mt-[-25px]">Manages strategies and executing pricing and promotion decisions to achieve the optimal balance of occupancy and Average Daily Rate (ADR).</p>
 
-                        <div class="space-y-6 grid grid-cols-7">
-                              <div class="promoModal bg-white dark:bg-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl p-6 animate-fade-in-up relative border border-white/20 col-span-4">
+                        <div class="grid grid-cols-7 gap-12 mt-10">
+                              <div class="promoModal bg-white dark:bg-gray-900 w-full rounded-2xl shadow-2xl p-6 animate-fade-in-up relative border border-white/20 col-span-4">
                                     <!-- Header -->
                                     <div class="flex items-center justify-center gap-2 mb-6">
                                           <i data-lucide="percent" class="w-6 h-6 text-primary-blue"></i>
@@ -1544,7 +1534,6 @@
 					<h1 class="text-2xl text-gray-900 dark:text-gray-200 font-bold">Admin Settings</h1>
 					<p class="flex items-center gap-2 text-[14px] font-bold text-gray-500">Admin Settings<i data-lucide="chevron-right" class="w-4 h-4 font-bold"></i><span class="dark:text-white text-black">Admin Settings</span></p>
 				</div>
-				
 				<p class="text-gray-600 dark:text-gray-100 text-sm max-w-3xl leading-relaxed mt-[-25px]">Manage your profile details, change your password, and update your account email.</p>
 
                         <div class="max-w-full mx-auto mt-10 p-6 bg-white border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-sm shadow-md">

@@ -1,3 +1,5 @@
+import { successToast, failedToast } from "./helper.js";
+
 
 const adminNum = document.getElementById('admin-num');
 const adminName = document.getElementById('admin-name');
@@ -5,48 +7,6 @@ const adminEmail = document.getElementById('admin-email');
 const datePasswordChange = document.getElementById('last-pass-changed');
 
 // ------------- HELPERS ---------------- //
-function successMessageCard2(message, redirect = null) {
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      // Append message popup
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-
-      document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.getElementById("success-message");
-            box.remove();
-
-            if (redirect)  window.location.href = redirect;
-      });
-}
-
-function failedMessageCard2(message){
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-      document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.getElementById("failed-message");
-            box.remove();
-      });
-}
-
 function renderChangePassword(email){
       const modal = `
             <div id="passwordModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
@@ -94,7 +54,7 @@ function renderEditModal(type, value){
             <div id="editModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                   <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-96 relative  fade-in-up">
                         <h3 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">Edit ${type}</h3>
-                        <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="text" name="${type === "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border border-gray-400 rounded text-gray-900 dark:text-gray-100" placeholder="Enter ${type}" value="${value}">
+                        <input id="input${type === "Contact Number" ? "ContactNumber" : type}" type="${type === "Contact Number" ? 'number' : type === 'Email' ? 'email' : 'text'}" name="${type === "Contact Number" ? "ContactNumber" : type}" class="w-full p-4 mb-4 border border-gray-400 rounded text-gray-900 dark:text-gray-100" placeholder="Enter  New ${type}" value="${value}">
                         <div class="flex justify-end gap-2">
                               <button id="cancel" type="button" class="px-4 py-2 bg-gray-600 dark:bg-white/15 dark:hover:bg-white/10 text-white rounded hover:bg-gray-500">Cancel</button>
                               <button id="change${type === "Contact Number" ? "ContactNumber" : type}" type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Change</button>
@@ -158,10 +118,10 @@ async function changePassv2(e) {
       const result = await response.json();
 
       if (result.success){
-            successMessageCard2(result.message);
+            successToast('Password updated successfully!');
             document.querySelector('#codeModal').remove();
       }else{
-            failedMessageCard2(result.message);
+            failedToast('Failed! Something went wrong.');
       }
 }
 
@@ -171,10 +131,9 @@ async function changePass(e) {
       const new_pass = document.querySelector('input[name="new_password"]').value;
       const confirm_pass = document.querySelector('input[name="confirm_password"]').value;
 
-      if (confirm_pass !== new_pass) return alert('Password unmatched!');
-
+      if (confirm_pass !== new_pass) return failedToast('Password unmatched!');
       const form = new FormData(e.target);
-      console.log(form);
+
       try {
             loadingAnimation3();
 
@@ -186,16 +145,16 @@ async function changePass(e) {
             const result = await response.json();
 
             if (result.success) {
-                  successMessageCard2(result.message);
+                  successToast('Password updated successfully!');
                   e.target.reset();
                   renderCodeModal();
             } else {
-                  failedMessageCard2(result.message);
+                  failedToast('Failed! Something went wrong.');
                   renderChangePassword(adminEmail.textContent);
             }
       } catch (error) {
             console.error('Error:', error);
-            failedMessageCard2('Something went wrong. Please try again.');
+            failedToast('Something went wrong. Please try again.');
       } finally {
             document.getElementById('loading').remove();
       }
@@ -211,11 +170,11 @@ async function editInfo(type) {
       const result = await response.json();
 
       if (result.success){
-            successMessageCard2(result.message);
+            successToast(`${type} updated successfully!`);
             document.querySelector('#editModal').remove();
             adminProfile();
       }else{
-            failedMessageCard2(result.message);
+            failedToast('Failed! Something went wrong.');
       }
 }
 
@@ -231,7 +190,7 @@ async function adminProfile() {
             adminNum.textContent = result.data.contact;
             datePasswordChange.textContent = formatDate;
       }else{
-            failedMessageCard2(result.message);
+            failedToast('Failed! Something went wrong.');
       }
 }
 

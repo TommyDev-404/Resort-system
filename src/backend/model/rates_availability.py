@@ -208,7 +208,17 @@ class RatesAndAvailability:
                               LEFT JOIN promos p
                               ON FIND_IN_SET(s.name, p.area) > 0
                               AND p.status = 'Active' AND p.date <= CURRENT_DATE() AND p.end_date >= CURRENT_DATE()
-                              ORDER BY a.room_type;
+                              ORDER BY
+                                    CASE
+                                          -- ROOMS
+                                          WHEN a.room_type IN ('Premium', 'Standard', 'Garden', 'Barkada') THEN 1
+                                          -- COTTAGES
+                                          WHEN a.room_type IN ('Small', 'Big', 'Cabana') THEN 2
+                                          -- HALLS
+                                          WHEN a.room_type IN ('Pavillion',  'Mariposa', 'Minicon') THEN 3
+                                          ELSE 4
+                                    END,
+                              a.room_type;
                         ''')
 
                         data = cursor.fetchall()

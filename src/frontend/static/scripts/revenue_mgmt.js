@@ -1,48 +1,8 @@
 import { notifications } from "./home-dashboard.js";
+import { successToast, failedToast, promoDateWarningMessageCard, promoRemoveWarningMessageCard } from "./helper.js";
+
 
 // ---------------------- HELPERS ---------------------
-function successMessageCard5(message, redirect = null) {
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      // Append message popup
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-
-      document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.querySelector("#success-message");
-            box.remove();
-
-            if (redirect)  window.location.href = redirect;
-      });
-}
-
-function failedMessageCard5(message){
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up ">
-                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-failed-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-      document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.querySelector("#failed-message");
-            box.remove();
-      });
-}
-
 function createpromoListRow(id, promo_name, promo_start, promo_end, area){
       const row = `
             <li data-id="${id}" data-area="${area}"  class="p-4 rounded-xl bg-gray-50 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-md flex justify-between items-center fade-in-up transition-all duration-200 ease-in-out hover:scale-101">
@@ -129,6 +89,12 @@ async function applyPromo(e) {
       let area_list = [];
       document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value) });
       form.append('area_list', area_list);
+
+      if (form.get('end_date') < form.get('date')){
+            promoDateWarningMessageCard('Warning: End date must be higher than start date!')
+            return;
+      }
+
       showLoader('Applying promo...');
       const response = await fetch('/promo', {
             method: 'POST', 
@@ -140,12 +106,12 @@ async function applyPromo(e) {
       if (res.success){
             await notifications();
             hideLoader();
-            successMessageCard5(res.message);
+            successToast('Promo applied successfully!');
             e.target.reset();
             getAllPromo();
       }else{
             hideLoader();
-            failedMessageCard5(res.message);
+            failedToast('Failed! Something went wrong.');
       }
 }
 
@@ -156,6 +122,11 @@ async function updatePromo(e) {
       let area_list = [];
       document.querySelectorAll('input[name="areas_promo"]:checked').forEach(check => { area_list.push(check.value)});
       form.append('area_list', area_list);
+      
+      if (form.get('end_date') < form.get('date')){
+            promoDateWarningMessageCard('Warning: End date must be higher than start date!')
+            return;
+      }
       
       showLoader('Updating promo...');
       const response = await fetch('/update-promo', {
@@ -168,13 +139,13 @@ async function updatePromo(e) {
       if (res.success){
             await notifications();
             hideLoader();
-            successMessageCard5(res.message);
+            successToast('Promo updated successfully!');
             e.target.reset();
             resetToAddPromoForm();
             getAllPromo();
       }else{
             hideLoader();
-            failedMessageCard5(res.message);
+            failedToast('Failed! Something went wrong.');
       }
 }
 
@@ -216,9 +187,9 @@ async function renderViewPromoDetails(id){
             const data = result.data;
             const start = new Date(data.date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
             const end = new Date(data.end_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+
             const areaNames = {
                   "Barkada": "Barkada Room",
-                  "Family": "Family Room",
                   "Garden": "Garden View Room",
                   "Premium": "Premium Villa Room",
                   "Standard": "Standard Villa Room",
@@ -229,6 +200,17 @@ async function renderViewPromoDetails(id){
                   "Mariposa": "Mariposa Hall",
                   "Minicon": "Minicon Hall"
             };
+
+            const areas_under_promo = data.area.split(',').map(a => a.trim()); // promo areas as array
+            const all_area_keys = Object.keys(areaNames); // ['Premium', 'Standard', ...]
+
+            // Check if all areas are under promo
+            let area_affected = null;
+            if (all_area_keys.every(key => areas_under_promo.includes(key))) {
+                  area_affected = 'All Area'; // just display "All Areas"
+            } else {
+                  area_affected = data.area.split(',').map(acc => areaNames[acc.trim()]).join(', ')
+            }
 
             const modal = `
                   <div id="promo-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -273,7 +255,7 @@ async function renderViewPromoDetails(id){
                                     <!-- Accommodations -->
                                     <div class="md:col-span-2 space-y-2">
                                           <h3 class="text-sm font-normal text-gray-700 dark:text-gray-300">Area Applied</h3>
-                                          <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${data.area.split(',').map(acc => areaNames[acc.trim()]).join(', ')}</div>
+                                          <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${area_affected}</div>
                                     </div>
                               </div>
                         </div>
@@ -318,7 +300,6 @@ async function renderDataToUpdatePromo(e){
       const all_area = {
             'Premium': 'Premium Villa Room',
             'Standard': 'Standard Villa Room',
-            'Family': 'Family Room',
             'Barkada': 'Barkada Room',
             'Garden': 'Garden View Room',
             'Cabana': 'Cabana Cottage',
@@ -379,34 +360,52 @@ function formatDate(date) {
       return `${year}-${month}-${day}`;
 }
 
-async function removePromo(e){
+async function removePromo(e) {
       const tr = e.target.closest('li');
       const id = tr.getAttribute('data-id');
       const area = tr.getAttribute('data-area');
 
-      let area_affected = null;
-      if (area === 'All Areas'){
-            area_affected = 'Premium Villa Room, Standard Villa Room, Family Room, Barkada Room, Garden View Room, Cabana Cottage, Small Cottage, Big Cottage, Hall';
-      }else{
-            area_affected = area;
-      }
-      
-      showLoader('Removing promo');
-      const response = await fetch(`/remove-promo?id=${id}&area_promos=${area_affected}`, {
-            method: 'DELETE'
-      });
-      const result = await response.json();
+      let area_affected = area === 'All Areas' ? 'Premium Villa Room, Standard Villa Room, Family Room, Barkada Room, Garden View Room, Cabana Cottage, Small Cottage, Big Cottage, Hall' : area;
 
-      if (result.success){
-            await notifications();
-            hideLoader();
-            successMessageCard5(result.message);
-            getAllPromo();
-      }else{
-            hideLoader();
-            failedMessageCard5(result.message);
-      }      
+      // Show confirmation modal
+      promoRemoveWarningMessageCard(`Are you sure you want to remove this promo?`);
+
+      // Wait for user's action
+      document.getElementById("confirm-remove").addEventListener("click", async () => {
+          // User confirmed
+            const warningBox = document.getElementById("warning-message");
+            if (warningBox) warningBox.remove();
+      
+            try {
+                  showLoader('Removing promo...');
+                  const response = await fetch(`/remove-promo?id=${id}&area_promos=${encodeURIComponent(area_affected)}`, {
+                        method: 'DELETE'
+                  });
+                  const result = await response.json();
+      
+                  if (result.success) {
+                        await notifications();
+                        hideLoader();
+                        successToast('Promo removed successfully!');
+                        getAllPromo();
+                  } else {
+                        hideLoader();
+                        failedToast('Failed! Something went wrong.');
+                  }
+            } catch (err) {
+                  hideLoader();
+                  failedToast('Failed! Something went wrong.');
+                  console.error(err);
+            }
+      });
+
+      // Cancel button just closes the modal
+      document.getElementById("cancel-remove").addEventListener("click", () => {
+            const warningBox = document.getElementById("warning-message");
+            if (warningBox) warningBox.remove();
+      });
 }
+
 
 // submit
 document.addEventListener('submit', (e) => {

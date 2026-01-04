@@ -1,3 +1,5 @@
+import { successToastRedirect, successToast, failedToast } from './helper.js';
+
 lucide.createIcons();
 
 const input = document.querySelector('input[name="password"]');
@@ -79,53 +81,6 @@ function showPassword() {
       input.setAttribute('type', type);
 }
 
-function successMessageCard1(message, redirect = null) {
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      // Append message popup
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-
-      document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.getElementById("success-message");
-            box.remove();
-
-            if (redirect) {
-                  showLoader('Logging in...');
-                  setTimeout(() => {
-                        window.location.href = redirect;
-                }, 600); // short delay so spinner appears
-            }
-      });
-}
-
-function failedMessageCard1(message){
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-      document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.getElementById("failed-message");
-            box.remove();
-      });
-}
-
 function showLoader(message) {
       loadingAnimation1(message); // adds #loading
 }
@@ -153,10 +108,10 @@ async function loginAdmin(e) {
       
             if (result.success){
                   hideLoader();
-                  successMessageCard1(result.message, result.redirect);
+                  successToastRedirect(result.message, result.redirect);
             } else {
                   hideLoader();
-                  failedMessageCard1(result.message);
+                  failedToast(result.message);
             }
 
       } catch (error) {
@@ -181,10 +136,10 @@ async function forgotPassword() {
       
             if (result.success){
                   hideLoader();
-                  successMessageCard1(result.message);
+                  successToast(result.message);
             }else{
                   hideLoader();
-                  failedMessageCard1(result.message);
+                  failedToast('Failed! Something went wrong.');
             }
       
       } catch (error) {
@@ -212,10 +167,10 @@ async function verifyCode() {
                         setTimeout(() => changePasswordForm.classList.add('opacity-100'), 50);
                   }, 300);
             }else{
-                  failedMessageCard1(result.message);
+                  failedToast('Failed! Something went wrong.');
             }
       }else {
-            failedMessageCard1('No code inputted!');
+            failedToast('No code inputted!');
       }
 }
 
@@ -243,11 +198,11 @@ async function changePassword() {
                   }, 300);
             }else{
                   hideLoader();
-                  failedMessageCard1(result.message);
+                  failedToast('Failed! Something went wrong.');
             }
       } catch (error) {
             console.error('Error:', error);
-            failedMessageCard1('Something went wrong. Please try again.');
+            failedToast('Something went wrong. Please try again.');
       } finally {
             hideLoader();
       }

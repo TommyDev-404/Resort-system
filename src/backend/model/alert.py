@@ -300,22 +300,21 @@ class Alerts:
                               room_name = area.split()[0].lower()
                               room_no = area.split()[-1]
 
-                        if room_name not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
-                              message = f"(System check-out): Housekeeping requested for {area}"
+                        message = f"(System check-out): Housekeeping requested for {area}"
 
-                              # Insert notification
-                              cursor.execute('''
-                                    INSERT INTO notifications
-                                    (name, date, room_name, room_no, alert_type, classification)
-                                    VALUES (%s, NOW(), %s, %s, %s, %s);
-                              ''', (message, room_name, int(room_no), 'housekeeping', 'system-checkout'))
+                        # Insert notification
+                        cursor.execute('''
+                              INSERT INTO notifications
+                              (name, date, room_name, room_no, alert_type, classification)
+                              VALUES (%s, NOW(), %s, %s, %s, %s);
+                        ''', (message, room_name, int(room_no), 'housekeeping', 'system-checkout'))
 
-                              # Set room as need-clean
-                              cursor.execute('''
-                                    UPDATE accomodation_spaces
-                                    SET status = 'need-clean'
-                                    WHERE name = %s AND room = %s;
-                              ''', (room_name, room_no))
+                        # Set room as need-clean
+                        cursor.execute('''
+                              UPDATE accomodation_spaces
+                              SET status = 'need-clean'
+                              WHERE name = %s AND room = %s;
+                        ''', (room_name, room_no))
 
                   con.commit()
 

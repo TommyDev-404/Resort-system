@@ -1,48 +1,7 @@
 import { notifications } from "./home-dashboard.js";
+import { successToast, failedToast } from "./helper.js";
 
 // -------------------- HELPERS ------------------------- //
-function successMessageCard7(message, redirect = null) {
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4  fade-in-up">
-                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      // Append message popup
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-
-      document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.getElementById("success-message");
-            box.remove();
-
-            if (redirect)  window.location.href = redirect;
-      });
-}
-
-function failedMessageCard7(message){
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4  fade-in-up">
-                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-failed-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-      document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.getElementById("failed-message");
-            box.remove();
-      });
-}
-
 function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied, reserved){
       const row = `
             <tr data-room="${acc_name}" class="fade-in-up border-b border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5">
@@ -54,7 +13,7 @@ function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupie
                   <td class="px-6 py-4 text-emerald-600  dark:text-emerald-500 font-bold">${reserved}</td>
                   <td class="px-6 py-4 text-rose-600 dark:text-rose-500 font-bold">${occupied}</td>
                   <td class="px-6 py-4 flex justify-center">
-                        <button class="px-4 py-2 text-sm bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex gap-2 items-center" id="view-room-details"><i data-lucide="building" class="text-lg"></i>View Rooms</button>
+                        <button class="px-4 py-2 text-sm bg-teal-600 dark:bg-teal-500 dark:hover:bg-teal-600 text-white rounded-md hover:bg-teal-700 transition flex gap-2 items-center" id="view-room-details"><i data-lucide="building" class="text-lg"></i>View Rooms</button>
                   </td>
             </tr>
       `;
@@ -90,12 +49,12 @@ function createRowForRoomDetails(room_name, room_no, status){
       let new_status = null;
       let bg_color = null;;
       let action_name = status === "need-clean" ? 'Assign' : status === "on-clean" ? 'Mark Ready' : 'View Info';
-      let btn_color = status === "need-clean" ? 'bg-red-500 hover:bg-red-600' : status === "on-clean" ? 'bg-green-500 hover:bg-green-600 ' : 'bg-teal-500 hover:bg-teal-600';
+      let btn_color = status === "need-clean" ? 'bg-red-500 hover:bg-red-600' : status === "on-clean" ? 'bg-green-500 hover:bg-green-600 ' : 'bg-blue-500 hover:bg-blue-600';
       let icon = action_name === 'View Info' ? '<i data-lucide="eye" class="text-lg"></i>' : action_name === 'Mark Ready' ? '<i data-lucide="clipboard-check" class="text-lg"></i>' : '<i data-lucide="user-plus" class="text-lg"></i>' 
       
       if (status === 'avl') (new_status = 'Ready/Available', bg_color = 'bg-green-100 text-green-700 dark:text-white dark:bg-green-500');
       if (status === 'occupied') (new_status = 'Occupied', bg_color = 'bg-purple-100 text-purple-700 dark:text-white dark:bg-purple-500');
-      if (status === 'need-clean') (new_status = 'Need Clean', bg_color = 'bg-blue-100 text-blue-700 dark:text-white dark:bg-blue-500');
+      if (status === 'need-clean') (new_status = 'Need Clean', bg_color = 'bg-red-100 text-red-700 dark:text-white dark:bg-red-500');
       if (status === 'on-clean') (new_status = 'Cleaning', bg_color = 'bg-yellow-100 text-yellow-700 dark:text-white dark:bg-yellow-500');
       if (status === 'reserved') (new_status = 'Reserved', bg_color = 'bg-emerald-100 text-emerald-600 dark:text-white dark:bg-emerald-400');
 
@@ -342,7 +301,13 @@ async function accomodationData(){
                   "Family": "Family Room",
                   "Garden": "Garden View Room",
                   "Premium": "Premium Villa Room",
-                  "Standard": "Standard Villa Room"
+                  "Standard": "Standard Villa Room", 
+                  "Cabana": "Cabana Cottage",
+                  "Small": "Small Cottage",
+                  "Big": "Big Cottage",
+                  "Pavillion": "Pavillion Hall",
+                  "Mariposa": "Mariposa Hall",
+                  "Minicon": "Minicon Hall"
             };
             result.data.forEach(data => {
                   createRowData(areaNames[data.name], data.total_room, data.need_clean, data.on_clean, data.ready, data.occupied, data.reserved);
@@ -422,14 +387,14 @@ async function submitAssignStaff(e){
       if(result.success){
             await notifications();
             hideLoader();
-            successMessageCard7(result.message);
+            successToast('Successfully assigned cleaner!');
             document.getElementById('assign-staff-modal').remove();
             openRoomDetails(form.get('area_name'));
             getSummarryCardData();
             accomodationData();
       }else{
             hideLoader();
-            failedMessageCard7(result.message);
+            failedToast('Failed! Something went wrong.');
       }
 }
 
@@ -458,14 +423,14 @@ async function markReady(btn){
       if(result.success){
             await notifications();
             hideLoader();
-            successMessageCard7(result.message);
+            successToast('Updated successfully!');
             openRoomDetails(row.dataset.room);
             getSummarryCardData();
             accomodationData();
             document.querySelector('#roomDetailsModal').remove();
       }else{
             hideLoader();
-            failedMessageCard7(result.message);
+            failedToast('Failed! Something went wrong.');
       }
 }
 

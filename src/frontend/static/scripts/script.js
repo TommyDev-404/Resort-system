@@ -1,4 +1,5 @@
 import { notifications } from './home-dashboard.js';
+import { successToastRedirect, failedToast } from './helper.js';
 
 lucide.createIcons();
 
@@ -108,11 +109,11 @@ function logout(){
                   const response = await fetch('/logout', { method: 'POST' });
                   if (response.ok) {
                         hideLoaderLogout();
-                        successMessageCard6('Log out successfully', '/login');
+                        successToastRedirect('Log out successfully!', '/login');
                   }
             } catch (err) {
                   hideLoaderLogout();
-                  failedMessageCard6(`Logout failed: ${err}`);
+                  failedToast(`Logout failed: ${err}`);
             }
       });
 }
@@ -226,50 +227,3 @@ function logoutCard(){
       document.getElementById('logoutPortal').innerHTML += modal;
 }
 
-function successMessageCard6(message, redirect = null) {
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
-                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      // Append message popup
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-
-      document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.getElementById("success-message");
-            box.remove();
-            
-            if (redirect) {
-                  loadingAnimationLogout('Logging out...');
-                  setTimeout(() => {
-                        window.location.href = redirect;
-                }, 600); // short delay so spinner appears
-            }
-      });
-}
-
-function failedMessageCard6(message){
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center fade-in-up z-50" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4">
-                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-      
-      document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.getElementById("failed-message");
-            box.remove();
-      });
-}

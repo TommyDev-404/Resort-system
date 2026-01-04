@@ -1,50 +1,9 @@
+import { successToast, failedToast , promoRemoveWarningMessageCard} from "./helper.js";
 
 let isAttendanceNotEmpty = false;
 const tbodys = document.getElementById('staffList');
 
 // ------------ HELPER FUNCTIONS ------------
-function successMessageCard3(message, redirect = null) {
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="success-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-check" class="w-15 h-15 text-green-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 px-6 py-2" id="close-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      // Append message popup
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-
-      document.getElementById("close-message").addEventListener("click", () =>  {
-            const box = document.querySelector("#success-message");
-            box.remove();
-
-            if (redirect)  window.location.href = redirect;
-      });
-}
-
-function failedMessageCard3(message){
-      const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-[60]" id="failed-message">
-                  <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
-                        <i data-lucide="circle-x" class="w-15 h-15 text-center font-bold text-red-500"></i>
-                        <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
-                        <button class="bg-blue-500 p-1 text-white rounded-lg mt-6 hover:bg-blue-600 w-70" id="close-failed-message">Okay</button>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('messagePortal').innerHTML += msg;
-      lucide.createIcons();
-      document.getElementById("close-failed-message").addEventListener("click", () =>  {
-            const box = document.querySelector("#failed-message");
-            box.remove();
-      });
-}
-
 function renderAddStaffModal(){
 
       const modal = `
@@ -646,13 +605,13 @@ async function addStaff(e){
 
             if (result.success){
                   hideLoader();
-                  successMessageCard3(result.message);
+                  successToast('Staff added successfully!');
                   document.querySelector('#addStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
             }else{
                   hideLoader();
-                  failedMessageCard3(result.message);
+                  failedToast('Failed! Something went wrong.')
             }
       }catch(err){
             console.error(err);
@@ -899,14 +858,14 @@ async function addStaffAttendance(e){
 
             if (result.success){
                   hideLoader();
-                  successMessageCard3(result.message);
+                  successToast('Attendance added successfully!');
                   document.querySelector('#bulkAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
                   showAllStaff();
             }else{
                   hideLoader();
-                  failedMessageCard3(result.message);
+                  failedToast('Failed! Something went wrong.')
                   document.querySelector('#bulkAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
@@ -948,13 +907,13 @@ async function updateStaffAttendance(e){
 
             if (result.success){
                   hideLoader();
-                  successMessageCard3(result.message);
+                  successToast('Attendance updated successfully!');
                   document.querySelector('#updateAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
             }else{
                   hideLoader();
-                  failedMessageCard3(result.message);
+                  failedToast('Failed! Something went wrong!');
                   document.querySelector('#updateAttendanceModal').remove();
                   allStaffAttendance();
                   sumarryCards();
@@ -980,13 +939,13 @@ async function updateStaffInfo(e){
 
             if (result.success){
                   hideLoader();
-                  successMessageCard3(result.message);
+                  successToast('Updated successfully!');
                   document.querySelector('#updateStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
             }else{
                   hideLoader();
-                  failedMessageCard3(result.message);
+                  failedToast('Failed! Something went wrong!');
                   document.querySelector('#updateStaffModal').remove();
                   showAllStaff();
                   sumarryCards();
@@ -1157,26 +1116,39 @@ async function sortAttendanceData(){
 }
 
 async function removeStaff(id){
-      showLoader('data', 'Removing staff...');
-      try{
-            const response = await fetch(`/remove-staff?id=${id}`, {
-                  method: 'DELETE'
-            });
-            const result = await response.json();
+      promoRemoveWarningMessageCard(`Are you sure you want to remove this Staff?`);
+      document.getElementById("confirm-remove").addEventListener("click", async () => {
+            // User confirmed
+            const warningBox = document.getElementById("warning-message");
+            if (warningBox) warningBox.remove();
 
-            if (result.success){
-                  hideLoader();
-                  successMessageCard3(result.message);
-                  showAllStaff();
-                  sumarryCards();
-            }else{
-                  hideLoader();
-                  failedMessageCard3(result.message);
+            showLoader('data', 'Removing staff...');
+            try{
+                  const response = await fetch(`/remove-staff?id=${id}`, {
+                        method: 'DELETE'
+                  });
+                  const result = await response.json();
+
+                  if (result.success){
+                        hideLoader();
+                        successMessageCard3(result.message);
+                        showAllStaff();
+                        sumarryCards();
+                  }else{
+                        hideLoader();
+                        failedMessageCard3(result.message);
+                  }
+
+            }catch(err){
+                  console.error(err);
             }
+      });  
 
-      }catch(err){
-            console.error(err);
-      }
+      // Cancel button just closes the modal
+      document.getElementById("cancel-remove").addEventListener("click", () => {
+            const warningBox = document.getElementById("warning-message");
+            if (warningBox) warningBox.remove();
+      });
 }
 
 async function removeStaffAttendance(e){
@@ -1186,27 +1158,40 @@ async function removeStaffAttendance(e){
       const status = td[4].textContent.trim();
       const date = td[3].textContent.trim();
       
-      showLoader('data', 'Removing staff attendance...');
-      try{
-            const response = await fetch(`/remove-staff-attendance?id=${id}&status=${status}&date=${date}`, {
-                  method: 'DELETE'
-            });
-            const result = await response.json();
+      promoRemoveWarningMessageCard(`Are you sure you want to remove this attendance?`);
+      document.getElementById("confirm-remove").addEventListener("click", async () => {
+            // User confirmed
+            const warningBox = document.getElementById("warning-message");
+            if (warningBox) warningBox.remove();
 
-            if (result.success){
-                  hideLoader();
-                  successMessageCard3(result.message);
-                  allStaffAttendance();
-                  sumarryCards();
-                  showAllStaff();
-            }else{
-                  hideLoader();
-                  failedMessageCard3(result.message);
+            showLoader('data', 'Removing staff attendance...');
+            try{
+                  const response = await fetch(`/remove-staff-attendance?id=${id}&status=${status}&date=${date}`, {
+                        method: 'DELETE'
+                  });
+                  const result = await response.json();
+
+                  if (result.success){
+                        hideLoader();
+                        successToast('Attendance removed successfully!');
+                        allStaffAttendance();
+                        sumarryCards();
+                        showAllStaff();
+                  }else{
+                        hideLoader();
+                        failedToast('Failed! Something went wrong.');
+                  }
+
+            }catch(err){
+                  console.error(err);
             }
-
-      }catch(err){
-            console.error(err);
-      }
+      });
+      
+      // Cancel button just closes the modal
+      document.getElementById("cancel-remove").addEventListener("click", () => {
+            const warningBox = document.getElementById("warning-message");
+            if (warningBox) warningBox.remove();
+      });
 }
 
 async function sumarryCards(){
