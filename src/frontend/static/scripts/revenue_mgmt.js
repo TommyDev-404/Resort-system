@@ -180,9 +180,10 @@ async function updatePromo(e) {
 
 async function getAllPromo() {
       document.querySelectorAll('ul li').forEach(row => row.remove());      
+      
+      loadingAnimation0();
       const response = await fetch('/get-all-promo');
       const res = await response.json();
-      loadingAnimation0();
       if (res.success){
             hideLoader();
             res.data.forEach(row => {

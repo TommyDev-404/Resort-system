@@ -533,7 +533,7 @@ function enableActionBtns(e){
                               }
 
                               if (status === 'Checked-in'){
-                                    if (checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'cancel-bookings') {
+                                    if (checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
                                           btn.style.opacity = '1';
                                           btn.style.pointerEvents = 'auto';
                                     }else if (checkoutDate > todayDate && btn.getAttribute('id') !== 'mark-checkin' &&  btn.getAttribute('id') !== 'mark-checkout' && btn.getAttribute('id') !== 'cancel-bookings') {
@@ -762,6 +762,75 @@ async function viewUpcomingModal(title, type){
       upcomingData(type, 'today');
 }
 
+function toggleFilter(toggleId, selectId) {
+      const toggle = document.getElementById(toggleId);
+      const select = document.getElementById(selectId);
+  
+      // Toggle its own select
+      select.disabled = !toggle.checked;
+      select.classList.toggle('opacity-40', !toggle.checked);
+  
+  
+      if (toggleId === 'dayToggle') {
+          if (!toggle.checked) {
+              // DAY OFF → month-only
+              fetchByFilterStatus('month-only');
+          } else {
+              // DAY ON → full filter
+              fetchByFilterStatus('all-enabled');
+          }
+      }
+}
+
+function fetchByFilterStatus(status) {
+      if (category_data) {
+            bookingsCategories(status);
+      } else {
+          // normal recent bookings
+            recentBookings(status);
+      }
+      
+      getTotalsCountData(status);
+}
+
+function getFilterStatus() {
+      const dayChecked = document.getElementById('dayToggle')?.checked;
+
+      if (!dayChecked) return 'month-only';
+      return 'all-enabled';
+}
+
+function recheckDateFilter(){
+      document.getElementById('dayToggle').checked = true;
+      document.getElementById('dayToggle').disabled = false;
+      
+      const daySelect = document.getElementById('daySelect3');
+
+      // Toggle its own select
+      daySelect.disabled = false;
+      daySelect.classList.remove('opacity-40');
+}
+
+function parseOrReturn(value) {
+      // Check if value is already a Date object
+      if (value instanceof Date && !isNaN(value)) {
+          return value; // already a Date
+      }
+  
+      // Check if value is a string and can be parsed as a date
+      if (typeof value === "string") {
+            const parsed = new Date(value);
+            if (!isNaN(parsed)) {
+                  
+                  const date = new Date(value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+                  return date; // parsed successfully
+            }
+      }
+
+      // Otherwise, return as-is
+      return value;
+}
+
 // --------------- POST DATA Fetching -------------- //
 async function addBooking(e){
       e.preventDefault();      
@@ -792,7 +861,7 @@ async function addBooking(e){
                   recentBookings();
             }
             
-            getTotalsCountData();
+            getTotalsCountData('all-enabled');
       }catch(err){
             console.log(err);
       }
@@ -822,7 +891,7 @@ async function markAsCheckout(){
             hideLoader();
             failedMessageCard4(result.message);
       }
-      getTotalsCountData();
+      getTotalsCountData(getFilterStatus());
 }
 
 async function markAsCheckin(){
@@ -848,7 +917,7 @@ async function markAsCheckin(){
             hideLoader();
             failedMessageCard4(result.message);
       }
-      getTotalsCountData();
+      getTotalsCountData(getFilterStatus());
 }
 
 async function cancelBooking(){
@@ -874,7 +943,7 @@ async function cancelBooking(){
             hideLoader();
             failedMessageCard4(result.message);
       }
-      getTotalsCountData();
+      getTotalsCountData(getFilterStatus());
 }
 
 async function submitPayment(e){
@@ -899,7 +968,7 @@ async function submitPayment(e){
             hideLoader();
             failedMessageCard4(result.message);
       }
-      getTotalsCountData();
+      getTotalsCountData(getFilterStatus());
 }
 
 async function updateReservationDate(e){
@@ -927,15 +996,16 @@ async function updateReservationDate(e){
             failedMessageCard4(result.message);
             document.querySelector('#update-reservation-overlay').remove();
       }
-      getTotalsCountData();
+      getTotalsCountData(getFilterStatus());
 }
 
 // --------------- GET DATA Fetching -------------- //
 async function renderViewReservationDetails(id){
       showLoader('data', 'Retrieving booking details...');
+      console.log(id);
       const response = await fetch(`/view-details/${id}`);
       const result = await response.json();
-      console.log(result);
+
       if (result.success){
             const check_in = new Date(result.data.check_in).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'});
             const check_out = new Date(result.data.check_out).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'});
@@ -1121,32 +1191,44 @@ async function avl_spaces() {
       document.getElementById('count-h').textContent = result.hall;
 }
 
-async function recentBookings(){
-      document.querySelectorAll('tbody tr').forEach(row => row.remove());      
+async function recentBookings(status ='all-enabled') {
+      document.querySelectorAll('tbody tr').forEach(row => row.remove());
       resetToDefaultTabItem();
       showLoader('table');
-      const year = document.getElementById('yearSelect').value;
+
+      getTotalsCountData(getFilterStatus());
+
+      let url;
+      const year = document.getElementById('yearSelect').value || new Date().getFullYear();
       const month = document.getElementById('monthSelect').value;
       const day = document.getElementById('daySelect3').value;
-      getTotalsCountData();
-
-      const response = await fetch(`/recent-bookings?year=${year ? year : new Date().getFullYear()}&month=${month}&day=${day}`);
+      
+      if (status === 'all-enabled') {
+          url = `/recent-bookings?year=${year}&month=${month}&day=${day}`;
+      } 
+      else{
+          url = `/recent-bookings-month?year=${year}&month=${month}`;
+      } 
+  
+      const response = await fetch(url);
       const result = await response.json();
-
-      if (result.success){
-            hideLoader();
+  
+      hideLoader();
+  
+      if (result.success && result.data.length) {
             result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
+                  const check_out = parseOrReturn(row.check_out);
+                  const check_in = parseOrReturn(row.check_in);
+                  const date_book = parseOrReturn(row.date_book);
+            
+                  createTable(row.booking_id, row.name, date_book, check_in, check_out, row.stay, row.accomodations, row.booking_type, row.status, row.payment);
             });
-      }else {
-            hideLoader();
-            const empty_row = `
+      } else {
+            tbody.innerHTML = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="9" class="text-center text-gray-800 py-6 dark:text-white">No data.</td>
+                        <td colspan="9" class="text-center py-6">No data.</td>
                   </tr>
             `;
-            
-            tbody.innerHTML += empty_row;
       }
 }
 
@@ -1240,12 +1322,20 @@ async function summaryCardsDatas(){
       }
 }
 
-async function getTotalsCountData() {
-      const year = document.getElementById('yearSelect').value;
+async function getTotalsCountData(status) {
+      let url;
+      const year = document.getElementById('yearSelect').value || new Date().getFullYear();
       const month = document.getElementById('monthSelect').value;
       const day = document.getElementById('daySelect3').value;
 
-      const response = await fetch(`/totals?month=${month}&year=${year ? year : new Date().getFullYear()}&day=${day}`);
+      if (status === 'all-enabled') {
+          url = `/totals?year=${year}&month=${month}&day=${day}`;
+      } 
+      else{
+          url = `/totals-month?year=${year}&month=${month}`;
+      } 
+  
+      const response = await fetch(url);
       const result = await response.json();
 
       if (result.success){
@@ -1259,7 +1349,7 @@ async function getTotalsCountData() {
       }
 }
 
-async function bookingsCategories(e){ 
+async function bookingsCategories(status='all-enabled'){ 
       document.querySelectorAll('tbody tr').forEach(row => row.remove());      
       // disable btns when navigating 
       const allBtns = document.querySelectorAll('.btn');
@@ -1268,22 +1358,31 @@ async function bookingsCategories(e){
             btn.style.pointerEvents = 'none';
       });
 
-      const tabItem = e.target.closest('.tab-item'); // ensures we get the button
-      if (!tabItem) return; // safety check
-
-      const category = tabItem.getAttribute('id'); // now this always works
       const year = document.getElementById('yearSelect').value;
       const month = document.getElementById('monthSelect').value;
       const day = document.getElementById('daySelect3').value;
-      category_data = category;
+
       showLoader('table');
-      const response = await fetch(`/category-bookings?year=${year}&month=${month}&category=${category}&day=${day}`);
+      
+      let url = null;
+      if (status === 'all-enabled') {
+            url = `/category-bookings?category=${category_data}&year=${year}&month=${month}&day=${day}`;
+      } 
+      else{
+            url = `/category-bookings-month?category=${category_data}&year=${year}&month=${month}`;
+      } 
+
+      const response = await fetch(url);
       const result = await response.json();
 
       if (result.success){
             hideLoader();
             result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
+                  const check_out = parseOrReturn(row.check_out);
+                  const check_in = parseOrReturn(row.check_in);
+                  const date_book = parseOrReturn(row.date_book);
+
+                  createTable(row.booking_id, row['name'], date_book, check_in, check_out, row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
@@ -1299,16 +1398,26 @@ async function bookingsCategories(e){
 }
 
 async function searchGuest(e){ 
+      document.querySelectorAll('tbody tr').forEach(row => row.remove());      
       const name = e.target.value;
-      const year = document.getElementById('yearSelect').value;
+      let status = getFilterStatus();
+      showLoader('table');
+      
+      let url;
+      const year = document.getElementById('yearSelect').value || new Date().getFullYear();
       const month = document.getElementById('monthSelect').value;
       const day = document.getElementById('daySelect3').value;
-      showLoader('table');
-      const response = await fetch(`/search-guest?name=${name}&year=${year}&month=${month}&category=${category_data}&day=${day}`);
+      console.log(status);
+      if (status === 'all-enabled') {
+            url = `/search-guest?name=${name}&category=${category_data}&year=${year}&month=${month}&day=${day}`;
+      } 
+      else {
+            url = `/search-guest-month?name=${name}&category=${category_data}&year=${year}&month=${month}`;
+      } 
+      
+      const response = await fetch(url);
       const result = await response.json();
 
-      document.querySelectorAll('tbody tr').forEach(row => row.remove());      
-      
       if (result.success){
             hideLoader();
             result.data.forEach(row => {
@@ -1417,8 +1526,14 @@ document.addEventListener('click', (e) => {
       if (e.target.closest('#mark-checkout')) markAsCheckout();
       if (e.target.closest('#cancel-bookings')) cancelBooking();
       if (e.target.closest('#update-reservation-date')) getReservationDate();
-      if (e.target.closest('.tab-item')) bookingsCategories(e);
+      if (e.target.closest('.tab-item')) {
+            const status = getFilterStatus();
+            const category = e.target.closest('.tab-item').getAttribute('id'); // now this always works;
+            category_data = category;
 
+            fetchByFilterStatus(status);
+      }
+      
       // icon click 
       if (e.target.closest('#view-full-info')) renderViewReservationDetails(e.target.closest('tr').getAttribute('id'));           
       if (e.target.closest('#update-bookings')) getDataToUpdate(e);
@@ -1452,9 +1567,10 @@ document.addEventListener('submit', async(e) => {
 
 // select tags  
 document.addEventListener('change', (e) => {
-      if (e.target.closest('#yearSelect')) ( getDays2(), recentBookings(), resetButtonAndCheckBox());
-      if (e.target.closest('#monthSelect')) ( getDays2(), recentBookings(), resetButtonAndCheckBox());
-      if (e.target.closest('#daySelect3')) (recentBookings(), resetButtonAndCheckBox());
+      //if (e.target.closest('#yearSelect')) ( getDays2(), recentBookings(), resetButtonAndCheckBox());
+      if (e.target.closest('#yearSelect')) ( getDays2(), recentBookings(getFilterStatus()), resetButtonAndCheckBox());
+      if (e.target.closest('#monthSelect')) ( getDays2(), recentBookings(getFilterStatus()), resetButtonAndCheckBox());
+      if (e.target.closest('#daySelect3')) (recentBookings(getFilterStatus()), resetButtonAndCheckBox());
       if (e.target.closest('input[name="select"]')) enableActionBtns(e);
       if (e.target.closest('input[name="select"]')) {
             const checkbox = e.target;
@@ -1485,6 +1601,8 @@ document.addEventListener('change', (e) => {
       if (e.target.closest('#payment'))  showPaymentDate(e);
       if (e.target.closest('#booking_status'))  showBookingDate(e);
       if (e.target.closest('#upcoming-day'))  upcomingData(e.target.getAttribute('data-section'), e.target.value);
+
+      if (e.target.closest('#dayToggle')) toggleFilter(e.target.getAttribute('id'), 'daySelect3');
 });
 
 document.addEventListener('input', (e) => {
@@ -1500,6 +1618,7 @@ document.addEventListener('input', (e) => {
 switchTabs();
 
 export function initPageReservation(){
+      recheckDateFilter();
       getYears();
       getMonths();
       getDays2();

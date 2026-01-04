@@ -1,7 +1,7 @@
 import pymysql
 from datetime import date, timedelta
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
-from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
+from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management, Storage
 from backend.extensions import cache
 
 app = Flask(__name__, template_folder='frontend/template', static_folder='frontend/static')
@@ -14,15 +14,6 @@ app.permanent_session_lifetime = timedelta(minutes=30)  # 30 minutes
 app.config['CACHE_TYPE'] = 'SimpleCache'
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # 5 minutes
 cache.init_app(app)
-
-# prevent going back to homepage after logout or going direct on home page without authentication
-@app.after_request
-def add_header(response):
-      response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-      response.headers["Pragma"] = "no-cache"
-      response.headers["Expires"] = "0"
-      return response
-
 
 # Create DB object once here
 db = Database( host="localhost", user="grandsight", password="123456", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
@@ -40,6 +31,13 @@ rev = RevenueMgmt(db, alert, reserve)
 staff = Staff_Management(db, house)
 login = Login(db)
 
+# prevent going back to homepage after logout or going direct on home page without authentication
+@app.after_request
+def add_header(response):
+      response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+      response.headers["Pragma"] = "no-cache"
+      response.headers["Expires"] = "0"
+      return response
 
 # render templates
 #------------------ LOGIN ------------------#
@@ -241,7 +239,11 @@ def avl_rooms_all():
 
 @app.route('/totals', methods=['GET'])
 def totals():
-      return jsonify(reserve.totals(request.args.get('month'), request.args.get('year'), request.args.get('day')))
+      return jsonify(reserve.totals(request.args.get('year'), request.args.get('month'), request.args.get('day')))
+
+@app.route('/totals-month', methods=['GET'])
+def totals_month():
+      return jsonify(reserve.totals(request.args.get('year'), request.args.get('month')))
 
 @app.route('/add-booking', methods=['POST'])
 def add_booking():
@@ -251,9 +253,17 @@ def add_booking():
 def recent_bookings():
       return jsonify(reserve.recent_bookings(request.args.get('year'), request.args.get('month'), request.args.get('day')))
 
+@app.route('/recent-bookings-month', methods=['GET'])
+def recent_bookings_month():
+      return jsonify(reserve.recent_bookings(request.args.get('year'), request.args.get('month')))
+
 @app.route('/category-bookings', methods=['GET'])
 def category_bookings():
-      return jsonify(reserve.booking_category(request.args.get('year'), request.args.get('month'), request.args.get('day'), request.args.get('category')))
+      return jsonify(reserve.booking_category(request.args.get('category'), request.args.get('year'), request.args.get('month'), request.args.get('day')))
+
+@app.route('/category-bookings-month', methods=['GET'])
+def category_bookings_month():
+      return jsonify(reserve.booking_category(request.args.get('category'), request.args.get('year'), request.args.get('month')))
 
 @app.route('/get-years', methods=['GET'])
 def get_years():
@@ -293,7 +303,15 @@ def get_data_to_update():
 
 @app.route('/search-guest', methods=['GET'])
 def search_guest():
-      return jsonify(reserve.search_guest(request.args.get('name'), request.args.get('year'), request.args.get('month'), request.args.get('day'), request.args.get('category')))
+      return jsonify(reserve.search_guest(request.args.get('name'),  request.args.get('category'), request.args.get('year'), request.args.get('month'), request.args.get('day')))
+
+@app.route('/search-guest-month', methods=['GET'])
+def search_guest_month():
+      return jsonify(reserve.search_guest(request.args.get('name'),  request.args.get('category'), request.args.get('year'), request.args.get('month')))
+
+@app.route('/search-guest-year', methods=['GET'])
+def search_guest_year():
+      return jsonify(reserve.search_guest(request.args.get('name'),  request.args.get('category'), request.args.get('year')))
 
 
 #--------------- HOUSEKEEPING ------------------#
@@ -485,5 +503,4 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
-
 

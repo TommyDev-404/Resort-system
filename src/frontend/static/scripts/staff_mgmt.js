@@ -689,9 +689,9 @@ async function viewStaffInfo(id){
 async function showAllStaff(){
       document.querySelectorAll('ul li').forEach(row => row.remove());      
       try{
+            loadingAnimation0();
             const response = await fetch('/all-staff', {});
             const result = await response.json();
-            loadingAnimation0();
             if (result.success){
                   hideLoader();
                   result.data.forEach(staff => {

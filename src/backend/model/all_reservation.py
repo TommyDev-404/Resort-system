@@ -1,7 +1,6 @@
 from collections import Counter
 from datetime import datetime, timezone, timedelta, date
 from backend.extensions import cache
-from .housekeeping import Housekeeping
 
 class Reservation:
       def __init__(self, db, alert, dashboard):
@@ -240,28 +239,47 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Error: {str(e)}'}
 
-      def recent_bookings(self, year, month, day):
+      def recent_bookings(self, year, month, day=None):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        start_date = date(int(year), int(month), int(day))
-                        
-                        cursor.execute('''
-                        SELECT 
-                              booking_id,
-                              name, 
-                              date_book,
-                              check_in, 
-                              check_out, 
-                              accomodations, 
-                              booking_type,
-                              status, 
-                              payment,
-                              DATEDIFF(check_out, check_in) AS stay_gap
-                        FROM bookings
-                        WHERE check_in = %s
-                        ORDER BY check_in DESC;
-                        ''', (start_date))
+
+                        params = []
+                        where_clause = ""
+
+                        if month and day:
+                              # YEAR + MONTH + DAY
+                              start_date = date(int(year), int(month), int(day))
+                              where_clause = "WHERE check_in = %s"
+                              params.append(start_date)
+                        elif month and not day:
+                              # YEAR + MONTH
+                              start_date = date(int(year), int(month), 1)
+
+                              if int(month) == 12:
+                                    end_date = date(int(year) + 1, 1, 1)
+                              else:
+                                    end_date = date(int(year), int(month) + 1, 1)
+
+                              where_clause = "WHERE check_in >= %s AND check_in < %s"
+                              params.extend([start_date, end_date])
+
+                        cursor.execute(f'''
+                              SELECT 
+                                    booking_id,
+                                    name,
+                                    date_book,
+                                    check_in,
+                                    check_out,
+                                    accomodations,
+                                    booking_type,
+                                    status,
+                                    payment,
+                                    DATEDIFF(check_out, check_in) AS stay_gap
+                              FROM bookings
+                              {where_clause}
+                              ORDER BY check_in DESC
+                        ''', params)
 
                         data = cursor.fetchall()
                         new_data = []
@@ -271,37 +289,53 @@ class Reservation:
                               formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0") if d.get('check_out') else '--'
                               formatted_date  = d.get('date_book').strftime("%b %d").lstrip("0") if d.get('date_book') else '--'
 
-                              new_data.append({'id': d.get('booking_id'), 'name': d.get('name'),  'date_book': formatted_date , 'checkin': formatted_checkin, 'checkout': formatted_checkout, 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
-                        
-                        result = {'success': bool(data), 'data': new_data}
-                        return result
+                              new_data.append({'booking_id': d.get('booking_id'), 'name': d.get('name'),  'date_book': formatted_date , 'check_in': formatted_checkin, 'check_out': formatted_checkout, 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
+                              
+                        return {'success': bool(data), 'data': new_data}
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def booking_category(self, year, month, day, category):
+      def booking_category(self, category, year, month, day=None):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
 
-                        # Compute start and end dates for the month
-                        start_date = date(int(year), int(month), int(day))
+                        params = []
+                        where_clause = ""
 
-                        base_sql = '''
-                        SELECT 
-                              booking_id,
-                              name, 
-                              date_book,
-                              check_in, 
-                              check_out, 
-                              accomodations,  
-                              booking_type,
-                              status, 
-                              payment,
-                              DATEDIFF(check_out, check_in) AS stay_gap
-                        FROM bookings
-                        WHERE check_in = %s
-                        '''
+                        if month and day:
+                              # YEAR + MONTH + DAY
+                              start_date = date(int(year), int(month), int(day))
+                              where_clause = "WHERE check_in = %s"
+                              params.append(start_date)
+                        elif month and not day:
+                              # YEAR + MONTH
+                              start_date = date(int(year), int(month), 1)
+
+                              if int(month) == 12:
+                                    end_date = date(int(year) + 1, 1, 1)
+                              else:
+                                    end_date = date(int(year), int(month) + 1, 1)
+                              
+                              where_clause = "WHERE check_in >= %s AND check_in < %s"
+                              params.extend([start_date, end_date])
+
+                        base_sql = f'''
+                              SELECT 
+                                    booking_id,
+                                    name, 
+                                    date_book,
+                                    check_in, 
+                                    check_out, 
+                                    accomodations,  
+                                    booking_type,
+                                    status, 
+                                    payment,
+                                    DATEDIFF(check_out, check_in) AS stay_gap
+                              FROM bookings
+                              {where_clause}
+                              '''
                         sql = base_sql
 
                         # Add category-specific filters
@@ -322,21 +356,21 @@ class Reservation:
 
                         sql += ' ORDER BY check_in DESC'
 
-                        cursor.execute(sql, (start_date))
+                        cursor.execute(sql, (params))
                         data = cursor.fetchall()
+                  
                         new_data = []
-
                         for d in data:
                               formatted_checkin  = d.get('check_in').strftime("%b %d").lstrip("0")  
                               formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0")    
                               formatted_date  = d.get('date_book').strftime("%b %d").lstrip("0") if d.get('date_book') else '--'
 
                               new_data.append({
-                                    'id': d.get('booking_id'),
+                                    'booking_id': d.get('booking_id'),
                                     'name': d.get('name'),
                                     'date_book': formatted_date,
-                                    'checkin': formatted_checkin,
-                                    'checkout': formatted_checkout,
+                                    'check_in': formatted_checkin,
+                                    'check_out': formatted_checkout,
                                     'accomodations': d.get('accomodations'),
                                     'status': d.get('status'),
                                     'booking_type': d.get('booking_type'),
@@ -344,10 +378,7 @@ class Reservation:
                                     'payment': d.get('payment')
                               })
 
-                        result = {'success': bool(data), 'data': new_data}
-
-                        return result
-
+                        return {'success': bool(new_data), 'data': new_data}
             except Exception as e:
                   con.rollback()
                   return {'success': False, 'message': f'Cancellation failed: {e}'}
@@ -713,43 +744,62 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def totals(self, month, year, day):
+      def totals(self, year,  month, day=None):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
 
-                        # Compute start and end dates for the month
-                        start_month = date(int(year), int(month), int(day))
+                        params = []
+                        where_clause = ""
+
+                        if month and day:
+                              # YEAR + MONTH + DAY
+                              start_date = date(int(year), int(month), int(day))
+                              where_clause = "WHERE check_in = %s"
+                              params.append(start_date)
+                        elif month and not day:
+                              # YEAR + MONTH
+                              start_date = date(int(year), int(month), 1)
+
+                              if int(month) == 12:
+                                    end_date = date(int(year) + 1, 1, 1)
+                              else:
+                                    end_date = date(int(year), int(month) + 1, 1)
+
+                              where_clause = "WHERE check_in >= %s AND check_in < %s"
+                              params.extend([start_date, end_date])
+
+                        all_params = params * 5
                         
-                        cursor.execute("""
+                        cursor.execute(f"""
                         WITH c_checkin AS (
                               SELECT COUNT(*) AS total_checkin
                               FROM bookings
-                              WHERE check_in = %s
+                              {where_clause}
                               AND status = 'Checked-in'
                         ),
                         c_reserved AS (
                               SELECT COUNT(*) AS total_reserved
                               FROM bookings
-                              WHERE check_in = %s
+                              {where_clause}
                               AND status = 'Reserved'
                         ),
                         c_overnight AS (
                               SELECT COUNT(*) AS total_overnight
                               FROM bookings
-                              WHERE check_in = %s 
+                              {where_clause}
                               AND booking_type = 'Check-in' and status in ("Checked-in", "Checked-out")
                         ),
                         c_dayguest AS (
                               SELECT COUNT(*) AS total_dayguest
                               FROM bookings
-                              WHERE check_in = %s
+                              {where_clause}
                               AND booking_type = 'Day Guest' and status in ("Checked-in", "Checked-out")
                         ),
                         c_all AS (
                               SELECT COUNT(*) AS total_all
                               FROM bookings
-                              WHERE check_in = %s 
+                              {where_clause}
                         )
                         SELECT 
                               ci.total_checkin,
@@ -762,7 +812,7 @@ class Reservation:
                               c_dayguest dg,
                               c_overnight o,
                               c_all a;
-                        """, (start_month, start_month, start_month, start_month, start_month))  # repeat start/end 9 times for placeholders
+                        """, (all_params))  # repeat start/end 9 times for placeholders
 
                         data = cursor.fetchone()
 
@@ -783,38 +833,51 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Failed: {e}'}
 
-      def search_guest(self, guest_name, year, month, day, category):
+      def search_guest(self, guest_name, category, year, month, day=None):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
 
-                        # Compute first and last day of the month
-                        start_date = date(int(year), int(month), int(day))
+                        params = []
+                        where_clause = ""
 
-                        # Base query with range (index-friendly)
+                        if month and day:
+                              # YEAR + MONTH + DAY
+                              start_date = date(int(year), int(month), int(day))
+                              where_clause = "AND check_in = %s"
+                              params.append(start_date)
+                        elif month and not day:
+                              # YEAR + MONTH
+                              start_date = date(int(year), int(month), 1)
+
+                              if int(month) == 12:
+                                    end_date = date(int(year) + 1, 1, 1)
+                              else:
+                                    end_date = date(int(year), int(month) + 1, 1)
+
+                              where_clause = "AND check_in >= %s AND check_in < %s"
+                              params.extend([start_date, end_date])
+
+                        # ---- BASE QUERY ----
                         sql = """
-                        SELECT * FROM bookings 
-                        WHERE name LIKE %s COLLATE utf8mb4_general_ci
-                        AND date_book = %s
+                              SELECT *
+                              FROM bookings
+                              WHERE name COLLATE utf8mb4_general_ci LIKE %s
                         """
-                        params = [guest_name + "%", start_date]
+                        params.insert(0, guest_name + "%")
+
+                        sql += f" {where_clause}"
 
                         # Add category filters
                         if category != 'all-data':
-                              if category == 'check_out-data':
-                                    sql += ' AND status = "Checked-out"'
-                              elif category == 'check_in-data':
+                              if category == 'check_in-data':
                                     sql += ' AND status = "Checked-in"'
                               elif category == 'reserved-data':
                                     sql += ' AND status = "Reserved"'
-                              elif category == 'cancelled-reservation-data':
-                                    sql += ' AND status = "Cancelled"'
                               elif category == 'overnight-data':
-                                    sql += ' AND status = "Checked-in" AND booking_type = "Check-in"'
-                              elif category == 'not_paid-data':
-                                    sql += ' AND payment = "Pending" '
+                                    sql += ' AND status IN ("Checked-out", "Checked-in") AND booking_type = "Check-in"'
                               elif category == 'day-guest':
-                                    sql += ' AND booking_type = "Day Guest" and status = "Checked-in" '
+                                    sql += ' AND booking_type = "Day Guest" and status IN ("Checked-out", "Checked-in") '
 
                         # Always order by check_in descending
                         sql += ' ORDER BY check_in DESC'

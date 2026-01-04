@@ -94,7 +94,6 @@ async function switchContent(sectionId) {
       hideLoader(sectionId);
 }
 
-
 function logout(){
       logoutCard();
       // cancel
