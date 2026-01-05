@@ -82,6 +82,13 @@ function hideLoader() {
       if (loader) loader.remove();
 }
 
+function toDateOnly(value) {
+      const d = new Date(value);
+      d.setHours(0, 0, 0, 0);
+      return d;
+}
+
+
 async function applyPromo(e) {
       e.preventDefault();
       const form = new FormData(e.target);
@@ -95,12 +102,12 @@ async function applyPromo(e) {
             return;
       }
 
-      const startDate = new Date(form.get('date'));
-      const endDate = new Date(form.get('end_date'));
+      const startDate = toDateOnly(form.get('date'));
+      const endDate = toDateOnly(form.get('end_date'));
       const today = new Date();
 
       const currentYear = today.getFullYear();
-
+      
       // ❌ End date must be after today
       if (endDate <= today) {
             promoDateWarningMessageCard('Warning: Promo end date must be after today!');

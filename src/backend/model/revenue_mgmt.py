@@ -88,7 +88,7 @@ class RevenueMgmt:
                                                 ba['booking_id']
                                           ))
                                           con.commit()
-                                          print(ba)
+
                                           # Recalculate booking totals safely
                                           self.reservation_model.update_reservation_date(
                                                 ba['booking_id'],
@@ -179,7 +179,7 @@ class RevenueMgmt:
 
                         # 3️⃣ Find affected bookings
                         cursor.execute('''
-                              SELECT booking_id, accomodations, check_in, check_out
+                              SELECT booking_id, accomodations, check_in, check_out, booking_type
                               FROM bookings
                               WHERE status NOT IN ('Cancelled')
                               AND check_in >= %s and check_in < %s
@@ -220,7 +220,8 @@ class RevenueMgmt:
                                     self.reservation_model.update_reservation_date(
                                           ba['booking_id'],
                                           str(ba['check_in']),
-                                          str(ba['check_out'])
+                                          str(ba['check_out']),
+                                          ba['booking_type']
                                     )
 
                         return {

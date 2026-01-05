@@ -615,7 +615,11 @@ async function roomsData() {
             Number(res.data[8].need_clean) +
             Number(res.data[9].need_clean);
             
-      const occupiedHallRooms = totalHallRooms - availableHallRooms;
+      const occupiedHallRooms = 
+            Number(res.data[7].occupied) +
+            Number(res.data[8].occupied) +
+            Number(res.data[9].occupied);
+      ;
 
       const hallPercentage = (availableHallRooms / totalHallRooms) * 100;
       
@@ -623,7 +627,7 @@ async function roomsData() {
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Barkada Room</p>
                   <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                        ${res.data[0].total_rooms - Number(res.data[0].today_avail) - Number(res.data[0].reserve)}
+                        ${res.data[0].occupied}
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[0].reserve} 
@@ -642,7 +646,7 @@ async function roomsData() {
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Garden View Room</p>
                   <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                        ${res.data[1].total_rooms - Number(res.data[1].today_avail) - Number(res.data[1].reserve)}
+                        ${res.data[1].occupied}
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[1].reserve} 
@@ -662,7 +666,7 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Premium Villa</p>
                   
                   <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                        ${res.data[2].total_rooms - Number(res.data[2].today_avail) - Number(res.data[2].reserve)}
+                        ${res.data[2].occupied}
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[2].reserve} 
@@ -682,7 +686,7 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Standard Villa</p>
                   
                   <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                        ${res.data[3].total_rooms - Number(res.data[3].today_avail) - Number(res.data[3].reserve)}
+                        ${res.data[3].occupied}
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[3].reserve} 
@@ -702,7 +706,7 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Cabana Cottage</p>
                   
                   <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                        ${res.data[5].total_rooms - Number(res.data[5].today_avail) - Number(res.data[5].reserve)}
+                        ${res.data[5].occupied}
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[5].reserve} 
@@ -722,7 +726,7 @@ async function roomsData() {
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Small Cottage</p>
                   
                   <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                        ${res.data[6].total_rooms - Number(res.data[6].today_avail) - Number(res.data[6].reserve)}
+                        ${res.data[6].occupied}
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[6].reserve} 
@@ -743,7 +747,7 @@ async function roomsData() {
                         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Big Cottage</p>
                         
                         <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                              ${res.data[4].total_rooms - Number(res.data[4].today_avail) - Number(res.data[4].reserve)}
+                              ${res.data[4].occupied}
                               <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
                               <span class="mx-1 text-gray-400">•</span>
                               ${res.data[4].reserve} 
