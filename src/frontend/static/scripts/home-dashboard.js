@@ -594,7 +594,7 @@ async function roomsData() {
 
       const response = await fetch('/availables', {method: "GET"});
       const res = await response.json();
-      
+      console.log(res);
       const totalHallRooms =
             Number(res.data[7].total_rooms) +
             Number(res.data[8].total_rooms) +
@@ -610,7 +610,11 @@ async function roomsData() {
             Number(res.data[8].reserve) +
             Number(res.data[9].reserve);
       
-
+      const needCleanHalls =
+            Number(res.data[7].need_clean) +
+            Number(res.data[8].need_clean) +
+            Number(res.data[9].need_clean);
+            
       const occupiedHallRooms = totalHallRooms - availableHallRooms;
 
       const hallPercentage = (availableHallRooms / totalHallRooms) * 100;
@@ -624,6 +628,9 @@ async function roomsData() {
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[0].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[0].need_clean} 
+                        <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Need-Clean</span> 
                   </p>
 
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[0].today_avail}</span></p>
@@ -640,6 +647,9 @@ async function roomsData() {
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[1].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[1].need_clean} 
+                        <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Need-Clean</span> 
                   </p>
 
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[1].today_avail}</span></p>
@@ -657,6 +667,9 @@ async function roomsData() {
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[2].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[2].need_clean} 
+                        <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Need-Clean</span> 
                   </p>
 
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[2].today_avail}</span></p>
@@ -674,6 +687,9 @@ async function roomsData() {
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[3].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[3].need_clean} 
+                        <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Need-Clean</span> 
                   </p>
 
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[3].today_avail}</span></p>
@@ -691,6 +707,9 @@ async function roomsData() {
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[5].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[5].need_clean} 
+                        <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Need-Clean</span> 
                   </p>
 
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[5].today_avail}</span></p>
@@ -708,6 +727,9 @@ async function roomsData() {
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[6].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[6].need_clean} 
+                        <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Need-Clean</span> 
                   </p>
 
                   <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[6].today_avail}</span></p>
@@ -726,6 +748,9 @@ async function roomsData() {
                               <span class="mx-1 text-gray-400">•</span>
                               ${res.data[4].reserve} 
                               <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                              <span class="mx-1 text-gray-400">•</span>
+                              ${res.data[4].need_clean} 
+                              <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Need-Clean</span> 
                         </p>
       
                         <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[4].today_avail}</span></p>
@@ -744,6 +769,9 @@ async function roomsData() {
                                     <span class="mx-1 text-gray-400">•</span>
                                     ${reservedHallRooms} 
                                     <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                                    <span class="mx-1 text-gray-400">•</span>
+                                    ${needCleanHalls} 
+                                    <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Need-Clean</span> 
                               </p>
 
                         

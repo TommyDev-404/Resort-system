@@ -523,7 +523,7 @@ class Reservation:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         cursor.execute(''' UPDATE bookings SET status = %s where booking_id = %s ''', ("Checked-out", id))
-                        
+                        print(accomodation)
                         parts = accomodation.split(',')
                         room_dict = {}
 
@@ -531,7 +531,7 @@ class Reservation:
                               tokens = part.split(' ')  # split by space
                               room_type = tokens[0].lower()  # "Premium", "Garden", ...
                               room_dict[room_type] = part
-                              
+                        print(room_dict)
                         rooms = [parts[x].split(' ')[0].strip().lower() for x in range(len(parts))]
                         room_no = [parts[x].split(' ')[-1].lower() for x in range(len(parts))]
                         now = datetime.now(timezone.utc)

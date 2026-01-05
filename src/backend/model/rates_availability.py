@@ -18,15 +18,15 @@ class RatesAndAvailability:
     s.orig_rate,
 
     /* TODAY AVAILABLE = TOTAL - (OCCUPIED + RESERVED) */
-    (s.total_rooms - (a.occupied + a.non_available_rooms + a.reserve)) AS today_avail,
+    (s.total_rooms - (a.occupied + a.need_clean + a.reserve)) AS today_avail,
 
     a.reserve,
     a.occupied,
-    a.non_available_rooms,
+    a.need_clean,
 
     SUM(a.reserve) OVER () AS total_reserved,
     SUM(a.occupied) OVER () AS total_occupied,
-    SUM(s.total_rooms - (a.occupied + a.non_available_rooms + a.reserve)) OVER () AS total_today_avail,
+    SUM(s.total_rooms - (a.occupied + a.need_clean + a.reserve)) OVER () AS total_today_avail,
 
     p.name AS promo_name,
     CASE WHEN p.area IS NOT NULL THEN 'under promotion' END AS area_condition
@@ -36,7 +36,7 @@ FROM (
     SELECT 'premium' AS room_type,
            SUM(CASE WHEN a.check_in <= CURRENT_DATE() AND a.check_out >= CURRENT_DATE() AND b.status='Checked-in' THEN premium ELSE 0 END) AS occupied,
            SUM(CASE WHEN a.check_in >= CURRENT_DATE() AND b.status='Reserved' THEN premium ELSE 0 END) AS reserve,
-           (SELECT SUM(name = 'Premium') FROM accomodation_spaces WHERE status = 'need-clean') AS non_available_rooms
+           (SELECT SUM(name = 'Premium') FROM accomodation_spaces WHERE status = 'need-clean') AS need_clean
     FROM accomodation_data a
     JOIN bookings b ON a.booking_id = b.booking_id
 
