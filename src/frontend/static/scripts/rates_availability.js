@@ -26,7 +26,7 @@ function openUpdateAreaModal(e) {
                         <form id="updateAreaForm">
                               <div class="w-full mb-6 flex flex-col gap-2">
                                     <input type="hidden" name="area-name-update" value="${cells[0].textContent.trim()}">
-                                    <input type="number" name="update-price" placeholder="Price (₱)" required class="w-full p-2 border rounded text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800" value="${parseInt(cells[3].textContent.split('.')[0].replace(/[^0-9]/g, ""))}">
+                                    <input type="number" name="update-price" placeholder="Price (₱)" required class="w-full p-2 border rounded text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800" value="${parseInt(cells[2].textContent.split('.')[0].replace(/[^0-9]/g, ""))}">
                                     <button type="submit" class="px-5 py-2 mt-8 bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"><i class="fas fa-paper-plane mr-1"></i> Update</button>
                               </div>
                         </form>
