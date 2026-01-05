@@ -82,6 +82,19 @@ class Reservation:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
+                        print(accomodations_selected)
+                        areaNames = {
+                              "Barkada": "Barkada Room",
+                              "Garden": "Garden View Room",
+                              "Premium": "Premium Villa Room",
+                              "Standard": "Standard Villa Room",
+                              "Cabana": "Cabana Cottage",
+                              "Small": "Small Cottage",
+                              "Big": "Big Cottage",
+                              "Pavillion": "Pavillion Hall",
+                              "Mariposa": "Mariposa Hall",
+                              "Minicon": "Minicon Hall"
+                        }
 
                         parts = accomodations_selected.split(',')
                         rooms = [parts[x].split(' ')[0].lower() for x in range(len(parts))]
@@ -93,11 +106,12 @@ class Reservation:
                         new_checkin = datetime.strptime(checkin, "%Y-%m-%d").date()
                         new_checkout = datetime.strptime(checkout, "%Y-%m-%d").date()
                         today = date.today()
+                        new_status = 'Checked-out' if new_checkout < today else booking_status
 
                         guest_revenue = int(total_guest) * 200
                         new_amount = guest_revenue
 
-                        cursor.execute(''' SELECT * FROM promos WHERE status IN ('Active') ''')
+                        cursor.execute(''' SELECT * FROM promos WHERE status IN ('Active') and end_date > CURRENT_DATE() ''')
                         promo_data = cursor.fetchone()
                         
                         room_affected = []
@@ -129,7 +143,12 @@ class Reservation:
                                     promo_area = promo_data.get('area').split(',')
                                     promo_start = promo_data.get('date') 
                                     promo_end = promo_data.get('end_date')
-                                    if room.capitalize() in promo_area: room_affected.append(parts[count])
+                                    if room.capitalize() in promo_area:
+                                          if booking_type == 'Day Guest':
+                                                room_affected.append(parts[count])
+                                          else:
+                                                if new_checkout > promo_start:
+                                                      room_affected.append(parts[count])
                               else:
                                     promo_start = None
                                     promo_end = None
@@ -165,10 +184,15 @@ class Reservation:
                         if payment == 'ZUZU (Online Payment)':
                               new_amount = new_amount - (new_amount * 0.05)
                         
-                        cursor.execute(''' INSERT INTO bookings (name, date_book, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, paid_date, promo, promo_area) 
-                        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-                        ''', (name, book_date if book_date != None else checkin, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, booking_status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
-                        
+                        if new_checkout < today:
+                              cursor.execute(''' INSERT INTO bookings (name, date_book, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, paid_date, promo, promo_area) 
+                              VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+                              ''', (name, book_date if book_date != None else checkin, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, new_status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
+                        else:
+                              cursor.execute(''' INSERT INTO bookings (name, date_book, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, paid_date, promo, promo_area) 
+                              VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+                              ''', (name, book_date if book_date != None else checkin, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, new_status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
+                              
                         if cursor.rowcount != 0: result_list.append(True)
 
                         cursor.execute(''' INSERT INTO accomodation_data(check_in, check_out, premium, standard, garden, barkada, cabana, small, big, pavillion, mariposa, minicon, total) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ''', 
@@ -190,11 +214,19 @@ class Reservation:
                         
                         if cursor.rowcount != 0: result_list.append(True)
 
+                        now = datetime.now(timezone.utc)
                         for room, number in set(zip(rooms, room_no)):
-                              if booking_status == 'Checked-in':
-                                    cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("occupied", room.capitalize(), number))
+                              print(room.capitalize())
+                              if new_status == 'Checked-in':
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("occupied", room.capitalize().strip(), number))
+                              elif new_status == 'Reserved':
+                                    cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("reserved", room.capitalize().strip(), number))
                               else:
-                                    cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("reserved", room.capitalize(), number))
+                                    if new_checkout == today - timedelta(days=1):
+                                          cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("need-clean", room.capitalize().strip(), number))
+                                          cursor.execute(''' INSERT INTO notifications(name, date, room_name, room_no, alert_type) VALUES(%s, %s, %s, %s, %s) ''', (f'Housekeeping requested for {areaNames.get(room.capitalize())}  {number}', now, room, number, 'housekeeping'))
+                                    else:
+                                          cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("avl", room.capitalize().strip(), number))
 
                         con.commit()
 
@@ -475,8 +507,8 @@ class Reservation:
                         room_no = [parts[x].split(' ')[-1].lower() for x in range(len(parts))]
 
                         for room, number in set(zip(rooms, room_no)):
-                              if room not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
-                                    cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("occupied", room.capitalize(), number))
+                              #if room not in ['cabana', 'small', 'big', 'pavillion', 'mariposa', 'minicon']:
+                              cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("occupied", room.capitalize(), number))
                         con.commit()
                         
                         self.alert.generate_alerts()
@@ -525,12 +557,12 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def mark_paid(self, payment, id):
+      def mark_paid(self, payment, id, date):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         
-                        query = f"UPDATE bookings SET payment = '{payment}', paid_date = '{date.today()}', total_amount = {'total_amount - (total_amount * 0.05)' if payment == 'ZUZU (Online Payment)' else 'total_amount'} where booking_id = {id} and paid_date IS NULL"
+                        query = f"UPDATE bookings SET payment = '{payment}', paid_date = '{date}', total_amount = {'total_amount - (total_amount * 0.05)' if payment == 'ZUZU (Online Payment)' else 'total_amount'} where booking_id = {id} and paid_date IS NULL"
                         cursor.execute(query)
                         con.commit()
 
@@ -597,14 +629,15 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def update_reservation_date(self, id, edit_checkin, edit_checkout):
+      def update_reservation_date(self, id, edit_checkin, edit_checkout, type):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
+                        print(id)
                         cursor.execute(''' SELECT premium, standard, garden, barkada, cabana, small, big, pavillion, mariposa, minicon FROM area_revenue WHERE booking_id = %s ''', (id,))
                         area_data = cursor.fetchone()
 
-                        cursor.execute(''' SELECT accomodations, total_guest, payment FROM bookings WHERE booking_id = %s ''', (id,))
+                        cursor.execute(''' SELECT accomodations, total_guest, payment, promo FROM bookings WHERE booking_id = %s ''', (id,))
                         data = cursor.fetchone()
 
                         areas = data.get('accomodations').split(',')
@@ -619,6 +652,7 @@ class Reservation:
                         new_area_revenue = {key: 0 for key in new_area_revenue}  # Reset values
                         new_amount = guest_revenue
 
+                        room_affected = []
                         for area in areas:
                               area_name = area.split(' ')[0].lower().strip()
 
@@ -631,17 +665,22 @@ class Reservation:
 
                               revenue_per_area = 0
 
-                              cursor.execute(''' SELECT * FROM promos WHERE status = %s ''', ('Active',))
+                              cursor.execute(''' SELECT * FROM promos WHERE status in ('Active') and end_date > CURRENT_DATE()''')
                               promo_data = cursor.fetchone()
 
                               if promo_data:
-                                    promo_start = promo_data.get('date')
-                                    promo_end = promo_data.get('end_date') 
+                                    promo_name = promo_data.get('name')
+                                    promo_area = promo_data.get('area').split(',')
+                                    promo_start = promo_data.get('date') 
+                                    promo_end = promo_data.get('end_date')
+                                    if area_name.capitalize() in promo_area:
+                                          if new_checkout > promo_start:
+                                                room_affected.append(area)
                               else:
                                     promo_start = None
                                     promo_end = None
 
-                              if new_checkin < new_checkout:
+                              if new_checkin < new_checkout: #room stay
                                     # Handle revenue if promo applied
                                     day = new_checkin
                                     while day < new_checkout: # loop until the day every night the guest stay
@@ -657,14 +696,14 @@ class Reservation:
                                           new_amount += nightly_rate
 
                                           day += timedelta(days=1)
-                              else:
-                                    if promo_end:
-                                          if promo_end >= new_checkin:
-                                                new_amount += promo_rate / 2
-                                                revenue_per_area += promo_rate / 2
-                                    else:
-                                          new_amount += orig_rate / 2
-                                          revenue_per_area += orig_rate / 2
+                              else: # day guest
+                                    if type == 'Day Guest':
+                                          new_amount += promo_rate if promo_end and promo_end >= today else orig_rate
+                                          revenue_per_area += promo_rate if promo_end and promo_end >= today else orig_rate
+                                    else: # for same day checkin and checkout
+                                          new_amount += promo_rate / 2 if promo_end and promo_end >= today else orig_rate / 2
+                                          revenue_per_area += promo_rate / 2 if promo_end and promo_end >= today else orig_rate / 2
+
 
                               new_area_revenue[area_name] = revenue_per_area - (revenue_per_area * 0.05) if data.get('payment') == 'ZUZU (Online Payment)' else revenue_per_area
 

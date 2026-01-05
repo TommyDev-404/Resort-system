@@ -35,11 +35,11 @@ function loadingAnimation0(){
 
 function successToastRedirect(message, redirect = null, duration = 3000) {
       const toast = `
-      <div class="fixed top-4 left-1/2 z-50 flex items-center gap-4 bg-white border border-gray-200 shadow-[0_10px_25px_rgba(0,0,0,0.15)] rounded-xl px-5 py-4 text-gray-800 transform -translate-x-1/2 -translate-y-full scale-95 opacity-0 transition-all duration-300 ease-out" data-toast>
+      <div class="fixed top-4 left-1/2 z-50 flex items-center gap-4 dark:text-gray-100 bg-gray-50  dark:bg-gray-600 border   border-gray-200 dark:border-gray-500 shadow-[0_10px_25px_rgba(0,0,0,0.15)] rounded-xl px-5 py-4 text-gray-800 transform -translate-x-1/2 -translate-y-full scale-95 opacity-0 transition-all duration-300 ease-out" data-toast>
 
       <!-- Icon -->
-      <div class="flex items-center justify-center w-9 h-9 rounded-full bg-green-50">
-            <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+      <div class="flex items-center justify-center w-9 h-9 rounded-full bg-green-50 dark:bg-green-500  border border-green-500">
+            <i data-lucide="check" class="w-5 h-5 text-green-600 dark:text-white"></i>
       </div>
 
       <!-- Message -->
@@ -148,7 +148,7 @@ function logout(){
                   const response = await fetch('/logout', { method: 'POST' });
                   if (response.ok) {
                         hideLoaderLogout();
-                        successToastRedirect('Log out successfully!', '/login');
+                        successToastRedirect('Log-out successfully!', '/login');
                   }
             } catch (err) {
                   hideLoaderLogout();

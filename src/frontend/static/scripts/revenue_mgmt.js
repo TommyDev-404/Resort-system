@@ -91,9 +91,27 @@ async function applyPromo(e) {
       form.append('area_list', area_list);
 
       if (form.get('end_date') < form.get('date')){
-            promoDateWarningMessageCard('Warning: End date must be higher than start date!')
+            promoDateWarningMessageCard('Warning: End date must be higher than start date!');
             return;
       }
+
+      const startDate = new Date(form.get('date'));
+      const endDate = new Date(form.get('end_date'));
+      const today = new Date();
+
+      const currentYear = today.getFullYear();
+
+      // ❌ End date must be after today
+      if (endDate <= today) {
+            promoDateWarningMessageCard('Warning: Promo end date must be after today!');
+            return;
+      }
+      // ❌ Promo must NOT be fully in the future
+      else if (startDate > today) {
+            promoDateWarningMessageCard('Warning: Promo cannot start in the future!');
+            return;
+      }
+
 
       showLoader('Applying promo...');
       const response = await fetch('/promo', {
@@ -128,6 +146,27 @@ async function updatePromo(e) {
             return;
       }
       
+      const startDate = new Date(form.get('date'));
+      const endDate = new Date(form.get('end_date'));
+      const today = new Date();
+
+      // Normalize time (important)
+      [startDate, endDate, today].forEach(d => d.setHours(0, 0, 0, 0));
+
+      const currentYear = today.getFullYear();
+      
+      // ❌ End date must be after today
+      if (endDate <= today) {
+            promoDateWarningMessageCard('Warning: Promo end date must be after today!');
+            return;
+      }
+      // ❌ Promo must NOT be fully in the future
+      else if (startDate > today) {
+            promoDateWarningMessageCard('Warning: Promo cannot start in the future!');
+            return;
+      }
+
+
       showLoader('Updating promo...');
       const response = await fetch('/update-promo', {
             method: 'POST', 
@@ -406,7 +445,6 @@ async function removePromo(e) {
       });
 }
 
-
 // submit
 document.addEventListener('submit', (e) => {
       if(e.target.matches('#promosForm')) applyPromo(e);
@@ -423,6 +461,22 @@ document.addEventListener('click', (e) => {
 
 document.addEventListener("change", (e) => {
       if (e.target.closest('#selectAllCheckbox')) selectAllAreas(e);
+      // Only react to area checkboxes
+      if (e.target.name === 'areas_promo') {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const areas = document.querySelectorAll('input[name="areas_promo"]');
+      
+            const allChecked = [...areas].every(cb => cb.checked);
+            const anyUnchecked = [...areas].some(cb => !cb.checked);
+      
+            if (allChecked) {
+                  selectAllCheckbox.checked = true;
+            }
+      
+            if (anyUnchecked) {
+                  selectAllCheckbox.checked = false;
+            }
+      }
 });
 
 document.addEventListener('input', (e) => {

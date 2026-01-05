@@ -18,7 +18,7 @@ class RevenueMgmt:
                         areas = [a.strip() for a in areas_promo.split(',')]
                         promo_label = f"{promo_name} - {promo_rate}%"
 
-                        status = 'Active' if promo_start <= date.today() else 'Upcoming'
+                        status = 'Expired' if promo_end < date.today() else 'Active'
 
                         new_areas = []
                         for area in areas:
@@ -56,7 +56,7 @@ class RevenueMgmt:
 
                         # 3️⃣ Find affected bookings
                         cursor.execute('''
-                              SELECT booking_id, accomodations, check_in, check_out
+                              SELECT booking_id, accomodations, check_in, check_out, booking_type
                               FROM bookings
                               WHERE status NOT IN ('Cancelled')
                               AND check_in >= %s and check_in < %s
@@ -93,7 +93,8 @@ class RevenueMgmt:
                                           self.reservation_model.update_reservation_date(
                                                 ba['booking_id'],
                                                 str(ba['check_in']),
-                                                str(ba['check_out'])
+                                                str(ba['check_out']), 
+                                                ba.get('booking_type')
                                           )
 
                         return {
@@ -114,10 +115,10 @@ class RevenueMgmt:
                         cursor = con.cursor()
 
                         if id:
-                              cursor.execute(f"SELECT * FROM promos WHERE id = {id} ORDER BY date DESC;")
+                              cursor.execute(f"SELECT * FROM promos WHERE id = {id} ORDER BY end_date DESC;")
                               promos = cursor.fetchone()
                         else:
-                              cursor.execute("SELECT * FROM promos ORDER BY date DESC;")
+                              cursor.execute("SELECT * FROM promos ORDER BY end_date DESC;")
                               promos = cursor.fetchall()
 
                         result = {'success': bool(promos), 'data': promos}
@@ -151,11 +152,7 @@ class RevenueMgmt:
                         for area in new_prev_areas:
                               cursor.execute(''' UPDATE accomodation_spaces SET promo = %s, rate = orig_rate WHERE name = %s ''', ("None", area))
 
-                        status = None
-                        if promo_start <= date.today():
-                              status = 'Active'  if promo_end >= date.today() else  'Expired'
-                        else:
-                              status = 'Upcoming'
+                        status = 'Active'  if promo_end >= date.today() else  'Expired'
 
                         new_areas = []
                         for area in areas:
@@ -241,43 +238,46 @@ class RevenueMgmt:
                         cursor = con.cursor()
                         areas = areas_promo.split(', ')
 
-                        for area in areas:
-                              areas_list = area.split(',')  # ['Premium', 'Standard']
-                              placeholders = ','.join(['%s'] * len(areas_list))
+                        cursor.execute(''' SELECT date, end_date FROM promos WHERE id = %s''', (id,))
+                        promo_data = cursor.fetchone()
 
-                              query = f'''
-                                    UPDATE accomodation_spaces
-                                    SET promo = %s, rate = orig_rate
-                                    WHERE name IN ({placeholders})
-                              '''
-                              cursor.execute(query, ['None', *areas_list])
-                              con.commit()
+                        if promo_data.get('end_date') >= date.today():
+                              for area in areas:
+                                    areas_list = area.split(',')  # ['Premium', 'Standard']
+                                    placeholders = ','.join(['%s'] * len(areas_list))
 
-                              cursor.execute(''' SELECT date FROM promos WHERE id = %s''', (id,))
-                              promo_data = cursor.fetchone()
+                                    query = f'''
+                                          UPDATE accomodation_spaces
+                                          SET promo = %s, rate = orig_rate
+                                          WHERE name IN ({placeholders})
+                                    '''
+                                    cursor.execute(query, ['None', *areas_list])
+                                    con.commit()
 
-                              cursor.execute(''' SELECT booking_id, accomodations, check_in, check_out FROM bookings WHERE check_out >= %s AND promo NOT IN ('No promo.') ''', (promo_data.get('date'),))
-                              booking_data = cursor.fetchall()
+                                    cursor.execute(''' SELECT booking_id, accomodations, check_in, check_out, booking_type FROM bookings WHERE check_out >= %s AND promo NOT IN ('No promo.') ''', (promo_data.get('date'),))
+                                    booking_data = cursor.fetchall()
+                                    print(booking_data)
+                                    for data in booking_data:
+                                          accomodations = data.get('accomodations').split(',')
+                                          bid = data.get('booking_id')
+                                          print(bid)
+                                          area_under_promo = []
+                                          for are in accomodations:
+                                                name = are.split(' ')[0].strip()
+                                                promo_area = area.split(' ')[0].strip()
 
-                              for data in booking_data:
-                                    accomodations = data.get('accomodations').split(',')
-                                    bid = data.get('booking_id')
-                                    
-                                    area_under_promo = []
-                                    for are in accomodations:
-                                          name = are.split(' ')[0].strip()
-                                          promo_area = area.split(' ')[0].strip()
+                                                if name in promo_area:
+                                                      area_under_promo.append(are)
+                                          print(area_under_promo)
+                                          if len(area_under_promo) > 0:
+                                                print('here')
+                                                cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', 
+                                                ('No promo.', 'No accomodations under promo.', bid))
+                                                con.commit()
 
-                                          if name in promo_area:
-                                                area_under_promo.append(are)
-
-                                    if len(area_under_promo) > 0:
-                                          cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', 
-                                          ('No promo.', 'No accomodations under promo.', bid))
-                                          con.commit()
-
-                                    self.reservation_model.update_reservation_date(bid, str(data.get('check_in')), str(data.get('check_out')))
-
+                                          self.reservation_model.update_reservation_date(bid, str(data.get('check_in')), str(data.get('check_out')), data.get('booking_type'))
+                        else:
+                              print('promo not today')
                         cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
                         con.commit()
 

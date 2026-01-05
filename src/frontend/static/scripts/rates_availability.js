@@ -86,10 +86,15 @@ async function renderTable() {
             res.data.forEach(data => {
                   rows.push(data);
             });
+            
+            document.getElementById('occupied').textContent = res.data[0].total_occupied;
+            document.getElementById('all-areas').textContent = 45;
+            document.getElementById('reserved').textContent = res.data[0].total_reserved;
+            document.getElementById('today-avl').textContent = res.data[0].total_today_avail;
+      
       } catch (err) {
             console.error("Failed to fetch data:", err);
       }
-      
       
       // Render body
       const bodyHtml = rows.map(row => {
@@ -100,7 +105,6 @@ async function renderTable() {
                               ${row.area_condition ? `<span class="text-[12px] font-medium text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-800 px-2 py-0.5 rounded-full">${row.promo_name}</span>` : ''}
                               ${name}
                         </td>
-                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap">${row.total_rooms}</td>
                         <td class="px-6 py-4 text-center font-bold text-lg text-primary-blue min-w-[80px] whitespace-nowrap">${capacity}</td>
                         <td class="px-6 py-4 text-center flex flex-col items-center justify-center gap-1 min-w-[250px] whitespace-nowrap">
                               ${row.area_condition 
@@ -112,8 +116,10 @@ async function renderTable() {
                                     : `<span class="text-gray-800 dark:text-gray-200">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
                               }
                         </td>
+                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap">${row.total_rooms}</td>
                         <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-red-500">${row.today_avail}</span></td>
-                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-green-500">${row.tomorrow_avail}</span></td>
+                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-red-500">${row.occupied}</span></td>
+                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-green-500">${row.reserve}</span></td>
                         <td class="px-6 py-4 min-w-[100px] whitespace-nowrap">
                               <button class="update-btn text-sm text-white bg-blue-500 py-2 px-4 rounded-sm flex gap-2 items-center justify-center hover:bg-blue-600 transition-colors" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update</button>
                         </td>

@@ -16,7 +16,7 @@ app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # 5 minutes
 cache.init_app(app)
 
 # Create DB object once here
-db = Database( host="localhost", user="grandsight", password="123456", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
+db = Database( host="localhost", user="tommy", password="2006", database="resort_db", port=3306, cursor=pymysql.cursors.DictCursor )
 
 # create instances of classesdb = Database()
 admin = Admin(db)
@@ -271,7 +271,7 @@ def get_years():
 
 @app.route('/mark-paid', methods=['POST'])
 def mark_paid():
-      return jsonify(reserve.mark_paid(request.args.get('payment'), request.args.get('id')))
+      return jsonify(reserve.mark_paid(request.args.get('payment'), request.args.get('id'), request.args.get('date')))
 
 @app.route('/mark-checkin', methods=['POST'])
 def mark_checkin():
@@ -503,3 +503,7 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
+
+
+if __name__  == '__main__':
+      app.run(debug=True)

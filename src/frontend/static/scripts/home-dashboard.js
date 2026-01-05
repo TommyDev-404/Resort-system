@@ -582,10 +582,11 @@ async function upcomingArrivals(type) {
 
 // Room Overview
 async function totalOccupied() {
-      const response = await fetch('/occupied-room', {method: "GET"});
-      const res = await response.json();
-
-      document.getElementById('total-occupied').textContent = res.occupied;
+      const response = await fetch('/summary-data');
+      const result = await response.json();
+      document.getElementById('to-be-clean2').textContent = result.need_clean;
+      document.getElementById('occupied2').textContent = result.occupied;
+      document.getElementById('reserved2').textContent = result.reserved;
 }
 
 async function roomsData() {
@@ -593,99 +594,164 @@ async function roomsData() {
 
       const response = await fetch('/availables', {method: "GET"});
       const res = await response.json();
-
+      
       const totalHallRooms =
-            Number(res.data[4].total_rooms) +
-            Number(res.data[5].total_rooms) +
-            Number(res.data[6].total_rooms);
+            Number(res.data[7].total_rooms) +
+            Number(res.data[8].total_rooms) +
+            Number(res.data[9].total_rooms);
 
       const availableHallRooms =
-            Number(res.data[4].today_avail) +
-            Number(res.data[5].today_avail) +
-            Number(res.data[6].today_avail);
+            Number(res.data[7].today_avail) +
+            Number(res.data[8].today_avail) +
+            Number(res.data[9].today_avail);
+
+      const reservedHallRooms =
+            Number(res.data[7].reserve) +
+            Number(res.data[8].reserve) +
+            Number(res.data[9].reserve);
+      
 
       const occupiedHallRooms = totalHallRooms - availableHallRooms;
 
       const hallPercentage = (availableHallRooms / totalHallRooms) * 100;
-
+      
       const rooms = `
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+                  <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Barkada Room</p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                        ${res.data[0].total_rooms - Number(res.data[0].today_avail) - Number(res.data[0].reserve)}
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[0].reserve} 
+                        <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                  </p>
+
+                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[0].today_avail}</span></p>
+                  <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-red-500 h-2 rounded-full" style="width:${(Number(res.data[0].today_avail) / Number(res.data[0].total_rooms)*100)}%"></div>
+                  </div>
+            </div>
+            
+            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
+                  <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Garden View Room</p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                        ${res.data[1].total_rooms - Number(res.data[1].today_avail) - Number(res.data[1].reserve)}
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[1].reserve} 
+                        <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                  </p>
+
+                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[1].today_avail}</span></p>
+                  <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width:${(Number(res.data[1].today_avail) / Number(res.data[1].total_rooms)*100)}%"></div>
+                  </div>
+            </div>
+
+            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Premium Villa</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3 ">${res.data[7].total_rooms - Number(res.data[7].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Occupied</span></p>
-                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[7].today_avail}</span></p>
-                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-blue-500 h-2 rounded-full" style="width:${(Number(res.data[7].today_avail) / Number(res.data[7].total_rooms)*100)}%"></div>
+                  
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                        ${res.data[2].total_rooms - Number(res.data[2].today_avail) - Number(res.data[2].reserve)}
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[2].reserve} 
+                        <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                  </p>
+
+                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[2].today_avail}</span></p>
+                  <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width:${(Number(res.data[2].today_avail) / Number(res.data[2].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Standard Villa</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[9].total_rooms - Number(res.data[9].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
-                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[9].today_avail}</span></p>
-                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-purple-500 h-2 rounded-full" style="width:${(Number(res.data[9].today_avail) / Number(res.data[9].total_rooms)*100)}%"></div>
+                  
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                        ${res.data[3].total_rooms - Number(res.data[3].today_avail) - Number(res.data[3].reserve)}
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[3].reserve} 
+                        <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                  </p>
+
+                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[3].today_avail}</span></p>
+                  <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-purple-500 h-2 rounded-full" style="width:${(Number(res.data[3].today_avail) / Number(res.data[3].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Cabana Cottage</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[2].total_rooms - Number(res.data[2].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Occupied</span></p>
-                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[2].today_avail}</span></p>
-                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-teal-500 h-2 rounded-full" style="width:${(Number(res.data[2].today_avail) / Number(res.data[2].total_rooms)*100)}%"></div>
-                  </div>
-            </div>
+                  
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                        ${res.data[5].total_rooms - Number(res.data[5].today_avail) - Number(res.data[5].reserve)}
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[5].reserve} 
+                        <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                  </p>
 
-            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
-                  <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Garden View Room</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[3].total_rooms - Number(res.data[3].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
-                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[3].today_avail}</span></p>
-                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-green-500 h-2 rounded-full" style="width:${(Number(res.data[3].today_avail) / Number(res.data[3].total_rooms)*100)}%"></div>
-                  </div>
-            </div>
-
-            <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
-                  <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Barkada Room</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[0].total_rooms - Number(res.data[0].today_avail)} <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span></p>
-                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[0].today_avail}</span></p>
-                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-red-500 h-2 rounded-full" style="width:${(Number(res.data[0].today_avail) / Number(res.data[0].total_rooms)*100)}%"></div>
+                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[5].today_avail}</span></p>
+                  <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-teal-500 h-2 rounded-full" style="width:${(Number(res.data[5].today_avail) / Number(res.data[5].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Small Cottage</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[8].total_rooms - Number(res.data[8].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
-                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[8].today_avail}</span></p>
-                  <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                        <div class="bg-indigo-500 h-2 rounded-full" style="width:${(Number(res.data[8].today_avail) / Number(res.data[8].total_rooms)*100)}%"></div>
+                  
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                        ${res.data[6].total_rooms - Number(res.data[6].today_avail) - Number(res.data[6].reserve)}
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="mx-1 text-gray-400">•</span>
+                        ${res.data[6].reserve} 
+                        <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                  </p>
+
+                  <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[6].today_avail}</span></p>
+                  <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="bg-indigo-500 h-2 rounded-full" style="width:${(Number(res.data[6].today_avail) / Number(res.data[6].total_rooms)*100)}%"></div>
                   </div>
             </div>
 
             <div class="grid grid-cols-2 col-span-3 gap-3">
                   <div class="col-span-1 p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700 ">
                         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Big Cottage</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">${res.data[1].total_rooms - Number(res.data[1].today_avail)} <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span></p>
-                        <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[1].today_avail}</span></p>
-                        <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
-                              <div class="bg-orange-500 h-2 rounded-full" style="width:${(Number(res.data[1].today_avail) / Number(res.data[1].total_rooms)*100)}%"></div>
+                        
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                              ${res.data[4].total_rooms - Number(res.data[4].today_avail) - Number(res.data[4].reserve)}
+                              <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                              <span class="mx-1 text-gray-400">•</span>
+                              ${res.data[4].reserve} 
+                              <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                        </p>
+      
+                        <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">Available: <span class="font-semibold">${res.data[4].today_avail}</span></p>
+                        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mt-2">
+                              <div class="bg-orange-500 h-2 rounded-full" style="width:${(Number(res.data[4].today_avail) / Number(res.data[4].total_rooms)*100)}%"></div>
                         </div>
                   </div>
                   
                   <div class="col-span-1 p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Hall</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
-                              ${occupiedHallRooms}
-                              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Occupied</span>
-                        </p>
 
+                                    
+                              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                                    ${occupiedHallRooms}
+                                    <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                                    <span class="mx-1 text-gray-400">•</span>
+                                    ${reservedHallRooms} 
+                                    <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
+                              </p>
+
+                        
                         <p class="text-xs text-gray-800 dark:text-gray-200 mt-1">
                               Available:
                               <span class="font-semibold">${availableHallRooms}</span>
                         </p>
-
-                        <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mt-2">
+                        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mt-2">
                               <div
                                     class="bg-pink-500 h-2 rounded-full transition-all"
                                     style="width:${hallPercentage.toFixed(1)}%">

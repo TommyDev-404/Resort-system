@@ -11,7 +11,7 @@ let searchTimeout;
 function createTable(id, guest_name, date_book, checkin, checkout, stay_count, accomodations, booking_type, status, payment_status){
       
       const row = `
-            <tr class="text-[16px] hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}" data-type="${booking_type}">
+            <tr class="text-[16px] hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}" data-type="${booking_type}" data-status="${status}"  data-checkin="${checkin}" data-checkout="${checkout}" data-date_book="${date_book}">
                   <!-- SELECT -->
                   <td class="px-3 py-4 w-[70px] text-center">
                         <label class="flex items-center justify-center gap-2 cursor-pointer select-none">
@@ -169,19 +169,19 @@ function renderAddBookingModal(){
                               <section>
                                     <h3 class="text-gray-700 dark:text-gray-300 font-semibold mb-2 text-center flex justify-center items-center gap-2"><i data-lucide="home" class="lucide w-4 h-4"></i> Select Accommodations</h3>
                                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-                                          <div class="btn-acc flex flex-col items-center justify-center bg-purple-600 hover:bg-purple-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Premium Villa">
+                                          <div class="btn-acc flex flex-col items-center justify-center bg-purple-600 hover:bg-purple-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Premium Villa Room">
                                                 <i data-lucide="bed" class="lucide w-5 h-5"></i>
-                                                <label>Premium Villa (<span id="count-p"></span>)</label> 
+                                                <label>Premium Villa Room (<span id="count-p"></span>)</label> 
                                           </div>
                                     
-                                          <div class="btn-acc flex flex-col items-center justify-center bg-green-600 hover:bg-green-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Standard Villa">
+                                          <div class="btn-acc flex flex-col items-center justify-center bg-green-600 hover:bg-green-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Standard Villa Room">
                                                 <i data-lucide="bed" class="lucide w-5 h-5"></i>
-                                                <label>Standard Villa (<span id="count-s"></span>)</label> 
+                                                <label>Standard Villa Room (<span id="count-s"></span>)</label> 
                                           </div>
 
-                                          <div class="btn-acc flex flex-col items-center justify-center bg-teal-600 hover:bg-teal-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Garden View">
+                                          <div class="btn-acc flex flex-col items-center justify-center bg-teal-600 hover:bg-teal-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Garden View Room">
                                                 <i data-lucide="bed" class="lucide w-5 h-5"></i>
-                                                <label>Garden View (<span id="count-g"></span>)</label> 
+                                                <label>Garden View Room(<span id="count-g"></span>)</label> 
                                           </div>
                                     
                                           <div class="btn-acc flex flex-col items-center justify-center bg-pink-600 hover:bg-pink-500 text-white py-1 rounded-lg cursor-pointer transition-all" data-section="Barkada Room">
@@ -251,6 +251,8 @@ function renderEditReservedModal(id, check_in, check_out, booking_type){
                         <form id="update-reserved-form">
                               <div class="flex flex-col gap-6 mt-2">
                                     <input type="hidden" name="id" value="${id}">
+                                    <input type="hidden" name="type" value="${booking_type}">
+                                    
                                     <div class="flex flex-col gap1 text-gray-600 dark:text-gray-200">
                                           Edit Check-In:
                                           <input type="date" name="edit_checkin" class="border border-gray-300 text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_in}">
@@ -270,12 +272,32 @@ function renderEditReservedModal(id, check_in, check_out, booking_type){
 }
 
 function renderMarkPaidModal(){
-      const modal = `
+      const checkedBox = document.querySelector(
+            '.timeout-checkbox:checked'
+      );
+
+      if (!checkedBox) {
+            promoDateWarningMessageCard('Please select a booking first!');
+            return;
+      }
+
+      const row = checkedBox.closest('tr');      
+      const checkin = row.dataset.checkin;
+      const checkout = row.dataset.checkout;
+      const book_type = row.dataset.status;
+      const date_book = row.dataset.date_book || null;
+
+      const modal = `   
             <div class="fixed top-0 left-0 w-full h-full  bg-black/40 backdrop-blur-sm z-50" id="mark-paid-overlay">
                   <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
                         <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-mark-paid">&times;</span>
                         <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Payment</h2>
                         <form id="markpaid-form">
+                              <input type="hidden" name="checkin-data" value=${checkin}>
+                              <input type="hidden" name="checkout-data" value=${checkout}>
+                              <input type="hidden" name="book-type" value=${book_type}>
+                              ${date_book ? `<input type="hidden" name="date_book-data" value=${date_book}>` : ''}
+                              
                               <div class="flex flex-col gap-6 mt-2">
                                     <div class="flex flex-col gap-0.5">
                                           <label class="text-sm text-gray-600 dark:text-gray-200">Select Payment Type:</label>
@@ -412,7 +434,7 @@ function enableActionBtns(e){
                   const reservationDate = new Date(`${date[0]}${year}`);
                   const checkoutDate = new Date(`${date[1]}${year}`);
                   const todayDate = new Date();
-                  console.log(booking_type);
+
                   // Paid
                   if (payment !== 'Pending') {
                         if (booking_type === 'Day Guest'){
@@ -728,8 +750,7 @@ function toggleFilter(toggleId, selectId) {
       // Toggle its own select
       select.disabled = !toggle.checked;
       select.classList.toggle('opacity-40', !toggle.checked);
-  
-  
+
       if (toggleId === 'dayToggle') {
           if (!toggle.checked) {
               // DAY OFF → month-only
@@ -790,16 +811,101 @@ function parseOrReturn(value) {
       return value;
 }
 
+function toDateOnly(value) {
+      const d = new Date(value);
+      d.setHours(0, 0, 0, 0);
+      return d;
+}
+
+
 // --------------- POST DATA Fetching -------------- //
 async function addBooking(e){
       e.preventDefault();      
       const form = new FormData(e.target);
+      
+      console.log(form.get('booking_status'));
 
       if (form.get('checkout') < form.get('checkin')){
             promoDateWarningMessageCard('Warning: Check-out date must be greater than Check-in date!');
             return;
       }
 
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const checkin = toDateOnly(form.get('checkin'));
+      const checkout = toDateOnly(form.get('checkout'));
+      const bookDate = toDateOnly(form.get('book_date'));
+      const datePaid = toDateOnly(form.get('date_paid_add'));
+      const date_book = toDateOnly(form.get('book_date'));
+
+      if (form.get('booking_status') === 'Checked-in') {
+            // 🚫 Checked-in date cannot be in the future
+            if (checkin > today) {
+                  promoDateWarningMessageCard('Warning: Checked-in date cannot be greater than today!');
+                  return;
+            }
+
+            if (checkin.getFullYear() < today.getFullYear()){
+                  promoDateWarningMessageCard('Warning: Adding booking data is limited on this year only!');
+                  return;
+            }
+
+            // Day guest must be same-day
+            if (form.get('booking_type') !== 'Check-in' &&checkin.getTime() !== checkout.getTime()) {
+                  promoDateWarningMessageCard('Warning: Day guest checked-in and checked-out must be the same!');
+                  return;
+            }
+      }else{
+            if (bookDate > today ) {
+                  promoDateWarningMessageCard('Warning: Date book cannot be greater than today!');
+                  return;
+            }
+            
+            if (bookDate.getFullYear() < today.getFullYear()) {
+                  promoDateWarningMessageCard('Warning: Adding booking data is limited on this year only!');
+                  return;
+            }
+
+            if (form.get('booking_type') === 'Check-in' && checkin < today){
+                  promoDateWarningMessageCard('Warning: Checked-in date must be greater than today!');
+                  return;
+            }else if (form.get('booking_type') !== 'Check-in' &&checkin.getTime() !== checkout.getTime()) {
+                  promoDateWarningMessageCard('Warning: Day guest checked-in and checked-out must be the same!');
+                  return;
+            }
+      }
+
+      if (form.get('payment') !== 'Pending') {
+            if (form.get('booking_status') === 'Reserved') {
+                  if (datePaid < bookDate || datePaid > checkout) {
+                        promoDateWarningMessageCard(
+                              'Warning: Payment date must be between reservation and checkout!'
+                        );
+                        return;
+                  }
+      
+            } else { // Checked-in
+                  if (datePaid < checkin || datePaid > checkout) {
+                        promoDateWarningMessageCard(
+                              'Warning: Payment date must be between check-in and checkout!'
+                        );
+                        return;
+                  }
+            }
+      
+            // Day guest payment must be same day
+            if (
+                  form.get('booking_type') !== 'Check-in' &&
+                  datePaid.getTime() !== checkin.getTime()
+            ) {
+                  promoDateWarningMessageCard(
+                        'Warning: Day guest payment must be on the check-in date!'
+                  );
+                  return;
+            }
+      }
+      
       showLoader('data', 'Adding guest...');
       
       try{
@@ -849,6 +955,7 @@ async function markAsCheckout(){
             upcomingCount();
             hideLoader();
             successToast('Checked-out successfully!');
+            recheckDateFilter();
             recentBookings();
             summaryCardsDatas();
             resetButtonAndCheckBox();
@@ -876,6 +983,7 @@ async function markAsCheckin(){
             successToast('Checked-in successfully!');
             upcomingCount();
             summaryCardsDatas();
+            recheckDateFilter();
             recentBookings();
             resetButtonAndCheckBox();
       }else{
@@ -901,6 +1009,7 @@ async function cancelBooking(){
             hideLoader();
             successToast('Cancelled successfully!');
             upcomingCount();
+            recheckDateFilter();
             recentBookings();
             summaryCardsDatas();
             resetButtonAndCheckBox();
@@ -913,11 +1022,33 @@ async function cancelBooking(){
 
 async function submitPayment(e){
       e.preventDefault();
-      showLoader('data', 'Adding Payment...');
       const select = document.getElementById('mark-payment').value;
       const id = retrieveCheckboxId().id;
+      
+      const form = new FormData(e.target);
+      const date_paid = form.get('date_paid');
+      const check_in = form.get('checkin-data');
+      const check_out = form.get('checkout-data');
+      const book_type = form.get('book-type');
 
-      const response = await fetch(`/mark-paid?id=${id}&payment=${select}`, {
+      if (book_type === 'Reserved'){      
+            if (date_paid < form.get('date_book-data') || date_paid > check_out) {
+                  promoDateWarningMessageCard(
+                        'Warning: Payment date must be between reservation date and checkout!'
+                  );
+                  return;
+            }
+      }else{      
+            if (date_paid < check_in || date_paid > check_out) {
+                  promoDateWarningMessageCard(
+                        'Warning: Payment date must be between check-in and checkout!'
+                  );
+                  return;
+            }
+      }
+      
+      showLoader('data', 'Adding Payment...');
+      const response = await fetch(`/mark-paid?id=${id}&payment=${select}&date=${date_paid}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'}
       });
@@ -927,6 +1058,7 @@ async function submitPayment(e){
             hideLoader();
             successToast('Successfully paid!');
             document.querySelector('#mark-paid-overlay').remove();
+            recheckDateFilter();
             recentBookings();
             resetButtonAndCheckBox();
       }else{
@@ -954,6 +1086,7 @@ async function updateReservationDate(e){
             successToast('Updated successfully!');
             upcomingCount();
             document.querySelector('#update-reservation-overlay').remove();
+            recheckDateFilter();
             recentBookings();
             resetButtonAndCheckBox();
       }else {
@@ -967,7 +1100,7 @@ async function updateReservationDate(e){
 // --------------- GET DATA Fetching -------------- //
 async function renderViewReservationDetails(id){
       showLoader('data', 'Retrieving booking details...');
-      console.log(id);
+
       const response = await fetch(`/view-details/${id}`);
       const result = await response.json();
 
@@ -1096,7 +1229,7 @@ async function generateAvlAccomodation(accomodation){
       document.querySelectorAll('#avl-accomodations label').forEach(label => label.remove());
       let room_name = accomodation.split(' ');
       let rooms = [];
-
+      console.log()
       if (accomodation === 'Hall'){
             const halls = ['Pavillion', 'Mariposa', 'Minicon'];
             let p = '';
@@ -1105,7 +1238,7 @@ async function generateAvlAccomodation(accomodation){
                   if (roomCache[name]) {
                         p +=  `
                               <label  class="acc-card flex gap-2 justify-center bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-300 dark:border-gray-700 cursor-pointer transition select-none hover:bg-gray-100 dark:hover:bg-gray-700"">
-                                    <input type="checkbox" class="text-gray-100 dark:text-gray-800 w-3" name="avl" value="${name} ${101}" required>${name} ${101}
+                                    <input type="checkbox" class="text-gray-100 dark:text-gray-800 w-3" name="avl" value="${name} Hall 101" required>${name} Hall 101
                               </label>
                         `;
                   }
@@ -1485,7 +1618,7 @@ async function upcomingCount() {
 // ---------- Event Listeners ----------------- //
 document.addEventListener('click', (e) => {
       // btn click
-      if (e.target.closest('#add-booking-btn')) (resetDropDown(), renderAddBookingModal());
+      if (e.target.closest('#add-booking-btn')) (resetDropDown(), renderAddBookingModal(), recheckDateFilter());
       if (e.target.closest('#mark-paid')) renderMarkPaidModal();
       if (e.target.closest('#mark-checkin')) markAsCheckin();
       if (e.target.closest('#mark-checkout')) markAsCheckout();
@@ -1535,7 +1668,7 @@ document.addEventListener('change', (e) => {
       //if (e.target.closest('#yearSelect')) ( getDays2(), recentBookings(), resetButtonAndCheckBox());
       if (e.target.closest('#yearSelect')) ( getDays2(), recentBookings(getFilterStatus()), resetButtonAndCheckBox());
       if (e.target.closest('#monthSelect')) ( getDays2(), recentBookings(getFilterStatus()), resetButtonAndCheckBox());
-      if (e.target.closest('#daySelect3')) (recentBookings(getFilterStatus()), resetButtonAndCheckBox());
+      if (e.target.closest('#daySelect3')) (recentBookings(getFilterStatus()), resetButtonAndCheckBox(), category_data = 'all-data');
       if (e.target.closest('input[name="select"]')) enableActionBtns(e);
       if (e.target.closest('input[name="select"]')) {
             const checkbox = e.target;

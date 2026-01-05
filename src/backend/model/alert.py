@@ -58,7 +58,7 @@ class Alerts:
                               ''', (f"Next week's forecasted occupancy is {round(avg_next_week, 2)}% (Target: 30%). Consider applying promotion!", now))
                               con.commit()
                         
-                        cursor.execute (''' SELECT * FROM promos WHERE status IN ('Upcoming', 'Active') ''')
+                        cursor.execute (''' SELECT * FROM promos WHERE status IN ('Active') and month(end_date) = month(current_date()) and year(end_date) = year(current_date()) and day(end_date) >= day(current_date()) ''')
                         promo = cursor.fetchone()
 
                         if bool(promo) == False:
