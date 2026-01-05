@@ -31,6 +31,16 @@ backToLogin.addEventListener('click', () => {
       }, 300);
 });
 
+backToLogin2.addEventListener('click', () => {
+      forgotForm.classList.remove('opacity-100');
+      setTimeout(() => {
+            changePasswordForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            setTimeout(() => loginForm.classList.remove('opacity-0'), 50);
+      }, 300);
+});
+
+
 // toggle view password with dynamic icon
 document.addEventListener('click', (e) => {
       if (e.target.matches('#show')){
@@ -194,7 +204,7 @@ async function verifyCode() {
                   body: JSON.stringify({ code : code })
             });
             const result = await response.json();
-      
+            console.log(result);
             if (result.success){
                   hideLoader();
                   successToast('Code matched! You can now update your password.')
