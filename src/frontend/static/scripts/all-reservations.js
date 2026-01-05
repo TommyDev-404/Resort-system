@@ -918,8 +918,8 @@ async function addBooking(e){
 
             if (result.success){
                   e.target.reset();
-                  hideLoader();
                   await notifications();
+                  hideLoader();
                   successToast('Added successfully!');
                   document.querySelector('#booking-overlay').remove();
                   recentBookings();

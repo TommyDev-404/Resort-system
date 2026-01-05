@@ -157,11 +157,6 @@ class Housekeeping:
             from datetime import date
 
       def cleaning_history(self, month, day):
-            cache_key = f"cleaning_history_{month}_{day}"
-            cached = cache.get(cache_key)
-            if cached:
-                  return cached
-            
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -176,14 +171,7 @@ class Housekeeping:
                         
                         data = cursor.fetchall()
 
-                        result = {'success': bool(data), 'data': data}
-                        cache.set(cache_key, result, timeout=300)
-
-                        key_index = cache.get("cleaning_history_keys") or set()
-                        key_index.add(cache_key)
-                        cache.set("cleaning_history_keys", key_index, timeout=None)  # never expire
-
-                        return result
+                        return {'success': bool(data), 'data': data}
 
             except Exception as e:
                   con.rollback()
