@@ -950,10 +950,18 @@ async function addBooking(e){
       }
 
       if (form.get('payment') !== 'Pending') {
+            // Day guest payment must be same day
+            if (form.get('booking_type') === 'Day Guest' && datePaid.getTime() !== checkin.getTime() && form.get('booking_status') !== 'Reserved') {
+                  promoDateWarningMessageCard(
+                        'Warning: Day guest payment must be  the same on the check-in date!'
+                  );
+                  return;
+            }
+
             if (form.get('booking_status') === 'Reserved') {
                   if (datePaid < bookDate || datePaid > checkout) {
                         promoDateWarningMessageCard(
-                              'Warning: Payment date must be between reservation and checkout!'
+                              'Warning: Payment date must be between reservation date and checkout!'
                         );
                         return;
                   }
@@ -965,14 +973,6 @@ async function addBooking(e){
                         );
                         return;
                   }
-            }
-      
-            // Day guest payment must be same day
-            if (form.get('booking_type') === 'Day Guest' && datePaid.getTime() !== checkin.getTime()) {
-                  promoDateWarningMessageCard(
-                        'Warning: Day guest payment must be  the same on the check-in date!'
-                  );
-                  return;
             }
       }
       
