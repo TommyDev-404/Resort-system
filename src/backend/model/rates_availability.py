@@ -1,6 +1,5 @@
 from collections import Counter
 from datetime import date
-from backend.extensions import cache
 
 class RatesAndAvailability:
        def __init__(self, db):

@@ -1,6 +1,5 @@
 from backend.forecast import Forecast
 from datetime import date, datetime
-from backend.extensions import cache
 
 class Accounting:
       def __init__(self, db):

@@ -1,6 +1,5 @@
 from collections import Counter
 from datetime import date, datetime
-from backend.extensions import cache
 
 class Housekeeping:
       def __init__(self, db, alert):

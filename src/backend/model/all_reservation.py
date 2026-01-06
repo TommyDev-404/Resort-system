@@ -1,6 +1,5 @@
 from collections import Counter
 from datetime import datetime, timezone, timedelta, date
-from backend.extensions import cache
 
 class Reservation:
       def __init__(self, db, alert, dashboard):

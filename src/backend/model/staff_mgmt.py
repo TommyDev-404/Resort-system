@@ -1,6 +1,5 @@
 from datetime import datetime
 from datetime import date, timedelta, datetime, time
-from backend.extensions import cache
 
 class Staff_Management: 
       def __init__(self, db, housekeeping):

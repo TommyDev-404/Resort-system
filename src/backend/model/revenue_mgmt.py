@@ -1,5 +1,4 @@
 from datetime import date, datetime
-from backend.extensions import cache
 
 class RevenueMgmt:
       def __init__(self, db, alert, reserve):

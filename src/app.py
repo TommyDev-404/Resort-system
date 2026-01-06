@@ -1,7 +1,7 @@
 import pymysql
 from datetime import date, timedelta
 from flask import Flask, render_template, session, request, jsonify, url_for, redirect
-from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management, Storage
+from backend.model import Database, Dashboard, Analytics, Reservation, Housekeeping, RatesAndAvailability, Accounting, Alerts, RevenueMgmt, Admin, Login, Staff_Management
 from backend.extensions import cache
 
 app = Flask(__name__, template_folder='frontend/template', static_folder='frontend/static')
@@ -503,4 +503,3 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
-

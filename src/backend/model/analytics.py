@@ -1,6 +1,5 @@
 from backend.forecast import Forecast
 from datetime import date
-from backend.extensions import cache
 
 class Analytics:
       def __init__(self, db):
