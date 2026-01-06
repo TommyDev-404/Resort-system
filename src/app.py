@@ -8,7 +8,7 @@ app = Flask(__name__, template_folder='frontend/template', static_folder='fronte
 app.secret_key = 'i_love_u'  # secret key
 
 # Set session lifetime
-app.permanent_session_lifetime = timedelta(minutes=30)  # 30 minutes
+app.permanent_session_lifetime = timedelta(minutes=15)  # 15 minutes
 
 # Configure cache
 app.config['CACHE_TYPE'] = 'SimpleCache'

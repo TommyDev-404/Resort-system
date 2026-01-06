@@ -1131,12 +1131,12 @@ async function removeStaff(id){
 
                   if (result.success){
                         hideLoader();
-                        successMessageCard3(result.message);
+                        successToast(result.message);
                         showAllStaff();
                         sumarryCards();
                   }else{
                         hideLoader();
-                        failedMessageCard3(result.message);
+                        failedToast(result.message);
                   }
 
             }catch(err){

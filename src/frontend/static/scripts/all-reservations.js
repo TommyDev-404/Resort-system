@@ -911,6 +911,20 @@ async function addBooking(e){
       const bookDate = toDateOnly(form.get('book_date'));
       const datePaid = toDateOnly(form.get('date_paid_add'));
       const date_book = toDateOnly(form.get('book_date'));
+      const bookingStatus = form.get('booking_status');
+      const bookingType = form.get('booking_type');
+
+      if (bookingStatus === 'Checked-in') {
+            if (bookingType === 'Day Guest' && checkin.getTime() !== checkout.getTime()) {
+                  promoDateWarningMessageCard('Day guest must check-in and check-out on the same day!');
+                  return;
+            }
+      } else { // Reserved
+            if (bookingType === 'Day Guest' && checkin.getTime() !== checkout.getTime()) {
+                  promoDateWarningMessageCard('Day guest must check-in and check-out on the same day!');
+                  return;
+            }
+      }
 
       if (form.get('booking_status') === 'Checked-in') {
             // 🚫 Checked-in date cannot be in the future
@@ -924,11 +938,6 @@ async function addBooking(e){
                   return;
             }
 
-            // Day guest must be same-day
-            if (form.get('booking_type') !== 'Check-in' &&checkin.getTime() !== checkout.getTime()) {
-                  promoDateWarningMessageCard('Warning: Day guest checked-in and checked-out must be the same!');
-                  return;
-            }
       }else{
             if (bookDate > today ) {
                   promoDateWarningMessageCard('Warning: Date book cannot be greater than today!');
@@ -943,12 +952,9 @@ async function addBooking(e){
             if (form.get('booking_type') === 'Check-in' && checkin < today){
                   promoDateWarningMessageCard('Warning: Checked-in date must be greater than today if reservation!');
                   return;
-            }else if (form.get('booking_type') !== 'Check-in' &&checkin.getTime() !== checkout.getTime()) {
-                  promoDateWarningMessageCard('Warning: Day guest checked-in and checked-out must be the same!');
-                  return;
             }
       }
-
+      console.log(form.get('booking_status'));
       if (form.get('payment') !== 'Pending') {
             // Day guest payment must be same day
             if (form.get('booking_type') === 'Day Guest' && datePaid.getTime() !== checkin.getTime() && form.get('booking_status') !== 'Reserved') {
