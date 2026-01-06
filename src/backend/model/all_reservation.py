@@ -152,7 +152,7 @@ class Reservation:
                               else:
                                     promo_start = None
                                     promo_end = None
-
+                              print(new_checkin < new_checkout)
                               if new_checkin < new_checkout:
                                     day = new_checkin
                                     while day < new_checkout:
@@ -178,7 +178,7 @@ class Reservation:
                               new_area_revenue[room.lower()] = revenue_per_area - (revenue_per_area * 0.05) if payment == 'ZUZU (Online Payment)' else revenue_per_area
 
                               count += 1
-
+                        print(room_affected)
                         full_promo_name = f'{promo_name} discount' if len(room_affected) > 0 else 'No promo.'
 
                         if payment == 'ZUZU (Online Payment)':
