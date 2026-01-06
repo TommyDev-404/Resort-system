@@ -59,7 +59,7 @@ class RevenueMgmt:
                               SELECT booking_id, accomodations, check_in, check_out, booking_type
                               FROM bookings
                               WHERE status NOT IN ('Cancelled')
-                              AND check_out > %s
+                              AND check_out >= %s
                         ''', (promo_start))
                         bookings = cursor.fetchall()
 
@@ -74,20 +74,21 @@ class RevenueMgmt:
                                     area_name = area.split(' ')[0].strip()
                                     if area_name in new_areas:
                                           affected.append(area)
-                                          
+
                               if affected:
                                     for ba in bookings:
-                                          cursor.execute('''
-                                                UPDATE bookings
-                                                SET promo = %s,
-                                                promo_area = %s
-                                                WHERE booking_id = %s
-                                          ''', (
-                                                f"{promo_label} discount",
-                                                ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
-                                                ba['booking_id']
-                                          ))
-                                          con.commit()
+                                          if ba['check_in'] >= promo_start:
+                                                cursor.execute('''
+                                                      UPDATE bookings
+                                                      SET promo = %s,
+                                                      promo_area = %s
+                                                      WHERE booking_id = %s
+                                                ''', (
+                                                      f"{promo_label} discount",
+                                                      ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
+                                                      ba['booking_id']
+                                                ))
+                                                con.commit()
                                           
                                           # Recalculate booking totals safely
                                           self.reservation_model.update_reservation_date(
@@ -204,9 +205,23 @@ class RevenueMgmt:
                         if affected:
                               for ba in bookings:
                                     if ba['check_out'] > promo_start:
-                                          area = [a.strip() for a in ba['accomodations'].split(',')]
-                                          if any(a in affected for a in area):
+                                          if ba['check_in'] >= promo_start:
+                                                area = [a.strip() for a in ba['accomodations'].split(',')]
+                                                if any(a in affected for a in area):
 
+                                                      cursor.execute('''
+                                                            UPDATE bookings
+                                                            SET promo = %s,
+                                                            promo_area = %s
+                                                            WHERE booking_id = %s
+                                                      ''', (
+                                                            f"{promo_label} discount",
+                                                            ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
+                                                            ba['booking_id']
+                                                      ))
+                                                      con.commit()
+
+                                    if ba['booking_type'] == 'Day Guest':
                                                 cursor.execute('''
                                                       UPDATE bookings
                                                       SET promo = %s,

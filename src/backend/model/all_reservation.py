@@ -679,7 +679,7 @@ class Reservation:
                               else:
                                     promo_start = None
                                     promo_end = None
-
+                              print(type, new_checkin, new_checkout, new_checkin < new_checkout)
                               if new_checkin < new_checkout: #room stay
                                     # Handle revenue if promo applied
                                     day = new_checkin
@@ -697,6 +697,7 @@ class Reservation:
 
                                           day += timedelta(days=1)
                               else: # day guest
+                                    print(type)
                                     if type == 'Day Guest':
                                           new_amount += promo_rate if promo_end and promo_end >= today else orig_rate
                                           revenue_per_area += promo_rate if promo_end and promo_end >= today else orig_rate
@@ -704,6 +705,7 @@ class Reservation:
                                           new_amount += promo_rate / 2 if promo_end and promo_end >= today else orig_rate / 2
                                           revenue_per_area += promo_rate / 2 if promo_end and promo_end >= today else orig_rate / 2
 
+                              print(new_amount)
 
                               new_area_revenue[area_name] = revenue_per_area - (revenue_per_area * 0.05) if data.get('payment') == 'ZUZU (Online Payment)' else revenue_per_area
 
