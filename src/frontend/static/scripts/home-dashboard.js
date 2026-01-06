@@ -626,9 +626,9 @@ async function roomsData() {
       const rooms = `
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Barkada Room</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                  <p class="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-3">
                         ${res.data[0].occupied}
-                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="text-xs font-medium text-red-600 dark:text-red-400">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[0].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
@@ -645,9 +645,9 @@ async function roomsData() {
             
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Garden View Room</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                  <p class="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-3">
                         ${res.data[1].occupied}
-                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="text-xs font-medium text-red-600 dark:text-red-400">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[1].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
@@ -665,9 +665,9 @@ async function roomsData() {
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Premium Villa</p>
                   
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                  <p class="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-3">
                         ${res.data[2].occupied}
-                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="text-xs font-medium text-red-600 dark:text-red-400">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[2].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
@@ -685,9 +685,9 @@ async function roomsData() {
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Standard Villa</p>
                   
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                  <p class="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-3">
                         ${res.data[3].occupied}
-                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="text-xs font-medium text-red-600 dark:text-gray-400">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[3].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
@@ -705,9 +705,9 @@ async function roomsData() {
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Cabana Cottage</p>
                   
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                  <p class="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-3">
                         ${res.data[5].occupied}
-                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="text-xs font-medium text-red-600 dark:text-red-400">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[5].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
@@ -725,9 +725,9 @@ async function roomsData() {
             <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Small Cottage</p>
                   
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                  <p class="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-3">
                         ${res.data[6].occupied}
-                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                        <span class="text-xs font-medium text-red-600 dark:text-red-400">Occupied</span>
                         <span class="mx-1 text-gray-400">•</span>
                         ${res.data[6].reserve} 
                         <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
@@ -746,9 +746,9 @@ async function roomsData() {
                   <div class="col-span-1 p-5 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-xl hover:scale-[1.02] transition-all border border-gray-200 dark:border-gray-700 ">
                         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Big Cottage</p>
                         
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                        <p class="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-3">
                               ${res.data[4].occupied}
-                              <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                              <span class="text-xs font-medium text-red-600 dark:text-red-400">Occupied</span>
                               <span class="mx-1 text-gray-400">•</span>
                               ${res.data[4].reserve} 
                               <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 
@@ -767,9 +767,9 @@ async function roomsData() {
                         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Hall</p>
 
                                     
-                              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-4 mb-3">
+                              <p class="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-3">
                                     ${occupiedHallRooms}
-                                    <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Occupied</span>
+                                    <span class="text-xs font-medium text-red-600 dark:text-red-400">Occupied</span>
                                     <span class="mx-1 text-gray-400">•</span>
                                     ${reservedHallRooms} 
                                     <span class="text-xs font-medium text-green-600 dark:text-green-400">Reserved</span> 

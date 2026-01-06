@@ -107,13 +107,18 @@ async function applyPromo(e) {
       const today = new Date();
 
       const currentYear = today.getFullYear();
-      
-      // ❌ End date must be after today
+
+      if (startDate.getFullYear() < currentYear) {
+            promoDateWarningMessageCard('Warning: Promo is limited only to this year!');
+            return;
+      }
+
+      // End date must be after today
       if (endDate <= today) {
             promoDateWarningMessageCard('Warning: Promo end date must be after today!');
             return;
       }
-      // ❌ Promo must NOT be fully in the future
+      // Promo must NOT be fully in the future
       else if (startDate > today) {
             promoDateWarningMessageCard('Warning: Promo cannot start in the future!');
             return;

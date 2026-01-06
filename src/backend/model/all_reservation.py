@@ -282,7 +282,7 @@ class Reservation:
                         if month and day:
                               # YEAR + MONTH + DAY
                               start_date = date(int(year), int(month), int(day))
-                              where_clause = "WHERE check_in = %s"
+                              where_clause = ' WHERE check_in = %s and status in ("Checked-in", "Checked-out", "Reserved") '
                               params.append(start_date)
                         elif month and not day:
                               # YEAR + MONTH
@@ -293,7 +293,7 @@ class Reservation:
                               else:
                                     end_date = date(int(year), int(month) + 1, 1)
 
-                              where_clause = "WHERE check_in >= %s AND check_in < %s"
+                              where_clause = ' WHERE check_in >= %s AND check_in < %s and status in ("Checked-in", "Checked-out", "Reserved") '
                               params.extend([start_date, end_date])
 
                         cursor.execute(f'''
@@ -317,11 +317,7 @@ class Reservation:
                         new_data = []
 
                         for d in data:
-                              formatted_checkin  = d.get('check_in').strftime("%b %d").lstrip("0")    
-                              formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0") if d.get('check_out') else '--'
-                              formatted_date  = d.get('date_book').strftime("%b %d").lstrip("0") if d.get('date_book') else '--'
-
-                              new_data.append({'booking_id': d.get('booking_id'), 'name': d.get('name'),  'date_book': formatted_date , 'check_in': formatted_checkin, 'check_out': formatted_checkout, 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
+                              new_data.append({'booking_id': d.get('booking_id'), 'name': d.get('name'),  'date_book': d.get('date_book') , 'check_in': d.get('check_in'), 'check_out': d.get('check_out'), 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
                               
                         return {'success': bool(data), 'data': new_data}
             except Exception as e:
@@ -372,7 +368,7 @@ class Reservation:
 
                         # Add category-specific filters
                         if category == 'overnight-data':
-                              sql += ' AND booking_type = "Check-in" and status in ("Checked-in", "Checked-out") '
+                              sql += ' AND booking_type = "Check-in" and status in ("Checked-in", "Checked-out", "Reserved") '
                         elif category == 'check_in-data':
                               sql += ' AND status = "Checked-in" '
                         elif category == 'check_out-data':
@@ -382,7 +378,7 @@ class Reservation:
                         elif category == 'cancelled-reservation-data':
                               sql += ' AND status = "Cancelled" '
                         elif category == 'day-guest':
-                              sql += ' AND booking_type = "Day Guest" and status in ("Checked-in", "Checked-out") '
+                              sql += ' AND booking_type = "Day Guest" and status in ("Checked-in", "Checked-out", "Reserved") '
                         elif category == 'not_paid-data':
                               sql += ' AND status <> "Reserved" AND payment = "Pending"'
 
@@ -393,23 +389,8 @@ class Reservation:
                   
                         new_data = []
                         for d in data:
-                              formatted_checkin  = d.get('check_in').strftime("%b %d").lstrip("0")  
-                              formatted_checkout  = d.get('check_out').strftime("%b %d").lstrip("0")    
-                              formatted_date  = d.get('date_book').strftime("%b %d").lstrip("0") if d.get('date_book') else '--'
-
-                              new_data.append({
-                                    'booking_id': d.get('booking_id'),
-                                    'name': d.get('name'),
-                                    'date_book': formatted_date,
-                                    'check_in': formatted_checkin,
-                                    'check_out': formatted_checkout,
-                                    'accomodations': d.get('accomodations'),
-                                    'status': d.get('status'),
-                                    'booking_type': d.get('booking_type'),
-                                    'stay': d.get('stay_gap'),
-                                    'payment': d.get('payment')
-                              })
-
+                              new_data.append({'booking_id': d.get('booking_id'), 'name': d.get('name'),  'date_book': d.get('date_book') , 'check_in': d.get('check_in'), 'check_out': d.get('check_out'), 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
+                              
                         return {'success': bool(new_data), 'data': new_data}
             except Exception as e:
                   con.rollback()
@@ -826,13 +807,13 @@ class Reservation:
                               SELECT COUNT(*) AS total_overnight
                               FROM bookings
                               {where_clause}
-                              AND booking_type = 'Check-in' and status in ("Checked-in", "Checked-out")
+                              AND booking_type = 'Check-in' and status in ("Checked-in", "Checked-out", "Reserved")
                         ),
                         c_dayguest AS (
                               SELECT COUNT(*) AS total_dayguest
                               FROM bookings
                               {where_clause}
-                              AND booking_type = 'Day Guest' and status in ("Checked-in", "Checked-out")
+                              AND booking_type = 'Day Guest' and status in ("Checked-in", "Checked-out", "Reserved")
                         ),
                         c_all AS (
                               SELECT COUNT(*) AS total_all

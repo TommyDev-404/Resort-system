@@ -77,7 +77,7 @@ function renderViewDetailsModal(roomType){
                         <span class="absolute top-2 right-4 text-gray-500 dark:text-gray-100 dark:hover:text-gray-200 hover:text-gray-700 text-[25px] cursor-pointer" id="closeRoomDetails">&times;</span>
                         <h3 id="modalRoomTitle" class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">${roomType} - Details</h3>
 
-                        <div class="overflow-y-auto max-h-[50vh] thin-scroll">
+                        <div class="overflow-y-auto max-h-[40vh] thin-scroll">
                               <table class="min-w-full divide-y divide-gray-200 text-center">
                                     <thead class="dark:bg-gray-700 bg-gray-900 text-white sticky top-0">
                                           <tr>
@@ -104,7 +104,7 @@ async function render_openViewInfoRoomDetails(btn) {
       const cells = row.querySelectorAll('td');
       const room_name = document.getElementById('modalRoomTitle').textContent.split('-');
       const roomNo = cells[0].textContent.trim();
-
+      showLoader('modal', 'Retrieving data...');
       const response = await fetch(`/room-cleaning-history?room_name=${room_name[0]}${roomNo}`);
       const result = await response.json();
 
@@ -158,6 +158,7 @@ async function render_openViewInfoRoomDetails(btn) {
       `;
 
       document.querySelector('#viewRoomInfoPortal').innerHTML += modal;
+      hideLoader();
 }
 
 async function renderAssignStaffModal(area_name, room_no){
@@ -430,6 +431,7 @@ async function markReady(btn){
 }
 
 async function openRoomDetails(roomType){
+      showLoader('modal', "Retrieving room data...");
       const response = await fetch(`/area-data?accomodation=${roomType}`);
       const result = await response.json();
 
@@ -438,8 +440,9 @@ async function openRoomDetails(roomType){
             result.data.forEach(data => {
                   createRowForRoomDetails(roomType, data.room, data.status);
             });
+            hideLoader();
       }else{
-            failedMessageCard7('Error fecthing data');
+            failedToast('Error fecthing data');
       }
 }
 

@@ -121,7 +121,7 @@ async function renderTable() {
                         <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-red-500">${row.occupied}</span></td>
                         <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-green-500">${row.reserve}</span></td>
                         <td class="px-6 py-4 min-w-[100px] whitespace-nowrap">
-                              <button class="update-btn text-sm text-white bg-blue-500 py-2 px-4 rounded-sm flex gap-2 items-center justify-center hover:bg-blue-600 transition-colors" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update</button>
+                              <button class="update-btn text-sm text-white bg-blue-500 py-2 px-4 rounded-sm flex gap-2 items-center justify-center hover:bg-blue-600 transition-colors" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update Price</button>
                         </td>
             </tr>
             `;

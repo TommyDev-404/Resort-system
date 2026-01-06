@@ -8,10 +8,17 @@ let roomCache = {};
 let searchTimeout;
 
 // ---------------- RENDER HELPERS ------------------
-function createTable(id, guest_name, date_book, checkin, checkout, stay_count, accomodations, booking_type, status, payment_status){
+function createTable(id, guest_name, date_book2, check_in, check_out, stay_count, accomodations, booking_type, status, payment_status){
+      const checkout = parseOrReturn(check_out);
+      const checkin = parseOrReturn(check_in);
+      const date_book = parseOrReturn(date_book2);
       
+      const formattedDatebook = new Date(date_book2).toISOString().split('T')[0];
+      const formattedCheckin = new Date(check_in).toISOString().split('T')[0];
+      const formattedCheckout = new Date(check_out).toISOString().split('T')[0];
+
       const row = `
-            <tr class="text-[16px] hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}" data-type="${booking_type}" data-status="${status}"  data-checkin="${checkin}" data-checkout="${checkout}" data-date_book="${date_book}">
+            <tr class="text-[16px] hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}" data-type="${booking_type}" data-status="${status}"  data-checkin="${formattedCheckin}" data-checkout="${formattedCheckout}" data-date_book="${formattedDatebook}">
                   <!-- SELECT -->
                   <td class="px-3 py-4 w-[70px] text-center">
                         <label class="flex items-center justify-center gap-2 cursor-pointer select-none">
@@ -226,7 +233,17 @@ function renderAddBookingModal(){
                         <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fade-in-up">
                               <span id="close-accomodation-avl" class="absolute top-4 right-4 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 text-2xl cursor-pointer">&times;</span>
                               <h2 id="accomodation_label" class="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center mt-2">Premium Villa Rooms</h2>
-                              <div id="avl-accomodations" class="mt-5 max-h-[240px] overflow-y-auto thin-scroll space-y-2 p-1 flex flex-col"></div>
+                              <div class="flex items-center gap-2 mt-5 pb-2 border-b border-gray-200 dark:border-gray-700" id="occupancy-title">
+                                    <i data-lucide="users" class="w-4 h-4 text-gray-500"></i>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Max occupancy:</span>
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100 flex gap-1 items-center">
+                                          <span id="max-occupancy-count">--</span>
+                                          <span class="text-xs text-gray-600 dark:text-gray-400 font-normal">guests</span>
+                                    </p>
+                                    
+                              </div>
+
+                              <div id="avl-accomodations" class="mt-3 max-h-[240px] overflow-y-auto thin-scroll space-y-2 p-1 flex flex-col"></div>
                               <!-- Bottom Buttons -->
                               <div class="mt-6 flex gap-3">
                                     <button id="select-all-areas" class="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 py-3 rounded-lg font-medium flex-1 transition">Select All</button>
@@ -281,11 +298,13 @@ function renderMarkPaidModal(){
             return;
       }
 
-      const row = checkedBox.closest('tr');      
+      const row = checkedBox.closest('tr');     
+      console.log(row); 
       const checkin = row.dataset.checkin;
       const checkout = row.dataset.checkout;
       const book_type = row.dataset.status;
       const date_book = row.dataset.date_book || null;
+      console.log(checkin, checkout, date_book);
 
       const modal = `   
             <div class="fixed top-0 left-0 w-full h-full  bg-black/40 backdrop-blur-sm z-50" id="mark-paid-overlay">
@@ -817,13 +836,40 @@ function toDateOnly(value) {
       return d;
 }
 
+function areaTypeInfo(area){
+      const room_name = {
+            'premium': 'Premium Villa Room',
+            'standard': 'Standard Villa Room',
+            'barkada': 'Barkada Room',
+            'garden': 'Garden View Room',
+            'cabana': 'Cabana Cottage',
+            'small': 'Small Cottage',
+            'big': 'Big Cottage',
+            'pavillion': 'Pavillion Hall',
+            'mariposa': 'Mariposa Hall',
+            'minicon': 'Minicon Hall'
+      };
+
+      const capacity = {
+            'premium': '12',
+            'standard': '10',
+            'barkada': '8',
+            'garden': '4',
+            'cabana': '30',
+            'small': '20',
+            'big': '50',
+            'pavillion' : "150-200",
+            'mariposa' : "120",
+            'minicon' : "70",
+      };
+
+      return {'name': room_name[area], 'capacity': capacity[area]}
+}
 
 // --------------- POST DATA Fetching -------------- //
 async function addBooking(e){
       e.preventDefault();      
       const form = new FormData(e.target);
-      
-      console.log(form.get('booking_status'));
 
       if (form.get('checkout') < form.get('checkin')){
             promoDateWarningMessageCard('Warning: Check-out date must be greater than Check-in date!');
@@ -868,7 +914,7 @@ async function addBooking(e){
             }
 
             if (form.get('booking_type') === 'Check-in' && checkin < today){
-                  promoDateWarningMessageCard('Warning: Checked-in date must be greater than today!');
+                  promoDateWarningMessageCard('Warning: Checked-in date must be greater than today if reservation!');
                   return;
             }else if (form.get('booking_type') !== 'Check-in' &&checkin.getTime() !== checkout.getTime()) {
                   promoDateWarningMessageCard('Warning: Day guest checked-in and checked-out must be the same!');
@@ -895,12 +941,9 @@ async function addBooking(e){
             }
       
             // Day guest payment must be same day
-            if (
-                  form.get('booking_type') !== 'Check-in' &&
-                  datePaid.getTime() !== checkin.getTime()
-            ) {
+            if (form.get('booking_type') === 'Day Guest' && datePaid.getTime() !== checkin.getTime()) {
                   promoDateWarningMessageCard(
-                        'Warning: Day guest payment must be on the check-in date!'
+                        'Warning: Day guest payment must be  the same on the check-in date!'
                   );
                   return;
             }
@@ -915,7 +958,7 @@ async function addBooking(e){
                   body: JSON.stringify(Object.fromEntries(form.entries()))
             });
             const result = await response.json();
-
+            console.log(result);
             if (result.success){
                   e.target.reset();
                   await notifications();
@@ -1030,7 +1073,7 @@ async function submitPayment(e){
       const check_in = form.get('checkin-data');
       const check_out = form.get('checkout-data');
       const book_type = form.get('book-type');
-
+      console.log(check_in, check_out, date_paid)
       if (book_type === 'Reserved'){      
             if (date_paid < form.get('date_book-data') || date_paid > check_out) {
                   promoDateWarningMessageCard(
@@ -1071,6 +1114,19 @@ async function submitPayment(e){
 async function updateReservationDate(e){
       e.preventDefault();
       const form = new FormData(e.target);
+
+      if (form.get('type') === 'Day Guest' && form.get('edit_checkin') > form.get('edit_checkout') || form.get('edit_checkin') < form.get('edit_checkout')){
+            promoDateWarningMessageCard('Warning: Day guest checked-in and checked-out must be the same!');
+            return;
+      }
+
+      if (form.get('edit_checkin') > form.get('edit_checkout')){
+            promoDateWarningMessageCard('Warning: Checked-in date must not greater that checked-out date! ');
+            return;
+      }else if (form.get('edit_checkout') < form.get('edit_checkin')){
+            promoDateWarningMessageCard('Warning: Checkout-in date must not less that checked-in date! ');
+            return;
+      }
       
       showLoader('data', 'Updating booking schedule...');
       const response = await fetch(`/update-reservation-date`, {
@@ -1229,34 +1285,50 @@ async function generateAvlAccomodation(accomodation){
       document.querySelectorAll('#avl-accomodations label').forEach(label => label.remove());
       let room_name = accomodation.split(' ');
       let rooms = [];
-      console.log()
+      
+      const { name, capacity } = areaTypeInfo(accomodation.split(' ')[0].toLowerCase());
       if (accomodation === 'Hall'){
+            document.querySelector('#occupancy-title').classList.add('hidden');
             const halls = ['Pavillion', 'Mariposa', 'Minicon'];
             let p = '';
-
+            
             halls.forEach(name => {
+                  const { name2, capacity} = areaTypeInfo(name.toLowerCase());
+
                   if (roomCache[name]) {
                         p +=  `
-                              <label  class="acc-card flex gap-2 justify-center bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-300 dark:border-gray-700 cursor-pointer transition select-none hover:bg-gray-100 dark:hover:bg-gray-700"">
-                                    <input type="checkbox" class="text-gray-100 dark:text-gray-800 w-3" name="avl" value="${name} Hall 101" required>${name} Hall 101
-                              </label>
-                        `;
+                        <label class="acc-card flex items-center justify-between gap-4 bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer transition hover:bg-gray-100 dark:hover:bg-gray-700 select-none">
+                              <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="avl" value="${name} Hall 101"required class="w-4 h-4 accent-blue-600 cursor-pointer"/>
+                                    <span class="font-medium text-gray-900 dark:text-gray-100">${name} Hall 101</span>
+                              </div>
+                              
+                              <div class="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                                    <span class="text-xs">Max:</span>
+                                    <span class="font-semibold text-gray-900 dark:text-gray-100">${capacity}</span>
+                                    <span class="text-xs">guests</span>
+                              </div>
+                        </label>`;
                   }
             });
 
             document.querySelector('#avl-accomodations').innerHTML += p;
       }else{
+            document.querySelector('#occupancy-title').classList.remove('hidden');
             rooms = roomCache[room_name[0]];
             for (let i = 0; i < rooms.length; i++){
                   const p = `
-                        <label  class="acc-card flex gap-2 justify-center bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-800 dark:text-gray-100 text-center border border-gray-300 dark:border-gray-700 cursor-pointer transition select-none hover:bg-gray-100 dark:hover:bg-gray-700"">
-                              <input type="checkbox" class="text-gray-100 dark:text-gray-800 w-3" name="avl" value="${accomodation} ${rooms[i]}" required>${accomodation} ${rooms[i]}
+                        <label class="acc-card flex items-center justify-center gap-3 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer select-none transition hover:bg-gray-100 dark:hover:bg-gray-700">
+                              <input type="checkbox" name="avl" value="${accomodation} ${rooms[i]}" required class="w-4 h-4 accent-blue-600 cursor-pointer"/>
+                              <span class="text-sm font-medium text-center">${accomodation} ${rooms[i]}</span>
                         </label>
                   `;
                   document.querySelector('#avl-accomodations').innerHTML += p;
             }
+            
       }
 
+      document.querySelector('#max-occupancy-count').textContent = capacity;
       savedAccomodations.forEach(value => {
             const checkbox = document.querySelector(`input[name="avl"][value="${value}"]`);
             if (checkbox) checkbox.checked = true;
@@ -1315,11 +1387,7 @@ async function recentBookings(status ='all-enabled') {
   
       if (result.success && result.data.length) {
             result.data.forEach(row => {
-                  const check_out = parseOrReturn(row.check_out);
-                  const check_in = parseOrReturn(row.check_in);
-                  const date_book = parseOrReturn(row.date_book);
-            
-                  createTable(row.booking_id, row.name, date_book, check_in, check_out, row.stay, row.accomodations, row.booking_type, row.status, row.payment);
+                  createTable(row.booking_id, row.name, row.date_book, row.check_in, row.check_out, row.stay, row.accomodations, row.booking_type, row.status, row.payment);
             });
       } else {
             tbody.innerHTML = `
@@ -1476,11 +1544,7 @@ async function bookingsCategories(status='all-enabled'){
       if (result.success){
             hideLoader();
             result.data.forEach(row => {
-                  const check_out = parseOrReturn(row.check_out);
-                  const check_in = parseOrReturn(row.check_in);
-                  const date_book = parseOrReturn(row.date_book);
-
-                  createTable(row.booking_id, row['name'], date_book, check_in, check_out, row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
+                  createTable(row.booking_id, row['name'], row.date_book, row.check_in, row.check_out, row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             document.querySelectorAll('tbody tr').forEach(row => row.remove());
