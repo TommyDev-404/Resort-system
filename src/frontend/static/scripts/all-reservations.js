@@ -259,33 +259,60 @@ function renderAddBookingModal(){
       lucide.createIcons();
 }
 
-function renderEditReservedModal(id, check_in, check_out, booking_type){
-      const modal = `
-            <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
-                  <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
-                        <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-reservation-overlay">&times;</span>
-                        <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Update Booking Schedule</h2>
-                        <form id="update-reserved-form">
-                              <div class="flex flex-col gap-6 mt-2">
-                                    <input type="hidden" name="id" value="${id}">
-                                    <input type="hidden" name="type" value="${booking_type}">
-                                    
-                                    <div class="flex flex-col gap1 text-gray-600 dark:text-gray-200">
-                                          Edit Check-In:
-                                          <input type="date" name="edit_checkin" class="border border-gray-300 text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_in}">
+function renderEditReservedModal(id, check_in, check_out, booking_type, booking_status, date_book){
+      if (booking_status === 'Reserved'){
+            const modal = `
+                  <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
+                        <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
+                              <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-reservation-overlay">&times;</span>
+                              <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Update Booking Schedule</h2>
+                              <form id="update-reserved-form">
+                                    <div class="flex flex-col gap-6 mt-2">
+                                          <input type="hidden" name="id" value="${id}">
+                                          <input type="hidden" name="type" value="${booking_type}">
+                                          <input type="hidden" name="status" value="${booking_status}">
+                                          <input type="hidden" name="date_book" value="${date_book}">
+                                          <div class="flex flex-col gap1 text-gray-600 dark:text-gray-200">
+                                                Edit Check-In:
+                                                <input type="date" name="edit_checkin" class="border border-gray-300 text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_in}">
+                                          </div>
+                                          <div class="flex flex-col gap1  text-gray-600 dark:text-gray-200">
+                                                Edit Check-out:
+                                                <input type="date" name="edit_checkout" class="border border-gray-300  text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_out}">
+                                          </div>
+                                          <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Update</button>      
                                     </div>
-                                    <div class="flex flex-col gap1  text-gray-600 dark:text-gray-200">
-                                          Edit Check-out:
-                                          <input type="date" name="edit_checkout" class="border border-gray-300  text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_out}">
-                                    </div>
-                                    <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Update</button>      
-                              </div>
-                        </form>
+                              </form>
+                        </div>
                   </div>
-            </div>
-      `;
-      
-      document.getElementById('reservationPortal').innerHTML += modal; 
+            `;
+            
+            document.getElementById('reservationPortal').innerHTML += modal; 
+      }else{
+            const modal = `
+                        <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
+                              <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
+                                    <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-reservation-overlay">&times;</span>
+                                    <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Update Booking Schedule</h2>
+                                    <form id="update-reserved-form">
+                                          <div class="flex flex-col gap-6 mt-2">
+                                                <input type="hidden" name="id" value="${id}">
+                                                <input type="hidden" name="type" value="${booking_type}">
+                                                <input type="hidden" name="edit_checkin" value="${check_in}">
+
+                                                <div class="flex flex-col gap1  text-gray-600 dark:text-gray-200">
+                                                      Edit Check-out:
+                                                      <input type="date" name="edit_checkout" class="border border-gray-300  text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_out}">
+                                                </div>
+                                                <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Update</button>      
+                                          </div>
+                                    </form>
+                              </div>
+                  </div>
+            `;
+            
+            document.getElementById('reservationPortal').innerHTML += modal; 
+      }
 }
 
 function renderMarkPaidModal(){
@@ -1114,7 +1141,7 @@ async function submitPayment(e){
 async function updateReservationDate(e){
       e.preventDefault();
       const form = new FormData(e.target);
-      console.log(form.get('type'));
+
       if (form.get('type') === 'Day Guest' && form.get('edit_checkin') !== form.get('edit_checkout') ){
             promoDateWarningMessageCard('Warning: Day guest checked-in and checked-out must be the same!');
             return;
@@ -1126,6 +1153,13 @@ async function updateReservationDate(e){
       }else if (form.get('edit_checkout') < form.get('edit_checkin')){
             promoDateWarningMessageCard('Warning: Checkout-in date must not less than checked-in date! ');
             return;
+      }
+      console.log(form.get('edit_checkin'), form.get('date_book'));
+      if (form.get('status') === 'Reserved'){
+            if (form.get('edit_checkin') < form.get('date_book')){
+                  promoDateWarningMessageCard('Warning: Checked-in date must not less than the booked date! ');
+                  return;
+            }
       }
       
       showLoader('data', 'Updating booking schedule...');
@@ -1276,8 +1310,9 @@ async function getReservationDate(){
       
       const formatCheckin = new Date(result.check_in).toISOString().split('T')[0];
       const formatCheckout = new Date(result.check_out).toISOString().split('T')[0];
+      const formattedDatebook = new Date(result.date_book).toISOString().split('T')[0];
 
-      renderEditReservedModal(id, formatCheckin, formatCheckout, result.booking_type); 
+      renderEditReservedModal(id, formatCheckin, formatCheckout, result.booking_type, result.booking_status, formattedDatebook); 
       hideLoader();
 }
 

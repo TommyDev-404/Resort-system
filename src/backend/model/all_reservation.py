@@ -601,20 +601,20 @@ class Reservation:
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        cursor.execute(''' SELECT check_in, check_out, booking_type FROM bookings where booking_id = %s ''', (id,))
+                        cursor.execute(''' SELECT check_in, check_out, booking_type, status, date_book FROM bookings where booking_id = %s ''', (id,))
                         data = cursor.fetchone()
                         
-                        return {'check_in': data.get('check_in'), 'check_out': data.get('check_out'), 'booking_type': data.get('booking_type')}
+                        return {'check_in': data.get('check_in'), 'check_out': data.get('check_out'), 'booking_type': data.get('booking_type'), 'booking_status': data.get('status'), 'date_book': data.get('date_book')}
                   
             except Exception as e:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def update_reservation_date(self, id, edit_checkin, edit_checkout, type):
+      def update_reservation_date(self, id, edit_checkin, edit_checkout, type, status=None, date_book=None):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
-                        print(id)
+
                         cursor.execute(''' SELECT premium, standard, garden, barkada, cabana, small, big, pavillion, mariposa, minicon FROM area_revenue WHERE booking_id = %s ''', (id,))
                         area_data = cursor.fetchone()
 
