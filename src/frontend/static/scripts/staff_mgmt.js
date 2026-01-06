@@ -1,4 +1,4 @@
-import { successToast, failedToast , promoRemoveWarningMessageCard} from "./helper.js";
+import { successToast, failedToast , promoRemoveWarningMessageCard, promoDateWarningMessageCard} from "./helper.js";
 
 let isAttendanceNotEmpty = false;
 const tbodys = document.getElementById('staffList');
@@ -7,7 +7,7 @@ const tbodys = document.getElementById('staffList');
 function renderAddStaffModal(){
 
       const modal = `
-            <div id="addStaffModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
+            <div id="addStaffModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                   <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] max-w-2xl p-6 relative fade-in-up">
                         <button id="closeAddStaff" class="absolute top-4 text-2xl right-4 text-gray-600 dark:text-gray-300 hover:text-red-500">&times;</button>
                         
@@ -88,13 +88,13 @@ async function renderAddStaffAttendanceModal(){
                                     <div class="mb-6 flex flex-col md:flex-row gap-4">
                                           <div class="flex-1">
                                                 <label for="attendanceDateAll" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date:</label>
-                                                <input type="date" id="attendanceDateAll" required class="date-icon px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                                <input type="date" id="attendanceDateAll" name="attendance_date" required class="date-icon px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                           </div>
                                     
                                           <!-- Time-in Input (only shows if Present) -->
                                           <div class="flex-1" id="timeInWrapper">
                                                 <label for="attendanceTimein" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time-in:</label>
-                                                <input type="time" id="attendanceTimein" required class="date-icon px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                                <input type="time" id="attendanceTimein" name="time_in" required class="date-icon px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                           </div>
                                     </div>
 
@@ -134,6 +134,7 @@ async function renderAddStaffAttendanceModal(){
 async function renderUpdateAttendanceModal(e){
       const generated_row = await getAllPresentStaff();
       hideLoader();
+
       const modal = `
             <div id="updateAttendanceModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[50]">
                   <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[85%] max-w-4xl py-8 px-10 relative fade-in-up">
@@ -145,7 +146,7 @@ async function renderUpdateAttendanceModal(e){
                               <div class="mb-6 flex justify-start w-full">
                                     <div class="flex flex-col">
                                           <label for="attendanceTimeout" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time-out:</label>
-                                          <input type="time" id="attendanceTimeout" required class="px-3 py-2 w-90 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500  date-icon">
+                                          <input type="time" id="attendanceTimeout" name="time_out" required class="px-3 py-2 w-90 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500  date-icon">
                                     </div>
                               </div>
 
@@ -315,7 +316,7 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
-                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="date-icon w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800  dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started2" class="date-icon w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800  dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
@@ -590,10 +591,70 @@ function hideLoader() {
       if (loader) loader.remove();
 }
 
+function buildDate(dateStr, timeStr) {
+      const date = new Date(dateStr);
+      const [h, m] = timeStr.split(':').map(Number);
+      date.setHours(h, m, 0, 0);
+      return date;
+}
+
+function isValidTimeout(selectedTime, staffDate) {
+      const timeout = buildDate(staffDate, selectedTime);
+
+      const noonStart = buildDate(staffDate, '12:00');
+      const noonEnd   = buildDate(staffDate, '13:00');
+
+      const eveningStart = buildDate(staffDate, '16:30');
+
+      // ❌ Prevent AM (before 12 PM)
+      if (timeout < noonStart) {
+            return false;
+      }
+
+      // ✅ Lunch time (12–1)
+      if (timeout >= noonStart && timeout <= noonEnd) {
+            return true;
+      }
+
+      // ✅ 5PM onwards
+      if (timeout >= eveningStart) {
+            return true;
+      }
+
+      return false;
+}
+
+function isValidTimeIn(selectedTime, staffDate) {
+      const timeIn = buildDate(staffDate, selectedTime);
+  
+      const earlyMorningStart = buildDate(staffDate, '06:00'); // 6 AM
+      const earlyMorningEnd   = buildDate(staffDate, '08:00'); // 8 AM
+  
+      const noonStart = buildDate(staffDate, '12:00'); // 12 PM
+      const noonEnd   = buildDate(staffDate, '13:00'); // 1 PM
+  
+      // ✅ Allow either 6–8 AM OR 12–1 PM
+      if ((timeIn >= earlyMorningStart && timeIn <= earlyMorningEnd) ||
+          (timeIn >= noonStart && timeIn <= noonEnd)) {
+          return true;
+      }
+  
+      // ❌ Otherwise invalid
+      return false;
+}
+
+
 // --------- DATA FETCHING FUNCTIONS -----------------
 async function addStaff(e){
       e.preventDefault();
       const form = new FormData(e.target);
+
+      const startDate = new Date(form.get('date_started'));
+      if (startDate > new Date()){
+            promoDateWarningMessageCard('Warning: Date started must not exceed todays date!');
+            return;
+      }
+
       showLoader('data', 'Adding staff...');
       try{
             const response = await fetch('/add-staff', {
@@ -711,7 +772,7 @@ async function getAllStaff(){
             }else{
                   const empty_row = `
                         <tr class="border-b border-gray-200 dark:border-gray-700">
-                              <td colspan="4" class="p-3 text-center dark:text-gray-100 text-gray-800">All Staff has been recorded.</td>
+                              <td colspan="4" class="p-3 text-center dark:text-gray-100 text-gray-800">No data yet.</td>
                         </tr>
                   `;
                   
@@ -726,6 +787,7 @@ async function getAllStaff(){
 async function getAllPresentStaff(){
       const day = document.getElementById('daySelect').value;
       const month = document.getElementById('monthSelect2').value;
+
       showLoader('data', 'Retrieving present staff...');
       try{
             const response = await fetch(`/all-present-staff?day=${day || new Date().getDate()}&month=${month || new Date().getMonth() + 1}`, {});
@@ -737,7 +799,7 @@ async function getAllPresentStaff(){
 
                   result.data.forEach(staff => {
                         const row = `
-                              <tr data-set="${staff.staff_id}" data-date="${staff.date}" class="border-b border-gray-200 dark:border-gray-700 hover:bg-black/3 dark:bg-white/3">
+                              <tr data-set="${staff.staff_id}" data-date="${staff.date}" " class="border-b border-gray-200 dark:border-gray-700 hover:bg-black/3 dark:bg-white/3">
                                     <td class="py-3 px-1 text-center">
                                           <label class="flex items-center  justify-center gap-2 cursor-pointer select-none">
                                                 <input type="checkbox" name="select_staff" class="timeout-checkbox hidden peer">
@@ -842,9 +904,20 @@ async function addStaffAttendance(e){
             }
       });
 
+      if (!isValidTimeIn(time_in, date)) {
+            promoDateWarningMessageCard('Invalid time-in. Allowed only before 6-8 AM and 12-1 PM.');
+            return;
+      }
+
       if (!allValid) {
-            failedMessageCard3("Please mark attendance for all staff before submitting.");
+            failedToast("Please mark attendance for all staff before submitting.");
             return; // stop submission
+      }
+      
+      const attendanceDate = new Date(date);
+      if (attendanceDate > new Date()){
+            promoDateWarningMessageCard('Warning: Cannot add future attendance!');
+            return;
       }
       
       showLoader('data', 'Adding staff attendance...');
@@ -881,7 +954,7 @@ async function updateStaffAttendance(e){
       
       let data = [];
       const rows = document.querySelectorAll('#updateAttendanceTable tr');
-      const time_out = document.getElementById('attendanceTimeout').value;
+      const time_outs = document.getElementById('attendanceTimeout').value;
 
       rows.forEach(row => {
             const selected = row.querySelector('input[type="checkbox"]:checked');
@@ -889,13 +962,20 @@ async function updateStaffAttendance(e){
             const date = row.getAttribute('data-date');
             const td = row.querySelectorAll('td');
             const timeInStr = td[2].textContent;
-            const time_in = new Date(`1970-01-01 ${timeInStr}`).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+            
+            const time_in = new Date(`1970-01-01 ${timeInStr}`).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+            const time_out = new Date(`1970-01-01 ${time_outs}`).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
 
             if (selected) {
                   data.push({ id, time_out, time_in, date});
             }
       });
-      
+
+      if (!isValidTimeout(time_outs, data[0].date)) {
+            promoDateWarningMessageCard('Invalid time-out. Allowed only 12–1 PM or 4:30 PM onwards.');
+            return;
+      }
+
       showLoader('data', 'Updating staff attendance...');
       try{
             const response = await fetch('/update-staff-attendance', {
@@ -928,6 +1008,12 @@ async function updateStaffInfo(e){
       e.preventDefault();
       const form = new FormData(e.target);
       
+      const startDate = new Date(form.get('date_started2'));
+      if (startDate > new Date()){
+            promoDateWarningMessageCard('Warning: Date started must not exceed todays date!');
+            return;
+      }
+
       showLoader('data', 'Updating staff details...');
       try{
             const response = await fetch('/update-staff-info', {

@@ -1,5 +1,5 @@
 from datetime import datetime
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta, datetime, time
 from backend.extensions import cache
 
 class Staff_Management: 
@@ -144,8 +144,8 @@ class Staff_Management:
                         cursor = con.cursor()
 
                         for data in updated_data:
-                              new_time_out = datetime.strptime(data.get('time_out'), '%H:%M').time() if data.get('time_out') else None
-                              new_time_in = datetime.strptime(data.get('time_in'), '%H:%M').time() if data.get('time_in') else None
+                              new_time_out = datetime.strptime(data.get('time_out').strip(), '%I:%M %p').time()
+                              new_time_in =  datetime.strptime(data.get('time_in').strip(), '%I:%M %p').time()
                               dates = datetime.strptime(data.get('date'), '%a, %d %b %Y %H:%M:%S %Z').date()
                               today = date.today()
                               start_of_week = today - timedelta(days=today.weekday())  # Monday
@@ -153,11 +153,12 @@ class Staff_Management:
 
                               is_this_week = start_of_week <= dates <= end_of_week
 
-                              morning_in = datetime.strptime('08:00', '%H:%M').time()
-                              afternoon_in= datetime.strptime('13:00', '%H:%M').time()
-                              morning_out = datetime.strptime('12:00', '%H:%M').time()
-                              afternoon_out = datetime.strptime('16:30', '%H:%M').time()
-                              overtime = datetime.strptime('17:00', '%H:%M').time()
+                              # Attendance rules
+                              morning_in    = time(8, 0)
+                              afternoon_in  = time(13, 0)
+                              morning_out   = time(12, 0)
+                              afternoon_out = time(16, 30)
+                              overtime      = time(17, 0)
 
                               if new_time_in <= morning_in:
                                     if new_time_out >= afternoon_out:

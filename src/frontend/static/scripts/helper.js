@@ -69,7 +69,7 @@ export function failedToast(message, duration = 3000) {
 
 export function promoDateWarningMessageCard(message) {
       const msg = `
-            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-50" id="warning-message">
+            <div class="fixed inset-0 bg-black/20 flex justify-center items-center z-80" id="warning-message">
                   <div class="bg-white dark:bg-gray-900 w-[23%] h-auto shadow-md rounded-sm flex flex-col justify-center items-center p-6 text-center gap-4 fade-in-up">
                         <i data-lucide="alert-circle" class="w-15 h-15 text-red-500"></i>
                         <h2 class="text-lg text-gray-600 dark:text-white" id="message">${message}</h2>
