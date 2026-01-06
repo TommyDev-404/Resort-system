@@ -1114,17 +1114,17 @@ async function submitPayment(e){
 async function updateReservationDate(e){
       e.preventDefault();
       const form = new FormData(e.target);
-
-      if (form.get('type') === 'Day Guest' && form.get('edit_checkin') > form.get('edit_checkout') || form.get('edit_checkin') < form.get('edit_checkout')){
+      console.log(form.get('type'));
+      if (form.get('type') === 'Day Guest' && form.get('edit_checkin') !== form.get('edit_checkout') ){
             promoDateWarningMessageCard('Warning: Day guest checked-in and checked-out must be the same!');
             return;
       }
 
       if (form.get('edit_checkin') > form.get('edit_checkout')){
-            promoDateWarningMessageCard('Warning: Checked-in date must not greater that checked-out date! ');
+            promoDateWarningMessageCard('Warning: Checked-in date must not greater than checked-out date! ');
             return;
       }else if (form.get('edit_checkout') < form.get('edit_checkin')){
-            promoDateWarningMessageCard('Warning: Checkout-in date must not less that checked-in date! ');
+            promoDateWarningMessageCard('Warning: Checkout-in date must not less than checked-in date! ');
             return;
       }
       

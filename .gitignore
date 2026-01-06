@@ -10,3 +10,9 @@ __pycache__/
 
 # Ignore the Excel folder
 src/backend/excel/
+
+accomodation-data.sql
+bookings.sql
+data.ods
+indexes.sql
+init.sql
