@@ -616,7 +616,7 @@ class Reservation:
 
                         cursor.execute(''' SELECT premium, standard, garden, barkada, cabana, small, big, pavillion, mariposa, minicon FROM area_revenue WHERE booking_id = %s ''', (id,))
                         area_data = cursor.fetchone()
-
+                        print(area_data)
                         cursor.execute(''' SELECT accomodations, total_guest, payment, promo FROM bookings WHERE booking_id = %s ''', (id,))
                         data = cursor.fetchone()
 

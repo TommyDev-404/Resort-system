@@ -431,7 +431,6 @@ async function markReady(btn){
 }
 
 async function openRoomDetails(roomType){
-      showLoader('modal', "Retrieving room data...");
       const response = await fetch(`/area-data?accomodation=${roomType}`);
       const result = await response.json();
 
@@ -440,7 +439,6 @@ async function openRoomDetails(roomType){
             result.data.forEach(data => {
                   createRowForRoomDetails(roomType, data.room, data.status);
             });
-            hideLoader();
       }else{
             failedToast('Error fecthing data');
       }
