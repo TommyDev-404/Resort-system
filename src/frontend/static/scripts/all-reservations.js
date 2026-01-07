@@ -707,7 +707,7 @@ function loadingAnimation0(){
       const load = `
             <div id="loading" class="absolute top-65 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center h-auto text-white space-y-2 z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Fetching data...</p>
             </div>
       `;      
 
@@ -759,7 +759,7 @@ async function viewUpcomingModal(title, type){
       const modal = `
       <div id="view-upcoming-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <!-- Modal Container -->
-            <div class="relative w-full max-w-5xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[60vh]">
+            <div class="relative w-full max-w-5xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[50vh]">
                   <!-- Close Button -->
                   <span id="close-view-upcoming-modal" class="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white text-xl font-semibold transition">&times;</span>
             

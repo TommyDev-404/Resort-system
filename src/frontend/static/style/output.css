@@ -605,6 +605,9 @@
   .h-100 {
     height: calc(var(--spacing) * 100);
   }
+  .h-\[0vh\] {
+    height: 0vh;
+  }
   .h-\[20vh\] {
     height: 20vh;
   }
