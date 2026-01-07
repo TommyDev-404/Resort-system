@@ -1,5 +1,5 @@
 import { notifications } from "./home-dashboard.js";
-import { successToast, failedToast } from "./helper.js";
+import { successToast, failedToast, promoDateWarningMessageCard } from "./helper.js";
 
 // -------------------- HELPERS ------------------------- //
 function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied, reserved){
@@ -374,7 +374,20 @@ async function allStaffs(){
 
 async function submitAssignStaff(e){
       e.preventDefault();
-      const form = new FormData(e.target);
+      const form = new FormData(e.target);      
+      const date = new Date(form.get('date'));
+      const today = new Date();
+
+      if ( date.getFullYear() < today.getFullYear() || date.getFullYear() > today.getFullYear() ){
+            promoDateWarningMessageCard('Warning: Assigning cleaning data is limited on this year only!');
+            return;
+      }
+
+      if ( date > today){
+            promoDateWarningMessageCard('Warning: Cannot assign in future dates!');
+            return;
+      }
+
       showLoader('add', 'Assigning staff...');
       const response = await fetch('/assign-cleaner', {
             method: 'POST',

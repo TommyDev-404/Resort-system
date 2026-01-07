@@ -175,18 +175,3 @@ class Housekeeping:
             except Exception as e:
                   con.rollback()
                   return {'success': False, 'message': f'Query failed: {e}'}
-
-            cache.delete('total_area_data')
-            cache.delete('total_data')
-            cache.delete('staff_cleaners')
-            key_index = cache.get("cleaning_history_keys") or set()
-            for key in key_index:
-                  cache.delete(key)
-
-            key_index2 = cache.get("room_assigned_history_keys") or set()
-            for key in key_index2:
-                  cache.delete(key)
-
-            key_index3 = cache.get("area_data_keys") or set()
-            for key in key_index3:
-                  cache.delete(key)

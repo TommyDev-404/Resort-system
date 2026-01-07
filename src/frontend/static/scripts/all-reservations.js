@@ -153,7 +153,7 @@ function renderAddBookingModal(){
                                                 <input type="date" name="checkin" class="w-full border date-icon border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                           </div>
                                           <div>
-                                                <label class="checkout_label text-gray-600 dark:text-gray-200 text-xs mb-1 block">Check-Out Date</label>
+                                                <label  class="checkout_label text-gray-600 dark:text-gray-200 text-xs mb-1 block">Check-Out Date</label>
                                                 <input type="date" name="checkout" class="w-full border date-icon border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                           </div>
                                           <div>
@@ -625,8 +625,15 @@ function selectAllRooms(){
 
 function showAccomodationBasedOnBookingType(e){
       const selectedBookingType = e.target.value;
+      const dateInput = document.querySelector('input[name="checkout"]'); // select the input
+      const dateLabel = document.querySelector('.checkout_label');
 
       if (selectedBookingType === 'Day Guest') {
+            dateInput.disabled = true; // disables the input
+            dateInput.classList.add('opacity-20', 'cursor-not-allowed'); // optional styling
+            dateLabel.classList.remove('text-gray-600', 'dark:text-gray-200');
+            dateLabel.classList.add('text-gray-200', 'dark:text-gray-600');
+
             const allowedAreas = ['Cabana Cottage', 'Hall', 'Big Cottage', 'Small Cottage'];
 
             document.querySelectorAll('.btn-acc').forEach(btn => {
@@ -645,6 +652,11 @@ function showAccomodationBasedOnBookingType(e){
                   btn.disabled = false;
                   btn.classList.remove('opacity-20', 'cursor-not-allowed', 'pointer-events-none');
             });
+            
+            dateInput.disabled = false; // enables the input
+            dateInput.classList.remove('opacity-20', 'cursor-not-allowed');
+            dateLabel.classList.remove('text-gray-200', 'dark:text-gray-600');
+            dateLabel.classList.add('text-gray-600', 'dark:text-gray-200');
       }      
 }
 
@@ -915,13 +927,13 @@ async function addBooking(e){
       const bookingType = form.get('booking_type');
 
       if (bookingStatus === 'Checked-in') {
-            if (bookingType === 'Day Guest' && checkin.getTime() !== checkout.getTime()) {
-                  promoDateWarningMessageCard('Day guest must check-in and check-out on the same day!');
+            if (bookingType === 'Day Guest' && checkin > today) {
+                  promoDateWarningMessageCard('Warning: Cannot set day guest date to future date if its not a reservation!');
                   return;
             }
       } else { // Reserved
-            if (bookingType === 'Day Guest' && checkin.getTime() !== checkout.getTime()) {
-                  promoDateWarningMessageCard('Day guest must check-in and check-out on the same day!');
+            if (bookingType === 'Day Guest' && checkin < today) {
+                  promoDateWarningMessageCard('Warning: Cannot set day guest date to less than today date if its a reservation!');
                   return;
             }
       }
@@ -959,23 +971,22 @@ async function addBooking(e){
             // Day guest payment must be same day
             if (form.get('booking_type') === 'Day Guest' && datePaid.getTime() !== checkin.getTime() && form.get('booking_status') !== 'Reserved') {
                   promoDateWarningMessageCard(
-                        'Warning: Day guest payment must be  the same on the check-in date!'
+                        'Warning: Day guest payment must be the same on the check-in date!'
                   );
                   return;
             }
 
             if (form.get('booking_status') === 'Reserved') {
-                  if (datePaid < bookDate || datePaid > checkout) {
+                  if (datePaid < bookDate || datePaid > checkin) {
                         promoDateWarningMessageCard(
-                              'Warning: Payment date must be between reservation date and checkout!'
+                              'Warning: Payment date must be between reservation date and checked-in or the same day of reservation and checked-in!'
                         );
                         return;
                   }
-      
             } else { // Checked-in
-                  if (datePaid < checkin || datePaid > checkout) {
+                  if (datePaid < checkin || datePaid > checkin) {
                         promoDateWarningMessageCard(
-                              'Warning: Payment date must be between check-in and checkout!'
+                              'Warning: Payment date must be the same to checked-in date!'
                         );
                         return;
                   }

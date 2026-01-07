@@ -598,9 +598,10 @@ function buildDate(dateStr, timeStr) {
       return date;
 }
 
-function isValidTimeout(selectedTime, staffDate) {
+function isValidTimeout(selectedTime, staffDate, timeIn) {
       const timeout = buildDate(staffDate, selectedTime);
-
+      const timein = buildDate(staffDate, timeIn);
+      console.log(timeIn, selectedTime);
       const noonStart = buildDate(staffDate, '12:00');
       const noonEnd   = buildDate(staffDate, '13:00');
 
@@ -610,6 +611,15 @@ function isValidTimeout(selectedTime, staffDate) {
       if (timeout < noonStart) {
             return false;
       }
+      
+      const isTimeinLunch  = timein >= noonStart && timein <= noonEnd;
+      const isTimeoutLunch = timeout >= noonStart && timeout <= noonEnd;
+      console.log(isTimeinLunch, isTimeoutLunch);
+      // ❌ If time-in is during lunch, prevent lunch timeout
+      if (isTimeinLunch || isTimeoutLunch) {
+            return false;
+      }
+
 
       // ✅ Lunch time (12–1)
       if (timeout >= noonStart && timeout <= noonEnd) {
@@ -955,14 +965,14 @@ async function updateStaffAttendance(e){
       let data = [];
       const rows = document.querySelectorAll('#updateAttendanceTable tr');
       const time_outs = document.getElementById('attendanceTimeout').value;
-
+      
       rows.forEach(row => {
             const selected = row.querySelector('input[type="checkbox"]:checked');
             const id = row.getAttribute('data-set');
             const date = row.getAttribute('data-date');
             const td = row.querySelectorAll('td');
             const timeInStr = td[2].textContent;
-            
+
             const time_in = new Date(`1970-01-01 ${timeInStr}`).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
             const time_out = new Date(`1970-01-01 ${time_outs}`).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
 
@@ -971,8 +981,8 @@ async function updateStaffAttendance(e){
             }
       });
 
-      if (!isValidTimeout(time_outs, data[0].date)) {
-            promoDateWarningMessageCard('Invalid time-out. Allowed only 12–1 PM or 4:30 PM onwards.');
+      if (!isValidTimeout(time_outs, data[0].date, data[0].time_in)) {
+            promoDateWarningMessageCard('Invalid time-out. Time-out is allowed only between 12:00–1:00 PM for morning time-in, or from 4:30 PM onwards for both morning and afternoon time-ins.');
             return;
       }
 

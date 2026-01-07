@@ -77,7 +77,7 @@ class Reservation:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def add_booking(self, name, total_guest, booking_status, booking_type, payment, accomodations_selected, checkin, checkout, book_date=None, date_paid_add=None):
+      def add_booking(self, name, total_guest, booking_status, booking_type, payment, accomodations_selected, checkin, checkout=None, book_date=None, date_paid_add=None):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -101,9 +101,9 @@ class Reservation:
                         counts = Counter(rooms)
 
                         result_list = []
-                        
+            
                         new_checkin = datetime.strptime(checkin, "%Y-%m-%d").date()
-                        new_checkout = datetime.strptime(checkout, "%Y-%m-%d").date()
+                        new_checkout = datetime.strptime(checkout, "%Y-%m-%d").date() if checkout else new_checkin
                         today = date.today()
                         new_status = 'Checked-out' if new_checkout < today else booking_status
 
@@ -186,18 +186,18 @@ class Reservation:
                         if new_checkout < today:
                               cursor.execute(''' INSERT INTO bookings (name, date_book, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, paid_date, promo, promo_area) 
                               VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-                              ''', (name, book_date if book_date != None else checkin, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, new_status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
+                              ''', (name, book_date if book_date != None else checkin, checkin, checkout if checkout else checkin, accomodations_selected, total_guest, booking_type, payment, new_status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
                         else:
                               cursor.execute(''' INSERT INTO bookings (name, date_book, check_in, check_out, accomodations, total_guest, booking_type, payment, status, total_amount, paid_date, promo, promo_area) 
                               VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-                              ''', (name, book_date if book_date != None else checkin, checkin, checkout, accomodations_selected, total_guest, booking_type, payment, new_status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
+                              ''', (name, book_date if book_date != None else checkin, checkin, checkout if checkout else checkin, accomodations_selected, total_guest, booking_type, payment, new_status, new_amount, date_paid_add if payment != 'Pending' else None, full_promo_name, ", ".join(room_affected) if len(room_affected) > 0 else 'No accomodations under promo.'))
                               
                         if cursor.rowcount != 0: result_list.append(True)
 
                         cursor.execute(''' INSERT INTO accomodation_data(check_in, check_out, premium, standard, garden, barkada, cabana, small, big, pavillion, mariposa, minicon, total) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ''', 
                         (      
                               checkin, 
-                              checkout, 
+                              checkout if checkout else checkin, 
                               counts.get('premium') if counts.get('premium') else 0, 
                               counts.get('standard') if counts.get('standard') else 0, 
                               counts.get('garden') if counts.get('garden') else 0, 
@@ -221,6 +221,9 @@ class Reservation:
                               elif new_status == 'Reserved':
                                     cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("reserved", room.capitalize().strip(), number))
                               else:
+                                    #cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("need-clean", room.capitalize().strip(), number))
+                                    #cursor.execute(''' INSERT INTO notifications(name, date, room_name, room_no, alert_type) VALUES(%s, %s, %s, %s, %s) ''', (f'Housekeeping requested for {areaNames.get(room.capitalize())}  {number}', now, room, number, 'housekeeping'))
+                                    
                                     if new_checkout == today - timedelta(days=1):
                                           cursor.execute('''UPDATE accomodation_spaces SET status = %s WHERE name=%s AND room=%s''', ("need-clean", room.capitalize().strip(), number))
                                           cursor.execute(''' INSERT INTO notifications(name, date, room_name, room_no, alert_type) VALUES(%s, %s, %s, %s, %s) ''', (f'Housekeeping requested for {areaNames.get(room.capitalize())}  {number}', now, room, number, 'housekeeping'))
@@ -242,7 +245,7 @@ class Reservation:
                               ''', (
                               booking_id,               # MUST BE THE FIRST VALUE
                               checkin,
-                              checkout,
+                              checkout if checkout else checkin,
                               new_area_revenue["premium"],
                               new_area_revenue["standard"],
                               new_area_revenue["garden"],
