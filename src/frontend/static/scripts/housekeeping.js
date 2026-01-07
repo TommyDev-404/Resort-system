@@ -77,7 +77,7 @@ function renderViewDetailsModal(roomType){
                         <span class="absolute top-2 right-4 text-gray-500 dark:text-gray-100 dark:hover:text-gray-200 hover:text-gray-700 text-[25px] cursor-pointer" id="closeRoomDetails">&times;</span>
                         <h3 id="modalRoomTitle" class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">${roomType} - Details</h3>
 
-                        <div class="overflow-y-auto max-h-[40vh] thin-scroll">
+                        <div class="overflow-y-auto h-[40vh] thin-scroll">
                               <table class="min-w-full divide-y divide-gray-200 text-center">
                                     <thead class="dark:bg-gray-700 bg-gray-900 text-white sticky top-0">
                                           <tr>
@@ -88,6 +88,7 @@ function renderViewDetailsModal(roomType){
                                     </thead>
                                     <tbody class="divide-y divide-gray-200" id="room-details"></tbody>
                               </table>
+                              <div id="loadingRoomDetailsPortal"></div>
                         </div>
                   </div>
                   
@@ -249,13 +250,21 @@ function getMonthsAndDays(){
 
 function loadingAnimation0(type=null){
       const load = `
-            <div id="loading" class="fixed top-[70%] left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-50 ">
+            <div id="loading" class="fixed  ${type === 'table3' ? 'top-[50%]' : 'top-[70%]'} left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-50 ">
                   <div class="w-8 h-8 border-4 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                  <p class="text-[15px] font-medium animate-pulse text-black">Fetching data...</p>
+                  <p class="text-[15px] font-medium animate-pulse text-black dark:text-white">Fetching data...</p>
             </div>
       `;      
 
-      type ? document.getElementById('loadingCleanPortal2').innerHTML += load : document.getElementById('loadingCleanPortal').innerHTML += load;
+      if (type){
+            if (type === 'table2'){
+                  document.getElementById('loadingCleanPortal2').innerHTML += load;
+            }else{
+                  document.getElementById('loadingRoomDetailsPortal').innerHTML += load;
+            }
+      }else{
+            document.getElementById('loadingCleanPortal').innerHTML += load;
+      }
 }
 
 function loadingAnimationAdd(message){
@@ -274,6 +283,8 @@ function showLoader(type, message=null) {
             loadingAnimation0(); // adds #loading inside #loadingPortal
       }else if (type === 'table2'){
                   loadingAnimation0(type); // adds #loading inside #loadingPortal
+      }else if (type === 'table3'){
+            loadingAnimation0(type); // adds #loading inside #loadingPortal
       }else{
             loadingAnimationAdd(message)
       }
@@ -444,10 +455,12 @@ async function markReady(btn){
 }
 
 async function openRoomDetails(roomType){
+      showLoader('table3');
       const response = await fetch(`/area-data?accomodation=${roomType}`);
       const result = await response.json();
-
+      
       if (result.success){
+            hideLoader();
             removePrevRoomDetailsRow();
             result.data.forEach(data => {
                   createRowForRoomDetails(roomType, data.room, data.status);
