@@ -460,7 +460,7 @@ async function bookingOverviewCardsData() {
 
 async function upcomingData(type, day_type) {
       type === 'checkout' ?  document.getElementById('upcoming-checkout-table').querySelectorAll('tbody tr').forEach(row => row.remove()) : document.getElementById('upcoming-arrival-table').querySelectorAll('tbody tr').forEach(row => row.remove());
-
+      showLoader(type);
       const response = await fetch(`/upcoming-bookings?book_type=${type}&day=${day_type}`);
       const res = await response.json();
 

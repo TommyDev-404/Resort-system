@@ -660,7 +660,9 @@ async function addStaff(e){
       const form = new FormData(e.target);
 
       const startDate = new Date(form.get('date_started'));
-      if (startDate > new Date()){
+      const dateString = startDate.toISOString().split('T')[0];
+
+      if (dateString > new Date()){
             promoDateWarningMessageCard('Warning: Date started must not exceed todays date!');
             return;
       }
@@ -925,7 +927,8 @@ async function addStaffAttendance(e){
       }
       
       const attendanceDate = new Date(date);
-      if (attendanceDate > new Date()){
+      const dateString = attendanceDate.toISOString().split('T')[0];
+      if (dateString > new Date()){
             promoDateWarningMessageCard('Warning: Cannot add future attendance!');
             return;
       }

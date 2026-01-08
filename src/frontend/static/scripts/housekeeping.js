@@ -428,6 +428,7 @@ async function submitAssignStaff(e){
       e.preventDefault();
       const form = new FormData(e.target);      
       const date = new Date(form.get('date'));
+      const dateString = date.toISOString().split('T')[0];
       const today = new Date();
 
       if ( date.getFullYear() < today.getFullYear() || date.getFullYear() > today.getFullYear() ){
@@ -435,7 +436,7 @@ async function submitAssignStaff(e){
             return;
       }
 
-      if ( date > today){
+      if ( dateString > today){
             promoDateWarningMessageCard('Warning: Cannot assign in future dates!');
             return;
       }
@@ -454,7 +455,7 @@ async function submitAssignStaff(e){
             successToast('Successfully assigned cleaner!');
             document.getElementById('assign-staff-modal').remove();
             openRoomDetails(form.get('area_name'));
-            getSummarryCardData();
+            housekeepingMetrics();
             accomodationData();
       }else{
             hideLoader();
@@ -486,7 +487,7 @@ async function markReady(btn){
             hideLoader();
             successToast('Updated successfully!');
             openRoomDetails(row.dataset.room);
-            getSummarryCardData();
+            housekeepingMetrics();
             accomodationData();
             document.querySelector('#roomDetailsModal').remove();
       }else{
