@@ -3,20 +3,61 @@ import { successToast, failedToast, promoDateWarningMessageCard } from "./helper
 
 // -------------------- HELPERS ------------------------- //
 function createRowData(acc_name, acc_count, need_clean, on_clean, ready, occupied, reserved){
+
       const row = `
-            <tr data-room="${acc_name}" class="fade-in-up border-b border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5">
-                  <td class="px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">${acc_name}</td>
-                  <td class="px-6 py-4 text-gray-800 dark:text-gray-100">${acc_count}</td>
-                  <td class="px-6 py-4 ${Number(need_clean) > 0 ? 'text-red-600' : 'text-blue-600'} dark:text-gray-blue-500 font-bold">${need_clean}</td>
-                  <td class="px-6 py-4 text-yellow-600 dark:text-gray-yellow-500 font-bold">${on_clean}</td>
-                  <td class="px-6 py-4 text-green-600  dark:text-green-500 font-bold">${ready}</td>
-                  <td class="px-6 py-4 flex justify-center">
-                        <button class="px-4 py-2 text-sm bg-teal-600 dark:bg-teal-500 dark:hover:bg-teal-600 text-white rounded-md hover:bg-teal-700 transition flex gap-2 items-center" id="view-room-details"><i data-lucide="building" class="text-lg"></i>View Rooms</button>
-                  </td>
-            </tr>
+            <li data-room="${acc_name}" class="bg-gray-50 dark:bg-gray-800 mt-4 shadow-md border border-gray-200 dark:border-gray-700 rounded-xl p-5 flex flex-col justify-between hover:shadow-2xl hover:scale-[1.03] transition-transform duration-200 list-none">
+            <!-- Header: Room Type and Total -->
+            <div class="flex justify-between items-center mb-4">
+                  <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${acc_name}</h4>
+                  <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total: ${acc_count}</span>
+            </div>
+
+            <!-- Status Bars -->
+            <div class="space-y-3">
+                  <!-- To Be Cleaned -->
+                  <div>
+                        <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">To Be Cleaned</span>
+                        <span class="text-sm font-bold ${Number(need_clean) > 0 ? 'text-red-600' : 'text-blue-600'} dark:text-red-400">${need_clean}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 h-3 rounded-full overflow-hidden">
+                        <div class="h-3 rounded-full ${Number(need_clean) > 0 ? 'bg-red-600' : 'bg-blue-600'}" style="width: ${Math.min((need_clean/acc_count)*100, 100)}%"></div>
+                        </div>
+                  </div>
+
+                  <!-- Cleaning -->
+                  <div>
+                        <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Cleaning</span>
+                        <span class="text-sm font-bold text-yellow-600 dark:text-yellow-400">${on_clean}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 h-3 rounded-full overflow-hidden">
+                        <div class="h-3 rounded-full bg-yellow-500" style="width: ${Math.min((on_clean/acc_count)*100, 100)}%"></div>
+                        </div>
+                  </div>
+
+                  <!-- Ready -->
+                  <div>
+                        <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Ready</span>
+                        <span class="text-sm font-bold text-green-600 dark:text-green-400">${ready}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 h-3 rounded-full overflow-hidden">
+                        <div class="h-3 rounded-full bg-green-500" style="width: ${Math.min((ready/acc_count)*100, 100)}%"></div>
+                        </div>
+                  </div>
+            </div>
+
+            <!-- Action Button -->
+            <button id="view-room-details" class="mt-5 w-full bg-teal-600 dark:bg-teal-500 hover:bg-teal-700 dark:hover:bg-teal-600 text-white text-sm py-2 rounded-md flex items-center justify-center gap-2 transition">
+                  <i data-lucide="building" class="text-lg"></i>
+                  View Rooms
+            </button>
+            </li>
       `;
 
-      document.querySelector('#room-status-tbody').innerHTML += row;
+
+      document.querySelector('#room-status-container').innerHTML += row;
       lucide.createIcons();
 }
 
@@ -298,9 +339,9 @@ function hideLoader() {
 
 // -------------------- DATA ------------------------- //
 async function accomodationData(){
-      document.querySelectorAll('#room-status-tbody tr').forEach(row => row.remove());
+      document.querySelectorAll('#room-status-container li').forEach(row => row.remove());
       showLoader('table');
-      const response = await fetch('/total-area-data');
+      const response = await fetch('/area-status');
       const result = await response.json();
       
       if (result.success){
@@ -421,8 +462,8 @@ async function submitAssignStaff(e){
       }
 }
 
-async function getSummarryCardData(){
-      const response = await fetch('/summary-data');
+async function housekeepingMetrics(){
+      const response = await fetch('/housekeeping-metrics');
       const result = await response.json();
 
       document.getElementById('to-be-clean').textContent = result.need_clean;
@@ -456,7 +497,7 @@ async function markReady(btn){
 
 async function openRoomDetails(roomType){
       showLoader('table3');
-      const response = await fetch(`/area-data?accomodation=${roomType}`);
+      const response = await fetch(`/area-details?accomodation=${roomType}`);
       const result = await response.json();
       
       if (result.success){
@@ -524,7 +565,7 @@ document.addEventListener('click', (e) => {
                         break;
             }
       }
-      if (e.target.matches('#view-room-details')) (renderViewDetailsModal(e.target.closest('tr').dataset.room), openRoomDetails(e.target.closest('tr').dataset.room));
+      if (e.target.matches('#view-room-details')) (renderViewDetailsModal(e.target.closest('li').dataset.room), openRoomDetails(e.target.closest('li').dataset.room));
 
       // spans
       if (e.target.matches('#closeRoomDetails')) document.getElementById('roomDetailsModal').remove();
@@ -551,6 +592,6 @@ document.addEventListener('change', (e) => {
 getMonthsAndDays();
 
 export function initPageHousekeeping(){
-      getSummarryCardData();
+      housekeepingMetrics();
       switchRoomStatus(document.querySelector('#room-status-btn'));
 }

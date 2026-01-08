@@ -6,7 +6,7 @@ class Housekeeping:
             self.db = db
             self.alert = alert
 
-      def total_area_data(self):
+      def housekeeping_area_status(self):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -40,7 +40,7 @@ class Housekeeping:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def total_data(self):
+      def housekeeping_metrics(self):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()
@@ -61,7 +61,7 @@ class Housekeeping:
                   con.rollback()
                   return { 'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def get_area_data(self, accomodation):
+      def area_details(self, accomodation):
             try:
                   with self.db.connect() as con:
                         cursor = con.cursor()

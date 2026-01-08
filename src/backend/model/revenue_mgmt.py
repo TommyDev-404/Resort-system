@@ -255,7 +255,7 @@ class RevenueMgmt:
                   with self.db.connect() as con:
                         cursor = con.cursor()
                         areas = areas_promo.split(', ')
-
+                        
                         cursor.execute(''' SELECT date, end_date FROM promos WHERE id = %s''', (id,))
                         promo_data = cursor.fetchone()
 
@@ -283,16 +283,15 @@ class RevenueMgmt:
                                           for are in accomodations:
                                                 name = are.split(' ')[0].strip()
                                                 promo_area = area.split(' ')[0].strip()
-
+                                                
                                                 if name in promo_area:
                                                       area_under_promo.append(are)
-                                          print(area_under_promo)
+
                                           if len(area_under_promo) > 0:
                                                 cursor.execute(''' UPDATE bookings SET  promo  = %s, promo_area = %s WHERE booking_id = %s ''', 
                                                 ('No promo.', 'No accomodations under promo.', bid))
                                                 con.commit()
 
-                                          print(bid)
                                           self.reservation_model.update_reservation_date(bid, str(data.get('check_in')), str(data.get('check_out')), data.get('booking_type'))
                         else:
                               print('promo not today')

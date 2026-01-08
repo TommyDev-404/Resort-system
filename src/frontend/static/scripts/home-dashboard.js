@@ -24,74 +24,77 @@ const observers = new MutationObserver(() => {
             hrevenueChartD.destroy();
       }
 
-
       drawOccupancyPercentage();
-      drawMonthlyBookings();
-      drawBookingTypeDistribution();
-      drawRevenueTrend();
+      drawDashboardTrends();
 });
 
 observers.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
 // --------------------------- HELPER ------------------------
-async function drawOccupancyPercentage(){
-      // Current occupancy
-      const response = await fetch('/occupancy', {method: "GET"});
-      const res = await response.json();
-
-      document.getElementById('total-avl-rooms').textContent = res.total_room;
-      const occupancyValue = res.occupancy; // target percentage
-      
-      // Plugin to draw animated center text
+function drawOccupancyPercentage(occupancyValue) {
+      // Center text plugin (for half doughnut)
       const centerTextPlugin = {
             id: 'centerText',
             afterDraw(chart) {
-                  const { ctx, chartArea: { width, height } } = chart;
+                  const { ctx, chartArea } = chart;
+                  if (!chartArea) return;
+            
+                  const centerX = (chartArea.left + chartArea.right) / 2;
+                  const centerY = chartArea.bottom - 12; // lower center for half arc
+
                   ctx.save();
-                  ctx.font = 'bold 28px sans-serif';
-                  ctx.fillStyle = '#3b82f6';
+                  // Base settings
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'middle';
-      
-                  // Get the value of the first slice (animated automatically)
-                  const value = chart.data.datasets[0].data[0];
-                  ctx.fillText(Math.round(value) + '%', width / 2, height / 2);
+                  // Draw the number bigger
+                  ctx.font = 'bold 28px sans-serif';
+                  ctx.fillStyle = '#3b82f6';
+                  ctx.fillText(Math.round(occupancyValue), centerX, centerY);
+                  // Draw the % smaller, slightly offset to the right
+                  ctx.font = 'bold 16px sans-serif';
+                  ctx.fillText('%', centerX + 15, centerY); // Adjust +30 for spacing
+                  
                   ctx.restore();
+                  
             }
       };
-      
-      if (occupancyChartPercentage) occupancyChartPercentage.destroy();
 
+      if (occupancyChartPercentage) {
+        occupancyChartPercentage.destroy();
+      }
+    
       const ctx = document.getElementById('occupancyChart').getContext('2d');
-            
-      // Colors based on mode
+    
       const isDarkMode = document.documentElement.classList.contains('dark');
-      const occupiedColor = isDarkMode ? '#3b82f6' : '#1e40af'; // e.g., bright blue in dark, darker in light
-      const availableColor = isDarkMode ? 'rgba(255,255,255,0.1)' : '#f3f4f6'; // subtle gray/white in light
-
+      const occupiedColor = isDarkMode ? '#22c55e' : '#16a34a'; // green
+      const availableColor = isDarkMode ? 'rgba(255,255,255,0.15)' : '#e5e7eb';
+    
       occupancyChartPercentage = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                  labels: ['Occupied', 'Available'],
-                  datasets: [{
-                        data: [occupancyValue, 100 - occupancyValue],
-                        backgroundColor: [occupiedColor, availableColor],
-                        borderWidth: 0
-                  }]
-            },
-            options: {
-                  cutout: '70%',
-                  responsive: true,
-                  animation: {
-                        duration: 2000,
-                        easing: 'easeOutCubic'
-                  },
-                  plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                  }
-            },
-            plugins: [centerTextPlugin]
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [occupancyValue, 100 - occupancyValue],
+            backgroundColor: [occupiedColor, availableColor],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          rotation: -90,        // 🔥 start from left
+          circumference: 180,   // 🔥 half circle
+          cutout: '75%',
+          radius: '95%',
+          animation: {
+            duration: 1200,
+            easing: 'easeOutCubic'
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+          }
+        },
+        plugins: [centerTextPlugin]
       });
 }
 
@@ -212,48 +215,91 @@ function resetDropdown(){
       document.getElementById('checkin-day').value = 'today';
 }
 
+function createMostBookedArea(area_name, percentage){
+      const areas = {
+            'premium': 'Premium Villa Room',
+            'standard': 'Standard Villa Room',
+            'barkada': 'Barkada Room',
+            'garden': 'Garden View Room',
+            'family': 'Family Room',
+            'cabana': 'Cabana Cottage',
+            'small': 'Small Cottage',
+            'big': 'Big Cottage'
+      };
+
+      const area_color =  {
+            'premium': 'bg-green-400',
+            'standard': 'bg-yellow-400',
+            'barkada': 'bg-blue-400',
+            'garden': 'bg-indigo-400',
+            'family': 'bg-red-400',
+            'cabana': 'bg-teal-400',
+            'small': 'bg-orange-400',
+            'big': 'bg-purple-400'
+      };
+
+      const row = `
+            <div class="flex flex-col gap-2">
+                  <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                              <span class="w-3 h-3 ${area_color[area_name]} rounded-full"></span>
+                              <p class="text-sm text-gray-800 dark:text-gray-100 font-medium">${areas[area_name]}</p>
+                        </div>
+                        <p class="text-sm dark:text-gray-400 text-black font-semibold">${percentage}%</p>
+                  </div>
+                  <div class="h-2 dark:bg-gray-700 bg-black/5 rounded-full overflow-hidden">
+                        <div class="h-2 ${area_color[area_name]} rounded-full" style="width:${percentage}%"></div>
+                  </div>
+            </div>
+      `;
+
+      document.getElementById('top-booked-area').innerHTML += row;
+}
+
 // Metric card
-async function todaysBookings() {
-      const response = await fetch('/today-bookings');
-      const res = await response.json();
-
-      updateMetric(
-            'today-checkin-guest',
-            'change-rate-checkin',
-            'change-rate-checkin-icon',
-            res.guests,
-            Number(res.change),     
-            'today-checkin-bookings',
-            res.check_in
-      );
-}
-
-async function totalGuestInHouse() {
-      const response = await fetch(`/total-guest-in-house`);
-      const res = await response.json();
-
-      updateMetric(
-            'total-guest-in-house',
-            'change-rate-guest',
-            'change-rate-guest-icon',
-            res.today,
-            Number(res.change), 
-            'guest-house-bookings',
-            res.bookings
-      );
-}
-
-async function todayProjectedRevenue() {
-      const response = await fetch('/revenue');
-      const res = await response.json();
-
-      updateMetric(
-            'total-revenue',
-            'change-rate-revenue',
-            'target-revenue-icon',
-            formatPesoShort2(Number(res.current_revenue)),
-            Number(res.change)
-      );
+async function fetchDashboardMetrics() {
+      try {
+          const response = await fetch('/dashboard-metrics'); // endpoint for the merged query
+          const res = await response.json();
+  
+          // Update Today's Check-ins
+          updateMetric(
+              'today-checkin-guest',
+              'change-rate-checkin',
+              'change-rate-checkin-icon',
+              res.today_checkin.guests,
+              Number(res.today_checkin.change),
+              'today-checkin-bookings',
+              res.today_checkin.check_in
+          );
+  
+          // Update Total Guests In-House
+          updateMetric(
+              'total-guest-in-house',
+              'change-rate-guest',
+              'change-rate-guest-icon',
+              res.total_guest_in_house.today,
+              Number(res.total_guest_in_house.change),
+              'guest-house-bookings',
+              res.total_guest_in_house.bookings
+          );
+  
+          // Update Today's Revenue
+          updateMetric(
+              'total-revenue',
+              'change-rate-revenue',
+              'target-revenue-icon',
+              formatPesoShort2(Number(res.revenue.current_revenue)),
+              Number(res.revenue.change)
+          );
+          
+          // --- Update Occupancy Chart ---
+          document.getElementById('total-avl-rooms').textContent = res.occupancy.total_room;
+          drawOccupancyPercentage(res.occupancy.occupancy);
+  
+      } catch (error) {
+          console.error("Error fetching dashboard metrics:", error);
+      }
 }
 
 export async function notifications() {
@@ -382,65 +428,6 @@ export async function notifications() {
 
 }
 
-function createMostBookedArea(area_name, percentage){
-      const areas = {
-            'premium': 'Premium Villa Room',
-            'standard': 'Standard Villa Room',
-            'barkada': 'Barkada Room',
-            'garden': 'Garden View Room',
-            'family': 'Family Room',
-            'cabana': 'Cabana Cottage',
-            'small': 'Small Cottage',
-            'big': 'Big Cottage'
-      };
-
-      const area_color =  {
-            'premium': 'bg-green-400',
-            'standard': 'bg-yellow-400',
-            'barkada': 'bg-blue-400',
-            'garden': 'bg-indigo-400',
-            'family': 'bg-red-400',
-            'cabana': 'bg-teal-400',
-            'small': 'bg-orange-400',
-            'big': 'bg-purple-400'
-      };
-
-      const row = `
-            <div class="flex flex-col gap-2">
-                  <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                              <span class="w-3 h-3 ${area_color[area_name]} rounded-full"></span>
-                              <p class="text-sm text-gray-800 dark:text-gray-100 font-medium">${areas[area_name]}</p>
-                        </div>
-                        <p class="text-sm dark:text-gray-400 text-black font-semibold">${percentage}%</p>
-                  </div>
-                  <div class="h-2 dark:bg-gray-700 bg-black/5 rounded-full overflow-hidden">
-                        <div class="h-2 ${area_color[area_name]} rounded-full" style="width:${percentage}%"></div>
-                  </div>
-            </div>
-      `;
-
-      document.getElementById('top-booked-area').innerHTML += row;
-}
-
-async function mostBookedArea() {
-      const area = document.getElementById('top-booked-area');
-      area.querySelectorAll('div').forEach(row => row.remove());
-      
-      try{
-            const response = await fetch('/top-booked-area');
-            const res = await response.json();
-            
-            if (res.success){
-                  res.data.forEach(data => {
-                        createMostBookedArea(data.area_name, data.percentage);
-                  });
-            }
-      }catch(err){
-            console.error(err);
-      }
-}
-
 // Bookings Overview
 async function bookingOverviewCardsData() {
       // total check in
@@ -471,22 +458,20 @@ async function bookingOverviewCardsData() {
       document.getElementById('total-checkout-guests').textContent = data.today_checkout_guests;
 }
 
-async function upcomingCheckouts(type) {
-      document.getElementById('upcoming-checkout-table').querySelectorAll('tbody tr').forEach(row => row.remove());
-      showLoader('checkout');
-      const response = await fetch(`/upcoming-checkout?day=${type}`, {method: "GET"});
+async function upcomingData(type, day_type) {
+      type === 'checkout' ?  document.getElementById('upcoming-checkout-table').querySelectorAll('tbody tr').forEach(row => row.remove()) : document.getElementById('upcoming-arrival-table').querySelectorAll('tbody tr').forEach(row => row.remove());
+
+      const response = await fetch(`/upcoming-bookings?book_type=${type}&day=${day_type}`);
       const res = await response.json();
-      
+
       if (res.success){
             hideLoader();
             res.data.forEach(guest => {
-                  const date = new Date(guest.check_out).toISOString().split('T')[0];
-                  const date2 = new Date(guest.check_in).toISOString().split('T')[0];
-                  const check_out = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                  const check_in = new Date(date2).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  const check_out = new Date(guest.check_out).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                  const check_in = new Date(guest.check_in).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
                   const row = `
-                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
+                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition py-2">
                               <td class="px-3 py-2 text-center">
                                     <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
                                           ${guest.name}
@@ -510,79 +495,90 @@ async function upcomingCheckouts(type) {
                               <td class="px-3 py-2 text-center">${guest.total_guest}</td>
                         </tr>
                   `;
-
-                  document.getElementById('upcoming-checkout-table').innerHTML += row;
+                  
+                  type === 'checkout' ? document.getElementById('upcoming-checkout-table').innerHTML += row : document.getElementById('upcoming-arrival-table').innerHTML += row;
             });
       }else{
             hideLoader();
             const empty_row = `
-                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="8" class="text-center text-gray-800 py-2 dark:text-white">No data.</td>
+                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up py-2">
+                        <td colspan="6" class="text-center text-gray-800  dark:text-white py-2 ">${type === 'checkout' ? 'No scheduled check-outs yet' : 'No scheduled arrivals yet'}.</td>
                   </tr>
             `;
-                  
-            document.getElementById('upcoming-checkout-table').innerHTML += empty_row;
+            
+            type === 'checkout' ? document.getElementById('upcoming-checkout-table').innerHTML += empty_row : document.getElementById('upcoming-arrival-table').innerHTML += empty_row;
       }
 }
 
-async function upcomingArrivals(type) {
-      document.getElementById('upcoming-arrival-table').querySelectorAll('tbody tr').forEach(row => row.remove());
-
-      showLoader('arrival');
-      const response = await fetch(`/upcoming-arrival?day=${type}`, {method: "GET"});
-      const res = await response.json();
-
-      if (res.success){
-            hideLoader();
-            res.data.forEach(guest => {
-                  const date = new Date(guest.check_out).toISOString().split('T')[0];
-                  const date2 = new Date(guest.check_in).toISOString().split('T')[0];
-                  const check_out = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                  const check_in = new Date(date2).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                  
-                  const row = `
-                        <tr class="text-gray-900 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-white/3 hover:bg-black/5 dark:hover:bg-white/5 transition">
-                              <td class="px-3 py-2 text-center">
-                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
-                                          ${guest.name}
-                                    </div>
-                              </td> 
-                              <td class="px-3 py-2 text-center">
-                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
-                                          ${guest.booking_type === 'Check-in' ? 'Room Stay' : guest.booking_type}
-                                    </div>
-                              </td>
-                              <td class="px-3 py-2 text-center">
-                                    <div class="overflow-x-auto thin-scroll whitespace-nowrap">    
-                                          ${check_in}
-                                    </div>
-                              </td>
-                              <td class="px-3 py-2 text-center ">
-                                    <div class="whitespace-nowrap">    
-                                          ${check_out}
-                                    </div>
-                              </td>
-                              <td class="px-3 py-2 text-center">${guest.total_guest}</td>
-                        </tr>
-                  `;
-                  
-                  document.getElementById('upcoming-arrival-table').innerHTML += row;
-            });
-      }else{
-            hideLoader();
-            const empty_row = `
-                  <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up">
-                        <td colspan="8" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
-                  </tr>
-            `;
-                  
-            document.getElementById('upcoming-arrival-table').innerHTML += empty_row;
+async function drawBookingStats() {
+      try {
+          const response = await fetch('/dashboard-booking-stats'); // the new merged endpoint
+          const res = await response.json();
+  
+          if (!res.success) return console.error("Failed to fetch dashboard booking stats");
+  
+          const isDark = document.documentElement.classList.contains('dark');
+  
+          // --- Draw Booking Type Distribution Pie Chart ---
+          const ctx = document.getElementById('bookingTypeChart');
+          if (bookingTypeChart) bookingTypeChart.destroy();
+  
+          bookingTypeChart = new Chart(ctx, {
+              type: 'pie',
+              data: {
+                  labels: ["Room Stay", "Day Guest"],
+                  datasets: [{
+                      data: [res.booking_type_distribution.checkin_total, res.booking_type_distribution.day_guest_total],
+                      backgroundColor: ["#3b82f6", "#eab308"]
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  plugins: {
+                      legend: {
+                          labels: {
+                              color: isDark ? "#e5e7eb" : "#1f2937",
+                              font: { size: 12 }
+                          }
+                      },
+                      tooltip: {
+                          enabled: true,
+                          backgroundColor: '#111827',
+                          titleColor: '#FBBF24',
+                          bodyColor: '#F9FAFB',
+                          borderColor: isDark ? "#374151" : "#d1d5db",
+                          borderWidth: 1,
+                          padding: 15,
+                          titleFont: { size: 20, weight: 'bold' },
+                          bodyFont: { size: 18, weight: 'bold' },
+                          callbacks: {
+                              label: function(context) {
+                                  const label = context.label || '';
+                                  const value = context.parsed;
+                                  return `${label}: ${value} Bookings`;
+                              }
+                          }
+                      }
+                  }
+              }
+          });
+  
+          // --- Draw Top Booked Areas ---
+          const areaContainer = document.getElementById('top-booked-area');
+          areaContainer.querySelectorAll('div').forEach(row => row.remove());
+  
+          res.top_booked_areas.forEach(area => {
+              createMostBookedArea(area.area_name, area.percentage);
+          });
+  
+      } catch (error) {
+          console.error("Error fetching dashboard booking stats:", error);
       }
 }
 
 // Room Overview
-async function totalOccupied() {
-      const response = await fetch('/summary-data');
+async function summaryRoomOverview() {
+      const response = await fetch('/housekeeping-metrics');
       const result = await response.json();
       document.getElementById('to-be-clean2').textContent = result.need_clean;
       document.getElementById('occupied2').textContent = result.occupied;
@@ -594,7 +590,7 @@ async function roomsData() {
 
       const response = await fetch('/availables', {method: "GET"});
       const res = await response.json();
-      console.log(res);
+
       const totalHallRooms =
             Number(res.data[7].total_rooms) +
             Number(res.data[8].total_rooms) +
@@ -796,210 +792,131 @@ async function roomsData() {
       document.getElementById('rooms-data').innerHTML += rooms;
 }
 
-async function drawMonthlyBookings() {
-      const response = await fetch('/monthly-bookings', { method: 'GET' });
-      const res = await response.json();
-      
-      const ctx = document.getElementById('monthlyBookingsChart');
-
-      const isDark = document.documentElement.classList.contains('dark');
-
-      const textColor = isDark ? '#e5e7eb' : '#1f2937';       // light gray for dark mode
-      const gridColor = isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb';
-
-      if (monthlyBookingsChart) monthlyBookingsChart.destroy();
-
-      monthlyBookingsChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
+async function drawDashboardTrends() {
+      try {
+          const response = await fetch('/dashboard-trends', { method: 'GET' });
+          const res = await response.json();
+  
+          const isDark = document.documentElement.classList.contains('dark');
+          const textColor = isDark ? '#e5e7eb' : '#374151';
+          const gridColor = isDark ? '#4b5563' : '#e5e7eb';
+  
+          // --- Monthly Bookings Chart ---
+          const monthlyCtx = document.getElementById('monthlyBookingsChart');
+          if (monthlyBookingsChart) monthlyBookingsChart.destroy();
+  
+          monthlyBookingsChart = new Chart(monthlyCtx, {
+              type: 'bar',
+              data: {
                   labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
                   datasets: [{
-                        label: "Bookings",
-                        data: res.data.map(item => item.booking_count),
-                        backgroundColor: "#3b82f6",
-                        borderRadius: 6 // rounded bar corners
+                      label: "Bookings",
+                      data: res.monthly_bookings,
+                      backgroundColor: "#3b82f6",
+                      borderRadius: 6
                   }]
-            },
-            options: {
-                  responsive: true,
-                  maintainAspectRatio: false, // allow custom height
-                  plugins: {
-                        legend: {
-                        labels: {
-                              color: textColor
-                        }
-                        },
-                        tooltip: {
-                              backgroundColor: '#111827',
-                              titleColor: '#FBBF24',
-                              bodyColor: '#F9FAFB',
-                              borderColor: '#374151',
-                              borderWidth: 1,
-                              padding: 10,
-                              titleFont: { size: 23, weight: 'bold' },
-                              bodyFont: { size: 22 },
-                              callbacks: {
-                                    label: function(context) {
-                                          const label = context.label || '';
-                                          const value = context.parsed.y;
-                                          return `${label}: ${value} Bookings`;
-                                    }
-                              }
-                        }
-                  },
-                  scales: {
-                        y: {
-                        beginAtZero: true,
-                        ticks: {
-                              color: textColor
-                        },
-                        grid: {
-                              color: gridColor
-                        }
-                        },
-                        x: {
-                        ticks: {
-                              color: textColor
-                        },
-                        grid: {
-                              display: false
-                        }
-                        }
-                  }
-            }
-      });
-}
-
-async function drawBookingTypeDistribution() {
-      const response = await fetch('/booking-type-ditribution', { method: 'GET' });
-      const res = await response.json();
-
-      const ctx = document.getElementById('bookingTypeChart');
-      const isDark = document.documentElement.classList.contains('dark');
-
-      if (bookingTypeChart) bookingTypeChart.destroy();
-
-      bookingTypeChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                  labels: ["Room Stay", "Day Guest"],
-                  datasets: [{
-                        data: [res.data.checkin_total, res.data.day_guest_total],
-                        backgroundColor: ["#3b82f6", "#eab308"]
-                  }]
-            },
-            options: {
-                  responsive: true,
-                  plugins: {
-                        legend: {
-                        labels: {
-                              color: isDark ? "#e5e7eb" : "#1f2937", // label color here
-                              font: {
-                                    size: 12,
-                              }
-                        }
-                        },
-                        tooltip: {
-                        enabled: true,
-                        backgroundColor: '#111827',
-                        titleColor: '#FBBF24',
-                        bodyColor: '#F9FAFB',
-                        borderColor: isDark ? "#374151" : "#d1d5db",
-                        borderWidth: 1,
-                        padding: 15,
-                        titleFont: { size: 20, weight: 'bold' },
-                        bodyFont: { size: 18, weight: 'bold' },
-                        callbacks: {
-                              label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.parsed;
-                                    return `${label}: ${value} Bookings`;
-                              }
-                        }
-                        }
-                  }
-            }
-      });
-      
-}
-
-async function drawRevenueTrend() {
-      const response = await fetch('/revenue-guest-trend', { method: 'GET' });
-      const res = await response.json();
-  
-      const ctx = document.getElementById('revenueChart').getContext('2d');
-  
-      // detect dark/light mode
-      const isDark = document.documentElement.classList.contains('dark');
-      const textColor = isDark ? '#e5e7eb' : '#374151';
-      const gridColor = isDark ? '#4b5563' : '#e5e7eb';
-
-      if (hrevenueChartD) hrevenueChartD.destroy();
-
-      hrevenueChartD = new Chart(ctx, {
-            type: 'line',
-            data: {
-                  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                  datasets: [
-                        {
-                        label: 'Revenue',
-                        data: res.data.map(d => d.revenue),
-                        borderColor: 'rgba(59,130,246,1)',
-                        backgroundColor: 'rgba(59,130,246,0.2)',
-                        tension: 0.3
-                        }
-                  ]
-            },
-            options: {
+              },
+              options: {
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: {
-                        legend: {
-                        labels: { color: textColor }
-                  },
-                  tooltip: {
-                        mode: 'nearest',
-                        intersect: false,
-                        backgroundColor: '#111827',
-                        titleColor: '#FBBF24',
-                        bodyColor: '#F9FAFB',
-                        borderColor: '#374151',
-                        borderWidth: 1,
-                        padding: 20,          // bigger box
-                        titleFont: {
-                              size: 28,         // bigger title
-                              weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 26          // bigger body text
-                        },
-                        callbacks: {
+                      legend: { labels: { color: textColor } },
+                      tooltip: {
+                          backgroundColor: '#111827',
+                          titleColor: '#FBBF24',
+                          bodyColor: '#F9FAFB',
+                          borderColor: '#374151',
+                          borderWidth: 1,
+                          padding: 10,
+                          titleFont: { size: 23, weight: 'bold' },
+                          bodyFont: { size: 22 },
+                          callbacks: {
                               label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.parsed.y;
-                                    return `${label}: ${value.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })} `;
+                                  const label = context.label || '';
+                                  const value = context.parsed.y;
+                                  return `${label}: ${value} Bookings`;
                               }
-                        }
-                  }
+                          }
+                      }
                   },
                   scales: {
-                        y: {
-                        beginAtZero: true,
-                        ticks: {
-                              color: textColor
-                        },
-                        grid: { color: gridColor }
-                        },
-                        x: {
-                        ticks: {
-                              color: textColor
-                        },
-                        grid: { color: gridColor }
-                        }
+                      y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } },
+                      x: { ticks: { color: textColor }, grid: { display: false } }
                   }
-            }
-      });
-}  
+              }
+          });
+  
+          // --- Revenue / Guests / Check-in Trend Chart ---
+          const trendCtx = document.getElementById('revenueChart').getContext('2d');
+          if (hrevenueChartD) hrevenueChartD.destroy();
+  
+          hrevenueChartD = new Chart(trendCtx, {
+              type: 'line',
+              data: {
+                  labels: res.weekly_trends.map(d => new Date(d.day_date).toLocaleDateString('en-US', { weekday: 'short' })),
+                  datasets: [
+                      {
+                          label: 'Revenue',
+                          data: res.weekly_trends.map(d => d.revenue),
+                          borderColor: 'rgba(59,130,246,1)',
+                          backgroundColor: 'rgba(59,130,246,0.2)',
+                          tension: 0.3
+                      },
+                      {
+                          label: 'Guests',
+                          data: res.weekly_trends.map(d => d.guest_count),
+                          borderColor: 'rgba(16,185,129,1)', // emerald green
+                          backgroundColor: 'rgba(16,185,129,0.2)',
+                          tension: 0.3
+                      },
+                      {
+                          label: 'Check-ins',
+                          data: res.weekly_trends.map(d => d.checkin_count),
+                          borderColor: 'rgba(234,179,8,1)', // amber
+                          backgroundColor: 'rgba(234,179,8,0.2)',
+                          tension: 0.3
+                      }
+                  ]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                      legend: { labels: { color: textColor } },
+                      tooltip: {
+                          mode: 'nearest',
+                          intersect: false,
+                          backgroundColor: '#111827',
+                          titleColor: '#FBBF24',
+                          bodyColor: '#F9FAFB',
+                          borderColor: '#374151',
+                          borderWidth: 1,
+                          padding: 20,
+                          titleFont: { size: 28, weight: 'bold' },
+                          bodyFont: { size: 26 },
+                          callbacks: {
+                              label: function(context) {
+                                  const label = context.dataset.label || '';
+                                  const value = context.parsed.y;
+                                  if (label === 'Revenue') {
+                                      return `${label}: ${value.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}`;
+                                  }
+                                  return `${label}: ${value}`;
+                              }
+                          }
+                      }
+                  },
+                  scales: {
+                      y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } },
+                      x: { ticks: { color: textColor }, grid: { color: gridColor } }
+                  }
+              }
+          });
+  
+      } catch (err) {
+          console.error("Error fetching dashboard trends:", err);
+      }
+}
 
 document.addEventListener('click', (e) => {
       if (e.target.matches('#closeAlert')) document.getElementById('alertToast').classList.add('hidden');
@@ -1015,25 +932,20 @@ document.addEventListener('click', (e) => {
 
 // select tags  
 document.addEventListener('change', (e) => {
-      if (e.target.closest('#checkout-day'))  upcomingCheckouts(e.target.value);
-      if (e.target.closest('#checkin-day'))  upcomingArrivals(e.target.value);
+      if (e.target.closest('#checkout-day'))  upcomingData('checkout', e.target.value);
+      if (e.target.closest('#checkin-day'))  upcomingData('arrival', e.target.value);
 });
 
 // Initial load: ensure the default content is shown and charts are drawn
 export async function initPageDashboard() {
       allNotifications.length = 0;
       resetDropdown();
-      mostBookedArea();
-      totalGuestInHouse();
-      totalOccupied();
+      fetchDashboardMetrics();
+      summaryRoomOverview();
       roomsData();
-      upcomingArrivals('today');
-      upcomingCheckouts('today');
-      todaysBookings();
-      todayProjectedRevenue();
+      upcomingData('checkout');
+      upcomingData('arrival');
       bookingOverviewCardsData();
-      drawMonthlyBookings();
-      drawOccupancyPercentage();
-      drawBookingTypeDistribution();
-      drawRevenueTrend();
+      drawDashboardTrends();
+      drawBookingStats();
 };

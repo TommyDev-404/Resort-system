@@ -316,7 +316,7 @@ function renderUpdateStaffModal(staff_id, staff_name, position, daily_salary, av
                         
                               <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Started</label>
-                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started2" class="date-icon w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800  dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <input type="date" id="updateDateStarted" value="${date_started}" name="date_started" class="date-icon w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800  dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                               </div>
                         
                               <div>
@@ -1018,7 +1018,7 @@ async function updateStaffInfo(e){
       e.preventDefault();
       const form = new FormData(e.target);
       
-      const startDate = new Date(form.get('date_started2'));
+      const startDate = new Date(form.get('date_started'));
       if (startDate > new Date()){
             promoDateWarningMessageCard('Warning: Date started must not exceed todays date!');
             return;

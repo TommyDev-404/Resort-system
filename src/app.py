@@ -8,7 +8,7 @@ app = Flask(__name__, template_folder='frontend/template', static_folder='fronte
 app.secret_key = 'i_love_u'  # secret key
 
 # Set session lifetime
-app.permanent_session_lifetime = timedelta(minutes=15)  # 30 minutes
+app.permanent_session_lifetime = timedelta(minutes=40)  # 30 minutes
 
 # Configure cache
 app.config['CACHE_TYPE'] = 'SimpleCache'
@@ -31,13 +31,6 @@ rev = RevenueMgmt(db, alert, reserve)
 staff = Staff_Management(db, house)
 login = Login(db)
 
-# prevent going back to homepage after logout or going direct on home page without authentication
-@app.after_request
-def add_header(response):
-      response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-      response.headers["Pragma"] = "no-cache"
-      response.headers["Expires"] = "0"
-      return response
 
 # render templates
 #------------------ LOGIN ------------------#
@@ -108,125 +101,50 @@ def change_password():
 
 
 #------------------ DASHBOARD ------------------#
-@app.route('/total-guest-in-house', methods=['GET'])
-def total_guest_in_house():
-      return jsonify(dashboard.get_total_guest_house())
-
 @app.route('/bookings-overview-data', methods=['GET'])
 def checkin():
       return jsonify(dashboard.bookings_overview_cards_data())
 
-@app.route('/today-bookings', methods=['GET'])
-def bookings():
-      return jsonify(dashboard.today_bookings())
+@app.route('/dashboard-booking-stats', methods=['GET'])
+def dashboard_bookings_stats():
+      return jsonify(dashboard.dashboard_booking_stats())
 
-@app.route('/occupancy', methods=['GET'])
-def occupancy():
-      return jsonify(dashboard.occupancy())
-
-@app.route('/revenue', methods=['GET'])
-def revenue():
-      return jsonify(dashboard.revenue_today())
-
-@app.route('/heavy-guest-month', methods=['GET'])
-def heavy_month():
-      return jsonify(dashboard.heavy_guest_month())
-
-@app.route('/most-booked-area', methods=['GET'])
-def most_booked_area():
-      return jsonify(dashboard.most_booked_area())
-
-@app.route('/top-booked-area', methods=['GET'])
-def top_booked_area():
-      return jsonify(dashboard.top_most_booked_area())
-
-@app.route('/upcoming-checkout', methods=['GET'])
-def upcoming_checkout():
-      return jsonify(dashboard.upcoming_checkouts(request.args.get('day')))
-
-@app.route('/upcoming-arrival', methods=['GET'])
-def upcoming_arrival():
-      return jsonify(dashboard.upcoming_arrival(request.args.get('day')))
+@app.route('/upcoming-bookings', methods=['GET'])
+def upcoming_bookings():
+      return jsonify(dashboard.upcoming_bookings(request.args.get('book_type'), request.args.get('day')))
 
 @app.route('/upcoming-count', methods=['GET'])
 def upcoming_count():
       return jsonify(dashboard.upcoming_count())
 
-@app.route('/occupied-room', methods=['GET'])
-def occupied_room():
-      return jsonify(dashboard.occupied_room())
+@app.route('/dashboard-metrics', methods=['GET'])
+def dashboar_metrics():
+      return jsonify(dashboard.dashboard_metrics())
 
-@app.route('/monthly-bookings', methods=['GET'])
-def monthly_bookings():
-      return jsonify(dashboard.monthly_bookings_data())
-
-@app.route('/booking-type-ditribution', methods=['GET'])
-def booking_type_distro():
-      return jsonify(dashboard.booking_type_distro())
-
-@app.route('/revenue-guest-trend', methods=['GET'])
-def revenue_guest_trend():
-      return jsonify(dashboard.revenue_guest_trend_data())
+@app.route('/dashboard-trends', methods=['GET'])
+def dashboar_trends():
+      return jsonify(dashboard.dashboard_trends())
 
 
 #----------------- ANALYTICS ------------------#
-@app.route('/occupancy-forecast', methods=['GET'])
-def occupancy_all():
-      return jsonify(analytics.forecast_occupancy())
+@app.route('/analytics-metrics', methods=['GET'])
+def analytics_metrics():
+      return jsonify(analytics.analytics_metrics(request.args.get('accomodation_type')))
 
-@app.route('/mtd-occupancy-all', methods=['GET'])
-def mtd_occupancy_all():
-      return jsonify(analytics.get_occupancy())
+@app.route('/forecast-checkin-revenue', methods=['GET'])
+def forecast_checkin_revene():
+      return jsonify(analytics.forecast_checkin_revenue(request.args.get('accomodation_type')))
 
-@app.route('/mtd-occupancy-type', methods=['GET'])
-def mtd_occupancy_type():
-      return jsonify(analytics.get_occupancy(request.args.get('accomodation_type')))
-
-@app.route('/daily-revenue-all', methods=['GET'])
-def daily_revenue_all():
-      return jsonify(analytics.daily_revenue())
-
-@app.route('/daily-revenue-type', methods=['GET'])
-def daily_revenue_type():
-      return jsonify(analytics.daily_revenue(request.args.get('accomodation_type')))
-
-@app.route('/monthly-revenue-all', methods=['GET'])
-def monthly_all():
-      return jsonify(analytics.monthly_revenue())
-
-@app.route('/monthly-revenue-type', methods=['GET'])
-def monthly_revenuetype():
-      return jsonify(analytics.monthly_revenue(request.args.get('accomodation_type')))
-
-@app.route('/checkin-forecast-all', methods=['GET'])
-def occupancy_forecast():
-      return jsonify(analytics.forecast_checkin())
-
-@app.route('/checkin-forecast-type', methods=['GET'])
-def occupancy_forecast_type():
-      return jsonify(analytics.forecast_checkin(request.args.get('accomodation_type')))
-
-@app.route('/revenue-forecast-all', methods=['GET'])
-def revenue_forecast():
-      return jsonify(analytics.forecasted_revenue())
-
-@app.route('/revenue-forecast-type', methods=['GET'])
-def revenue_forecast_type():
-      return jsonify(analytics.forecasted_revenue(request.args.get('accomodation_type')))
-
-@app.route('/target-revenue', methods=['GET'])
-def target_revenue():
-      return jsonify(analytics.get_target_revenue())
-
-@app.route('/target-revenue-type', methods=['GET'])
-def target_revenue_type():
-      return jsonify(analytics.get_target_revenue(request.args.get('accomodation_type')))
+@app.route('/analytics-stats', methods=['GET'])
+def analytics_stats():
+      return jsonify(analytics.analytics_stats())
 
 
 
 #--------------- ALL RESERVATION ------------------#
 @app.route('/avl-spaces', methods=['GET'])
 def avl_spaces():
+      dashboard.rebuild_dashboard_cache()
       return jsonify(reserve.get_avl_spaces())
 
 @app.route('/summary-cards-data', methods=['GET'])
@@ -315,25 +233,21 @@ def search_guest_year():
 
 
 #--------------- HOUSEKEEPING ------------------#
-@app.route('/summary-data', methods=['GET'])
-def summary_data():
-      return jsonify(house.total_data())
+@app.route('/housekeeping-metrics', methods=['GET'])
+def housekeeping_metrics():
+      return jsonify(house.housekeeping_metrics())
 
-@app.route('/area-data', methods=['GET'])
-def area_data():
-      return jsonify(house.get_area_data(request.args.get('accomodation')))
+@app.route('/area-details', methods=['GET'])
+def area_details():
+      return jsonify(house.area_details(request.args.get('accomodation')))
 
-@app.route('/total-area-data', methods=['GET'])
-def total_area_data():
-      return jsonify(house.total_area_data())
+@app.route('/area-status', methods=['GET'])
+def housekeeping_area_status():
+      return jsonify(house.housekeeping_area_status())
 
 @app.route('/assign-cleaner', methods=['POST'])
 def assign_cleaner():
       return jsonify(house.assign_cleaner(**request.get_json()))
-
-@app.route('/reassign-cleaner', methods=['POST'])
-def reassign_cleaner():
-      return jsonify(house.reassign_cleaner(request.args.get('name'), request.args.get('role'), request.args.get('date'), request.args.get('room_no'), request.args.get('area_name')))
 
 @app.route('/update-area-condition', methods=['POST'])
 def update_area_condition():
@@ -362,7 +276,7 @@ def update_price():
       return jsonify(avl.update_price(request.args.get('price'), request.args.get('name')))
 
 
-#--------------- RATES AND AVAILABILITY ------------------#
+#--------------- ACCOUNTING ------------------#
 @app.route('/accounting-data', methods=['GET'])
 def accounting_data():
       return jsonify(acc.get_current_payment_data())
@@ -503,3 +417,4 @@ def admin_profile():
 def logout():
       session.clear()
       return redirect(url_for('login_page'))
+

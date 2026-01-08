@@ -3,9 +3,11 @@ import { successToast, failedToast } from "./helper.js";
 
 // ----------------- HELPERS ----------------- //
 function openUpdateAreaModal(e) {
-      const row = e.target.closest('tr'); // get the row
-      const cells = row.querySelectorAll('td'); // get all td in that row
-
+      const row = e.target.closest('li.room-card'); // find the clicked li
+      const area_name = row.dataset.area;       // get the data-area-name value
+      const rate = row.dataset.rate;               // get the data-rate value
+      const isDiscounted = row.dataset.discount === 'null' ? false : true;               // get the data-rate value
+      
       const modal2 = `
             <div id="update-area-modal" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
                   <div class="bg-card-bg dark:bg-gray-900 w-full max-w-[500px] rounded-lg shadow-2xl px-6 py-6 relative fade-in-up">
@@ -25,16 +27,16 @@ function openUpdateAreaModal(e) {
                         <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-5 text-center flex items-center justify-center gap-2 mt-4">Update Price</h3>
                         <form id="updateAreaForm">
                               <div class="w-full mb-6 flex flex-col gap-2">
-                                    <input type="hidden" name="area-name-update" value="${cells[0].textContent.trim()}">
-                                    <input type="number" name="update-price" placeholder="Price (₱)" required class="w-full p-2 border rounded text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800" value="${parseInt(cells[2].textContent.split('.')[0].replace(/[^0-9]/g, ""))}">
+                                    <input type="hidden" name="area-name-update" value="${area_name.trim()}">
+                                    <input type="number" name="update-price" placeholder="Price (₱)" required class="w-full p-2 border rounded text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800" value="${parseInt(rate.split('.')[0].replace(/[^0-9]/g, ""))}">
                                     <button type="submit" class="px-5 py-2 mt-8 bg-primary-blue dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"><i class="fas fa-paper-plane mr-1"></i> Update</button>
                               </div>
                         </form>
                   </div>
             </div>
       `;
-
-      document.getElementById('ratesAvailabilityPortal').innerHTML += cells[0].textContent.split('-').length > 1 ? modal2 : modal;
+      
+      document.getElementById('ratesAvailabilityPortal').innerHTML += isDiscounted ? modal2 : modal;
       lucide.createIcons();
 }
 
@@ -100,30 +102,54 @@ async function renderTable() {
       const bodyHtml = rows.map(row => {
             const { name, capacity } = areaTypeInfo(row.room_type);
             return `
-                  <tr class="fade-in-up text-gray-900 bg-gray-50 dark:bg-white/3 dark:text-gray-100 border-b border-gray-300 dark:border-gray-700 hover:bg-black/5 dark:hover:bg-white/5 transition-all">
-                        <td class="px-6 py-4 text-center font-semibold flex flex-col justify-center items-center gap-1 min-w-[450px] whitespace-nowrap">
-                              ${row.area_condition ? `<span class="text-[12px] font-medium text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-800 px-2 py-0.5 rounded-full">${row.promo_name}</span>` : ''}
-                              ${name}
-                        </td>
-                        <td class="px-6 py-4 text-center font-bold text-lg text-primary-blue min-w-[80px] whitespace-nowrap">${capacity}</td>
-                        <td class="px-6 py-4 text-center flex flex-col items-center justify-center gap-1 min-w-[250px] whitespace-nowrap">
-                              ${row.area_condition 
-                                    ? `<div class="flex flex-col items-center gap-1">
-                                          <span class="line-through text-red-500 font-light text-sm">₱${row.orig_rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                          <span class="text-green-600 dark:text-green-500 font-semibold text-lg">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                          <span class="text-xs text-gray-500 dark:text-gray-400">Promo Applied</span>
-                                    </div>` 
-                                    : `<span class="text-gray-800 dark:text-gray-200">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
-                              }
-                        </td>
-                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap">${row.total_rooms}</td>
-                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-red-500">${row.today_avail}</span></td>
-                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-red-500">${row.occupied}</span></td>
-                        <td class="px-6 py-4 text-center min-w-[80px] whitespace-nowrap"><span class="font-bold text-lg text-green-500">${row.reserve}</span></td>
-                        <td class="px-6 py-4 min-w-[100px] whitespace-nowrap">
-                              <button class="update-btn text-sm text-white bg-blue-500 py-2 px-4 rounded-sm flex gap-2 items-center justify-center hover:bg-blue-600 transition-colors" id="${row.room_type}"><i data-lucide="edit" class="text-lg"></i>Update Price</button>
-                        </td>
-            </tr>
+                  <li data-area="${name}" data-rate="${row.area_condition ? row.rate : row.orig_rate}" data-discount="${row.area_condition}"  class="room-card bg-gray-50 dark:bg-white/5 shadow-lg border border-gray-200 dark:border-gray-700 rounded-xl p-5 flex flex-col justify-between hover:shadow-2xl hover:scale-[1.02] transition-transform duration-200 list-none">
+                  <!-- Header: Room Name + Promo -->
+                  <div class="flex justify-between items-start mb-3">
+                  <div class="flex flex-col gap-1">
+                        ${row.area_condition ? `<span class="text-[12px] font-medium text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-800 px-2 py-0.5 rounded-full">${row.promo_name}</span>` : ''}
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100" >${name}</h4>
+                  </div>
+                  <span class="text-sm font-medium text-primary-blue dark:text-blue-400">Capacity: ${capacity}</span>
+                  </div>
+            
+                  <!-- Rate Info -->
+                  <div  class="mb-3">
+                  ${row.area_condition 
+                        ? `<div class="flex flex-col items-start gap-1">
+                              <span class="line-through text-red-500 font-light text-sm">₱${row.orig_rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              <span class="text-green-600 dark:text-green-500 font-semibold text-lg">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              <span class="text-xs text-gray-500 dark:text-gray-400">Promo Applied</span>
+                        </div>` 
+                        : `<span class="text-gray-800 dark:text-gray-200 font-semibold text-lg">₱${row.rate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
+                  }
+                  </div>
+            
+                  <!-- Room Stats -->
+                  <div class="grid grid-cols-4 gap-3 mb-3 text-center">
+                  <div>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Total Rooms</span>
+                        <span class="block font-bold text-lg text-gray-800 dark:text-gray-200">${row.total_rooms}</span>
+                  </div>
+                  <div>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Available Today</span>
+                        <span class="block font-bold text-lg text-red-500">${row.today_avail}</span>
+                  </div>
+                  <div>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Occupied</span>
+                        <span class="block font-bold text-lg text-red-500">${row.occupied}</span>
+                  </div>
+                  <div>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Reserved</span>
+                        <span class="block font-bold text-lg text-green-500">${row.reserve}</span>
+                  </div>
+                  </div>
+            
+                  <!-- Action Button -->
+                  <button class="update-btn mt-2 w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-2 px-4 rounded-md flex items-center justify-center gap-2 transition-colors">
+                  <i data-lucide="edit" class="text-lg"></i>
+                  Update Price
+                  </button>
+            </li>
             `;
       }).join('');
 

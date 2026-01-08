@@ -18,84 +18,103 @@ function createTable(id, guest_name, date_book2, check_in, check_out, stay_count
       const formattedCheckout = new Date(check_out).toISOString().split('T')[0];
 
       const row = `
-            <tr class="text-[16px] hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up bg-gray-50 dark:bg-gray-900" id="${id}" data-set="${accomodations}" data-type="${booking_type}" data-status="${status}"  data-checkin="${formattedCheckin}" data-checkout="${formattedCheckout}" data-date_book="${formattedDatebook}">
-                  <!-- SELECT -->
-                  <td class="px-3 py-4 w-[70px] text-center">
-                        <label class="flex items-center justify-center gap-2 cursor-pointer select-none">
-                              <input type="checkbox" name="select" class="timeout-checkbox hidden peer">
-                              <span class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition">
-                              <i data-lucide="check" class="check-icon w-4 h-4 text-transparent"></i>
-                              </span>
-                        </label>
-                  </td>
+            <tr
+            id="${id}"
+            data-set="${accomodations}"
+            data-type="${booking_type}"
+            data-status="${status}"
+            data-checkin="${formattedCheckin}"
+            data-checkout="${formattedCheckout}"
+            data-date_book="${formattedDatebook}"
+            class="group text-[15px] bg-white dark:bg-gray-900 hover:bg-blue-50/40 dark:hover:bg-white/5 transition-all border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-100 fade-in-up"
+            >
 
-                  <!-- TRAVELER -->
-                  <td class="px-3 py-4 text-center">
-                        <div class="block w-[180px] mx-auto overflow-x-auto whitespace-nowrap truncate">
-                              <span class="font-medium">${guest_name}</span>
-                        </div>
-                  </td>
+            <!-- SELECT -->
+            <td class="px-3 py-4 w-[70px] text-center"> <label class="flex items-center justify-center gap-2 cursor-pointer select-none"> <input type="checkbox" name="select" class="timeout-checkbox hidden peer"> <span class="w-6 h-6 flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition"> <i data-lucide="check" class="check-icon w-4 h-4 text-transparent"></i> </span> </label> </td>
 
-                  <!-- BOOKING DATE -->
-                  <td class="px-3 py-4 text-center">
-                        <div class="block w-[150px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
-                              <span class="text-gray-700 dark:text-gray-100">${date_book}</span>
-                        </div>
-                  </td>
+            <!-- GUEST -->
+            <td class="px-4 py-4 text-center">
+            <div class="max-w-[180px] mx-auto truncate">
+                  <span class="font-semibold text-gray-800 dark:text-white">
+                  ${guest_name}
+                  </span>
+            </div>
+            </td>
 
-                  <td class="px-3 py-4 text-center">
-                        <div class="block w-[220px] mx-auto overflow-x-auto whitespace-nowrap thin-scroll">
-                              <span class="text-gray-700 dark:text-gray-100">
-                              ${checkin} - ${checkout}
-                              <label class="text-gray-500 dark:text-gray-200 text-xs">
-                                    ${stay_count > 0 ? `(${stay_count} Nights)` : ''}
-                              </label>
-                              </span>
-                        </div>
-                  </td>
+            <!-- BOOKED DATE -->
+            <td class="px-4 py-4 text-center">
+            <span class="text-sm text-gray-600 dark:text-gray-300">
+                  ${date_book}
+            </span>
+            </td>
 
-                  <!-- ACCOMMODATIONS -->
-                  <td class="px-3 py-4 text-center">
-                        <div class="block w-[280px] truncate">
-                              <span>${accomodations.split(',').map(accs => accs.trim()).join(', ')}</span>
-                        </div>
-                  </td>
-                  
-                  <td class="px-3 py-4">
-                        <div class="w-[90px] truncate text-center mx-auto">
-                              <span>${booking_type === 'Check-in' ? 'Room Stay' : booking_type}</span>
-                        </div>
-                  </td>
+            <!-- STAY RANGE -->
+            <td class="px-4 py-4 text-center">
+            <div class="text-sm text-gray-700 dark:text-gray-200">
+                  <span>${checkin} → ${checkout}</span>
+                  ${stay_count > 0 ? `
+                  <div class="text-xs text-gray-500 dark:text-gray-400">
+                  (${stay_count} night${stay_count > 1 ? 's' : ''})
+                  </div>
+                  ` : ''}
+            </div>
+            </td>
 
-                  <!-- STATUS -->
-                  <td class="px-3 py-4 text-center">
-                        <div class="block w-[140px]">
-                              <span class="px-3 py-1 text-xs rounded-full
-                              ${status === 'Reserved' ? 'text-green-700 bg-green-100 dark:text-white dark:bg-green-500'
-                              : status === 'Cancelled' ? 'text-red-700 bg-red-100 dark:text-white dark:bg-red-500'
-                              : status === 'Checked-out' ? 'text-rose-600 bg-rose-100 dark:text-white dark:bg-rose-500'
-                              : 'text-blue-700 bg-blue-100 dark:text-white dark:bg-blue-500'}">
-                              ${status}
-                              </span>
-                        </div>
-                  </td>
+            <!-- ACCOMMODATIONS -->
+            <td class="px-4 py-4 text-center">
+            <div class="max-w-[280px] mx-auto truncate text-sm">
+                  ${accomodations.split(',').map(a => a.trim()).join(', ')}
+            </div>
+            </td>
 
-                  <!-- PAYMENT -->
-                  <td class="px-3 py-4 text-center">
-                        <div class="w-[200px] mx-auto">
-                              <span class=" px-3 py-1 text-xs rounded-full dark:text-white">
-                              ${payment_status}
-                              </span>
-                        </div>
-                  </td>
+            <!-- TYPE -->
+            <td class="px-4 py-4 text-center">
+            <span class="text-sm font-medium">
+                  ${booking_type === 'Check-in' ? 'Room Stay' : booking_type}
+            </span>
+            </td>
 
-                  <!-- ACTION -->
-                  <td class="px-3 py-4 w-full flex items-center justify-center">
-                        <button id="view-full-info" 
-                              class="text-[14px] bg-blue-700 dark:bg-blue-500 hover:bg-blue-600 p-2 rounded-lg text-white flex items-center justify-center gap-1 cursor-pointer">
-                              <i data-lucide="eye" class="w-5 h-5"></i>
-                        </button>
-                  </td>
+            <!-- STATUS -->
+            <td class="px-4 py-4 text-center">
+            <span
+                  class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full
+                  ${status === 'Reserved'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-500 dark:text-white'
+                  : status === 'Cancelled'
+                  ? 'bg-red-100 text-red-700 dark:bg-red-500 dark:text-white'
+                  : status === 'Checked-out'
+                  ? 'bg-rose-100 text-rose-600 dark:bg-rose-500 dark:text-white'
+                  : 'bg-blue-100 text-blue-700 dark:bg-blue-500 dark:text-white'}">
+                  ${status}
+            </span>
+            </td>
+
+            <!-- PAYMENT -->
+            <td class="px-4 py-4 text-center">
+            <span class="inline-flex px-3 py-1 text-xs rounded-full
+            ${payment_status === 'Direct Payment' 
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-500 dark:text-white'
+                  : payment_status === 'ZUZU (Online Payment)' 
+                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-500 dark:text-white'
+                  : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500 dark:text-white'}"
+            >
+            ${payment_status}
+            </span>
+            </td>
+
+            <!-- ACTION -->
+            <td class="px-4 py-4 text-center">
+            <button
+                  id="view-full-info"
+                  class="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg
+                        bg-blue-600 hover:bg-blue-700 text-white transition
+                        opacity-90 group-hover:opacity-100"
+            >
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                  <span class="hidden lg:inline">View</span>
+            </button>
+            </td>
+
             </tr>
       `;
 
@@ -149,7 +168,7 @@ function renderAddBookingModal(){
                                                 <input type="date" name="book_date" class="w-full border date-icon border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                           </div>
                                           <div>
-                                                <label class="text-gray-600 dark:text-gray-200 text-xs mb-1 block">Check-In Date</label>
+                                                <label class="checkin_label text-gray-600 dark:text-gray-200 text-xs mb-1 block">Check-In Date</label>
                                                 <input type="date" name="checkin" class="w-full border date-icon border-gray-300 dark:text-white text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 p-2 rounded-md transition-all" required>
                                           </div>
                                           <div>
@@ -261,33 +280,59 @@ function renderAddBookingModal(){
 
 function renderEditReservedModal(id, check_in, check_out, booking_type, booking_status, date_book){
       if (booking_status === 'Reserved'){
-            const modal = `
-                  <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
-                        <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
-                              <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-reservation-overlay">&times;</span>
-                              <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Update Booking Schedule</h2>
-                              <form id="update-reserved-form">
-                                    <div class="flex flex-col gap-6 mt-2">
-                                          <input type="hidden" name="id" value="${id}">
-                                          <input type="hidden" name="type" value="${booking_type}">
-                                          <input type="hidden" name="status" value="${booking_status}">
-                                          <input type="hidden" name="date_book" value="${date_book}">
-                                          <div class="flex flex-col gap1 text-gray-600 dark:text-gray-200">
-                                                Edit Check-In:
-                                                <input type="date" name="edit_checkin" class="border border-gray-300 text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_in}">
+            if (booking_type === 'Day Guest'){
+                  const modal = `
+                        <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
+                              <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
+                                    <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-reservation-overlay">&times;</span>
+                                    <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Update Booking Schedule</h2>
+                                    <form id="update-reserved-form">
+                                          <div class="flex flex-col gap-6 mt-2">
+                                                <input type="hidden" name="id" value="${id}">
+                                                <input type="hidden" name="type" value="${booking_type}">
+                                                <input type="hidden" name="edit_checkin" value="${check_in}">
+
+                                                <div class="flex flex-col gap1  text-gray-600 dark:text-gray-200">
+                                                      Edit Check-out:
+                                                      <input type="date" name="edit_checkout" class="border border-gray-300  text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_out}">
+                                                </div>
+                                                <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Update</button>      
                                           </div>
-                                          <div class="flex flex-col gap1  text-gray-600 dark:text-gray-200">
-                                                Edit Check-out:
-                                                <input type="date" name="edit_checkout" class="border border-gray-300  text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_out}">
-                                          </div>
-                                          <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Update</button>      
-                                    </div>
-                              </form>
-                        </div>
+                                    </form>
+                              </div>
                   </div>
             `;
-            
+
             document.getElementById('reservationPortal').innerHTML += modal; 
+            }else{
+                  const modal = `
+                        <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
+                              <div class="relative top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-[500px] px-6 py-4 fade-in-up">
+                                    <span class="font-semibold text-[25px] flex justify-end cursor-pointer text-gray-900 dark:text-gray-200" id="close-reservation-overlay">&times;</span>
+                                    <h2 class="text-gray-500 dark:text-gray-100 text-center font-bold text-[20px]">Update Booking Schedule</h2>
+                                    <form id="update-reserved-form">
+                                          <div class="flex flex-col gap-6 mt-2">
+                                                <input type="hidden" name="id" value="${id}">
+                                                <input type="hidden" name="type" value="${booking_type}">
+                                                <input type="hidden" name="status" value="${booking_status}">
+                                                <input type="hidden" name="date_book" value="${date_book}">
+                                                <div class="flex flex-col gap1 text-gray-600 dark:text-gray-200">
+                                                      Edit Check-In:
+                                                      <input type="date" name="edit_checkin" class="border border-gray-300 text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_in}">
+                                                </div>
+                                                <div class="flex flex-col gap1  text-gray-600 dark:text-gray-200">
+                                                      Edit Check-out:
+                                                      <input type="date" name="edit_checkout" class="border border-gray-300  text-gray-600 dark:text-gray-100 p-4 rounded-sm date-icon" value="${check_out}">
+                                                </div>
+                                                <button type="submit" class="bg-primary-blue hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-sm text-white py-2 px-[50px] text-center">Update</button>      
+                                          </div>
+                                    </form>
+                              </div>
+                        </div>
+                  `;
+                  
+                  document.getElementById('reservationPortal').innerHTML += modal; 
+            }
       }else{
             const modal = `
                         <div class="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-50" id="update-reservation-overlay">
@@ -372,6 +417,23 @@ function showAccomodationAvlForm(e) {
       if (!card) return;    // Click was outside cards
 
       const section = card.dataset.section;
+      
+      if (section === 'Hall') {
+            const halls = ['Pavillion', 'Mariposa', 'Minicon'];
+            const hasAvailableHall = halls.some(hall => roomCache[hall]);
+      
+            if (!hasAvailableHall) {
+                  promoDateWarningMessageCard('No hall available!');
+                  return;
+            }
+      }else{
+            if (roomCache[section.split(' ')[0]] === undefined){
+                  promoDateWarningMessageCard('No available!') ;
+                  return;
+            }
+      }
+      
+
       document.getElementById('accomodation_label').textContent = `${section} Available's`;
       document.querySelector(".accomodation-avl-overlay").classList.remove("hidden");
       
@@ -384,7 +446,6 @@ function saveAccomodationRoom(){
       if (checked.length > 0){
             checked.forEach(cb => {
                   if (!savedAccomodations.includes(cb.value) && cb.value !== 'on'){
-                        console.log(cb.value);
                         savedAccomodations.push(cb.value);
                         const tag = `<label class="h-10 bg-green-500 hover:bg-green-600 px-2 py-1 rounded-lg inline-flex justify-between items-center gap-2 text-white text-sm font-medium shadow-sm transition" id="${cb.value.split(' ').join('-')}"> ${cb.value} <span class="remove-btn text-lg font-bold cursor-pointer"  data-acc="${cb.value}">&times;</span></label>`;
                         document.querySelector("#selected-accomodations").innerHTML += tag;
@@ -408,21 +469,43 @@ function resetDropDown(){
       recentBookings(); 
 }
 
-function switchTabs(){
+function switchTabs() {
       const tabs = document.querySelectorAll(".tab-item");
-      const content = document.getElementById("tab-content");
 
       tabs.forEach(tab => {
             tab.addEventListener("click", () => {
-                  // Reset all tabs to gray
+
+                  // Reset all tabs
                   tabs.forEach(t => {
-                        t.classList.remove("text-blue-500", "border-blue-500", "bg-black/10", "dark:bg-white/10", "rounded-t-sm");
-                        t.classList.add("text-gray-600", "border-gray-300");
+                        t.classList.remove(
+                              "text-blue-500",
+                              "border-blue-500",
+                              "bg-white",
+                              "dark:bg-gray-900",
+                              "font-medium"
+                        );
+
+                        t.classList.add(
+                              "text-gray-600",
+                              "dark:text-gray-300",
+                              "border-transparent"
+                        );
                   });
 
-                  // Activate the clicked tab
-                  tab.classList.add("text-blue-500", "border-blue-500", "bg-black/10", "dark:bg-white/10", "rounded-t-sm");
-                  tab.classList.remove("text-gray-600", "border-gray-300");
+                  // Activate clicked tab
+                  tab.classList.add(
+                        "text-blue-500",
+                        "border-blue-500",
+                        "bg-white",
+                        "dark:bg-gray-900",
+                        "font-medium"
+                  );
+
+                  tab.classList.remove(
+                        "text-gray-600",
+                        "dark:text-gray-300",
+                        "border-transparent"
+                  );
             });
       });
 }
@@ -475,9 +558,10 @@ function enableActionBtns(e){
             
             // --- Apply your conditions
             allBtns.forEach(btn => {
-                  const date = tr.querySelectorAll('td')[3].textContent.split('-');
+                  const date = tr.querySelectorAll('td')[3].textContent.split('→');
                   const year = document.getElementById('yearSelect').value;
                   const reservationDate = new Date(`${date[0]}${year}`);
+                  console.log(date[0]), date[1]
                   const checkoutDate = new Date(`${date[1]}${year}`);
                   const todayDate = new Date();
 
@@ -521,6 +605,7 @@ function enableActionBtns(e){
                               }
 
                               if (status === 'Checked-in'){
+                                    console.log(checkoutDate)
                                     if (checkoutDate <= todayDate && btn.getAttribute('id') !== 'mark-checkin' && btn.getAttribute('id') !== 'mark-paid' && btn.getAttribute('id') !== 'cancel-bookings') {
                                           btn.style.opacity = '1';
                                           btn.style.pointerEvents = 'auto';
@@ -627,10 +712,13 @@ function showAccomodationBasedOnBookingType(e){
       const selectedBookingType = e.target.value;
       const dateInput = document.querySelector('input[name="checkout"]'); // select the input
       const dateLabel = document.querySelector('.checkout_label');
+      const dateLabelCheckin = document.querySelector('.checkin_label');
 
       if (selectedBookingType === 'Day Guest') {
             dateInput.disabled = true; // disables the input
             dateInput.classList.add('opacity-20', 'cursor-not-allowed'); // optional styling
+            dateInput.value = '';
+            dateLabelCheckin.textContent = 'Check-In & Check-Out Date';
             dateLabel.classList.remove('text-gray-600', 'dark:text-gray-200');
             dateLabel.classList.add('text-gray-200', 'dark:text-gray-600');
 
@@ -654,6 +742,7 @@ function showAccomodationBasedOnBookingType(e){
             });
             
             dateInput.disabled = false; // enables the input
+            dateLabelCheckin.textContent = 'Check-In Date';
             dateInput.classList.remove('opacity-20', 'cursor-not-allowed');
             dateLabel.classList.remove('text-gray-200', 'dark:text-gray-600');
             dateLabel.classList.add('text-gray-600', 'dark:text-gray-200');
@@ -669,6 +758,7 @@ function showPaymentDate(e){
       if (selectedPaymentType === 'Pending') {
             dateInput.disabled = true; // disables the input
             dateInput.classList.add('opacity-20', 'cursor-not-allowed'); // optional styling
+            dateInput.value = '';
             dateLabel.classList.remove('text-gray-600', 'dark:text-gray-200');
             dateLabel.classList.add('text-gray-200', 'dark:text-gray-600');
       } else {
@@ -687,6 +777,7 @@ function showBookingDate(e){
 
       if (selectedBookingType !== 'Reserved') {
             dateInput.disabled = true; // disables the input
+            dateInput.value = '';
             dateInput.classList.add('opacity-20', 'cursor-not-allowed'); // optional styling
             dateLabel.classList.remove('text-gray-600', 'dark:text-gray-200');
             dateLabel.classList.add('text-gray-200', 'dark:text-gray-600');
@@ -759,7 +850,7 @@ async function viewUpcomingModal(title, type){
       const modal = `
       <div id="view-upcoming-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <!-- Modal Container -->
-            <div class="relative w-full max-w-5xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[50vh]">
+            <div class="relative w-full max-w-5xl mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 animate-fade-in h-[55vh]">
                   <!-- Close Button -->
                   <span id="close-view-upcoming-modal" class="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white text-xl font-semibold transition">&times;</span>
             
@@ -854,7 +945,7 @@ function parseOrReturn(value) {
       if (value instanceof Date && !isNaN(value)) {
           return value; // already a Date
       }
-  
+
       // Check if value is a string and can be parsed as a date
       if (typeof value === "string") {
             const parsed = new Date(value);
@@ -977,16 +1068,25 @@ async function addBooking(e){
             }
 
             if (form.get('booking_status') === 'Reserved') {
-                  if (datePaid < bookDate || datePaid > checkin) {
-                        promoDateWarningMessageCard(
-                              'Warning: Payment date must be between reservation date and checked-in or the same day of reservation and checked-in!'
-                        );
-                        return;
+                  if (form.get('booking_type') === 'Check-in'){
+                        if (datePaid < bookDate || datePaid > checkout) {
+                              promoDateWarningMessageCard(
+                                    'Warning: Payment date must be between reservation date and checked-out or the same day of reservation and checked-out!'
+                              );
+                              return;
+                        }
+                  }else{ // Day Guest - Reserved
+                        if (datePaid < bookDate || datePaid > checkin) {
+                              promoDateWarningMessageCard(
+                                    'Warning: Day Guest payment for reservation must between the day of reservation and checked-out!'
+                              );
+                              return;
+                        }
                   }
             } else { // Checked-in
-                  if (datePaid < checkin || datePaid > checkin) {
+                  if (datePaid < checkin || datePaid > checkout) {
                         promoDateWarningMessageCard(
-                              'Warning: Payment date must be the same to checked-in date!'
+                              'Warning: Payment date must be between checked-in date and checked-out or the same day of reservation and checked-out!'
                         );
                         return;
                   }
@@ -1164,14 +1264,11 @@ async function updateReservationDate(e){
             return;
       }
 
-      if (form.get('edit_checkin') > form.get('edit_checkout')){
-            promoDateWarningMessageCard('Warning: Checked-in date must not greater than checked-out date! ');
-            return;
-      }else if (form.get('edit_checkout') < form.get('edit_checkin')){
-            promoDateWarningMessageCard('Warning: Checkout-in date must not less than checked-in date! ');
+      if (form.get('edit_checkout') < form.get('edit_checkin')){
+            promoDateWarningMessageCard('Warning: Checked-out date must not less than checked-in date! ');
             return;
       }
-      console.log(form.get('edit_checkin'), form.get('date_book'));
+
       if (form.get('status') === 'Reserved'){
             if (form.get('edit_checkin') < form.get('date_book')){
                   promoDateWarningMessageCard('Warning: Checked-in date must not less than the booked date! ');
@@ -1218,95 +1315,161 @@ async function renderViewReservationDetails(id){
             const paid_date = result.data.paid_date ? new Date(result.data.paid_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'}) : '--';
             
             const modal = `
-                  <div id="details-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                        <div class="relative w-full max-w-3xl bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden ">
+                  <div id="details-overlay"
+                  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm">
+
+                        <div class="w-full max-w-4xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
 
                               <!-- Header -->
-                              <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Guest Details</h2>
-                                    <span id="close-details" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 text-2xl font-bold transition cursor-pointer">&times;</span>
+                              <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-gray-700
+                                          bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+                                    <div class="flex items-center gap-4">
+                                          <!-- Guest Icon -->
+                                          <div class="w-12 h-12 rounded-full bg-blue-200 text-white
+                                                      flex items-center justify-center text-xl shadow">
+                                                👤
+                                          </div>
+
+                                          <div>
+                                                <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                                                      ${result.data.name}
+                                                </h2>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                      ${result.data.booking_type === 'Check-in' ? 'Room Stay' : result.data.booking_type}
+                                                      · 
+                                                      <span class="font-medium
+                                                            ${result.data.status === 'Cancelled'
+                                                                  ? 'text-red-600 dark:text-red-400'
+                                                                  : result.data.status === 'Checked-in'
+                                                                        ? 'text-blue-600 dark:text-blue-400' : result.data.status === 'Checked-out'
+                                                                        ? 'text-red-600 dark:text-red-400'
+                                                                        : 'text-green-600 dark:text-green-400'}">
+                                                            ${result.data.status}
+                                                      </span>
+                                                </p>
+                                          </div>
+                                    </div>
+
+                                    <span id="close-details"
+                                          class="text-3xl cursor-pointer text-gray-400 dark:text-gray-300
+                                                hover:text-gray-700 dark:hover:text-white transition ">
+                                          &times;
+                                    </span>
                               </div>
 
-                              <!-- Body -->
-                              <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                              <!-- Content -->
+                              <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+
                                     <!-- Guest Info -->
-                                    <div class="space-y-2 md:col-span-1">
-                                          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Personal Info</h3>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal text-sm">Name</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.name}</div>
+                                    <div class="rounded-xl border border-blue-200 dark:border-blue-800 p-4 space-y-3">
+                                          <h3 class="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                                                Guest Information
+                                          </h3>
+
+                                          <div class="flex justify-between">
+                                                <span class="text-gray-500 dark:text-gray-400">Total Guests</span>
+                                                <span class="font-medium text-gray-900 dark:text-gray-100">${result.data.total_guest}</span>
                                           </div>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Total Guests</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.total_guest}</div>
+
+                                          <div class="flex justify-between">
+                                                <span class="text-gray-500 dark:text-gray-400">Booking Type</span>
+                                                <span class="font-medium text-gray-900 dark:text-gray-100">
+                                                      ${result.data.booking_type === 'Check-in' ? 'Room Stay' : result.data.booking_type}
+                                                </span>
                                           </div>
                                     </div>
 
-                                    <!-- Booking Info -->
-                                    <div class="space-y-2 md:col-span-1">
-                                          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Booking Info</h3>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Booking Type</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.booking_type === 'Check-in' ? 'Room Stay' : result.data.booking_type}</div>
+                                    <!-- Schedule -->
+                                    <div class="rounded-xl border border-indigo-200 dark:border-indigo-800 p-4 space-y-3">
+                                          <h3 class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
+                                                Schedule
+                                          </h3>
+
+                                          <div class="flex justify-between">
+                                                <span class="text-gray-500 dark:text-gray-400">Date Book</span>
+                                                <span class="text-gray-900 dark:text-gray-100">${date_book}</span>
                                           </div>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Status</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.status}</div>
+
+                                          <div class="flex justify-between">
+                                                <span class="text-gray-500 dark:text-gray-400">Check-in</span>
+                                                <span class="text-gray-900 dark:text-gray-100">${check_in}</span>
+                                          </div>
+
+                                          <div class="flex justify-between">
+                                                <span class="text-gray-500 dark:text-gray-400">Check-out</span>
+                                                <span class="text-gray-900 dark:text-gray-100">${check_out}</span>
                                           </div>
                                     </div>
 
-                                    <!-- Schedule Info -->
-                                    <div class="space-y-2 md:col-span-1">
-                                          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Schedule</h3>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Date Book</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${date_book}</div>
+                                    <!-- Payment -->
+                                    <div class="rounded-xl border border-emerald-200 dark:border-emerald-800 p-4 space-y-3">
+                                          <h3 class="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                                                Payment
+                                          </h3>
+
+                                          <div class="flex justify-between">
+                                                <span class="text-gray-500 dark:text-gray-400">Date Paid</span>
+                                                <span class="text-gray-900 dark:text-gray-100">${paid_date}</span>
                                           </div>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Check-in</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${check_in}</div>
+
+                                          <div class="flex justify-between">
+                                                <span class="text-gray-500 dark:text-gray-400">
+                                                      Payment ${result.data.payment === 'None' || result.data.payment === 'Refunded'
+                                                            ? 'Status'
+                                                            : 'Method'}
+                                                </span>
+                                                <span class="font-medium
+                                                      ${result.data.payment === 'Paid'
+                                                            ? 'text-emerald-600 dark:text-emerald-400'
+                                                            : result.data.payment === 'Pending'
+                                                                  ? 'text-amber-600 dark:text-amber-400'
+                                                                  : 'text-gray-900 dark:text-gray-100'}">
+                                                      ${result.data.payment}
+                                                </span>
                                           </div>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Check-out</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${check_out}</div>
+
+                                          <div class="flex justify-between font-semibold">
+                                                <span class="text-gray-700 dark:text-gray-300">
+                                                      ${result.data.status !== "Cancelled" && result.data.payment !== "Pending"
+                                                            ? 'Total Amount Paid'
+                                                            : 'Total Amount to Pay'} (₱)
+                                                </span>
+                                                <span class="text-emerald-600 dark:text-emerald-400">
+                                                      ${result.data.total_amount}
+                                                </span>
                                           </div>
                                     </div>
 
-                                    <!-- Payment Info -->
-                                    <div class="space-y-2 md:col-span-1">
-                                          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Payment</h3>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Date Paid</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${paid_date}</div>
-                                          </div>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Payment ${result.data.payment === 'None' | result.data.payment === "Refunded" ? 'Status' : 'Method'}</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.payment}</div>
-                                          </div>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">${result.data.status !== "Cancelled" && result.data.payment !== "Pending" ? 'Total Amount Paid' : 'Total Amount to Pay'} (₱)</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.total_amount}</div>
-                                          </div>
-                                    </div>
+                                    <!-- Promo -->
+                                    <div class="rounded-xl border border-purple-200 dark:border-purple-800 p-4 space-y-3">
+                                          <h3 class="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                                                Promo Details
+                                          </h3>
 
-                                    <!-- Promo Info -->
-                                    <div class="md:col-span-2 space-y-2">
-                                          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Promo & Areas Affected</h3>
                                           <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Promo Name</p>
-                                                <div class="max-h-20 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.promo}</div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Promo Name</p>
+                                                <p class="text-gray-900 dark:text-gray-100">${result.data.promo}</p>
                                           </div>
+
                                           <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Area Affected</p>
-                                                <div class="max-h-20 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.promo_area.split(',').map(acc => acc.trim()).join(', ')}</div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Area Affected</p>
+                                                <p class="text-gray-900 dark:text-gray-100">
+                                                      ${result.data.promo_area.split(',').map(a => a.trim()).join(', ')}
+                                                </p>
                                           </div>
                                     </div>
 
                                     <!-- Accommodations -->
-                                    <div class="md:col-span-2 space-y-2">
-                                          <h3 class="text-sm font-normal text-gray-700 dark:text-gray-300">Accommodations</h3>
-                                          <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${result.data.accomodations.split(',').map(acc => acc.trim()).join(', ')}</div>
+                                    <div class="md:col-span-2 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-2">
+                                          <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                Accommodations
+                                          </h3>
+
+                                          <div class="max-h-32 overflow-y-auto text-gray-900 dark:text-gray-100">
+                                                ${result.data.accomodations.split(',').map(a => a.trim()).join(', ')}
+                                          </div>
                                     </div>
+
                               </div>
                         </div>
                   </div>
@@ -1337,7 +1500,7 @@ async function generateAvlAccomodation(accomodation){
       document.querySelectorAll('#avl-accomodations label').forEach(label => label.remove());
       let room_name = accomodation.split(' ');
       let rooms = [];
-      
+
       const { name, capacity } = areaTypeInfo(accomodation.split(' ')[0].toLowerCase());
       if (accomodation === 'Hall'){
             document.querySelector('#occupancy-title').classList.add('hidden');
@@ -1635,7 +1798,7 @@ async function searchGuest(e){
       if (result.success){
             hideLoader();
             result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['date_book'], row['checkin'], row['checkout'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
+                  createTable(row['id'], row['name'], row['date_book'], row['check_in'], row['check_out'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             hideLoader();
@@ -1652,13 +1815,8 @@ async function searchGuest(e){
 async function upcomingData(type, day_type) {
       document.querySelector('#upcoming-table2').querySelectorAll('tbody tr').forEach(row => row.remove());
       loadingAnimationUpcoming();
-      let url = null;
-      if (type === 'checkout'){
-            url = `/upcoming-checkout?day=${day_type}`;
-      }else{
-            url = `/upcoming-arrival?day=${day_type}`;
-      }
-      const response = await fetch(url);
+      
+      const response = await fetch(`/upcoming-bookings?book_type=${type}&day=${day_type}`);
       const res = await response.json();
 
       if (res.success){
@@ -1700,7 +1858,7 @@ async function upcomingData(type, day_type) {
             hideLoader();
             const empty_row = `
                   <tr class="text-sm hover:bg-black/5 bg-gray-50 dark:bg-white/3 dark:hover:bg-white/5 transition-all text-gray-600 border-b border-gray-300 dark:border-gray-700 dark:text-white fade-in-up py-2">
-                        <td colspan="6" class="text-center text-gray-800  dark:text-white py-2 ">No data.</td>
+                        <td colspan="6" class="text-center text-gray-800  dark:text-white py-2 ">${day_type === 'checkout' ? 'No scheduled check-outs yet' : 'No scheduled arrivals yet'}.</td>
                   </tr>
             `;
 

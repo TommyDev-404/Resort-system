@@ -398,18 +398,6 @@ class Reservation:
                   con.rollback()
                   return {'success': False, 'message': f'Cancellation failed: {e}'}
 
-      def arrivals(self):
-            try:
-                  with self.db.connect() as con:
-                        cursor = con.cursor()
-                        cursor.execute(''' SELECT COALESCE(COUNT(booking_id), 0) as arrivals FROM bookings where status IN ('Reserved') AND check_in > CURRENT_DATE() ''')
-                        data = cursor.fetchone()
-
-                        return {'upcoming_checkin': data.get('arrivals')}
-            except Exception as e:
-                  con.rollback()
-                  return { 'success': False, 'message': f'Cancellation failed: {e}'}
-
       def get_year_data(self):
             try:
                   with self.db.connect() as con:
@@ -908,22 +896,7 @@ class Reservation:
 
                         new_data = []
                         for d in data: 
-                              formatted_checkin  = d.get('check_in').strftime("%b %d").lstrip("0")  
-                              formatted_checkout = d.get('check_out').strftime("%b %d").lstrip("0")    
-                              formatted_date     = d.get('date_book').strftime("%b %d").lstrip("0") if d.get('date_book') else '--'
-
-                              new_data.append({
-                                    'id': d.get('booking_id'),
-                                    'name': d.get('name'),
-                                    'date_book': formatted_date,
-                                    'checkin': formatted_checkin,
-                                    'checkout': formatted_checkout,
-                                    'accomodations': d.get('accomodations'),
-                                    'booking_type': d.get('booking_type'),
-                                    'status': d.get('status'),
-                                    'stay': d.get('stay_gap'),
-                                    'payment': d.get('payment')
-                              })
+                              new_data.append({'booking_id': d.get('booking_id'), 'name': d.get('name'),  'date_book': d.get('date_book') , 'check_in': d.get('check_in'), 'check_out': d.get('check_out'), 'accomodations': d.get('accomodations'), 'booking_type': d.get('booking_type'), 'status': d.get('status'), 'stay': d.get('stay_gap'), 'payment': d.get('payment')})
 
                         return {'success': bool(new_data), 'data': new_data}
 
