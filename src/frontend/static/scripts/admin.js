@@ -71,13 +71,13 @@ function renderCodeModal(){
             <div id="codeModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in-up">
                   <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 w-90 max-w-full">
                         <h2 class="text-xl font-bold mb-4 text-center text-gray-900 dark:text-white">Enter 6-Digit Code</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-6 gap-2 mt-2 mb-4">
-                              <input id="codeInput1" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput2" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput3" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput4" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput5" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
-                              <input id="codeInput6" type="text" maxlength="1" class="w-full p-2 text-gray-900 dark:text-white border border-gray-300 rounded-md text-center text-lg tracking-widest" />
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-2 mt-2 mb-4">     
+                              <input type="text" id="codeInput1" inputmode="numeric" maxlength="1" class="w-full p-2 text-center text-lg text-black dark:text-white border border-gray-700 dark:border-gray-400  rounded-lg" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
+                              <input type="text" id="codeInput2" inputmode="numeric" maxlength="1" class="w-full p-2 text-center text-lg text-black dark:text-white border border-gray-700 dark:border-gray-400 rounded-lg" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
+                              <input type="text" id="codeInput3" inputmode="numeric" maxlength="1" class="w-full p-2 text-center text-lg text-black dark:text-white border border-gray-700 dark:border-gray-400  rounded-lg" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
+                              <input type="text" id="codeInput4" inputmode="numeric" maxlength="1" class="w-full p-2 text-center text-lg text-black dark:text-white border border-gray-700 dark:border-gray-400 rounded-lg" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
+                              <input type="text" id="codeInput5" inputmode="numeric" maxlength="1" class="w-full p-2 text-center text-lg text-black dark:text-white border border-gray-700 dark:border-gray-400 rounded-lg" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
+                              <input type="text" id="codeInput6" inputmode="numeric" maxlength="1" class="w-full p-2 text-center text-lg text-black dark:text-white border border-gray-700 dark:border-gray-400 rounded-lg" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
                         </div>
                         <div class="mt-4 flex justify-end gap-2 ">
                               <button id="closeCode" class="px-4 py-2 bg-gray-600 dark:bg-white/15 dark:hover:bg-white/10 rounded-lg hover:bg-gray-500">Cancel</button>
@@ -119,12 +119,14 @@ async function changePassv2(e) {
 
       if (result.success){
             successToast('Password updated successfully!');
+            adminProfile();
             document.querySelector('#codeModal').remove();
       }else{
             failedToast('Failed! Something went wrong.');
       }
 }
 
+// change the pass where user enter the current pass
 async function changePass(e) {
       e.preventDefault();
 

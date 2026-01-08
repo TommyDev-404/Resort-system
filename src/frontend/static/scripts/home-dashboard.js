@@ -526,7 +526,7 @@ async function drawBookingStats() {
           bookingTypeChart = new Chart(ctx, {
               type: 'pie',
               data: {
-                  labels: ["Room Stay", "Day Guest"],
+                  labels: ["Overnight", "Day Guest"],
                   datasets: [{
                       data: [res.booking_type_distribution.checkin_total, res.booking_type_distribution.day_guest_total],
                       backgroundColor: ["#3b82f6", "#eab308"]

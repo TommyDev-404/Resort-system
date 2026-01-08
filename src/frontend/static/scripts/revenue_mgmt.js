@@ -88,7 +88,7 @@ function toDateOnly(value) {
       return d;
 }
 
-
+// async functions
 async function applyPromo(e) {
       e.preventDefault();
       const form = new FormData(e.target);
@@ -230,11 +230,12 @@ async function getAllPromo() {
 }
 
 async function renderViewPromoDetails(id){
+      showLoader('Retrieving promo details...');
       const response = await fetch(`/get-promo?id=${id}`);
       const result = await response.json();
       
-      showLoader('Retrieving promo details...');
       if (result.success){
+            
             const data = result.data;
             const start = new Date(data.date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
             const end = new Date(data.end_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
@@ -265,51 +266,91 @@ async function renderViewPromoDetails(id){
 
             const modal = `
                   <div id="promo-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                        <div class="relative w-full max-w-3xl bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden ">
+                  <div class="relative w-full max-w-3xl bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden">
 
-                              <!-- Header -->
-                              <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">${data.name.split('-')[0].trim()} Details</h2>
-                                    <span id="close-promo" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 text-2xl font-bold transition cursor-pointer">&times;</span>
-                              </div>
-
-                              <!-- Body -->
-                              <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                    <div class="space-y-2 md:col-span-1">
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal text-sm">Promo Name</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${data.name.split('-')[0].trim()}</div>
-                                          </div>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Discount (%)</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${data.discount}</div>
-                                          </div>
-                                    </div>
-
-                                    <!-- Schedule Info -->
-                                    <div class="space-y-2 md:col-span-1">
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">Started</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${start}</div>
-                                          </div>
-                                          <div>
-                                                <p class="text-gray-600 dark:text-gray-400 font-normal">End</p>
-                                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${end}</div>
-                                          </div>
-                                    </div>
-                                    
-                                    <div class="md:col-span-2 space-y-2">
-                                          <h3 class="text-sm font-normal text-gray-700 dark:text-gray-300">Status</h3>
-                                          <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${data.status}</div>
-                                    </div>
-
-                                    <!-- Accommodations -->
-                                    <div class="md:col-span-2 space-y-2">
-                                          <h3 class="text-sm font-normal text-gray-700 dark:text-gray-300">Area Applied</h3>
-                                          <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-black dark:text-white">${area_affected}</div>
-                                    </div>
-                              </div>
+                  <!-- Header -->
+                  <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <div>
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                        ${data.name.split('-')[0].trim()} Details
+                        </h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Promotion information overview
+                        </p>
                         </div>
+                        <span id="close-promo"
+                        class="text-gray-400 dark:text-gray-300 hover:text-red-500 text-2xl font-bold transition cursor-pointer">
+                        &times;
+                        </span>
+                  </div>
+
+                  <!-- Body -->
+                  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+
+                        <!-- Promo Info -->
+                        <div class="space-y-4">
+                        <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                              Promo Name
+                        </p>
+                        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 font-medium text-gray-900 dark:text-white">
+                              ${data.name.split('-')[0].trim()}
+                        </div>
+                        </div>
+
+                        <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                              Discount (%)
+                        </p>
+                        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 font-medium text-gray-900 dark:text-white">
+                              ${data.discount}
+                        </div>
+                        </div>
+                        </div>
+
+                        <!-- Schedule Info -->
+                        <div class="space-y-4">
+                        <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                              Started
+                        </p>
+                        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white">
+                              ${start}
+                        </div>
+                        </div>
+
+                        <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                              End
+                        </p>
+                        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white">
+                              ${end}
+                        </div>
+                        </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="md:col-span-2 space-y-2">
+                        <h3 class="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                        Status
+                        </h3>
+                        <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white">
+                        ${data.status}
+                        </div>
+                        </div>
+
+                        <!-- Area Applied -->
+                        <div class="md:col-span-2 space-y-2">
+                        <h3 class="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                        Area Applied
+                        </h3>
+                        <div class="max-h-28 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white">
+                        ${area_affected}
+                        </div>
+                        </div>
+
+                  </div>
+                  </div>
                   </div>
             `;
 
@@ -464,10 +505,23 @@ document.addEventListener('submit', (e) => {
 });
 
 // click
+let isUpdateOpen = false;
 document.addEventListener('click', (e) => {     
       if(e.target.closest('#viewPromoInfo')) renderViewPromoDetails(e.target.closest('li').getAttribute('data-id'));
       if(e.target.closest('#removePromoInfo')) removePromo(e);
-      if(e.target.closest('#updatePromoInfo')) renderDataToUpdatePromo(e);
+      if(e.target.closest('#updatePromoInfo')){
+            const btn = e.target.closest('#updatePromoInfo');
+            
+            if (!btn) return;
+            if (!isUpdateOpen) {
+                // First click → show & populate
+                  renderDataToUpdatePromo(e);
+            } else {
+                  resetToAddPromoForm();
+            }
+
+            isUpdateOpen = !isUpdateOpen;
+      }
       if(e.target.closest('#close-promo')) document.querySelector('#promo-overlay').remove();
 });
 

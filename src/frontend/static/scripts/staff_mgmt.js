@@ -915,7 +915,7 @@ async function addStaffAttendance(e){
       });
 
       if (!isValidTimeIn(time_in, date)) {
-            promoDateWarningMessageCard('Invalid time-in. Allowed only before 6-8 AM and 12-1 PM.');
+            promoDateWarningMessageCard('Invalid time-in! Allowed are 6-8 AM and 12-1 PM for time-in.');
             return;
       }
 
@@ -982,7 +982,7 @@ async function updateStaffAttendance(e){
       });
 
       if (!isValidTimeout(time_outs, data[0].date, data[0].time_in)) {
-            promoDateWarningMessageCard('Invalid time-out. Time-out is allowed only between 12:00–1:00 PM for morning time-in, or from 4:30 PM onwards for both morning and afternoon time-ins.');
+            promoDateWarningMessageCard('Invalid time-out! Time-out is allowed only between 12:00–1:00 PM for morning time-in, or from 4:30 PM onwards for both morning and afternoon time-ins.');
             return;
       }
 
@@ -1228,6 +1228,7 @@ async function removeStaff(id){
                   if (result.success){
                         hideLoader();
                         successToast(result.message);
+                        allStaffAttendance();
                         showAllStaff();
                         sumarryCards();
                   }else{

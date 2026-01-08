@@ -58,8 +58,8 @@ class RevenueMgmt:
                               SELECT booking_id, accomodations, check_in, check_out, booking_type
                               FROM bookings
                               WHERE status NOT IN ('Cancelled')
-                              AND check_out >= %s
-                        ''', (promo_start))
+                              AND check_out >= %s 
+                        ''', (promo_start,))
                         bookings = cursor.fetchall()
 
                         if bookings:
@@ -76,19 +76,6 @@ class RevenueMgmt:
 
                               if affected:
                                     for ba in bookings:
-                                          if ba['check_in'] >= promo_start:
-                                                cursor.execute('''
-                                                      UPDATE bookings
-                                                      SET promo = %s,
-                                                      promo_area = %s
-                                                      WHERE booking_id = %s
-                                                ''', (
-                                                      f"{promo_label} discount",
-                                                      ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
-                                                      ba['booking_id']
-                                                ))
-                                                con.commit()
-                                          
                                           # Recalculate booking totals safely
                                           self.reservation_model.update_reservation_date(
                                                 ba['booking_id'],
@@ -182,7 +169,7 @@ class RevenueMgmt:
                               SELECT booking_id, accomodations, check_in, check_out, booking_type
                               FROM bookings
                               WHERE status NOT IN ('Cancelled')
-                              AND check_out >= %s
+                              AND check_out >= %s 
                         ''', (promo_start))
                         bookings = cursor.fetchall()
 
@@ -200,39 +187,9 @@ class RevenueMgmt:
                               area_name = area.split(' ')[0].strip()
                               if area_name in new_areas:
                                     affected.append(area)
-                                    
+
                         if affected:
                               for ba in bookings:
-                                    if ba['check_out'] > promo_start:
-                                          if ba['check_in'] >= promo_start:
-                                                area = [a.strip() for a in ba['accomodations'].split(',')]
-                                                if any(a in affected for a in area):
-
-                                                      cursor.execute('''
-                                                            UPDATE bookings
-                                                            SET promo = %s,
-                                                            promo_area = %s
-                                                            WHERE booking_id = %s
-                                                      ''', (
-                                                            f"{promo_label} discount",
-                                                            ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
-                                                            ba['booking_id']
-                                                      ))
-                                                      con.commit()
-
-                                    if ba['booking_type'] == 'Day Guest':
-                                                cursor.execute('''
-                                                      UPDATE bookings
-                                                      SET promo = %s,
-                                                      promo_area = %s
-                                                      WHERE booking_id = %s
-                                                ''', (
-                                                      f"{promo_label} discount",
-                                                      ','.join([a for a in ba['accomodations'].split(',') if a.strip() in affected]),
-                                                      ba['booking_id']
-                                                ))
-                                                con.commit()
-
                                     # Recalculate booking totals safely
                                     self.reservation_model.update_reservation_date(
                                           ba['booking_id'],
@@ -240,6 +197,8 @@ class RevenueMgmt:
                                           str(ba['check_out']),
                                           ba['booking_type']
                                     )
+
+
 
                         return {
                               'success': promo_updated,
@@ -272,7 +231,7 @@ class RevenueMgmt:
                                     cursor.execute(query, ['None', *areas_list])
                                     con.commit()
 
-                                    cursor.execute(''' SELECT booking_id, accomodations, check_in, check_out, booking_type FROM bookings WHERE check_out >= %s ''', (promo_data.get('date'),))
+                                    cursor.execute(''' SELECT booking_id, accomodations, check_in, check_out, booking_type FROM bookings WHERE check_out >= %s''', (promo_data.get('date')))
                                     booking_data = cursor.fetchall()
 
                                     for data in booking_data:
@@ -292,9 +251,8 @@ class RevenueMgmt:
                                                 ('No promo.', 'No accomodations under promo.', bid))
                                                 con.commit()
 
-                                          self.reservation_model.update_reservation_date(bid, str(data.get('check_in')), str(data.get('check_out')), data.get('booking_type'))
-                        else:
-                              print('promo not today')
+                                          self.reservation_model.update_reservation_date(bid, str(data.get('check_in')), str(data.get('check_out')), data.get('booking_type'), 'remove')
+                        
                         cursor.execute(''' DELETE FROM promos WHERE id = %s''', (id))
                         con.commit()
 

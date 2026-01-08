@@ -83,17 +83,16 @@ class Analytics:
                   monthly_data = cursor.fetchone()
 
                   # --------- Target Revenue ---------
-                  if accomodation_type != all:
+                  if accomodation_type != 'all':
                         area_targets = {
-                        'premium': 100000,
-                        'standard': 90000,
-                        'garden': 120000,
+                        'premium': 100210,
+                        'standard': 91300,
+                        'garden': 120900,
                         'barkada': 80000,
-                        'family': 95000,
-                        'cabana': 75000,
-                        'big': 70000,
-                        'small': 50000,
-                        'hall': 80000
+                        'cabana': 72190,
+                        'big': 77600,
+                        'small': 53280,
+                        'hall': 110580
                         }
                         target_value = area_targets.get(accomodation_type.lower(), 0)
                   else:
@@ -108,9 +107,9 @@ class Analytics:
                               SELECT ROUND(AVG(monthly_revenue),2) AS target_revenue FROM monthly_data;
                         """)
                         target_value = cursor.fetchone().get('target_revenue')
-
+                        
                   monthly_change_rate = round((int(monthly_data.get('revenue')) / int(target_value)) * 100, 2) if target_value else 0
-
+                  print(target_value)
                   return {
                         'occupancy': {
                         'current': occ_data.get('current_occupancy'),
