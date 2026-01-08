@@ -1798,7 +1798,7 @@ async function searchGuest(e){
       if (result.success){
             hideLoader();
             result.data.forEach(row => {
-                  createTable(row['id'], row['name'], row['date_book'], row['check_in'], row['check_out'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
+                  createTable(row['booking_id'], row['name'], row['date_book'], row['check_in'], row['check_out'], row['stay'], row['accomodations'], row['booking_type'], row['status'], row['payment']);
             });
       }else {
             hideLoader();
